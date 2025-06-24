@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to basic-open-agent-tools! This guide will help you get started.
+Thank you for your interest in contributing to basic-open-agent-tools! This toolkit provides essential functions for AI agent frameworks, and this guide will help you get started with development.
 
 ## Development Setup
 
@@ -96,7 +96,7 @@ basic-open-agent-tools/
 │   │   ├── info.py              # File information utilities
 │   │   ├── tree.py              # Directory tree operations
 │   │   └── validation.py        # Path validation
-│   ├── http/                     # HTTP tools (planned)
+│   ├── network/                  # Network tools (planned)
 │   ├── text/                     # Text processing (planned)
 │   ├── data/                     # Data utilities (planned)
 │   ├── system/                   # System tools (planned)
@@ -108,15 +108,39 @@ basic-open-agent-tools/
 └── pyproject.toml               # Package configuration
 ```
 
+## Agent Toolkit Design Philosophy
+
+This project is specifically designed to provide **tool functions for AI agents**. Key principles:
+
+### Function-First Design
+- Each function is designed to work as an individual agent tool
+- Functions have clear, descriptive names suitable for AI interpretation
+- Parameters and return values are optimized for agent framework integration
+- Comprehensive docstrings help AI understand function purpose and usage
+
+### Agent Framework Integration
+Functions are designed to work with various agent frameworks:
+- **Google ADK** - Direct function imports in tools list
+- **LangChain** - Functions can be wrapped with StructuredTool
+- **Custom Agents** - Direct function integration
+- **MCP Servers** - Adaptable for Model Context Protocol
+
+### Import Patterns
+- **Individual function imports** (preferred for agents)
+- **Module imports** (for direct developer usage)
+- **Clear separation** between agent tools and developer utilities
+
 ## Contributing Guidelines
 
-### Code Style
+### Code Style for Agent Tools
 
 - Follow PEP 8 style guidelines
 - Use type hints for all function parameters and return values
-- Write docstrings for all public functions and classes
-- Keep functions focused and single-purpose
-- Use descriptive variable and function names
+- Write comprehensive docstrings for all public functions and classes
+- Keep functions focused and single-purpose (optimal for agent tools)
+- Use descriptive variable and function names that agents can understand
+- Design function signatures to be clear for AI interpretation
+- Ensure functions are stateless and thread-safe where possible
 
 ### Documentation
 
@@ -139,36 +163,46 @@ basic-open-agent-tools/
 - Handle edge cases gracefully
 - Document expected exceptions in docstrings
 
-## Adding New Modules
+## Adding New Agent Tool Modules
 
 ### 1. Choose the Right Category
 
 The project is organized into these categories:
 - `file_system` - File and directory operations (implemented)
-- `http` - HTTP requests and web utilities (planned)
+- `network` - Network utilities and validation (planned)
 - `text` - Text processing and manipulation (planned)
 - `data` - Data parsing and conversion (planned)
 - `system` - System information and processes (planned)
 - `crypto` - Cryptographic utilities (planned)
 - `utilities` - Common helpers and utilities (planned)
 
-### 2. Follow the Module Pattern
+### 2. Follow the Agent Tool Pattern
 
-Each module should:
-- Have a clear, focused purpose
-- Include comprehensive docstrings
-- Use type hints throughout
-- Handle errors appropriately
-- Include unit tests
-- Follow the existing code style
+Each module should provide functions that work well as agent tools:
+- **Clear, focused purpose** - Each function does one thing well
+- **Agent-friendly names** - Descriptive function names that AI can understand
+- **Comprehensive docstrings** - Help AI understand function purpose and usage
+- **Type hints throughout** - Clear parameter and return types
+- **Appropriate error handling** - Consistent exception patterns
+- **Individual function exports** - Functions can be imported individually
+- **Stateless design** - Functions don't rely on external state
+- **Thread-safe operations** - Safe for concurrent agent usage
 
-### 3. Update Package Exports
+### 3. Agent Integration Testing
+
+When adding new functions, test them with agent frameworks:
+- Test individual function imports
+- Verify function signatures work with agent tools
+- Test error handling in agent contexts
+- Ensure docstrings provide clear guidance for AI
+
+### 4. Update Package Exports
 
 When adding new modules:
 1. Update `src/basic_open_agent_tools/__init__.py`
 2. Add appropriate exports to module's `__init__.py`
-3. Update documentation
-4. Add tests
+3. Update documentation with agent usage examples
+4. Add tests including agent integration patterns
 
 ## Pull Request Process
 
