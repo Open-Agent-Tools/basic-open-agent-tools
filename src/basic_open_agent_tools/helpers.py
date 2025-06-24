@@ -3,7 +3,7 @@
 import inspect
 from typing import Any, Callable, Dict, List, Union
 
-from . import file_system, text
+from . import data, file_system, text
 
 
 def load_all_filesystem_tools() -> List[Callable[..., Any]]:
@@ -44,6 +44,90 @@ def load_all_text_tools() -> List[Callable[..., Any]]:
     # Get all functions from text module
     for name in text.__all__:
         func = getattr(text, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
+def load_all_data_tools() -> List[Callable[..., Any]]:
+    """Load all data processing tools as a list of callable functions.
+
+    Returns:
+        List of all data processing tool functions
+
+    Example:
+        >>> data_tools = load_all_data_tools()
+        >>> len(data_tools) > 0
+        True
+    """
+    tools = []
+
+    # Get all functions from data module
+    for name in data.__all__:
+        func = getattr(data, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
+def load_data_json_tools() -> List[Callable[..., Any]]:
+    """Load JSON processing tools as a list of callable functions.
+
+    Returns:
+        List of JSON processing tool functions
+
+    Example:
+        >>> json_tools = load_data_json_tools()
+        >>> len(json_tools) == 5
+        True
+    """
+    from .data import json_tools
+
+    tools = []
+    json_function_names = [
+        "safe_json_serialize",
+        "safe_json_deserialize",
+        "validate_json_string",
+        "compress_json_data",
+        "decompress_json_data",
+    ]
+
+    for name in json_function_names:
+        func = getattr(json_tools, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
+def load_data_csv_tools() -> List[Callable[..., Any]]:
+    """Load CSV processing tools as a list of callable functions.
+
+    Returns:
+        List of CSV processing tool functions
+
+    Example:
+        >>> csv_tools = load_data_csv_tools()
+        >>> len(csv_tools) == 7
+        True
+    """
+    from .data import csv_tools
+
+    tools = []
+    csv_function_names = [
+        "read_csv_file",
+        "write_csv_file",
+        "csv_to_dict_list",
+        "dict_list_to_csv",
+        "detect_csv_delimiter",
+        "validate_csv_structure",
+        "clean_csv_data",
+    ]
+
+    for name in csv_function_names:
+        func = getattr(csv_tools, name)
         if callable(func):
             tools.append(func)
 
@@ -149,4 +233,5 @@ def list_all_available_tools() -> Dict[str, List[Dict[str, Any]]]:
     return {
         "file_system": [get_tool_info(tool) for tool in load_all_filesystem_tools()],
         "text": [get_tool_info(tool) for tool in load_all_text_tools()],
+        "data": [get_tool_info(tool) for tool in load_all_data_tools()],
     }

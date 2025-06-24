@@ -143,18 +143,20 @@ class TestHelperFunctions:
         # Load the same tools multiple times
         fs_tools_1 = load_all_filesystem_tools()
         fs_tools_2 = load_all_filesystem_tools()
-        
+
         # Merge with duplicates
         merged = merge_tool_lists(fs_tools_1, fs_tools_2)
-        
+
         # Should have same length as single load (duplicates removed)
         assert len(merged) == len(fs_tools_1)
-        
+
         # Check that no function name appears twice
         function_names = [tool.__name__ for tool in merged]
         unique_names = set(function_names)
-        assert len(function_names) == len(unique_names), "Found duplicate function names"
-        
+        assert len(function_names) == len(unique_names), (
+            "Found duplicate function names"
+        )
+
         # Should still contain all expected functions
         expected_names = [tool.__name__ for tool in fs_tools_1]
         for name in expected_names:
@@ -162,20 +164,21 @@ class TestHelperFunctions:
 
     def test_merge_tool_lists_different_modules_same_name(self):
         """Test handling of functions with same name from different modules."""
+
         # Create two functions with the same name but different modules
         def test_function():
             return "first"
-        
+
         def another_test_function():
             return "second"
-        
+
         # Manually set different module names to simulate different sources
         test_function.__module__ = "module1"
         another_test_function.__module__ = "module2"
         another_test_function.__name__ = "test_function"  # Same name as first
-        
+
         merged = merge_tool_lists([test_function], [another_test_function])
-        
+
         # Should keep both since they're from different modules
         assert len(merged) == 2
         assert test_function in merged
