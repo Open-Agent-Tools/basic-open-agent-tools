@@ -22,13 +22,13 @@ import warnings
 from dotenv import load_dotenv
 from google.adk.agents import Agent
 from google.adk.models.lite_llm import LiteLlm
-from basic_open_agent_tools.file_system.operations import (
-    append_to_file, copy_file, create_directory, delete_directory, delete_file,
-    list_directory_contents, move_file, read_file_to_string, write_file_from_string,
-)
-from basic_open_agent_tools.file_system.info import (
-    directory_exists, file_exists, get_file_info, get_file_size, is_empty_directory,
-)
+
+import basic_open_agent_tools as boat
+
+fs_tools = boat.load_all_filesystem_tools()
+text_tools = boat.load_all_text_tools()
+agent_tools = boat.merge_tool_lists(fs_tools, text_tools)
+
 
 load_dotenv()
 
@@ -52,13 +52,45 @@ file_ops_agent = Agent(
     name="FileOps",
     instruction=agent_instruction,
     description="Specialized file and directory operations sub-agent for the Python developer.",
-    tools=[
-        append_to_file, copy_file, create_directory, delete_directory, delete_file,
-        directory_exists, file_exists, get_file_info, get_file_size, is_empty_directory,
-        list_directory_contents, move_file, read_file_to_string, write_file_from_string,
-    ],
+    tools=agent_tools,
 )
 
+"""
+The above would load:
+File and Directory Operations:
+
+read_file_to_string
+write_file_from_string
+append_to_file
+list_directory_contents
+create_directory
+delete_file
+delete_directory
+move_file
+copy_file
+get_file_info
+file_exists
+directory_exists
+get_file_size
+is_empty_directory
+list_all_directory_contents
+generate_directory_tree
+validate_path
+validate_file_content
+Text Processing Tools:
+
+clean_whitespace
+normalize_line_endings
+strip_html_tags
+normalize_unicode
+to_snake_case
+to_camel_case
+to_title_case
+smart_split_lines
+extract_sentences
+join_with_oxford_comma
+
+"""
 
 ```
 
