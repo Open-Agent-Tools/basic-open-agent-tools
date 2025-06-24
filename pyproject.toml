@@ -1,16 +1,15 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "basic-open-agent-tools"
 dynamic = ["version"]
 description = "An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions."
 readme = "README.md"
-license = {file = "LICENSE"}
 requires-python = ">=3.8"
 authors = [
-    { name = "Open Agent Tools", email = "info@openagenttools.org" },
+    { name = "Open Agent Tools", email = "unseriousai@gmail.com" },
 ]
 keywords = [
     "ai",
@@ -22,7 +21,6 @@ keywords = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
@@ -54,19 +52,11 @@ test = [
     "pytest-cov>=4.0.0",
 ]
 
-[tool.hatch.version]
-path = "src/basic_open_agent_tools/__init__.py"
+[tool.setuptools.dynamic]
+version = {attr = "basic_open_agent_tools.__version__"}
 
-[tool.hatch.build.targets.sdist]
-include = [
-    "/src",
-    "/tests",
-    "/README.md",
-    "/LICENSE",
-]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/basic_open_agent_tools"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.ruff]
 target-version = "py38"
