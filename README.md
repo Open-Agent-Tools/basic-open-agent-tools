@@ -27,10 +27,10 @@ import basic_open_agent_tools as boat
 # Load tools by category
 fs_tools = boat.load_all_filesystem_tools()    # 18 functions
 text_tools = boat.load_all_text_tools()       # 10 functions
-# data_tools = boat.load_all_data_tools()     # Coming in Phase 1
+data_tools = boat.load_all_data_tools()       # 28 functions (Phase 1 ✅)
 
 # Merge for agent use (automatically deduplicates)
-agent_tools = boat.merge_tool_lists(fs_tools, text_tools)
+agent_tools = boat.merge_tool_lists(fs_tools, text_tools, data_tools)
 
 
 load_dotenv()
@@ -118,12 +118,17 @@ Text Processing Tools:
 - Smart text splitting and sentence extraction
 - HTML tag removal and Unicode normalization
 
-### Data Tools 📋 (Planned - 5 Phases)
-**Phase 1 (MVP)**: Data structures, JSON serialization, basic validation (21 functions)
-**Phase 2**: CSV processing, object serialization (11 functions)  
-**Phase 3**: Configuration files (YAML/TOML/INI), data transformation (16 functions)
-**Phase 4**: Binary data, archives, streaming (18 functions)
-**Phase 5**: Caching, database processing (13 functions)
+### Data Tools ✅ (28 functions - Phase 1 Complete)
+**Phase 1 ✅**: Data structures, JSON/CSV processing, validation (28 functions)
+- Data structure manipulation (flatten, merge, nested access)
+- JSON serialization with compression and validation  
+- CSV file processing and data cleaning
+- Schema validation and data type checking
+
+**Phase 2 📋**: Object serialization, configuration files (15 functions)
+**Phase 3 📋**: Data transformation, YAML/TOML support (16 functions)  
+**Phase 4 📋**: Binary data, archives, streaming (18 functions)
+**Phase 5 📋**: Caching, database processing (13 functions)
 
 ### Future Modules 🚧
 - **Network Tools** - HTTP utilities, API helpers

@@ -20,6 +20,8 @@ from .helpers import (
     load_all_text_tools,
     load_data_csv_tools,
     load_data_json_tools,
+    load_data_structure_tools,
+    load_data_validation_tools,
     merge_tool_lists,
 )
 
@@ -49,6 +51,8 @@ __all__: List[str] = [
     "load_all_data_tools",
     "load_data_json_tools",
     "load_data_csv_tools",
+    "load_data_structure_tools",
+    "load_data_validation_tools",
     "merge_tool_lists",
     "get_tool_info",
     "list_all_available_tools",
