@@ -1,7 +1,7 @@
 """Helper functions for loading and managing tool collections."""
 
 import inspect
-from typing import Any, Callable, List, Union
+from typing import Any, Callable, Dict, List, Union
 
 from . import file_system, text
 
@@ -30,10 +30,10 @@ def load_all_filesystem_tools() -> List[Callable[..., Any]]:
 
 def load_all_text_tools() -> List[Callable[..., Any]]:
     """Load all text processing tools as a list of callable functions.
-    
+
     Returns:
         List of all text processing tool functions
-        
+
     Example:
         >>> text_tools = load_all_text_tools()
         >>> len(text_tools) > 0
@@ -50,18 +50,20 @@ def load_all_text_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def merge_tool_lists(*args: Union[List[Callable[..., Any]], Callable[..., Any]]) -> List[Callable[..., Any]]:
+def merge_tool_lists(
+    *args: Union[List[Callable[..., Any]], Callable[..., Any]],
+) -> List[Callable[..., Any]]:
     """Merge multiple tool lists and individual functions into a single list.
-    
+
     Args:
         *args: Tool lists (List[Callable]) and/or individual functions (Callable)
-        
+
     Returns:
         Combined list of all tools
-        
+
     Raises:
         TypeError: If any argument is not a list of callables or a callable
-        
+
     Example:
         >>> def custom_tool(x): return x
         >>> fs_tools = load_all_filesystem_tools()
@@ -80,23 +82,27 @@ def merge_tool_lists(*args: Union[List[Callable[..., Any]], Callable[..., Any]])
             # List of functions
             for item in arg:
                 if not callable(item):
-                    raise TypeError(f"All items in tool lists must be callable, got {type(item)}")
+                    raise TypeError(
+                        f"All items in tool lists must be callable, got {type(item)}"
+                    )
                 merged.append(item)
         else:
-            raise TypeError(f"Arguments must be callable or list of callables, got {type(arg)}")
+            raise TypeError(
+                f"Arguments must be callable or list of callables, got {type(arg)}"
+            )
 
     return merged
 
 
-def get_tool_info(tool: Callable[..., Any]) -> dict:
+def get_tool_info(tool: Callable[..., Any]) -> Dict[str, Any]:
     """Get information about a tool function.
-    
+
     Args:
         tool: The tool function to inspect
-        
+
     Returns:
         Dictionary containing tool information (name, docstring, signature)
-        
+
     Example:
         >>> from basic_open_agent_tools.text import clean_whitespace
         >>> info = get_tool_info(clean_whitespace)
@@ -109,20 +115,20 @@ def get_tool_info(tool: Callable[..., Any]) -> dict:
     sig = inspect.signature(tool)
 
     return {
-        'name': tool.__name__,
-        'docstring': tool.__doc__ or '',
-        'signature': str(sig),
-        'module': getattr(tool, '__module__', 'unknown'),
-        'parameters': list(sig.parameters.keys())
+        "name": tool.__name__,
+        "docstring": tool.__doc__ or "",
+        "signature": str(sig),
+        "module": getattr(tool, "__module__", "unknown"),
+        "parameters": list(sig.parameters.keys()),
     }
 
 
-def list_all_available_tools() -> dict:
+def list_all_available_tools() -> Dict[str, List[Dict[str, Any]]]:
     """List all available tools organized by category.
-    
+
     Returns:
         Dictionary with tool categories as keys and lists of tool info as values
-        
+
     Example:
         >>> tools = list_all_available_tools()
         >>> 'file_system' in tools
@@ -131,6 +137,6 @@ def list_all_available_tools() -> dict:
         True
     """
     return {
-        'file_system': [get_tool_info(tool) for tool in load_all_filesystem_tools()],
-        'text': [get_tool_info(tool) for tool in load_all_text_tools()]
+        "file_system": [get_tool_info(tool) for tool in load_all_filesystem_tools()],
+        "text": [get_tool_info(tool) for tool in load_all_text_tools()],
     }

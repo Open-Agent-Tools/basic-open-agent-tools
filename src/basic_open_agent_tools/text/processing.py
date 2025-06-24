@@ -88,7 +88,9 @@ def strip_html_tags(text: str) -> str:
     return clean_whitespace(cleaned)
 
 
-def normalize_unicode(text: str, form: Literal["NFC", "NFD", "NFKC", "NFKD"] = "NFC") -> str:
+def normalize_unicode(
+    text: str, form: Literal["NFC", "NFD", "NFKC", "NFKD"] = "NFC"
+) -> str:
     """Normalize Unicode text.
 
     Args:
@@ -202,14 +204,14 @@ def to_title_case(text: str) -> str:
         return word.capitalize()
 
     # Split on word separators (spaces, hyphens, underscores) but preserve them
-    parts = re.split(r'([\s\-_]+)', text)  # Split on whitespace, hyphens, underscores
+    parts = re.split(r"([\s\-_]+)", text)  # Split on whitespace, hyphens, underscores
     result = []
     for part in parts:
-        if part and not re.match(r'^[\s\-_]+$', part):  # If it's not just separators
+        if part and not re.match(r"^[\s\-_]+$", part):  # If it's not just separators
             result.append(part.capitalize())
         else:  # If it's separators or empty, keep as-is
             result.append(part)
-    return ''.join(result)
+    return "".join(result)
 
 
 def smart_split_lines(

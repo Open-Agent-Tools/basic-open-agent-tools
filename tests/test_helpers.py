@@ -74,6 +74,7 @@ class TestHelperFunctions:
 
     def test_merge_tool_lists_with_individual_functions(self):
         """Test merging with individual functions."""
+
         def custom_tool_1(x: str) -> str:
             return x.upper()
 
@@ -93,6 +94,7 @@ class TestHelperFunctions:
 
     def test_merge_tool_lists_mixed_args(self):
         """Test merging with mixed list and function arguments."""
+
         def custom_tool(x: str) -> str:
             return x + "_custom"
 
@@ -110,6 +112,7 @@ class TestHelperFunctions:
 
     def test_merge_tool_lists_empty_lists(self):
         """Test merging with empty lists."""
+
         def custom_tool(x: str) -> str:
             return x
 
