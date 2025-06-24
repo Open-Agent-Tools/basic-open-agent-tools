@@ -1,10 +1,10 @@
-# Byte-compiled / optimized / DLL files
+# Python cache and compiled files
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
+*.pyo
+*.pyd
 
 # Distribution / packaging
 .Python
@@ -25,6 +25,8 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*.tar.gz
+*.whl
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -50,6 +52,8 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+test-results/
+.nyc_output/
 
 # Translations
 *.mo
@@ -127,14 +131,23 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
-# Environments
+# Environments and secrets
 .env
+.env.*
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+.envrc
+.secrets
+secrets/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
 
 # Spyder project settings
 .spyderproject
@@ -173,12 +186,36 @@ cython_debug/
 # Learn more at https://abstra.io/docs
 .abstra/
 
-# Visual Studio Code
-#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
-#  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
-#  you could uncomment the following to ignore the enitre vscode folder
-# .vscode/
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+.metadata
+.classpath
+.loadpath
+.externalToolBuilders/
+*.launch
+.cproject
+.autotools
+.sublime-workspace
+*.sublime-project
+.tern-project
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
 # Ruff stuff:
 .ruff_cache/
@@ -192,3 +229,60 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Claude Code and AI assistants
+CLAUDE.md
+.claude/
+.aider*
+.cursor/
+.copilot/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+*.rej
+logs/
+log/
+temp/
+tmp/
+.tmp/
+
+# Development and debugging
+.debug/
+debug.py
+test_*.py.bak
+profile_*.py
+benchmark_*.py
+*.prof
+*.lprof
+
+# Documentation builds
+docs/_build/
+site/
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# Package manager locks and configs
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnp.*
+node_modules/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Cache directories
+.cache/
+cache/
+.npm/
+.yarn/

@@ -1,6 +1,31 @@
 # basic-open-agent-tools
 
-An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions. Designed to offer core utilities and interfaces that developers can easily integrate into their own agents to avoid excess boilerplate, while being simpler than needs requiring MCP or A2A.
+An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions. Designed to offer core utilities and interfaces that developers can easily integrate into their own agents to avoid excess boilerplate, while being simpler than solutions requiring MCP or A2A.
+
+## Installation
+
+```bash
+pip install basic-open-agent-tools
+```
+
+Or with UV:
+```bash
+uv add basic-open-agent-tools
+```
+
+## Usage
+
+```python
+from basic_open_agent_tools import file_system
+
+# File operations
+content = file_system.read_file_to_string("file.txt")
+file_system.write_file_from_string("output.txt", "Hello!")
+
+# Directory operations  
+files = file_system.list_directory_contents("/path/to/dir")
+file_system.create_directory("new_dir")
+```
 
 
 
