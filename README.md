@@ -19,7 +19,6 @@ uv add basic-open-agent-tools
 
 import logging
 import warnings
-from pathlib import Path
 from dotenv import load_dotenv
 from google.adk.agents import Agent
 from google.adk.models.lite_llm import LiteLlm
@@ -31,9 +30,7 @@ from basic_open_agent_tools.file_system.info import (
     directory_exists, file_exists, get_file_info, get_file_size, is_empty_directory,
 )
 
-Path(__file__).parent.parent.joinpath(".env") and load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
-
-MODEL_NAME = "anthropic/claude-3-5-haiku-20241022"
+load_dotenv()
 
 agent_instruction = """
 **INSTRUCTION:**
@@ -51,7 +48,7 @@ logging.basicConfig(level=logging.ERROR)
 warnings.filterwarnings("ignore")
 
 file_ops_agent = Agent(
-    model=LiteLlm(model=MODEL_NAME),
+    model=LiteLlm(model="anthropic/claude-3-5-haiku-20241022"),
     name="FileOps",
     instruction=agent_instruction,
     description="Specialized file and directory operations sub-agent for the Python developer.",
