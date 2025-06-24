@@ -16,19 +16,53 @@ uv add basic-open-agent-tools
 ## Quick Start
 
 ```python
-from basic_open_agent_tools import file_system
 
-# File operations
-content = file_system.read_file_to_string("file.txt")
-file_system.write_file_from_string("output.txt", "Hello!")
+import logging
+import warnings
+from pathlib import Path
+from dotenv import load_dotenv
+from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
+from basic_open_agent_tools.file_system.operations import (
+    append_to_file, copy_file, create_directory, delete_directory, delete_file,
+    list_directory_contents, move_file, read_file_to_string, write_file_from_string,
+)
+from basic_open_agent_tools.file_system.info import (
+    directory_exists, file_exists, get_file_info, get_file_size, is_empty_directory,
+)
 
-# Directory operations  
-files = file_system.list_directory_contents("/path/to/dir")
-file_system.create_directory("new_dir")
+Path(__file__).parent.parent.joinpath(".env") and load_dotenv(dotenv_path=Path(__file__).parent.parent / ".env")
 
-# Directory tree visualization
-tree = file_system.generate_directory_tree(".", max_depth=2)
-print(tree)
+MODEL_NAME = "anthropic/claude-3-5-haiku-20241022"
+
+agent_instruction = """
+**INSTRUCTION:**
+You are FileOps, a specialized file and directory operations sub-agent.
+Your role is to execute file operations (create, read, update, delete, move, copy) and directory operations (create, delete) with precision.
+**Guidelines:**
+- **Preserve Content:** Always read full file content before modifications; retain all original content except targeted changes.
+- **Precision:** Execute instructions exactly, verify operations, and handle errors with specific details.
+- **Communication:** Provide concise, technical status reports (success/failure, file paths, operation type, content preservation details).
+- **Scope:** File/directory CRUD, move, copy, path validation. No code analysis.
+- **Confirmation:** Confirm completion to the senior developer with specific details of modifications.
+"""
+
+logging.basicConfig(level=logging.ERROR)
+warnings.filterwarnings("ignore")
+
+file_ops_agent = Agent(
+    model=LiteLlm(model=MODEL_NAME),
+    name="FileOps",
+    instruction=agent_instruction,
+    description="Specialized file and directory operations sub-agent for the Python developer.",
+    tools=[
+        append_to_file, copy_file, create_directory, delete_directory, delete_file,
+        directory_exists, file_exists, get_file_info, get_file_size, is_empty_directory,
+        list_directory_contents, move_file, read_file_to_string, write_file_from_string,
+    ],
+)
+
+
 ```
 
 ## Documentation
