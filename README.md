@@ -16,7 +16,6 @@ uv add basic-open-agent-tools
 ## Quick Start
 
 ```python
-
 import logging
 import warnings
 from dotenv import load_dotenv
@@ -25,8 +24,12 @@ from google.adk.models.lite_llm import LiteLlm
 
 import basic_open_agent_tools as boat
 
-fs_tools = boat.load_all_filesystem_tools()
-text_tools = boat.load_all_text_tools()
+# Load tools by category
+fs_tools = boat.load_all_filesystem_tools()    # 18 functions
+text_tools = boat.load_all_text_tools()       # 10 functions
+# data_tools = boat.load_all_data_tools()     # Coming in Phase 1
+
+# Merge for agent use (automatically deduplicates)
 agent_tools = boat.merge_tool_lists(fs_tools, text_tools)
 
 
@@ -103,19 +106,30 @@ Text Processing Tools:
 
 ## Current Features
 
-### File System Tools
+### File System Tools ✅ (18 functions)
 - File operations (read, write, append, delete, copy, move)
 - Directory operations (create, list, delete, tree visualization)
 - File information and existence checking
 - Path validation and error handling
 
-### Planned Modules
-- HTTP request utilities
-- Text processing and manipulation
-- Data parsing and conversion
-- System information and process management
-- Cryptographic utilities
-- Common helper functions
+### Text Processing Tools ✅ (10 functions)
+- Text cleaning and normalization
+- Case conversion utilities (snake_case, camelCase, Title Case)
+- Smart text splitting and sentence extraction
+- HTML tag removal and Unicode normalization
+
+### Data Tools 📋 (Planned - 5 Phases)
+**Phase 1 (MVP)**: Data structures, JSON serialization, basic validation (21 functions)
+**Phase 2**: CSV processing, object serialization (11 functions)  
+**Phase 3**: Configuration files (YAML/TOML/INI), data transformation (16 functions)
+**Phase 4**: Binary data, archives, streaming (18 functions)
+**Phase 5**: Caching, database processing (13 functions)
+
+### Future Modules 🚧
+- **Network Tools** - HTTP utilities, API helpers
+- **System Tools** - Process management, system information  
+- **Crypto Tools** - Hashing, encoding, basic cryptographic utilities
+- **Utilities** - Development and debugging helpers
 
 ## Contributing
 
