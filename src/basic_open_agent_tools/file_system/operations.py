@@ -2,8 +2,9 @@
 
 import shutil
 from typing import List
+
 from ..exceptions import FileSystemError
-from .validation import validate_path, validate_file_content
+from .validation import validate_file_content, validate_path
 
 
 def read_file_to_string(file_path: str) -> str:
@@ -19,12 +20,12 @@ def read_file_to_string(file_path: str) -> str:
         FileSystemError: If file doesn't exist or can't be read
     """
     path = validate_path(file_path, "read")
-    
+
     if not path.is_file():
         raise FileSystemError(f"File not found: {path}")
-    
+
     try:
-        return path.read_text(encoding='utf-8').strip()
+        return path.read_text(encoding="utf-8").strip()
     except (OSError, UnicodeDecodeError) as e:
         raise FileSystemError(f"Failed to read file {path}: {e}")
 
@@ -44,10 +45,10 @@ def write_file_from_string(file_path: str, content: str) -> bool:
     """
     validate_file_content(content, "write")
     path = validate_path(file_path, "write")
-    
+
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content, encoding='utf-8')
+        path.write_text(content, encoding="utf-8")
         return True
     except OSError as e:
         raise FileSystemError(f"Failed to write file {path}: {e}")
@@ -68,17 +69,19 @@ def append_to_file(file_path: str, content: str) -> bool:
     """
     validate_file_content(content, "append")
     path = validate_path(file_path, "append")
-    
+
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open('a', encoding='utf-8') as file:
+        with path.open("a", encoding="utf-8") as file:
             file.write(content)
         return True
     except OSError as e:
         raise FileSystemError(f"Failed to append to file {path}: {e}")
 
 
-def list_directory_contents(directory_path: str, include_hidden: bool = False) -> List[str]:
+def list_directory_contents(
+    directory_path: str, include_hidden: bool = False
+) -> List[str]:
     """List contents of a directory.
 
     Args:
@@ -92,14 +95,14 @@ def list_directory_contents(directory_path: str, include_hidden: bool = False) -
         FileSystemError: If directory doesn't exist or can't be read
     """
     path = validate_path(directory_path, "list directory")
-    
+
     if not path.is_dir():
         raise FileSystemError(f"Directory not found: {path}")
-    
+
     try:
         contents = [item.name for item in path.iterdir()]
         if not include_hidden:
-            contents = [name for name in contents if not name.startswith('.')]
+            contents = [name for name in contents if not name.startswith(".")]
         return sorted(contents)
     except OSError as e:
         raise FileSystemError(f"Failed to list directory {path}: {e}")
@@ -118,7 +121,7 @@ def create_directory(directory_path: str) -> bool:
         FileSystemError: If directory creation fails
     """
     path = validate_path(directory_path, "create directory")
-    
+
     try:
         path.mkdir(parents=True, exist_ok=True)
         return True
@@ -139,7 +142,7 @@ def delete_file(file_path: str) -> bool:
         FileSystemError: If deletion fails
     """
     path = validate_path(file_path, "delete file")
-    
+
     try:
         path.unlink(missing_ok=True)
         return True
@@ -161,10 +164,10 @@ def delete_directory(directory_path: str, recursive: bool = False) -> bool:
         FileSystemError: If deletion fails
     """
     path = validate_path(directory_path, "delete directory")
-    
+
     if not path.exists():
         return True
-    
+
     try:
         if recursive:
             shutil.rmtree(path)
@@ -190,10 +193,10 @@ def move_file(source_path: str, destination_path: str) -> bool:
     """
     src_path = validate_path(source_path, "move source")
     dst_path = validate_path(destination_path, "move destination")
-    
+
     if not src_path.exists():
         raise FileSystemError(f"Source path not found: {src_path}")
-    
+
     try:
         dst_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(src_path), str(dst_path))
@@ -217,10 +220,10 @@ def copy_file(source_path: str, destination_path: str) -> bool:
     """
     src_path = validate_path(source_path, "copy source")
     dst_path = validate_path(destination_path, "copy destination")
-    
+
     if not src_path.exists():
         raise FileSystemError(f"Source path not found: {src_path}")
-    
+
     try:
         dst_path.parent.mkdir(parents=True, exist_ok=True)
         if src_path.is_file():

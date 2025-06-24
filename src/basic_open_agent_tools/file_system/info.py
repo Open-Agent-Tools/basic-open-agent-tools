@@ -1,6 +1,7 @@
 """File and directory information utilities."""
 
 from typing import Dict, Union
+
 from ..exceptions import FileSystemError
 from .validation import validate_path
 
@@ -18,10 +19,10 @@ def get_file_info(file_path: str) -> Dict[str, Union[str, int, float, bool]]:
         FileSystemError: If path doesn't exist or info can't be retrieved
     """
     path = validate_path(file_path, "get info")
-    
+
     if not path.exists():
         raise FileSystemError(f"Path not found: {path}")
-    
+
     try:
         stat = path.stat()
         return {
@@ -34,7 +35,7 @@ def get_file_info(file_path: str) -> Dict[str, Union[str, int, float, bool]]:
             "absolute_path": str(path),
             "parent": str(path.parent),
             "suffix": path.suffix,
-            "permissions": oct(stat.st_mode)[-3:]
+            "permissions": oct(stat.st_mode)[-3:],
         }
     except OSError as e:
         raise FileSystemError(f"Failed to get info for {path}: {e}")
@@ -85,10 +86,10 @@ def get_file_size(file_path: str) -> int:
         FileSystemError: If file doesn't exist or size can't be retrieved
     """
     path = validate_path(file_path, "get file size")
-    
+
     if not path.is_file():
         raise FileSystemError(f"File not found: {path}")
-    
+
     try:
         return path.stat().st_size
     except OSError as e:
@@ -108,10 +109,10 @@ def is_empty_directory(directory_path: str) -> bool:
         FileSystemError: If directory doesn't exist or can't be read
     """
     path = validate_path(directory_path, "check empty directory")
-    
+
     if not path.is_dir():
         raise FileSystemError(f"Directory not found: {path}")
-    
+
     try:
         return not any(path.iterdir())
     except OSError as e:
