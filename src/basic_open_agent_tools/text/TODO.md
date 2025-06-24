@@ -56,11 +56,14 @@ Text manipulation, processing, and format conversion tools for AI agents.
   - Content filtering
   - Schema-based text validation
 
-## Design Considerations
+## Design Considerations for Agent Tools
 - Keep dependencies minimal (prefer standard library)
+- Functions designed as individual agent tools
 - Handle different encodings gracefully
 - Provide both simple and advanced APIs
 - Consistent error handling
 - Memory-efficient for large texts
 - Cross-platform line ending handling
 - Security considerations for text processing
+- Functions suitable for agent framework integration
+- Clear function signatures optimized for AI tool usage

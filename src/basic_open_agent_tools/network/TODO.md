@@ -1,7 +1,7 @@
 # Network Tools TODO
 
 ## Overview
-Local network utilities and validation tools (no HTTP/API operations).
+Local network utilities and validation tools for AI agents (no HTTP/API operations).
 
 ## Planned Modules
 
@@ -44,8 +44,9 @@ Local network utilities and validation tools (no HTTP/API operations).
   - Network protocol validation
   - Common port definitions
 
-## Design Considerations
+## Design Considerations for Agent Tools
 - No external HTTP/API calls (follows project principle)
+- Functions designed as individual agent tools
 - Focus on local network operations only
 - Cross-platform network interface handling
 - Security considerations (no unauthorized scanning)
@@ -53,3 +54,5 @@ Local network utilities and validation tools (no HTTP/API operations).
 - Proper error handling for network operations
 - Timeout handling for network checks
 - Permission awareness for network operations
+- Functions suitable for agent framework integration
+- Clear function signatures for AI tool usage

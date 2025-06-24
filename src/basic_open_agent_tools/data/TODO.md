@@ -59,11 +59,14 @@ Data structure utilities, validation, and serialization tools for AI agents.
   - Batch processing helpers
   - Memory-efficient data handling
 
-## Design Considerations
+## Design Considerations for Agent Tools
 - Memory efficiency for large datasets
+- Functions designed as individual agent tools
 - Type safety and validation
 - Immutable data operations where possible
 - Clear error messages and handling
 - Performance considerations for bulk operations
 - Security awareness for deserialization
 - Consistent API design across modules
+- Functions suitable for agent framework integration
+- Clear function signatures optimized for AI tool usage

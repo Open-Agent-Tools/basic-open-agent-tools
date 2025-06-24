@@ -1,7 +1,7 @@
 # Utilities TODO
 
 ## Overview
-Common utilities and helper functions that don't fit into other categories.
+Common utilities and helper functions for AI agents that don't fit into other categories.
 
 ## Planned Modules
 
@@ -69,11 +69,14 @@ Common utilities and helper functions that don't fit into other categories.
   - Assertion helpers
   - Test environment setup
 
-## Design Considerations
+## Design Considerations for Agent Tools
 - Keep modules focused and cohesive
+- Functions designed as individual agent tools
 - Provide both simple and advanced APIs
 - Thread-safety where applicable
 - Memory efficiency
 - Clear documentation and examples
 - Minimal external dependencies
 - Cross-platform compatibility
+- Functions suitable for agent framework integration
+- Clear function signatures optimized for AI tool usage
