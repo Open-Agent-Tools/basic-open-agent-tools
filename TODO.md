@@ -20,6 +20,42 @@ Create a comprehensive toolkit of **AI agent tools** providing essential functio
 
 **Coverage:** 41% test coverage, all functions working
 
+#### Text Processing Tools (`src/basic_open_agent_tools/text/`)
+**Status:** ✅ Fully Implemented  
+**Functions:** 10 agent-ready text processing functions
+- **Normalization:** clean_whitespace, normalize_line_endings, normalize_unicode
+- **HTML Processing:** strip_html_tags with intelligent spacing
+- **Case Conversion:** to_snake_case, to_camel_case, to_title_case  
+- **Text Manipulation:** smart_split_lines, extract_sentences, join_with_oxford_comma
+
+**Coverage:** 98% test coverage, comprehensive quality assurance
+
+#### Helper Functions (`src/basic_open_agent_tools/helpers.py`)
+**Status:** ✅ Fully Implemented  
+**Functions:** 5 top-level tool management functions
+- **Tool Loading:** load_all_filesystem_tools(), load_all_text_tools()
+- **Tool Management:** merge_tool_lists(), get_tool_info(), list_all_available_tools()
+- **Agent Integration:** Designed for seamless agent framework integration
+
+**Coverage:** 96% test coverage, full type safety
+
+**Usage Example:**
+```python
+import basic_open_agent_tools as boat
+
+# Load tools by category
+fs_tools = boat.load_all_filesystem_tools()  # 18 functions
+text_tools = boat.load_all_text_tools()     # 10 functions
+
+# Add custom tools
+def my_custom_tool(input: str) -> str:
+    return input.upper()
+
+# Merge all tools for agent use
+agent_tools = boat.merge_tool_lists(fs_tools, text_tools, my_custom_tool)
+# Result: 29 total functions ready for agent frameworks
+```
+
 ---
 
 ## 🚧 Planned Modules
@@ -38,33 +74,19 @@ Create a comprehensive toolkit of **AI agent tools** providing essential functio
 
 **Agent Use Cases:** Network validation, local discovery, connectivity checks
 
-#### 2. Text Processing (`src/basic_open_agent_tools/text/`)
-**Status:** 📋 Planned  
-**See:** [text/TODO.md](src/basic_open_agent_tools/text/TODO.md)
-
-**Key Functions:**
-- String cleaning and normalization
-- Pattern matching and search
-- Format handling (JSON, CSV, YAML)
-- Encoding/decoding utilities
-
-**Agent Use Cases:** Content processing, data extraction, format conversion
-
-#### 3. Data Tools (`src/basic_open_agent_tools/data/`)
+#### 2. Data Tools (`src/basic_open_agent_tools/data/`)
 **Status:** 📋 Planned  
 **See:** [data/TODO.md](src/basic_open_agent_tools/data/TODO.md)
 
 **Key Functions:**
 - Data structure manipulation
 - Schema validation
-- Serialization utilities
+- Serialization utilities (JSON, CSV, YAML)
 - Data transformation and querying
 
 **Agent Use Cases:** Data validation, transformation, structured processing
 
-### Medium Priority
-
-#### 4. System Tools (`src/basic_open_agent_tools/system/`)
+#### 3. System Tools (`src/basic_open_agent_tools/system/`)
 **Status:** 📋 Planned  
 **See:** [system/TODO.md](src/basic_open_agent_tools/system/TODO.md)
 
@@ -76,7 +98,9 @@ Create a comprehensive toolkit of **AI agent tools** providing essential functio
 
 **Agent Use Cases:** Command execution, system monitoring, environment management
 
-#### 5. Cryptographic Tools (`src/basic_open_agent_tools/crypto/`)
+### Medium Priority
+
+#### 4. Cryptographic Tools (`src/basic_open_agent_tools/crypto/`)
 **Status:** 📋 Planned  
 **See:** [crypto/TODO.md](src/basic_open_agent_tools/crypto/TODO.md)
 
@@ -90,7 +114,7 @@ Create a comprehensive toolkit of **AI agent tools** providing essential functio
 
 **⚠️ Note:** NO encryption/decryption - integrity and encoding only
 
-#### 6. Utility Tools (`src/basic_open_agent_tools/utilities/`)
+#### 5. Utility Tools (`src/basic_open_agent_tools/utilities/`)
 **Status:** 📋 Planned  
 **See:** [utilities/TODO.md](src/basic_open_agent_tools/utilities/TODO.md)
 
@@ -107,16 +131,15 @@ Create a comprehensive toolkit of **AI agent tools** providing essential functio
 ## 🎯 Development Priorities
 
 ### Phase 1: Core Utilities (Next Release)
-1. **Text Processing** - Essential for content manipulation
-2. **Data Tools** - Critical for structured data handling
-3. **Network Tools** - Important for connectivity and validation
+1. **Data Tools** - Critical for structured data handling
+2. **Network Tools** - Important for connectivity and validation
 
 ### Phase 2: System Integration
-4. **System Tools** - Process management and system interaction
-5. **Crypto Tools** - Security and integrity features
+3. **System Tools** - Process management and system interaction
+4. **Crypto Tools** - Security and integrity features
 
 ### Phase 3: Infrastructure
-6. **Utilities** - Development and debugging support
+5. **Utilities** - Development and debugging support
 
 ---
 
@@ -125,8 +148,9 @@ Create a comprehensive toolkit of **AI agent tools** providing essential functio
 Each module has a detailed TODO.md file with specific implementation plans:
 
 - **File System:** [src/basic_open_agent_tools/file_system/TODO.md](src/basic_open_agent_tools/file_system/TODO.md) ✅ *Implemented*
+- **Text Processing:** ✅ *Fully Implemented* (10 functions + comprehensive tests)
+- **Helper Functions:** ✅ *Fully Implemented* (5 tool management functions)
 - **Network:** [src/basic_open_agent_tools/network/TODO.md](src/basic_open_agent_tools/network/TODO.md)
-- **Text:** [src/basic_open_agent_tools/text/TODO.md](src/basic_open_agent_tools/text/TODO.md)  
 - **Data:** [src/basic_open_agent_tools/data/TODO.md](src/basic_open_agent_tools/data/TODO.md)
 - **System:** [src/basic_open_agent_tools/system/TODO.md](src/basic_open_agent_tools/system/TODO.md)
 - **Crypto:** [src/basic_open_agent_tools/crypto/TODO.md](src/basic_open_agent_tools/crypto/TODO.md)
@@ -168,18 +192,23 @@ Each module has a detailed TODO.md file with specific implementation plans:
 4. **Follow Pattern:** Use file_system module as implementation reference
 
 ### For Users
-1. **Current:** Use file_system tools for production workloads
-2. **Coming Soon:** Text and data processing tools (next release)
-3. **Documentation:** See [docs/](docs/) for complete usage guides
+1. **Current:** Use file_system and text processing tools for production workloads
+2. **Helper Functions:** Use top-level helpers for easy tool loading and management
+3. **Coming Soon:** Data processing and network tools (next release)
+4. **Documentation:** See [docs/](docs/) for complete usage guides
 
 ---
 
 ## 📊 Progress Tracking
 
 - **Modules Planned:** 7 total
-- **Modules Implemented:** 1 (file_system) ✅
-- **Functions Available:** 18 agent tools ready for use
-- **Test Coverage:** 41% overall (100% for implemented modules)
+- **Modules Implemented:** 2 (file_system ✅, text ✅) + helper functions ✅
+- **Functions Available:** 33+ agent tools ready for use
+  - **File System:** 18 functions (read, write, tree operations, validation)
+  - **Text Processing:** 10 functions (normalization, case conversion, manipulation)
+  - **Helper Functions:** 5 functions (tool loading, management, inspection)
+- **Test Coverage:** 66% overall (98%+ for new implementations)
+- **Quality Assurance:** Full ruff + mypy compliance, GPG signed commits
 - **Agent Frameworks:** Google ADK, LangChain, Custom agents supported
 
-**Next Milestone:** Text processing module implementation
+**Next Milestone:** Data processing and network tools implementation
