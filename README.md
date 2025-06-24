@@ -57,38 +57,38 @@ file_ops_agent = Agent(
 
 """
 The above would load:
+
 File and Directory Operations:
+    read_file_to_string
+    write_file_from_string
+    append_to_file
+    list_directory_contents
+    create_directory
+    delete_file
+    delete_directory
+    move_file
+    copy_file
+    get_file_info
+    file_exists
+    directory_exists
+    get_file_size
+    is_empty_directory
+    list_all_directory_contents
+    generate_directory_tree
+    validate_path
+    validate_file_content
 
-read_file_to_string
-write_file_from_string
-append_to_file
-list_directory_contents
-create_directory
-delete_file
-delete_directory
-move_file
-copy_file
-get_file_info
-file_exists
-directory_exists
-get_file_size
-is_empty_directory
-list_all_directory_contents
-generate_directory_tree
-validate_path
-validate_file_content
 Text Processing Tools:
-
-clean_whitespace
-normalize_line_endings
-strip_html_tags
-normalize_unicode
-to_snake_case
-to_camel_case
-to_title_case
-smart_split_lines
-extract_sentences
-join_with_oxford_comma
+    clean_whitespace
+    normalize_line_endings
+    strip_html_tags
+    normalize_unicode
+    to_snake_case
+    to_camel_case
+    to_title_case
+    smart_split_lines
+    extract_sentences
+    join_with_oxford_comma
 
 """
 
