@@ -11,3 +11,21 @@ class FileSystemError(BasicAgentToolsError):
     """Exception for file system operations."""
 
     pass
+
+
+class DataError(BasicAgentToolsError):
+    """Exception for data operations."""
+
+    pass
+
+
+class ValidationError(DataError):
+    """Exception for data validation operations."""
+
+    pass
+
+
+class SerializationError(DataError):
+    """Exception for data serialization/deserialization operations."""
+
+    pass

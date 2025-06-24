@@ -9,14 +9,17 @@ from typing import List
 __version__ = "0.2.0"
 
 # Modular structure
-from . import exceptions, file_system, text, types
+from . import data, exceptions, file_system, text, types
 
 # Helper functions for tool management
 from .helpers import (
     get_tool_info,
     list_all_available_tools,
+    load_all_data_tools,
     load_all_filesystem_tools,
     load_all_text_tools,
+    load_data_csv_tools,
+    load_data_json_tools,
     merge_tool_lists,
 )
 
@@ -31,10 +34,10 @@ __all__: List[str] = [
     # Implemented modules
     "file_system",
     "text",
+    "data",
     # Future modules (uncomment when implemented)
     # "system",
     # "network",
-    # "data",
     # "crypto",
     # "utilities",
     # Common infrastructure
@@ -43,6 +46,9 @@ __all__: List[str] = [
     # Helper functions
     "load_all_filesystem_tools",
     "load_all_text_tools",
+    "load_all_data_tools",
+    "load_data_json_tools",
+    "load_data_csv_tools",
     "merge_tool_lists",
     "get_tool_info",
     "list_all_available_tools",
