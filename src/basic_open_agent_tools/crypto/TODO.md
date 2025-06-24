@@ -1,7 +1,7 @@
 # Cryptographic Tools TODO
 
 ## Overview
-Hashing, encoding, and basic cryptographic utilities (no encryption/decryption).
+Hashing, encoding, and basic cryptographic utilities for AI agents (no encryption/decryption).
 
 ## Planned Modules
 
@@ -50,11 +50,14 @@ Hashing, encoding, and basic cryptographic utilities (no encryption/decryption).
 - Provide secure defaults
 - Clear documentation about security limitations
 
-## Design Considerations
+## Design Considerations for Agent Tools
 - Use standard library implementations where possible
+- Functions designed as individual agent tools
 - Clear separation between secure and non-secure operations
 - Consistent error handling
 - Performance considerations for large files
 - Cross-platform compatibility
 - Clear documentation of security properties
 - Warning messages for deprecated hash algorithms
+- Functions suitable for agent framework integration
+- Clear function signatures optimized for AI tool usage

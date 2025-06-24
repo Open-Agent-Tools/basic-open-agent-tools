@@ -52,11 +52,14 @@ System-level operations and information gathering tools for AI agents.
   - Structured logging helpers
   - Log rotation utilities
 
-## Design Considerations
+## Design Considerations for Agent Tools
 - Cross-platform compatibility (Windows, macOS, Linux)
+- Functions designed as individual agent tools
 - Secure command execution (avoid shell injection)
 - Proper error handling for system operations
 - Resource cleanup (processes, file handles)
 - Permission and security awareness
 - Timeout handling for long-running operations
 - Non-blocking operations where possible
+- Functions suitable for agent framework integration
+- Clear function signatures optimized for AI tool usage

@@ -1,0 +1,21 @@
+# Production Dependencies
+# This package has no runtime dependencies by design - it uses only Python standard library
+
+# Development Dependencies
+# Install with: pip install -r requirements.txt
+
+# Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Code Quality
+ruff>=0.1.0
+mypy>=1.0.0
+
+# Development Tools
+pre-commit>=3.0.0
+
+# Optional: For development convenience
+# Uncomment if needed for local development
+# ipython>=8.0.0
+# jupyter>=1.0.0

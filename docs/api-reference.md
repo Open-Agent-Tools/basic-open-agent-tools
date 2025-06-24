@@ -2,15 +2,33 @@
 
 ## File System Module
 
-The `file_system` module provides comprehensive file and directory operations organized into logical submodules.
+The `file_system` module provides comprehensive file and directory operations organized into logical submodules. **Functions are designed as tools for AI agents** and can be imported individually for agent framework integration.
 
-### Import Options
+### Import Options for Agent Integration
+
+#### Individual Function Imports (Recommended for AI Agents)
 
 ```python
-# Main module import (recommended)
+# Import specific functions to use as agent tools
+from basic_open_agent_tools.file_system.operations import (
+    read_file_to_string, write_file_from_string, append_to_file,
+    create_directory, delete_file, move_file, copy_file
+)
+from basic_open_agent_tools.file_system.info import (
+    file_exists, directory_exists, get_file_info, get_file_size
+)
+
+# Use in agent frameworks (Google ADK example)
+tools = [read_file_to_string, write_file_from_string, file_exists, ...]
+```
+
+#### Module Import (For Direct Usage)
+
+```python
+# Main module import for direct developer usage
 from basic_open_agent_tools import file_system
 
-# Submodule imports
+# Submodule imports for specific functionality
 from basic_open_agent_tools.file_system.operations import read_file_to_string
 from basic_open_agent_tools.file_system.info import get_file_info
 from basic_open_agent_tools.file_system.tree import generate_directory_tree
@@ -273,15 +291,65 @@ Base exception for all file system operations. Inherits from `BasicAgentToolsErr
 ### `PathLike`
 Type alias for `Union[str, Path]` - accepts both string paths and Path objects.
 
-## Future Modules
+## Agent Integration Examples
 
-The following modules are planned but not yet implemented:
+### Google ADK Integration
 
-- `basic_open_agent_tools.http` - HTTP request utilities
-- `basic_open_agent_tools.text` - Text processing and manipulation
-- `basic_open_agent_tools.data` - Data parsing and conversion
-- `basic_open_agent_tools.system` - System information and process management  
-- `basic_open_agent_tools.crypto` - Cryptographic utilities
-- `basic_open_agent_tools.utilities` - Common utilities and helpers
+```python
+from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
+from basic_open_agent_tools.file_system.operations import (
+    read_file_to_string, write_file_from_string, create_directory
+)
 
-See individual TODO.md files in each module directory for planned functionality.
+# Create agent with file system tools
+agent = Agent(
+    model=LiteLlm(model="anthropic/claude-3-5-haiku-20241022"),
+    name="FileOps",
+    tools=[read_file_to_string, write_file_from_string, create_directory],
+)
+```
+
+### LangChain Integration
+
+```python
+from langchain.tools import StructuredTool
+from basic_open_agent_tools.file_system.operations import read_file_to_string
+
+# Wrap function as LangChain tool
+read_tool = StructuredTool.from_function(
+    func=read_file_to_string,
+    name="read_file",
+    description="Read contents of a text file"
+)
+```
+
+### Custom Agent Integration
+
+```python
+# Direct function usage in custom agents
+from basic_open_agent_tools.file_system.operations import write_file_from_string
+
+class CustomAgent:
+    def __init__(self):
+        self.tools = {
+            'write_file': write_file_from_string,
+            # ... other tools
+        }
+    
+    def execute_tool(self, tool_name, **kwargs):
+        return self.tools[tool_name](**kwargs)
+```
+
+## Future Modules for Agent Toolkits
+
+The following modules are planned to expand agent capabilities:
+
+- `basic_open_agent_tools.http` - HTTP request utilities for web-enabled agents
+- `basic_open_agent_tools.text` - Text processing and manipulation tools
+- `basic_open_agent_tools.data` - Data parsing and conversion utilities
+- `basic_open_agent_tools.system` - System information and process management tools
+- `basic_open_agent_tools.crypto` - Cryptographic utilities for secure agents
+- `basic_open_agent_tools.utilities` - Common helper functions and utilities
+
+Each module will provide individual functions optimized for agent tool integration. See individual TODO.md files in each module directory for planned functionality.

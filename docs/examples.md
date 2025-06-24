@@ -1,6 +1,186 @@
 # Examples
 
-## Basic File Operations
+This document provides examples for both **AI agent integration** (primary use case) and direct usage patterns.
+
+## AI Agent Integration Examples
+
+### Google ADK File Operations Agent
+
+```python
+import logging
+import warnings
+from pathlib import Path
+from dotenv import load_dotenv
+from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
+from basic_open_agent_tools.file_system.operations import (
+    append_to_file, copy_file, create_directory, delete_directory, delete_file,
+    list_directory_contents, move_file, read_file_to_string, write_file_from_string,
+)
+from basic_open_agent_tools.file_system.info import (
+    directory_exists, file_exists, get_file_info, get_file_size, is_empty_directory,
+)
+
+# Configuration
+load_dotenv()
+logging.basicConfig(level=logging.ERROR)
+warnings.filterwarnings("ignore")
+
+# Agent instructions optimized for file operations
+agent_instruction = """
+**INSTRUCTION:**
+You are FileOps, a specialized file and directory operations sub-agent.
+Your role is to execute file operations (create, read, update, delete, move, copy) and directory operations (create, delete) with precision.
+
+**Guidelines:**
+- **Preserve Content:** Always read full file content before modifications; retain all original content except targeted changes.
+- **Precision:** Execute instructions exactly, verify operations, and handle errors with specific details.
+- **Communication:** Provide concise, technical status reports (success/failure, file paths, operation type, content preservation details).
+- **Scope:** File/directory CRUD, move, copy, path validation. No code analysis.
+- **Confirmation:** Confirm completion to the senior developer with specific details of modifications.
+"""
+
+# Create specialized agent
+file_ops_agent = Agent(
+    model=LiteLlm(model="anthropic/claude-3-5-haiku-20241022"),
+    name="FileOps",
+    instruction=agent_instruction,
+    description="Specialized file and directory operations sub-agent for the Python developer.",
+    tools=[
+        append_to_file, copy_file, create_directory, delete_directory, delete_file,
+        directory_exists, file_exists, get_file_info, get_file_size, is_empty_directory,
+        list_directory_contents, move_file, read_file_to_string, write_file_from_string,
+    ],
+)
+
+# Usage example
+response = file_ops_agent("Create a project structure with main.py, config.json, and a docs folder")
+print(response)
+```
+
+### LangChain Tool Integration
+
+```python
+from langchain.tools import StructuredTool
+from langchain.agents import initialize_agent, AgentType
+from langchain.llms import OpenAI
+from basic_open_agent_tools.file_system.operations import (
+    read_file_to_string, write_file_from_string, create_directory
+)
+from basic_open_agent_tools.file_system.info import file_exists
+
+# Wrap functions as LangChain tools
+file_tools = [
+    StructuredTool.from_function(
+        func=read_file_to_string,
+        name="read_file",
+        description="Read the contents of a text file. Input should be a file path string."
+    ),
+    StructuredTool.from_function(
+        func=write_file_from_string,
+        name="write_file", 
+        description="Write content to a text file. Inputs: file_path (string) and content (string)."
+    ),
+    StructuredTool.from_function(
+        func=create_directory,
+        name="create_directory",
+        description="Create a directory and any necessary parent directories. Input should be a directory path string."
+    ),
+    StructuredTool.from_function(
+        func=file_exists,
+        name="file_exists",
+        description="Check if a file exists. Input should be a file path string."
+    ),
+]
+
+# Create LangChain agent with file tools
+llm = OpenAI(temperature=0)
+agent = initialize_agent(
+    file_tools,
+    llm,
+    agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
+# Usage
+result = agent.run("Create a new directory called 'project' and write a hello world script to main.py inside it")
+```
+
+### Custom Agent Framework Integration
+
+```python
+from basic_open_agent_tools.file_system.operations import *
+from basic_open_agent_tools.file_system.info import *
+from basic_open_agent_tools.file_system.tree import *
+
+class FileSystemAgent:
+    """Custom agent specialized in file system operations."""
+    
+    def __init__(self):
+        # Map tool names to functions for easy access
+        self.tools = {
+            # File operations
+            'read_file': read_file_to_string,
+            'write_file': write_file_from_string,
+            'append_file': append_to_file,
+            'delete_file': delete_file,
+            'copy_file': copy_file,
+            'move_file': move_file,
+            
+            # Directory operations
+            'create_directory': create_directory,
+            'delete_directory': delete_directory,
+            'list_directory': list_directory_contents,
+            'directory_tree': generate_directory_tree,
+            
+            # Information tools
+            'file_exists': file_exists,
+            'directory_exists': directory_exists,
+            'file_info': get_file_info,
+            'file_size': get_file_size,
+        }
+    
+    def execute_tool(self, tool_name: str, **kwargs):
+        """Execute a file system tool with given parameters."""
+        if tool_name not in self.tools:
+            raise ValueError(f"Unknown tool: {tool_name}")
+        
+        try:
+            result = self.tools[tool_name](**kwargs)
+            return {"success": True, "result": result}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    def batch_operations(self, operations: list):
+        """Execute multiple file operations in sequence."""
+        results = []
+        for op in operations:
+            tool_name = op.pop('tool')
+            result = self.execute_tool(tool_name, **op)
+            results.append(result)
+            if not result['success']:
+                break  # Stop on first error
+        return results
+
+# Usage example
+agent = FileSystemAgent()
+
+# Single operation
+result = agent.execute_tool('write_file', file_path='test.txt', content='Hello World!')
+print(result)
+
+# Batch operations
+operations = [
+    {'tool': 'create_directory', 'directory_path': 'project'},
+    {'tool': 'write_file', 'file_path': 'project/main.py', 'content': 'print("Hello World!")'},
+    {'tool': 'write_file', 'file_path': 'project/README.md', 'content': '# My Project'},
+]
+results = agent.batch_operations(operations)
+```
+
+## Direct Usage Examples
+
+### Basic File Operations
 
 ### Reading and Writing Files
 
@@ -295,31 +475,100 @@ print(analysis)
 file_system.write_file_from_string("project_analysis.txt", analysis)
 ```
 
-## Integration with Other Tools
+## Agent Tool Selection Strategies
 
-### Using with Different Import Patterns
+### Minimal File Agent (Basic Operations)
 
 ```python
-# Pattern 1: Main module import (recommended)
-from basic_open_agent_tools import file_system
-file_system.read_file_to_string("example.txt")
+# For simple file operations agents
+from basic_open_agent_tools.file_system.operations import (
+    read_file_to_string, write_file_from_string, create_directory
+)
+from basic_open_agent_tools.file_system.info import file_exists, directory_exists
 
-# Pattern 2: Submodule imports for specific functions
-from basic_open_agent_tools.file_system.operations import read_file_to_string, write_file_from_string
-from basic_open_agent_tools.file_system.info import file_exists, get_file_info
+minimal_tools = [
+    read_file_to_string, write_file_from_string, create_directory,
+    file_exists, directory_exists
+]
+```
+
+### Comprehensive File Agent (All Operations)
+
+```python
+# For full-featured file system agents
+from basic_open_agent_tools.file_system.operations import (
+    read_file_to_string, write_file_from_string, append_to_file,
+    create_directory, delete_file, delete_directory, move_file, copy_file,
+    list_directory_contents
+)
+from basic_open_agent_tools.file_system.info import (
+    file_exists, directory_exists, get_file_info, get_file_size, is_empty_directory
+)
+from basic_open_agent_tools.file_system.tree import (
+    generate_directory_tree, list_all_directory_contents
+)
+
+comprehensive_tools = [
+    # All functions for maximum capability
+    read_file_to_string, write_file_from_string, append_to_file,
+    create_directory, delete_file, delete_directory, move_file, copy_file,
+    list_directory_contents, file_exists, directory_exists, get_file_info,
+    get_file_size, is_empty_directory, generate_directory_tree, list_all_directory_contents
+]
+```
+
+### Specialized Read-Only Agent
+
+```python
+# For analysis and inspection agents (no modifications)
+from basic_open_agent_tools.file_system.operations import (
+    read_file_to_string, list_directory_contents
+)
+from basic_open_agent_tools.file_system.info import (
+    file_exists, directory_exists, get_file_info, get_file_size
+)
 from basic_open_agent_tools.file_system.tree import generate_directory_tree
 
-content = read_file_to_string("example.txt")
-info = get_file_info("example.txt")
-tree = generate_directory_tree(".")
+readonly_tools = [
+    read_file_to_string, list_directory_contents, file_exists,
+    directory_exists, get_file_info, get_file_size, generate_directory_tree
+]
+```
 
-# Pattern 3: Mixed imports
+## Import Patterns for Different Use Cases
+
+### Agent Framework Integration (Recommended)
+
+```python
+# Individual function imports for agent tools
+from basic_open_agent_tools.file_system.operations import read_file_to_string, write_file_from_string
+from basic_open_agent_tools.file_system.info import file_exists
+
+# Use directly in agent framework
+tools = [read_file_to_string, write_file_from_string, file_exists]
+```
+
+### Direct Developer Usage
+
+```python
+# Module import for scripting and direct usage
 from basic_open_agent_tools import file_system
-from basic_open_agent_tools.file_system.validation import validate_path
 
-# Use main module for most operations
+# Use module methods
+content = file_system.read_file_to_string("example.txt")
+file_system.write_file_from_string("output.txt", content.upper())
+```
+
+### Mixed Approach
+
+```python
+# Combine both patterns as needed
+from basic_open_agent_tools import file_system
+from basic_open_agent_tools.file_system.operations import read_file_to_string
+
+# Use module for most operations
 file_system.create_directory("new_folder")
 
-# Use specific imports for specialized functions
-path = validate_path("./some/path", "custom operation")
+# Use specific imports for agent tools or specialized functions
+agent_tools = [read_file_to_string]
 ```

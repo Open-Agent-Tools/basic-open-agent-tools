@@ -1,7 +1,7 @@
 """Common type definitions for basic-open-agent-tools."""
 
-from typing import Union
 from pathlib import Path
+from typing import Union
 
 # Common type aliases currently in use
 PathLike = Union[str, Path]

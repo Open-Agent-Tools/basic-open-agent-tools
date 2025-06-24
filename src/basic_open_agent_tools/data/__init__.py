@@ -3,4 +3,6 @@
 This module is not yet implemented. See TODO.md for planned functionality.
 """
 
-__all__ = []  # No functions available yet
+from typing import List
+
+__all__: List[str] = []  # No functions available yet
