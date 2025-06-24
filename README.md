@@ -13,7 +13,7 @@ Or with UV:
 uv add basic-open-agent-tools
 ```
 
-## Usage
+## Quick Start
 
 ```python
 from basic_open_agent_tools import file_system
@@ -25,40 +25,38 @@ file_system.write_file_from_string("output.txt", "Hello!")
 # Directory operations  
 files = file_system.list_directory_contents("/path/to/dir")
 file_system.create_directory("new_dir")
+
+# Directory tree visualization
+tree = file_system.generate_directory_tree(".", max_depth=2)
+print(tree)
 ```
 
+## Documentation
 
+- **[Getting Started](docs/getting-started.md)** - Installation and quick start guide
+- **[API Reference](docs/api-reference.md)** - Complete function documentation
+- **[Examples](docs/examples.md)** - Detailed usage examples and patterns
+- **[Contributing](docs/contributing.md)** - Development setup and guidelines
 
+## Current Features
 
-# Best Practices for Contributors and Reviewers
+### File System Tools
+- File operations (read, write, append, delete, copy, move)
+- Directory operations (create, list, delete, tree visualization)
+- File information and existence checking
+- Path validation and error handling
 
-## Regularly Sync Your Fork/Branch:
+### Planned Modules
+- HTTP request utilities
+- Text processing and manipulation
+- Data parsing and conversion
+- System information and process management
+- Cryptographic utilities
+- Common helper functions
 
-Before starting new work or submitting a PR, git pull upstream main to get the latest changes into your local main branch, then rebase your feature branch on top of it.
+## Contributing
 
-## Small, Focused Pull Requests:
-
-Break down large features into smaller, atomic PRs.
-
-## Clear Titles and Descriptions:
-
-Use a consistent format (e.g., "Feat: Add user profile page," "Fix: Resolve login bug"). Include context, what changed, why, and how to test. Link to related issues (e.g., "Closes #123").
-
-## Use Draft Pull Requests:
-
-Contributors can open PRs as "Draft" and mark them "Ready for review" when complete. Draft PRs won't trigger required status checks or reviews.
-
-## Descriptive Commit Messages:
-
-Add well-written commit messages (subject line + body for details).
-
-## Self-Review First:
-
-Contributors should review their own PRs thoroughly before requesting reviews.
-
-## Responsive to Feedback:
-
-Contributors should address comments and questions from reviewers promptly. If changes are requested, push new commits to the same branch; the PR will automatically update.
+We welcome contributions! Please see our [Contributing Guide](docs/contributing.md) for development setup, coding standards, and pull request process.
 
 
 
