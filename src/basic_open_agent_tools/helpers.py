@@ -55,11 +55,14 @@ def merge_tool_lists(
 ) -> List[Callable[..., Any]]:
     """Merge multiple tool lists and individual functions into a single list.
 
+    This function automatically deduplicates tools based on their function name and module.
+    If the same function appears multiple times, only the first occurrence is kept.
+
     Args:
         *args: Tool lists (List[Callable]) and/or individual functions (Callable)
 
     Returns:
-        Combined list of all tools
+        Combined list of all tools with duplicates removed
 
     Raises:
         TypeError: If any argument is not a list of callables or a callable
@@ -73,11 +76,15 @@ def merge_tool_lists(
         True
     """
     merged = []
+    seen = set()  # Track (name, module) tuples to detect duplicates
 
     for arg in args:
         if callable(arg):
             # Single function
-            merged.append(arg)
+            func_key = (arg.__name__, getattr(arg, "__module__", ""))
+            if func_key not in seen:
+                merged.append(arg)
+                seen.add(func_key)
         elif isinstance(arg, list):
             # List of functions
             for item in arg:
@@ -85,7 +92,10 @@ def merge_tool_lists(
                     raise TypeError(
                         f"All items in tool lists must be callable, got {type(item)}"
                     )
-                merged.append(item)
+                func_key = (item.__name__, getattr(item, "__module__", ""))
+                if func_key not in seen:
+                    merged.append(item)
+                    seen.add(func_key)
         else:
             raise TypeError(
                 f"Arguments must be callable or list of callables, got {type(arg)}"
