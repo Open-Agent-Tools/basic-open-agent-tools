@@ -134,6 +134,72 @@ def load_data_csv_tools() -> List[Callable[..., Any]]:
     return tools
 
 
+def load_data_structure_tools() -> List[Callable[..., Any]]:
+    """Load data structure manipulation tools as a list of callable functions.
+
+    Returns:
+        List of data structure tool functions
+
+    Example:
+        >>> structure_tools = load_data_structure_tools()
+        >>> len(structure_tools) == 10
+        True
+    """
+    from .data import structures
+
+    tools = []
+    structure_function_names = [
+        "flatten_dict",
+        "unflatten_dict",
+        "get_nested_value",
+        "set_nested_value",
+        "merge_dicts",
+        "compare_data_structures",
+        "safe_get",
+        "remove_empty_values",
+        "extract_keys",
+        "rename_keys",
+    ]
+
+    for name in structure_function_names:
+        func = getattr(structures, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
+def load_data_validation_tools() -> List[Callable[..., Any]]:
+    """Load data validation tools as a list of callable functions.
+
+    Returns:
+        List of data validation tool functions
+
+    Example:
+        >>> validation_tools = load_data_validation_tools()
+        >>> len(validation_tools) == 6
+        True
+    """
+    from .data import validation
+
+    tools = []
+    validation_function_names = [
+        "validate_schema",
+        "check_required_fields",
+        "validate_data_types",
+        "validate_range",
+        "aggregate_validation_errors",
+        "create_validation_report",
+    ]
+
+    for name in validation_function_names:
+        func = getattr(validation, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
 def merge_tool_lists(
     *args: Union[List[Callable[..., Any]], Callable[..., Any]],
 ) -> List[Callable[..., Any]]:

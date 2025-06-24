@@ -80,7 +80,7 @@ def validate_json_string(json_str: str) -> bool:
         False
     """
     if not isinstance(json_str, str):
-        return False
+        return False  # type: ignore[unreachable]
 
     try:
         json.loads(json_str)

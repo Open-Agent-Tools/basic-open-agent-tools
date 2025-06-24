@@ -346,7 +346,7 @@ def clean_csv_data(
 
     for row in data:
         if not isinstance(row, dict):
-            continue  # Skip non-dictionary items
+            continue  # type: ignore[unreachable]
 
         cleaned_row = {}
 
