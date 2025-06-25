@@ -23,7 +23,7 @@ Thank you for your interest in contributing to basic-open-agent-tools! This tool
    # Using venv
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
-   
+
    # Or using uv (recommended)
    uv venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
@@ -33,10 +33,39 @@ Thank you for your interest in contributing to basic-open-agent-tools! This tool
    ```bash
    # Using pip
    pip install -e ".[dev]"
-   
+
    # Or using uv
    uv pip install -e ".[dev]"
    ```
+
+
+## 🏗️ Agent Toolkit Design Philosophy
+
+This project is specifically designed to provide **tool functions for AI agents**. 
+
+### Key Design Principles
+
+- **Function-First Design:** Each function works as a standalone agent tool with clear signatures optimized for AI interpretation
+- **Comprehensive Docstrings:** Help AI understand function purpose and usage
+- **Stateless Operations:** Thread-safe and concurrent-friendly
+- **Consistent Error Handling:** Predictable exception patterns
+- **Type Safety:** Full type annotations for all functions
+- **Minimal Dependencies:** Prefer Python standard library where possible
+
+### Agent Framework Integration
+
+The toolkit is designed to work with various agent frameworks:
+- **Google ADK:** Direct function imports in tools list
+- **LangChain:** Functions wrapped with StructuredTool
+- **Custom Agents:** Direct function integration
+- **MCP Servers:** Adaptable for Model Context Protocol
+
+### Quality Standards
+
+- **Testing:** Minimum 70% coverage target for new modules
+- **Documentation:** Complete API reference and examples
+- **Type Safety:** 100% mypy compliance
+- **Code Quality:** All ruff checks passing
 
 ## Development Workflow
 
@@ -82,65 +111,20 @@ python -m build
 pip install -e .
 ```
 
-## Project Structure
-
-```
-basic-open-agent-tools/
-├── src/basic_open_agent_tools/    # Main package source
-│   ├── __init__.py               # Package initialization
-│   ├── exceptions.py             # Custom exceptions
-│   ├── types.py                  # Type definitions
-│   ├── file_system/              # File system tools (implemented)
-│   │   ├── __init__.py
-│   │   ├── operations.py         # Core file operations
-│   │   ├── info.py              # File information utilities
-│   │   ├── tree.py              # Directory tree operations
-│   │   └── validation.py        # Path validation
-│   ├── network/                  # Network tools (planned)
-│   ├── text/                     # Text processing (planned)
-│   ├── data/                     # Data utilities (planned)
-│   ├── system/                   # System tools (planned)
-│   ├── crypto/                   # Crypto utilities (planned)
-│   └── utilities/                # Common utilities (planned)
-├── tests/                        # Test suite
-├── docs/                         # Documentation
-├── .github/workflows/            # CI/CD pipelines
-└── pyproject.toml               # Package configuration
-```
-
-## Agent Toolkit Design Philosophy
-
-This project is specifically designed to provide **tool functions for AI agents**. Key principles:
-
-### Function-First Design
-- Each function is designed to work as an individual agent tool
-- Functions have clear, descriptive names suitable for AI interpretation
-- Parameters and return values are optimized for agent framework integration
-- Comprehensive docstrings help AI understand function purpose and usage
-
-### Agent Framework Integration
-Functions are designed to work with various agent frameworks:
-- **Google ADK** - Direct function imports in tools list
-- **LangChain** - Functions can be wrapped with StructuredTool
-- **Custom Agents** - Direct function integration
-- **MCP Servers** - Adaptable for Model Context Protocol
-
-### Import Patterns
-- **Individual function imports** (preferred for agents)
-- **Module imports** (for direct developer usage)
-- **Clear separation** between agent tools and developer utilities
-
 ## Contributing Guidelines
 
 ### Code Style for Agent Tools
 
-- Follow PEP 8 style guidelines
-- Use type hints for all function parameters and return values
-- Write comprehensive docstrings for all public functions and classes
-- Keep functions focused and single-purpose (optimal for agent tools)
-- Use descriptive variable and function names that agents can understand
-- Design function signatures to be clear for AI interpretation
-- Ensure functions are stateless and thread-safe where possible
+- **Follow PEP 8** style guidelines
+- **Type hints throughout** - Use type hints for all function parameters and return values
+- **Comprehensive docstrings** - Help AI understand function purpose and usage
+- **Clear, focused purpose** - Each function does one thing well (optimal for agent tools)
+- **Agent-friendly names** - Descriptive function and variable names that AI can understand
+- **Clear function signatures** - Design function signatures to be clear for AI interpretation
+- **Stateless design** - Functions don't rely on external state
+- **Thread-safe operations** - Safe for concurrent agent usage
+- **Individual function exports** - Functions can be imported individually
+- **Appropriate error handling** - Consistent exception patterns
 
 ### Documentation
 
@@ -178,15 +162,7 @@ The project is organized into these categories:
 
 ### 2. Follow the Agent Tool Pattern
 
-Each module should provide functions that work well as agent tools:
-- **Clear, focused purpose** - Each function does one thing well
-- **Agent-friendly names** - Descriptive function names that AI can understand
-- **Comprehensive docstrings** - Help AI understand function purpose and usage
-- **Type hints throughout** - Clear parameter and return types
-- **Appropriate error handling** - Consistent exception patterns
-- **Individual function exports** - Functions can be imported individually
-- **Stateless design** - Functions don't rely on external state
-- **Thread-safe operations** - Safe for concurrent agent usage
+Each module should provide functions that work well as agent tools, following the code style guidelines above.
 
 ### 3. Agent Integration Testing
 

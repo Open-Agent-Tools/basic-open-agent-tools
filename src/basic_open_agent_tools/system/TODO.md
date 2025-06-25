@@ -8,9 +8,13 @@ System-level operations and information gathering tools for AI agents.
 ### High Priority
 - [ ] **Process Management** (`process.py`)
   - Command execution with timeout
+    - Ensure avoidance of shell injection vulnerabilities.
+    - Build a mechanism to pre-validate commands for safety.
   - Process spawning and monitoring
+    - Separate concerns between command execution and process tree management for modularity.
   - Subprocess communication
   - Process tree operations
+    - Add support for platform-specific process management tools as needed.
   - Safe command execution
   - Return code handling
 
@@ -20,16 +24,8 @@ System-level operations and information gathering tools for AI agents.
   - Working directory management
   - User/system information
   - Platform detection
+    - Test platform-dependent features early to catch cross-platform issues.
   - Shell detection
-
-### Medium Priority
-- [ ] **Resource Monitoring** (`resources.py`)
-  - CPU usage monitoring
-  - Memory usage information
-  - Disk space checking
-  - System load information
-  - Process resource usage
-  - Basic performance metrics
 
 - [ ] **System Information** (`info.py`)
   - Operating system details
@@ -38,28 +34,33 @@ System-level operations and information gathering tools for AI agents.
   - Timezone and locale information
   - System uptime and boot time
   - Available system tools detection
-
-### Low Priority
-- [ ] **Service Management** (`services.py`)
-  - System service status checking
-  - Basic service interaction
-  - Daemon/service utilities
-  - Process management helpers
+  - Start with universally supported features to ensure portability, deferring platform-specific nuances for later consideration.
 
 - [ ] **Logging Integration** (`logging.py`)
   - System log access (where available)
   - Log file monitoring
+    - Include features for structured logging (e.g., JSON or CSV formats for AI-readability).
+    - Prepare provisions for log file rotation for long-running scenarios.
   - Structured logging helpers
   - Log rotation utilities
 
 ## Design Considerations for Agent Tools
 - Cross-platform compatibility (Windows, macOS, Linux)
+  - Identify platform differences early and create abstractions for platform-specific operations.
 - Functions designed as individual agent tools
 - Secure command execution (avoid shell injection)
 - Proper error handling for system operations
 - Resource cleanup (processes, file handles)
+  - Ensure all long-running operations incorporate timeout mechanisms and clear cleanup procedures.
 - Permission and security awareness
 - Timeout handling for long-running operations
 - Non-blocking operations where possible
 - Functions suitable for agent framework integration
 - Clear function signatures optimized for AI tool usage
+
+## Suggestions for Organization and Workflow
+- Include minimal placeholder files/modules for planned components to align folder structure.
+- Create a central shared utility folder (e.g., `utilities/`) for constants, exception handling, configuration, and logging components reusable across modules.
+- Begin writing API documentation and examples in the early development phase.
+- Ensure cross-platform testing for system-specific modules to minimize regressions later.
+- Incrementally deliver components starting from high-priority and widely reusable modules like `process.py` and `environment.py`.

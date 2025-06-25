@@ -100,7 +100,6 @@ Text Processing Tools:
 ## Documentation
 
 - **[Getting Started](docs/getting-started.md)** - Installation and quick start guide
-- **[API Reference](docs/api-reference.md)** - Complete function documentation
 - **[Examples](docs/examples.md)** - Detailed usage examples and patterns
 - **[Contributing](docs/contributing.md)** - Development setup and guidelines
 
