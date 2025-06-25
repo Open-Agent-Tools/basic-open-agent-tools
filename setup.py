@@ -2,18 +2,21 @@
 
 from setuptools import find_packages, setup
 
+
 # Read version from __init__.py
 def get_version():
     with open("src/basic_open_agent_tools/__init__.py") as f:
         for line in f:
             if line.startswith("__version__"):
-                return line.split("=")[1].strip().strip('"\'')
+                return line.split("=")[1].strip().strip("\"'")
     raise RuntimeError("Version not found")
+
 
 # Read long description from README
 def get_long_description():
     with open("README.md", encoding="utf-8") as f:
         return f.read()
+
 
 setup(
     name="basic-open-agent-tools",
