@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-from setuptools import setup, find_packages
-import os
+from setuptools import find_packages, setup
 
 # Read version from __init__.py
 def get_version():
-    with open("src/basic_open_agent_tools/__init__.py", "r") as f:
+    with open("src/basic_open_agent_tools/__init__.py") as f:
         for line in f:
             if line.startswith("__version__"):
                 return line.split("=")[1].strip().strip('"\'')
@@ -13,7 +12,7 @@ def get_version():
 
 # Read long description from README
 def get_long_description():
-    with open("README.md", "r", encoding="utf-8") as f:
+    with open("README.md", encoding="utf-8") as f:
         return f.read()
 
 setup(
@@ -37,7 +36,7 @@ setup(
     keywords=["ai", "agents", "toolkit", "automation", "local-tools"],
     classifiers=[
         "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers", 
+        "Intended Audience :: Developers",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
@@ -52,7 +51,7 @@ setup(
     extras_require={
         "dev": [
             "pytest>=7.0.0",
-            "pytest-cov>=4.0.0", 
+            "pytest-cov>=4.0.0",
             "ruff>=0.1.0",
             "mypy>=1.0.0",
             "pre-commit>=3.0.0",
