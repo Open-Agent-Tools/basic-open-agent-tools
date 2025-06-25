@@ -27,10 +27,9 @@ import basic_open_agent_tools as boat
 # Load tools by category
 fs_tools = boat.load_all_filesystem_tools()    # 18 functions
 text_tools = boat.load_all_text_tools()       # 10 functions
-data_tools = boat.load_all_data_tools()       # 28 functions (Phase 1 ✅)
 
 # Merge for agent use (automatically deduplicates)
-agent_tools = boat.merge_tool_lists(fs_tools, text_tools, data_tools)
+agent_tools = boat.merge_tool_lists(fs_tools, text_tools)
 
 
 load_dotenv()
