@@ -17,7 +17,8 @@ from ..exceptions import DataError
 
 # Optional imports with graceful fallbacks
 try:
-    import yaml
+    import yaml  # type: ignore[import-untyped]
+
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
@@ -26,12 +27,14 @@ except ImportError:
 if sys.version_info >= (3, 11):
     try:
         import tomllib
+
         TOML_AVAILABLE = True
     except ImportError:
         TOML_AVAILABLE = False
 else:
     try:
-        import tomli
+        import tomli  # type: ignore[import-not-found]
+
         TOML_AVAILABLE = True
     except ImportError:
         TOML_AVAILABLE = False
@@ -67,7 +70,7 @@ def read_yaml_file(file_path: str) -> Dict[str, Any]:
 
     try:
         with open(file_path, encoding="utf-8") as file:
-            return yaml.safe_load(file)
+            return yaml.safe_load(file) or {}
     except yaml.YAMLError as e:
         raise ValueError(f"Invalid YAML file: {str(e)}")
     except Exception as e:
@@ -136,9 +139,9 @@ def read_toml_file(file_path: str) -> Dict[str, Any]:
     try:
         with open(file_path, "rb") as file:
             if sys.version_info >= (3, 11):
-                return tomllib.load(file)
+                return tomllib.load(file) or {}
             else:
-                return tomli.load(file)
+                return tomli.load(file) or {}
     except ValueError as e:
         # Both tomli.TOMLDecodeError and tomllib.TOMLDecodeError inherit from ValueError
         raise ValueError(f"Invalid TOML file: {str(e)}")
@@ -163,7 +166,7 @@ def write_toml_file(data: Dict[str, Any], file_path: str) -> None:
         >>> write_toml_file(data, "config.toml")
     """
     try:
-        import tomli_w
+        import tomli_w  # type: ignore[import-not-found]
     except ImportError:
         raise DataError(
             "tomli_w is required for writing TOML files. "
@@ -247,7 +250,9 @@ def write_ini_file(data: Dict[str, Dict[str, str]], file_path: str) -> None:
         raise DataError(f"Failed to write INI file: {str(e)}")
 
 
-def validate_config_schema(config_data: Dict[str, Any], schema: Dict[str, Any]) -> List[str]:
+def validate_config_schema(
+    config_data: Dict[str, Any], schema: Dict[str, Any]
+) -> List[str]:
     """Validate configuration data against a schema.
 
     This function performs basic validation of configuration data against a schema
@@ -318,7 +323,9 @@ def validate_config_schema(config_data: Dict[str, Any], schema: Dict[str, Any]) 
     return errors
 
 
-def merge_config_files(*config_paths: str, format_type: Optional[str] = None) -> Dict[str, Any]:
+def merge_config_files(
+    *config_paths: str, format_type: Optional[str] = None
+) -> Dict[str, Any]:
     """Merge multiple configuration files into a single configuration.
 
     Later files in the list override values from earlier files.
@@ -358,13 +365,18 @@ def merge_config_files(*config_paths: str, format_type: Optional[str] = None) ->
     # Validate all files have the same format
     for path in config_paths:
         ext = os.path.splitext(path)[1].lower()
-        if (format_type == "yaml" and ext not in (".yaml", ".yml") or
-            format_type == "toml" and ext != ".toml" or
-            format_type == "ini" and ext != ".ini"):
+        if (
+            format_type == "yaml"
+            and ext not in (".yaml", ".yml")
+            or format_type == "toml"
+            and ext != ".toml"
+            or format_type == "ini"
+            and ext != ".ini"
+        ):
             raise DataError(f"File {path} does not match format type {format_type}")
 
     # Read and merge configs
-    merged_config = {}
+    merged_config: Dict[str, Any] = {}
 
     for path in config_paths:
         if not os.path.isfile(path):

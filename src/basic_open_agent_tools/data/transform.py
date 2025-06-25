@@ -10,7 +10,7 @@ from typing import Any, Callable, Dict, List, TypeVar, Union
 
 from ..exceptions import DataError
 
-T = TypeVar('T')
+T = TypeVar("T")
 DataRecord = Dict[str, Any]
 DataList = List[DataRecord]
 TransformationFunc = Callable[[Any], Any]
@@ -67,7 +67,9 @@ def transform_data(data: DataList, mapping: TransformationMap) -> DataList:
                 # Value transformation
                 new_record[src_field] = transform(value)
             else:
-                raise DataError(f"Invalid transformation for field '{src_field}': must be string or callable")
+                raise DataError(
+                    f"Invalid transformation for field '{src_field}': must be string or callable"
+                )
 
         result.append(new_record)
 
@@ -114,7 +116,9 @@ def rename_fields(data: DataList, field_mapping: Dict[str, str]) -> DataList:
     return result
 
 
-def convert_data_types(data: DataList, type_conversions: Dict[str, Callable[[Any], Any]]) -> DataList:
+def convert_data_types(
+    data: DataList, type_conversions: Dict[str, Callable[[Any], Any]]
+) -> DataList:
     """Convert field values to specified types in a list of data records.
 
     Args:
@@ -154,14 +158,18 @@ def convert_data_types(data: DataList, type_conversions: Dict[str, Callable[[Any
                 try:
                     new_record[field] = converter(new_record[field])
                 except Exception as e:
-                    raise ValueError(f"Failed to convert field '{field}' with value '{new_record[field]}': {str(e)}")
+                    raise ValueError(
+                        f"Failed to convert field '{field}' with value '{new_record[field]}': {str(e)}"
+                    )
 
         result.append(new_record)
 
     return result
 
 
-def apply_data_transformations(data: DataList, transformations: List[Callable[[DataList], DataList]]) -> DataList:
+def apply_data_transformations(
+    data: DataList, transformations: List[Callable[[DataList], DataList]]
+) -> DataList:
     """Apply multiple transformation functions to data in sequence.
 
     Args:
@@ -198,12 +206,16 @@ def apply_data_transformations(data: DataList, transformations: List[Callable[[D
             raise DataError("Each transformation must return a list of records")
 
         if result and not all(isinstance(r, dict) for r in result):
-            raise DataError("Each transformation must return a list of dictionary records")
+            raise DataError(
+                "Each transformation must return a list of dictionary records"
+            )
 
     return result
 
 
-def clean_data(data: DataList, rules: Dict[str, List[Callable[[Any], Any]]]) -> DataList:
+def clean_data(
+    data: DataList, rules: Dict[str, List[Callable[[Any], Any]]]
+) -> DataList:
     """Apply cleaning rules to data fields.
 
     Args:
@@ -242,12 +254,16 @@ def clean_data(data: DataList, rules: Dict[str, List[Callable[[Any], Any]]]) -> 
 
                 for cleaner in cleaners:
                     if not callable(cleaner):
-                        raise DataError(f"Cleaning rule for field '{field}' must be callable")
+                        raise DataError(
+                            f"Cleaning rule for field '{field}' must be callable"
+                        )
 
                     try:
                         value = cleaner(value)
                     except Exception as e:
-                        raise DataError(f"Failed to apply cleaner to field '{field}': {str(e)}")
+                        raise DataError(
+                            f"Failed to apply cleaner to field '{field}': {str(e)}"
+                        )
 
                 new_record[field] = value
 
@@ -305,7 +321,9 @@ def deduplicate_records(data: DataList, key_fields: List[str]) -> DataList:
     return result
 
 
-def normalize_data(data: DataList, normalization_rules: Dict[str, Callable[[Any], Any]]) -> DataList:
+def normalize_data(
+    data: DataList, normalization_rules: Dict[str, Callable[[Any], Any]]
+) -> DataList:
     """Normalize data values according to specified rules.
 
     Args:
@@ -347,7 +365,9 @@ def normalize_data(data: DataList, normalization_rules: Dict[str, Callable[[Any]
     return result
 
 
-def pivot_data(data: DataList, row_key: str, col_key: str, value_key: str) -> Dict[Any, Dict[Any, Any]]:
+def pivot_data(
+    data: DataList, row_key: str, col_key: str, value_key: str
+) -> Dict[Any, Dict[Any, Any]]:
     """Transform a list of records into a pivot table structure.
 
     Args:
@@ -378,7 +398,7 @@ def pivot_data(data: DataList, row_key: str, col_key: str, value_key: str) -> Di
     if not isinstance(data, list):
         raise DataError("Input data must be a list of records")
 
-    result = defaultdict(dict)
+    result: Dict[Any, Dict[Any, Any]] = defaultdict(dict)
 
     for record in data:
         if not isinstance(record, dict):

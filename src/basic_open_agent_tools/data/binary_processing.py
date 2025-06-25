@@ -180,16 +180,23 @@ def validate_binary_format(data: bytes, expected_format: str) -> bool:
         "rar": b"Rar!\x1a\x07",
         "7z": b"7z\xbc\xaf\x27\x1c",
         "tar": b"ustar" in data[257:262] if len(data) >= 262 else False,
-        "mp3": b"ID3" == data[:3] or b"\xFF\xFB" == data[:2],
+        "mp3": b"ID3" == data[:3] or b"\xff\xfb" == data[:2],
         "mp4": b"ftyp" in data[4:8] if len(data) >= 8 else False,
-        "avi": b"RIFF" == data[:4] and b"AVI " == data[8:12] if len(data) >= 12 else False,
-        "wav": b"RIFF" == data[:4] and b"WAVE" == data[8:12] if len(data) >= 12 else False,
+        "avi": b"RIFF" == data[:4] and b"AVI " == data[8:12]
+        if len(data) >= 12
+        else False,
+        "wav": b"RIFF" == data[:4] and b"WAVE" == data[8:12]
+        if len(data) >= 12
+        else False,
     }
 
     if expected_format.lower() in signatures:
-        if isinstance(signatures[expected_format.lower()], bool):
-            return signatures[expected_format.lower()]
-        return signatures[expected_format.lower()] == data[:len(signatures[expected_format.lower()])]
+        signature = signatures[expected_format.lower()]
+        if isinstance(signature, bool):
+            return signature
+        elif isinstance(signature, bytes):
+            return signature == data[: len(signature)]
+        return False
 
     # If no specific validation is available, return False
     return False

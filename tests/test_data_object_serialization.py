@@ -1,14 +1,15 @@
 """Tests for object serialization functions."""
 
 import pickle
-import pytest
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict
+
+import pytest
 
 from basic_open_agent_tools.data.object_serialization import (
-    serialize_object,
     deserialize_object,
     sanitize_for_serialization,
+    serialize_object,
     validate_pickle_safety,
 )
 from basic_open_agent_tools.exceptions import DataError
@@ -86,7 +87,7 @@ class TestDeserializeObject:
 
         # Invalid pickle
         with pytest.raises(ValueError):
-            deserialize_object(b'not pickle data', method="pickle")
+            deserialize_object(b"not pickle data", method="pickle")
 
     def test_deserialize_object_not_bytes(self):
         """Test deserializing with non-bytes input."""
@@ -138,10 +139,7 @@ class TestSanitizeForSerialization:
         data = {
             "name": "test",
             "values": [1, 2, 3],
-            "metadata": {
-                "created": datetime(2023, 1, 1),
-                "tags": {"tag1", "tag2"}
-            }
+            "metadata": {"created": datetime(2023, 1, 1), "tags": {"tag1", "tag2"}},
         }
 
         sanitized = sanitize_for_serialization(data)

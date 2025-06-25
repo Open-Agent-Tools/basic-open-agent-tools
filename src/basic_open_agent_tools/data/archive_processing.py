@@ -12,7 +12,9 @@ from typing import Dict, List, Optional, Union
 from ..exceptions import DataError
 
 
-def create_zip_archive(files: Union[List[str], Dict[str, str]], archive_path: str) -> None:
+def create_zip_archive(
+    files: Union[List[str], Dict[str, str]], archive_path: str
+) -> None:
     """Create a ZIP archive containing the specified files.
 
     Args:
@@ -57,8 +59,9 @@ def create_zip_archive(files: Union[List[str], Dict[str, str]], archive_path: st
         raise DataError(f"Failed to create ZIP archive: {str(e)}")
 
 
-def extract_zip_archive(archive_path: str, extract_to: str,
-                        safe_extraction: bool = True) -> List[str]:
+def extract_zip_archive(
+    archive_path: str, extract_to: str, safe_extraction: bool = True
+) -> List[str]:
     """Extract a ZIP archive to the specified directory.
 
     Args:
@@ -93,7 +96,9 @@ def extract_zip_archive(archive_path: str, extract_to: str,
             # Check for path traversal attacks if safe_extraction is enabled
             if safe_extraction:
                 for file_info in zip_file.infolist():
-                    file_path = os.path.abspath(os.path.join(extract_to, file_info.filename))
+                    file_path = os.path.abspath(
+                        os.path.join(extract_to, file_info.filename)
+                    )
                     if not file_path.startswith(extract_to_abs):
                         raise DataError(
                             f"Attempted path traversal in ZIP: {file_info.filename}"
@@ -151,13 +156,15 @@ def list_archive_contents(archive_path: str) -> List[Dict[str, Union[str, int, b
             with zipfile.ZipFile(archive_path, "r") as zip_file:
                 contents = []
                 for file_info in zip_file.infolist():
-                    contents.append({
-                        "name": file_info.filename,
-                        "size": file_info.file_size,
-                        "compressed_size": file_info.compress_size,
-                        "is_dir": file_info.is_dir(),
-                        "mtime": file_info.date_time,
-                    })
+                    contents.append(
+                        {
+                            "name": file_info.filename,
+                            "size": file_info.file_size,
+                            "compressed_size": file_info.compress_size,
+                            "is_dir": file_info.is_dir(),
+                            "mtime": file_info.date_time,
+                        }
+                    )
                 return contents
 
         elif extension in (".tar", ".tgz", ".gz", ".bz2", ".xz"):
@@ -165,13 +172,15 @@ def list_archive_contents(archive_path: str) -> List[Dict[str, Union[str, int, b
             with tarfile.open(archive_path, "r:*") as tar_file:
                 contents = []
                 for member in tar_file.getmembers():
-                    contents.append({
-                        "name": member.name,
-                        "size": member.size,
-                        "is_dir": member.isdir(),
-                        "mtime": member.mtime,
-                        "mode": member.mode,
-                    })
+                    contents.append(
+                        {
+                            "name": member.name,
+                            "size": member.size,
+                            "is_dir": member.isdir(),
+                            "mtime": member.mtime,
+                            "mode": member.mode,
+                        }
+                    )
                 return contents
 
         else:
@@ -183,7 +192,9 @@ def list_archive_contents(archive_path: str) -> List[Dict[str, Union[str, int, b
         raise DataError(f"Failed to read archive: {str(e)}")
 
 
-def add_to_archive(archive_path: str, file_path: str, archive_name: Optional[str] = None) -> None:
+def add_to_archive(
+    archive_path: str, file_path: str, archive_name: Optional[str] = None
+) -> None:
     """Add a file to an existing archive.
 
     Args:
@@ -227,12 +238,15 @@ def add_to_archive(archive_path: str, file_path: str, archive_name: Optional[str
             temp_path = archive_path + ".tmp"
 
             # Copy the original archive and add the new file
-            with tarfile.open(archive_path, f"r:{mode}") as src_tar, \
-                 tarfile.open(temp_path, f"w:{mode}") as dest_tar:
-
+            with tarfile.open(archive_path, f"r:{mode}") as src_tar, tarfile.open(
+                temp_path, f"w:{mode}"
+            ) as dest_tar:
                 # Copy existing files
                 for member in src_tar.getmembers():
-                    dest_tar.addfile(member, src_tar.extractfile(member) if not member.isdir() else None)
+                    dest_tar.addfile(
+                        member,
+                        src_tar.extractfile(member) if not member.isdir() else None,
+                    )
 
                 # Add the new file
                 dest_tar.add(file_path, arcname=archive_name)
@@ -249,8 +263,11 @@ def add_to_archive(archive_path: str, file_path: str, archive_name: Optional[str
         raise DataError(f"Failed to add file to archive: {str(e)}")
 
 
-def create_tar_archive(files: Union[List[str], Dict[str, str]], archive_path: str,
-                       compression: Optional[str] = None) -> None:
+def create_tar_archive(
+    files: Union[List[str], Dict[str, str]],
+    archive_path: str,
+    compression: Optional[str] = None,
+) -> None:
     """Create a TAR archive containing the specified files.
 
     Args:
@@ -306,8 +323,9 @@ def create_tar_archive(files: Union[List[str], Dict[str, str]], archive_path: st
         raise DataError(f"Failed to create TAR archive: {str(e)}")
 
 
-def extract_tar_archive(archive_path: str, extract_to: str,
-                        safe_extraction: bool = True) -> List[str]:
+def extract_tar_archive(
+    archive_path: str, extract_to: str, safe_extraction: bool = True
+) -> List[str]:
     """Extract a TAR archive to the specified directory.
 
     Args:
@@ -350,9 +368,7 @@ def extract_tar_archive(archive_path: str, extract_to: str,
 
                     # Also check for absolute paths in the archive
                     if member.name.startswith(("/", "~")):
-                        raise DataError(
-                            f"Absolute path in TAR: {member.name}"
-                        )
+                        raise DataError(f"Absolute path in TAR: {member.name}")
 
             # Extract all files
             tar_file.extractall(extract_to)
