@@ -6,11 +6,43 @@ This module provides data processing and manipulation tools organized into logic
 - json_tools: JSON serialization, compression, and validation
 - csv_tools: CSV file processing, parsing, and cleaning
 - validation: Data validation and schema checking
+- transform: Data transformation, cleaning, and normalization
+- object_serialization: Object serialization and deserialization
+- config_processing: Configuration file processing (YAML, TOML, INI)
+- binary_processing: Binary data handling and encoding
+- archive_processing: Archive file creation and extraction (ZIP, TAR)
 """
 
 from typing import List
 
 # Import all functions from submodules
+from .archive_processing import (
+    add_to_archive,
+    create_tar_archive,
+    create_zip_archive,
+    extract_tar_archive,
+    extract_zip_archive,
+    list_archive_contents,
+    validate_archive_integrity,
+)
+from .binary_processing import (
+    decode_binary_data,
+    encode_binary_data,
+    extract_binary_metadata,
+    read_binary_file,
+    validate_binary_format,
+    write_binary_file,
+)
+from .config_processing import (
+    merge_config_files,
+    read_ini_file,
+    read_toml_file,
+    read_yaml_file,
+    validate_config_schema,
+    write_ini_file,
+    write_toml_file,
+    write_yaml_file,
+)
 from .csv_tools import (
     clean_csv_data,
     csv_to_dict_list,
@@ -27,6 +59,12 @@ from .json_tools import (
     safe_json_serialize,
     validate_json_string,
 )
+from .object_serialization import (
+    deserialize_object,
+    sanitize_for_serialization,
+    serialize_object,
+    validate_pickle_safety,
+)
 from .structures import (
     compare_data_structures,
     extract_keys,
@@ -38,6 +76,16 @@ from .structures import (
     safe_get,
     set_nested_value,
     unflatten_dict,
+)
+from .transform import (
+    apply_data_transformations,
+    clean_data,
+    convert_data_types,
+    deduplicate_records,
+    normalize_data,
+    pivot_data,
+    rename_fields,
+    transform_data,
 )
 from .validation import (
     aggregate_validation_errors,
@@ -75,6 +123,15 @@ __all__: List[str] = [
     "detect_csv_delimiter",
     "validate_csv_structure",
     "clean_csv_data",
+    # Data transformation
+    "transform_data",
+    "rename_fields",
+    "convert_data_types",
+    "apply_data_transformations",
+    "clean_data",
+    "deduplicate_records",
+    "normalize_data",
+    "pivot_data",
     # Validation
     "validate_schema",
     "check_required_fields",
@@ -82,4 +139,33 @@ __all__: List[str] = [
     "validate_range",
     "aggregate_validation_errors",
     "create_validation_report",
+    # Object serialization
+    "serialize_object",
+    "deserialize_object",
+    "sanitize_for_serialization",
+    "validate_pickle_safety",
+    # Configuration processing
+    "read_yaml_file",
+    "write_yaml_file",
+    "read_toml_file",
+    "write_toml_file",
+    "read_ini_file",
+    "write_ini_file",
+    "validate_config_schema",
+    "merge_config_files",
+    # Binary processing
+    "read_binary_file",
+    "write_binary_file",
+    "encode_binary_data",
+    "decode_binary_data",
+    "validate_binary_format",
+    "extract_binary_metadata",
+    # Archive processing
+    "create_zip_archive",
+    "extract_zip_archive",
+    "list_archive_contents",
+    "add_to_archive",
+    "create_tar_archive",
+    "extract_tar_archive",
+    "validate_archive_integrity",
 ]

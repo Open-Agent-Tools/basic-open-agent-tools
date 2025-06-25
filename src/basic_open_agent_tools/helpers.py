@@ -200,6 +200,164 @@ def load_data_validation_tools() -> List[Callable[..., Any]]:
     return tools
 
 
+def load_data_transformation_tools() -> List[Callable[..., Any]]:
+    """Load data transformation tools as a list of callable functions.
+
+    Returns:
+        List of data transformation tool functions
+
+    Example:
+        >>> transform_tools = load_data_transformation_tools()
+        >>> len(transform_tools) == 8
+        True
+    """
+    from .data import transform
+
+    tools = []
+    transform_function_names = [
+        "transform_data",
+        "rename_fields",
+        "convert_data_types",
+        "apply_data_transformations",
+        "clean_data",
+        "deduplicate_records",
+        "normalize_data",
+        "pivot_data",
+    ]
+
+    for name in transform_function_names:
+        func = getattr(transform, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
+def load_data_object_tools() -> List[Callable[..., Any]]:
+    """Load object serialization tools as a list of callable functions.
+
+    Returns:
+        List of object serialization tool functions
+
+    Example:
+        >>> object_tools = load_data_object_tools()
+        >>> len(object_tools) == 4
+        True
+    """
+    from .data import object_serialization
+
+    tools = []
+    object_function_names = [
+        "serialize_object",
+        "deserialize_object",
+        "sanitize_for_serialization",
+        "validate_pickle_safety",
+    ]
+
+    for name in object_function_names:
+        func = getattr(object_serialization, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
+def load_data_config_tools() -> List[Callable[..., Any]]:
+    """Load configuration file processing tools as a list of callable functions.
+
+    Returns:
+        List of configuration file processing tool functions
+
+    Example:
+        >>> config_tools = load_data_config_tools()
+        >>> len(config_tools) == 8
+        True
+    """
+    from .data import config_processing
+
+    tools = []
+    config_function_names = [
+        "read_yaml_file",
+        "write_yaml_file",
+        "read_toml_file",
+        "write_toml_file",
+        "read_ini_file",
+        "write_ini_file",
+        "validate_config_schema",
+        "merge_config_files",
+    ]
+
+    for name in config_function_names:
+        func = getattr(config_processing, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
+def load_data_binary_tools() -> List[Callable[..., Any]]:
+    """Load binary data processing tools as a list of callable functions.
+
+    Returns:
+        List of binary data processing tool functions
+
+    Example:
+        >>> binary_tools = load_data_binary_tools()
+        >>> len(binary_tools) == 6
+        True
+    """
+    from .data import binary_processing
+
+    tools = []
+    binary_function_names = [
+        "read_binary_file",
+        "write_binary_file",
+        "encode_binary_data",
+        "decode_binary_data",
+        "validate_binary_format",
+        "extract_binary_metadata",
+    ]
+
+    for name in binary_function_names:
+        func = getattr(binary_processing, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
+def load_data_archive_tools() -> List[Callable[..., Any]]:
+    """Load archive processing tools as a list of callable functions.
+
+    Returns:
+        List of archive processing tool functions
+
+    Example:
+        >>> archive_tools = load_data_archive_tools()
+        >>> len(archive_tools) == 7
+        True
+    """
+    from .data import archive_processing
+
+    tools = []
+    archive_function_names = [
+        "create_zip_archive",
+        "extract_zip_archive",
+        "list_archive_contents",
+        "add_to_archive",
+        "create_tar_archive",
+        "extract_tar_archive",
+        "validate_archive_integrity",
+    ]
+
+    for name in archive_function_names:
+        func = getattr(archive_processing, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
 def merge_tool_lists(
     *args: Union[List[Callable[..., Any]], Callable[..., Any]],
 ) -> List[Callable[..., Any]]:
