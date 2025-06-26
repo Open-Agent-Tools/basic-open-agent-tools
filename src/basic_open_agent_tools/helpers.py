@@ -483,15 +483,15 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
 
     # Data Read-Only Tools (35 tools)
     from .data import (
-        json_tools,
-        csv_tools,
-        config_processing,
-        binary_processing,
         archive_processing,
-        structures,
-        validation,
+        binary_processing,
+        config_processing,
+        csv_tools,
+        json_tools,
         object_serialization,
+        structures,
         transform,
+        validation,
     )
 
     # JSON read-only tools (2)

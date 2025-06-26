@@ -1,6 +1,5 @@
 """Tests for the load_all_read_only_tools helper function."""
 
-import pytest
 
 import basic_open_agent_tools as boat
 
