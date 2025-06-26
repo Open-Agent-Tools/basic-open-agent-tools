@@ -73,6 +73,18 @@ From the README.md, follow these practices:
 3. **Type Checking**: `python3 -m mypy src/`
 4. **Test Suite**: `python3 -m pytest`
 
+### Quick Cleanup Command
+
+When the user says **"cleanup"**, perform the complete quality assurance workflow:
+
+1. Run all quality tools in parallel: ruff check, ruff format, mypy, pytest
+2. Fix any issues that can be automatically resolved
+3. Report any remaining issues that need manual attention
+4. If all checks pass or only have expected warnings, commit and push with message: "Run quality checks and cleanup"
+5. Provide detailed status summary with current repository state
+
+This provides a single command to ensure code quality and commit any formatting/cleanup changes.
+
 ### Pre-Commit Checklist
 
 Before committing any changes, ensure:
