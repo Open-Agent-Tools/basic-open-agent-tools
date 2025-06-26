@@ -1,6 +1,6 @@
 # basic-open-agent-tools
 
-An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions. Designed to offer core utilities and interfaces that developers can easily integrate into their own agents to avoid excess boilerplate, while being simpler than solutions requiring MCP or A2A.
+An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions. Designed with **agent-friendly type signatures** to eliminate "signature too complex" errors, while offering core utilities that developers can easily integrate into their agents to avoid excess boilerplate.
 
 ## Installation
 
@@ -12,6 +12,14 @@ Or with UV:
 ```bash
 uv add basic-open-agent-tools
 ```
+
+## Key Features
+
+✨ **Agent-Friendly Design**: All functions use simplified type signatures to prevent "signature too complex" errors when used with AI agent frameworks
+
+🚀 **Minimal Dependencies**: Pure Python implementation with no external dependencies for core functionality
+
+🔧 **Modular Architecture**: Load only the tools you need with category-specific helpers
 
 ## Quick Start
 
@@ -116,17 +124,20 @@ Text Processing Tools:
 - Smart text splitting and sentence extraction
 - HTML tag removal and Unicode normalization
 
-### Data Tools ✅ (28 functions - Phase 1 Complete)
-**Phase 1 ✅**: Data structures, JSON/CSV processing, validation (28 functions)
-- Data structure manipulation (flatten, merge, nested access)
-- JSON serialization with compression and validation  
-- CSV file processing and data cleaning
-- Schema validation and data type checking
+### Data Tools ✅ (28+ functions with Agent-Friendly Signatures)
+**Enhanced for AI Agents**: All functions use simplified type signatures for maximum compatibility
+- **Structure Tools**: `flatten_dict_simple`, `merge_dicts_simple`, `get_nested_value_simple`
+- **CSV Tools**: `read_csv_simple`, `write_csv_simple` with basic types
+- **Validation Tools**: `validate_schema_simple`, `validate_data_types_simple`
+- **JSON & Config**: Safe serialization with compression and validation
+- **Transform Tools**: Data cleaning and normalization functions
 
-**Phase 2 📋**: Object serialization, configuration files (15 functions)
-**Phase 3 📋**: Data transformation, YAML/TOML support (16 functions)  
-**Phase 4 📋**: Binary data, archives, streaming (18 functions)
-**Phase 5 📋**: Caching, database processing (13 functions)
+**Additional Data Modules** 📋:
+- Object serialization and configuration files (YAML, TOML, INI)
+- Binary data processing and archive handling
+- Advanced transformation and streaming utilities
+
+**✨ Agent Compatibility**: All data functions use basic Python types (str, dict, list, bool) instead of complex Union types or custom type aliases, ensuring seamless integration with AI agent frameworks.
 
 ### Future Modules 🚧
 - **Network Tools** - HTTP utilities, API helpers
