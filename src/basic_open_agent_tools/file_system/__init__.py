@@ -27,9 +27,11 @@ from .operations import (
     create_directory,
     delete_directory,
     delete_file,
+    insert_at_line,
     list_directory_contents,
     move_file,
     read_file_to_string,
+    replace_in_file,
     write_file_from_string,
 )
 from .tree import (
@@ -47,6 +49,8 @@ __all__ = [
     "read_file_to_string",
     "write_file_from_string",
     "append_to_file",
+    "replace_in_file",
+    "insert_at_line",
     # Directory operations
     "list_directory_contents",
     "create_directory",

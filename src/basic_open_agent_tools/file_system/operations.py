@@ -233,3 +233,98 @@ def copy_file(source_path: str, destination_path: str) -> bool:
         return True
     except OSError as e:
         raise FileSystemError(f"Failed to copy {src_path} to {dst_path}: {e}")
+
+
+def replace_in_file(
+    file_path: str, old_text: str, new_text: str, count: int = -1
+) -> bool:
+    """Replace occurrences of text within a file without rewriting the entire content.
+
+    This function performs targeted text replacement, making it safer for agents
+    to make small changes without accidentally removing other content.
+
+    Args:
+        file_path: Path to the file to modify
+        old_text: Text to search for and replace
+        new_text: Text to replace the old text with
+        count: Maximum number of replacements to make (-1 for all occurrences)
+
+    Returns:
+        True if successful (even if no replacements were made)
+
+    Raises:
+        FileSystemError: If file doesn't exist, can't be read, or write fails
+        ValueError: If old_text is empty
+    """
+    if not old_text:
+        raise ValueError("old_text cannot be empty")
+
+    validate_file_content(new_text, "replace")
+    path = validate_path(file_path, "replace")
+
+    if not path.is_file():
+        raise FileSystemError(f"File not found: {path}")
+
+    try:
+        # Read current content
+        content = path.read_text(encoding="utf-8")
+
+        # Perform replacement
+        updated_content = content.replace(old_text, new_text, count)
+
+        # Write back to file
+        path.write_text(updated_content, encoding="utf-8")
+        return True
+    except (OSError, UnicodeDecodeError) as e:
+        raise FileSystemError(f"Failed to replace text in file {path}: {e}")
+
+
+def insert_at_line(file_path: str, line_number: int, content: str) -> bool:
+    """Insert content at a specific line number in a file.
+
+    This function allows precise insertion of text at a specific line,
+    making it safer for agents to add content without overwriting files.
+
+    Args:
+        file_path: Path to the file to modify
+        line_number: Line number to insert at (1-based indexing)
+        content: Content to insert (will be added as a new line)
+
+    Returns:
+        True if successful
+
+    Raises:
+        FileSystemError: If file doesn't exist, can't be read, or write fails
+        ValueError: If line_number is less than 1
+    """
+    if line_number < 1:
+        raise ValueError("line_number must be 1 or greater")
+
+    validate_file_content(content, "insert")
+    path = validate_path(file_path, "insert")
+
+    if not path.is_file():
+        raise FileSystemError(f"File not found: {path}")
+
+    try:
+        # Read current lines
+        lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+
+        # Ensure content ends with newline if it doesn't already
+        if content and not content.endswith("\n"):
+            content += "\n"
+
+        # Insert at specified line (convert to 0-based index)
+        insert_index = line_number - 1
+
+        # If line number is beyond file length, append to end
+        if insert_index >= len(lines):
+            lines.append(content)
+        else:
+            lines.insert(insert_index, content)
+
+        # Write back to file
+        path.write_text("".join(lines), encoding="utf-8")
+        return True
+    except (OSError, UnicodeDecodeError) as e:
+        raise FileSystemError(f"Failed to insert content in file {path}: {e}")
