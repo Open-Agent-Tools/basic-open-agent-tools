@@ -229,7 +229,7 @@ def extract_binary_metadata(file_path: str) -> Dict[str, Any]:
         # Basic file metadata
         stat_info = os.stat(file_path)
 
-        metadata = {
+        metadata: Dict[str, Any] = {
             "size": stat_info.st_size,
             "created": stat_info.st_ctime,
             "modified": stat_info.st_mtime,

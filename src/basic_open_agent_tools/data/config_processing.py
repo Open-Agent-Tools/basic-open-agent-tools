@@ -33,7 +33,7 @@ if sys.version_info >= (3, 11):
         TOML_AVAILABLE = False
 else:
     try:
-        import tomli  # type: ignore[import-not-found]
+        import tomli
 
         TOML_AVAILABLE = True
     except ImportError:
@@ -166,7 +166,7 @@ def write_toml_file(data: Dict[str, Any], file_path: str) -> None:
         >>> write_toml_file(data, "config.toml")
     """
     try:
-        import tomli_w  # type: ignore[import-not-found]
+        import tomli_w
     except ImportError:
         raise DataError(
             "tomli_w is required for writing TOML files. "

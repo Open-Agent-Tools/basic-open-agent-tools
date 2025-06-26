@@ -7,7 +7,7 @@ archive files (ZIP, TAR) with a focus on safety and ease of use.
 import os
 import tarfile
 import zipfile
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from ..exceptions import DataError
 
@@ -120,7 +120,7 @@ def extract_zip_archive(
         raise DataError(f"Failed to extract ZIP archive: {str(e)}")
 
 
-def list_archive_contents(archive_path: str) -> List[Dict[str, Union[str, int, bool]]]:
+def list_archive_contents(archive_path: str) -> List[Dict[str, Any]]:
     """List the contents of an archive file (ZIP or TAR).
 
     Args:
@@ -238,18 +238,54 @@ def add_to_archive(
             temp_path = archive_path + ".tmp"
 
             # Copy the original archive and add the new file
-            with tarfile.open(archive_path, f"r:{mode}") as src_tar, tarfile.open(
-                temp_path, f"w:{mode}"
-            ) as dest_tar:
-                # Copy existing files
-                for member in src_tar.getmembers():
-                    dest_tar.addfile(
-                        member,
-                        src_tar.extractfile(member) if not member.isdir() else None,
-                    )
-
-                # Add the new file
-                dest_tar.add(file_path, arcname=archive_name)
+            if mode == "gz":
+                with tarfile.open(archive_path, "r:gz") as src_tar, tarfile.open(
+                    temp_path, "w:gz"
+                ) as dest_tar:
+                    # Copy existing files
+                    for member in src_tar.getmembers():
+                        dest_tar.addfile(
+                            member,
+                            src_tar.extractfile(member) if not member.isdir() else None,
+                        )
+                    # Add the new file
+                    dest_tar.add(file_path, arcname=archive_name)
+            elif mode == "bz2":
+                with tarfile.open(archive_path, "r:bz2") as src_tar, tarfile.open(
+                    temp_path, "w:bz2"
+                ) as dest_tar:
+                    # Copy existing files
+                    for member in src_tar.getmembers():
+                        dest_tar.addfile(
+                            member,
+                            src_tar.extractfile(member) if not member.isdir() else None,
+                        )
+                    # Add the new file
+                    dest_tar.add(file_path, arcname=archive_name)
+            elif mode == "xz":
+                with tarfile.open(archive_path, "r:xz") as src_tar, tarfile.open(
+                    temp_path, "w:xz"
+                ) as dest_tar:
+                    # Copy existing files
+                    for member in src_tar.getmembers():
+                        dest_tar.addfile(
+                            member,
+                            src_tar.extractfile(member) if not member.isdir() else None,
+                        )
+                    # Add the new file
+                    dest_tar.add(file_path, arcname=archive_name)
+            else:
+                with tarfile.open(archive_path, "r") as src_tar, tarfile.open(
+                    temp_path, "w"
+                ) as dest_tar:
+                    # Copy existing files
+                    for member in src_tar.getmembers():
+                        dest_tar.addfile(
+                            member,
+                            src_tar.extractfile(member) if not member.isdir() else None,
+                        )
+                    # Add the new file
+                    dest_tar.add(file_path, arcname=archive_name)
 
             # Replace the original archive with the new one
             os.replace(temp_path, archive_path)
@@ -294,28 +330,23 @@ def create_tar_archive(
             f"Must be one of: {', '.join(str(c) for c in valid_compressions)}"
         )
 
-    # Determine the mode based on compression
-    mode = f"w:{compression if compression else ''}"
-
     try:
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(os.path.abspath(archive_path)), exist_ok=True)
 
-        with tarfile.open(archive_path, mode) as tar_file:
-            if isinstance(files, list):
-                # List of files - use original filenames
-                for file_path in files:
-                    if not os.path.isfile(file_path):
-                        raise FileNotFoundError(f"File not found: {file_path}")
-
-                    tar_file.add(file_path, arcname=os.path.basename(file_path))
-            else:
-                # Dictionary mapping source paths to archive paths
-                for src_path, archive_name in files.items():
-                    if not os.path.isfile(src_path):
-                        raise FileNotFoundError(f"File not found: {src_path}")
-
-                    tar_file.add(src_path, arcname=archive_name)
+        # Use explicit mode strings to satisfy MyPy type checking
+        if compression == "gz":
+            with tarfile.open(archive_path, "w:gz") as tar_file:
+                _add_files_to_tar(tar_file, files)
+        elif compression == "bz2":
+            with tarfile.open(archive_path, "w:bz2") as tar_file:
+                _add_files_to_tar(tar_file, files)
+        elif compression == "xz":
+            with tarfile.open(archive_path, "w:xz") as tar_file:
+                _add_files_to_tar(tar_file, files)
+        else:
+            with tarfile.open(archive_path, "w") as tar_file:
+                _add_files_to_tar(tar_file, files)
 
     except tarfile.TarError as e:
         raise DataError(f"Failed to create TAR archive: {str(e)}")
@@ -425,6 +456,22 @@ def validate_archive_integrity(archive_path: str) -> bool:
 
     except (zipfile.BadZipFile, tarfile.ReadError, OSError):
         return False
+
+
+def _add_files_to_tar(tar_file: tarfile.TarFile, files: Union[List[str], Dict[str, str]]) -> None:
+    """Helper function to add files to a tar archive."""
+    if isinstance(files, list):
+        # List of files - use original filenames
+        for file_path in files:
+            if not os.path.isfile(file_path):
+                raise FileNotFoundError(f"File not found: {file_path}")
+            tar_file.add(file_path, arcname=os.path.basename(file_path))
+    else:
+        # Dictionary mapping source paths to archive paths
+        for src_path, archive_name in files.items():
+            if not os.path.isfile(src_path):
+                raise FileNotFoundError(f"File not found: {src_path}")
+            tar_file.add(src_path, arcname=archive_name)
 
 
 def _get_tar_mode(extension: str) -> str:
