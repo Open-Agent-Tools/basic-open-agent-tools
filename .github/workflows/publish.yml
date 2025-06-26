@@ -31,6 +31,12 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install build hatch
     
+    - name: Clean build artifacts
+      run: |
+        rm -rf dist/ build/ *.egg-info/
+        find . -name "*.pyc" -delete
+        find . -name "__pycache__" -type d -exec rm -rf {} + || true
+    
     - name: Build package
       run: python -m build
     
