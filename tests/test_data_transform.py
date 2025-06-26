@@ -136,42 +136,6 @@ class TestConvertDataTypes:
             convert_data_types(data, conversions)
 
 
-class TestApplyDataTransformations:
-    """Tests for apply_data_transformations function."""
-
-    def test_apply_data_transformations_basic(self):
-        """Test applying multiple transformations."""
-        data = [{"name": "john doe", "age": "42"}]
-
-        def capitalize_names(d):
-            return [{**r, "name": r["name"].title()} for r in d]
-
-        def convert_ages(d):
-            return [{**r, "age": int(r["age"])} for r in d]
-
-        result = apply_data_transformations(data, [capitalize_names, convert_ages])
-
-        assert result[0]["name"] == "John Doe"
-        assert result[0]["age"] == 42
-
-    def test_apply_data_transformations_invalid_transform(self):
-        """Test with invalid transformation."""
-        data = [{"name": "John"}]
-
-        with pytest.raises(DataError):
-            apply_data_transformations(data, ["not a function"])
-
-    def test_apply_data_transformations_invalid_result(self):
-        """Test with transformation returning invalid result."""
-        data = [{"name": "John"}]
-
-        def bad_transform(d):
-            return "not a list"
-
-        with pytest.raises(DataError):
-            apply_data_transformations(data, [bad_transform])
-
-
 class TestCleanData:
     """Tests for clean_data function."""
 

@@ -153,8 +153,19 @@ def merge_dicts_simple(dicts: list, deep: bool = True) -> dict:
         >>> merge_dicts_simple([dict1, dict2])
         {"a": {"b": 1, "d": 3}, "c": 2, "e": 4}
     """
+    if not isinstance(dicts, list):
+        raise TypeError("dicts must be a list")
+    
+    if not isinstance(deep, bool):
+        raise TypeError("deep must be a boolean")
+        
     if not dicts:
         return {}
+
+    # Validate all inputs are dictionaries
+    for i, d in enumerate(dicts):
+        if not isinstance(d, dict):
+            raise TypeError("All arguments must be dictionaries")
 
     import copy
 

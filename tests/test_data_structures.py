@@ -193,7 +193,7 @@ class TestMergeDicts:
         """Test merging simple dictionaries."""
         dict1 = {"a": 1, "b": 2}
         dict2 = {"c": 3, "d": 4}
-        result = merge_dicts_simple(dict1, dict2)
+        result = merge_dicts_simple([dict1, dict2])
         expected = {"a": 1, "b": 2, "c": 3, "d": 4}
         assert result == expected
 

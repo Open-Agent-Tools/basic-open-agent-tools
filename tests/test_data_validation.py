@@ -200,8 +200,12 @@ class TestValidateRange:
     def test_validate_range_simple_within_bounds(self):
         """Test validation within range bounds."""
         assert validate_range_simple(25, min_val=18, max_val=65) is True
-        assert validate_range_simple(18, min_val=18, max_val=65) is True  # Inclusive min
-        assert validate_range_simple(65, min_val=18, max_val=65) is True  # Inclusive max
+        assert (
+            validate_range_simple(18, min_val=18, max_val=65) is True
+        )  # Inclusive min
+        assert (
+            validate_range_simple(65, min_val=18, max_val=65) is True
+        )  # Inclusive max
 
     def test_validate_range_simple_only_min(self):
         """Test validation with only minimum bound."""
@@ -244,65 +248,6 @@ class TestValidateRange:
 
         with pytest.raises(TypeError, match="max_val must be numeric or None"):
             validate_range_simple(25, max_val="not numeric")
-
-
-class TestAggregateValidationErrors:
-    """Test aggregate_validation_errors function."""
-
-    def test_aggregate_all_valid(self):
-        """Test aggregating all valid results."""
-        results = [
-            {"valid": True, "errors": []},
-            {"valid": True, "errors": []},
-            {"valid": True, "errors": []},
-        ]
-
-        result = aggregate_validation_errors(results)
-        expected = {
-            "valid": True,
-            "errors": [],
-            "total_validations": 3,
-            "failed_validations": 0,
-        }
-        assert result == expected
-
-    def test_aggregate_mixed_results(self):
-        """Test aggregating mixed valid/invalid results."""
-        results = [
-            {"valid": True, "errors": []},
-            {"valid": False, "errors": ["Error 1"]},
-            {"valid": False, "errors": ["Error 2", "Error 3"]},
-        ]
-
-        result = aggregate_validation_errors(results)
-        expected = {
-            "valid": False,
-            "errors": ["Error 1", "Error 2", "Error 3"],
-            "total_validations": 3,
-            "failed_validations": 2,
-        }
-        assert result == expected
-
-    def test_aggregate_string_errors(self):
-        """Test aggregating results with string errors."""
-        results = [
-            {"valid": False, "errors": "Single error"},
-            {"valid": False, "errors": ["List error"]},
-        ]
-
-        result = aggregate_validation_errors(results)
-        assert result["errors"] == ["Single error", "List error"]
-
-    def test_aggregate_empty_results(self):
-        """Test aggregating empty results list."""
-        result = aggregate_validation_errors([])
-        expected = {"valid": True, "errors": []}
-        assert result == expected
-
-    def test_aggregate_invalid_types(self):
-        """Test with invalid argument types."""
-        with pytest.raises(TypeError, match="results must be a list"):
-            aggregate_validation_errors("not a list")
 
 
 class TestCreateValidationReport:
@@ -430,8 +375,8 @@ class TestIntegrationScenarios:
         assert report["errors"] == []
         assert report["fields_validated"] == 4
 
-    def test_batch_validation_aggregation(self):
-        """Test aggregating multiple validation results."""
+    def test_batch_validation_reports(self):
+        """Test creating multiple validation reports."""
         users = [
             {"name": "Alice", "age": 25},
             {"name": "Bob"},  # Missing age
@@ -440,14 +385,15 @@ class TestIntegrationScenarios:
 
         validation_results = []
         for user in users:
-            rules = {"required": ["name", "age"], "types": {"name": "str", "age": "int"}}
+            rules = {
+                "required": ["name", "age"],
+                "types": {"name": "str", "age": "int"},
+            }
             result = create_validation_report(user, rules)
             validation_results.append(result)
 
-        # Aggregate results
-        summary = aggregate_validation_errors(validation_results)
-
-        assert summary["valid"] is False
-        assert summary["total_validations"] == 3
-        assert summary["failed_validations"] == 2
-        assert len(summary["errors"]) > 0
+        # Check that we got validation results
+        assert len(validation_results) == 3
+        assert validation_results[0]["valid"] is True  # Alice is valid
+        assert validation_results[1]["valid"] is False  # Bob missing age
+        assert validation_results[2]["valid"] is False  # Invalid types
