@@ -458,7 +458,9 @@ def validate_archive_integrity(archive_path: str) -> bool:
         return False
 
 
-def _add_files_to_tar(tar_file: tarfile.TarFile, files: Union[List[str], Dict[str, str]]) -> None:
+def _add_files_to_tar(
+    tar_file: tarfile.TarFile, files: Union[List[str], Dict[str, str]]
+) -> None:
     """Helper function to add files to a tar archive."""
     if isinstance(files, list):
         # List of files - use original filenames
