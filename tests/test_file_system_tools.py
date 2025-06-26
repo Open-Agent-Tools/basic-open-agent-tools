@@ -151,9 +151,9 @@ class TestFileSystemModule:
         """Test that individual submodules can be imported."""
         from basic_open_agent_tools.file_system.info import file_exists
         from basic_open_agent_tools.file_system.operations import (
+            insert_at_line,
             read_file_to_string,
             replace_in_file,
-            insert_at_line,
         )
         from basic_open_agent_tools.file_system.tree import list_all_directory_contents
         from basic_open_agent_tools.file_system.validation import validate_path
