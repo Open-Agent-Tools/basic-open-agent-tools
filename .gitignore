@@ -236,6 +236,16 @@ CLAUDE.md
 .aider*
 .cursor/
 .copilot/
+.junie/
+.junie
+.anthropic/
+.openai/
+.github-copilot/
+.tabnine/
+.codeium/
+.sourcegraph/
+.continue/
+.windsurf/
 
 # Logs and temporary files
 *.log
