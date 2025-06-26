@@ -3,6 +3,17 @@
 ## Overview
 Local network utilities and validation tools for AI agents (no HTTP/API operations).
 
+**Status**: 📋 Planned for future implementation
+
+## Agent Compatibility Requirements
+
+When implementing this module, all functions MUST follow the agent-friendly design principles established in v0.6.0:
+- ✅ **Simple Type Signatures**: Use only basic Python types (str, dict, list, bool, int, float)
+- ✅ **No Complex Types**: Avoid Union types, Optional complex types, or custom type aliases
+- ✅ **Individual Import Ready**: Functions must work when imported individually
+- ✅ **Clear Naming**: Function names should be descriptive and unambiguous
+- ✅ **Basic Parameters**: Use simple parameter lists, avoid *args/**kwargs when possible
+
 ## Planned Modules
 
 ### High Priority
