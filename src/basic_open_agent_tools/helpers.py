@@ -443,7 +443,7 @@ def get_tool_info(tool: Callable[..., Any]) -> Dict[str, Any]:
 
 def load_all_read_only_tools() -> List[Callable[..., Any]]:
     """Load all read-only tools (non-destructive operations) from all modules.
-    
+
     This function returns tools that only read, analyze, validate, or transform data
     without modifying files, creating new files, or performing destructive operations.
     Perfect for agents that need to analyze and process information safely.
@@ -457,115 +457,141 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
         True
     """
     tools = []
-    
+
     # File System Read-Only Tools (11 tools)
     fs_read_only = [
         "file_exists",
-        "directory_exists", 
+        "directory_exists",
         "get_file_info",
         "get_file_size",
         "is_empty_directory",
         "read_file_to_string",
         "list_directory_contents",
-        "list_all_directory_contents", 
+        "list_all_directory_contents",
         "generate_directory_tree",
         "validate_path",
         "validate_file_content",
     ]
-    
+
     for name in fs_read_only:
         func = getattr(file_system, name)
         if callable(func):
             tools.append(func)
-    
+
     # Text Processing Tools (10 tools - ALL are read-only)
     tools.extend(load_all_text_tools())
-    
+
     # Data Read-Only Tools (35 tools)
     from .data import (
-        json_tools, csv_tools, config_processing, binary_processing,
-        archive_processing, structures, validation, object_serialization, transform
+        json_tools,
+        csv_tools,
+        config_processing,
+        binary_processing,
+        archive_processing,
+        structures,
+        validation,
+        object_serialization,
+        transform,
     )
-    
+
     # JSON read-only tools (2)
     data_json_read_only = ["safe_json_deserialize", "validate_json_string"]
     for name in data_json_read_only:
         func = getattr(json_tools, name)
         if callable(func):
             tools.append(func)
-    
-    # CSV read-only tools (4) 
+
+    # CSV read-only tools (4)
     data_csv_read_only = [
-        "read_csv_file", "csv_to_dict_list", 
-        "detect_csv_delimiter", "validate_csv_structure"
+        "read_csv_file",
+        "csv_to_dict_list",
+        "detect_csv_delimiter",
+        "validate_csv_structure",
     ]
     for name in data_csv_read_only:
         func = getattr(csv_tools, name)
         if callable(func):
             tools.append(func)
-    
+
     # Config read-only tools (4)
     data_config_read_only = [
-        "read_yaml_file", "read_toml_file", 
-        "read_ini_file", "validate_config_schema"
+        "read_yaml_file",
+        "read_toml_file",
+        "read_ini_file",
+        "validate_config_schema",
     ]
     for name in data_config_read_only:
         func = getattr(config_processing, name)
         if callable(func):
             tools.append(func)
-    
+
     # Binary read-only tools (3)
     data_binary_read_only = [
-        "read_binary_file", "validate_binary_format", "extract_binary_metadata"
+        "read_binary_file",
+        "validate_binary_format",
+        "extract_binary_metadata",
     ]
     for name in data_binary_read_only:
         func = getattr(binary_processing, name)
         if callable(func):
             tools.append(func)
-    
+
     # Archive read-only tools (2)
     data_archive_read_only = ["list_archive_contents", "validate_archive_integrity"]
     for name in data_archive_read_only:
         func = getattr(archive_processing, name)
         if callable(func):
             tools.append(func)
-    
+
     # Structure read-only tools (8)
     data_structure_read_only = [
-        "flatten_dict", "unflatten_dict", "get_nested_value", "merge_dicts",
-        "compare_data_structures", "safe_get", "remove_empty_values", "extract_keys"
+        "flatten_dict",
+        "unflatten_dict",
+        "get_nested_value",
+        "merge_dicts",
+        "compare_data_structures",
+        "safe_get",
+        "remove_empty_values",
+        "extract_keys",
     ]
     for name in data_structure_read_only:
         func = getattr(structures, name)
         if callable(func):
             tools.append(func)
-    
+
     # Validation tools (6 - ALL are read-only)
     data_validation_read_only = [
-        "validate_schema", "check_required_fields", "validate_data_types", 
-        "validate_range", "aggregate_validation_errors", "create_validation_report"
+        "validate_schema",
+        "check_required_fields",
+        "validate_data_types",
+        "validate_range",
+        "aggregate_validation_errors",
+        "create_validation_report",
     ]
     for name in data_validation_read_only:
         func = getattr(validation, name)
         if callable(func):
             tools.append(func)
-    
+
     # Object serialization read-only tools (2)
     data_object_read_only = ["sanitize_for_serialization", "validate_pickle_safety"]
     for name in data_object_read_only:
         func = getattr(object_serialization, name)
         if callable(func):
             tools.append(func)
-    
+
     # Transform read-only tools (4 - analysis/cleaning without modification)
     data_transform_read_only = [
-        "clean_data", "deduplicate_records", "normalize_data", "convert_data_types"
+        "clean_data",
+        "deduplicate_records",
+        "normalize_data",
+        "convert_data_types",
     ]
     for name in data_transform_read_only:
         func = getattr(transform, name)
         if callable(func):
             tools.append(func)
-    
+
     return tools
 
 
