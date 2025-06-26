@@ -1,417 +1,333 @@
-"""Data transformation tools for AI agents.
-
-This module provides functions for transforming, cleaning, and manipulating
-structured data like dictionaries and lists of records.
-"""
+"""Data transformation tools for AI agents."""
 
 import copy
-from collections import defaultdict
-from typing import Any, Callable, Dict, List, TypeVar, Union
 
 from ..exceptions import DataError
 
-T = TypeVar("T")
-DataRecord = Dict[str, Any]
-DataList = List[DataRecord]
-TransformationFunc = Callable[[Any], Any]
-TransformationMap = Dict[str, Union[str, TransformationFunc]]
 
-
-def transform_data(data: DataList, mapping: TransformationMap) -> DataList:
+def transform_data(data: list, mapping: dict) -> list:
     """Apply a transformation mapping to a list of data records.
-
-    This function applies a set of transformations to each record in a list.
-    The mapping can specify both field renaming and value transformations.
 
     Args:
         data: List of dictionary records to transform
-        mapping: Dictionary mapping source fields to either:
-            - A string (for simple field renaming)
-            - A function (to transform the field's value)
+        mapping: Dictionary mapping source fields to new field names
 
     Returns:
-        New list of transformed records
-
-    Raises:
-        DataError: If the input data is not a list of dictionaries
+        Transformed list of dictionaries
 
     Example:
-        >>> data = [{"name": "John Doe", "age": "42"}]
-        >>> mapping = {"name": "full_name", "age": lambda x: int(x)}
+        >>> data = [{"old_name": "Alice", "old_age": 25}]
+        >>> mapping = {"old_name": "name", "old_age": "age"}
         >>> transform_data(data, mapping)
-        [{"full_name": "John Doe", "age": 42}]
+        [{"name": "Alice", "age": 25}]
     """
     if not isinstance(data, list):
-        raise DataError("Input data must be a list of records")
+        raise DataError("Data must be a list of dictionaries")
+    if not isinstance(mapping, dict):
+        raise DataError("Mapping must be a dictionary")
 
-    result = []
+    transformed_data = []
 
     for record in data:
         if not isinstance(record, dict):
-            raise DataError("Each record must be a dictionary")
+            continue
 
-        new_record = copy.deepcopy(record)
+        transformed_record = {}
 
-        for src_field, transform in mapping.items():
-            if src_field not in record:
+        for source_field, target_field in mapping.items():
+            if source_field in record:
+                transformed_record[target_field] = record[source_field]
+
+        # Include fields not in mapping as-is
+        for field, value in record.items():
+            if field not in mapping and field not in transformed_record:
+                transformed_record[field] = value
+
+        transformed_data.append(transformed_record)
+
+    return transformed_data
+
+
+def rename_fields(data: list, field_mapping: dict) -> list:
+    """Rename fields in a list of dictionaries.
+
+    Args:
+        data: List of dictionaries
+        field_mapping: Mapping of old field names to new field names
+
+    Returns:
+        List with renamed fields
+
+    Example:
+        >>> data = [{"first": "Alice", "last": "Smith"}]
+        >>> rename_fields(data, {"first": "first_name", "last": "last_name"})
+        [{"first_name": "Alice", "last_name": "Smith"}]
+    """
+    if not isinstance(data, list):
+        raise DataError("Data must be a list")
+    if not isinstance(field_mapping, dict):
+        raise DataError("Field mapping must be a dictionary")
+
+    renamed_data = []
+
+    for record in data:
+        if not isinstance(record, dict):
+            continue
+
+        renamed_record = {}
+        for field, value in record.items():
+            new_field = field_mapping.get(field, field)
+            renamed_record[new_field] = value
+
+        renamed_data.append(renamed_record)
+
+    return renamed_data
+
+
+def convert_data_types(data: list, type_mapping: dict) -> list:
+    """Convert data types for specified fields.
+
+    Args:
+        data: List of dictionaries
+        type_mapping: Mapping of field names to type conversion functions
+
+    Returns:
+        List with converted data types
+
+    Example:
+        >>> data = [{"age": "25", "score": "95.5"}]
+        >>> convert_data_types(data, {"age": int, "score": float})
+        [{"age": 25, "score": 95.5}]
+    """
+    if not isinstance(data, list):
+        raise DataError("Data must be a list")
+    if not isinstance(type_mapping, dict):
+        raise DataError("Type mapping must be a dictionary")
+
+    converted_data = []
+
+    for record in data:
+        if not isinstance(record, dict):
+            continue
+
+        converted_record = record.copy()
+
+        for field, type_func in type_mapping.items():
+            if field in converted_record:
+                try:
+                    converted_record[field] = type_func(converted_record[field])
+                except (ValueError, TypeError) as e:
+                    raise DataError(f"Failed to convert field '{field}': {e}")
+
+        converted_data.append(converted_record)
+
+    return converted_data
+
+
+def clean_data(data: list, rules: dict = None) -> list:
+    """Clean data according to specified rules.
+
+    Args:
+        data: List of dictionaries to clean
+        rules: Dictionary of cleaning rules
+
+    Returns:
+        Cleaned data
+
+    Example:
+        >>> data = [{"name": "  Alice  ", "age": None, "city": ""}]
+        >>> clean_data(data, {"strip_whitespace": True, "remove_nulls": True})
+        [{"name": "Alice"}]
+    """
+    if not isinstance(data, list):
+        raise DataError("Data must be a list")
+
+    # Default rules
+    default_rules = {
+        "strip_whitespace": True,
+        "remove_nulls": False,
+        "remove_empty_strings": False,
+        "remove_empty_lists": False,
+    }
+
+    if rules:
+        default_rules.update(rules)
+
+    cleaned_data = []
+
+    for record in data:
+        if not isinstance(record, dict):
+            continue
+
+        cleaned_record = {}
+
+        for field, value in record.items():
+            # Strip whitespace from strings
+            if default_rules.get("strip_whitespace") and isinstance(value, str):
+                value = value.strip()
+
+            # Remove null values
+            if default_rules.get("remove_nulls") and value is None:
                 continue
 
-            value = record[src_field]
+            # Remove empty strings
+            if default_rules.get("remove_empty_strings") and value == "":
+                continue
 
-            if isinstance(transform, str):
-                # Simple field renaming
-                new_record[transform] = value
-                if transform != src_field:
-                    del new_record[src_field]
-            elif callable(transform):
-                # Value transformation
-                new_record[src_field] = transform(value)
-            else:
-                raise DataError(
-                    f"Invalid transformation for field '{src_field}': must be string or callable"
-                )
+            # Remove empty lists
+            if default_rules.get("remove_empty_lists") and value == []:
+                continue
 
-        result.append(new_record)
+            cleaned_record[field] = value
 
-    return result
+        cleaned_data.append(cleaned_record)
+
+    return cleaned_data
 
 
-def rename_fields(data: DataList, field_mapping: Dict[str, str]) -> DataList:
-    """Rename fields in a list of data records.
+def deduplicate_records(data: list, key_fields: list = None) -> list:
+    """Remove duplicate records from a list.
 
     Args:
-        data: List of dictionary records
-        field_mapping: Dictionary mapping old field names to new field names
+        data: List of dictionaries
+        key_fields: List of fields to use for deduplication (None for all fields)
 
     Returns:
-        New list of records with renamed fields
-
-    Raises:
-        DataError: If the input data is not a list of dictionaries
+        List with duplicates removed
 
     Example:
-        >>> data = [{"name": "John", "age": 30}, {"name": "Jane", "age": 25}]
-        >>> rename_fields(data, {"name": "full_name", "age": "years"})
-        [{"full_name": "John", "years": 30}, {"full_name": "Jane", "years": 25}]
+        >>> data = [{"name": "Alice", "age": 25}, {"name": "Alice", "age": 25}, {"name": "Bob", "age": 30}]
+        >>> deduplicate_records(data)
+        [{"name": "Alice", "age": 25}, {"name": "Bob", "age": 30}]
     """
     if not isinstance(data, list):
-        raise DataError("Input data must be a list of records")
+        raise DataError("Data must be a list")
 
-    result = []
+    seen = set()
+    deduplicated_data = []
 
     for record in data:
         if not isinstance(record, dict):
-            raise DataError("Each record must be a dictionary")
+            continue
 
-        new_record = copy.deepcopy(record)
+        # Create a key based on specified fields or all fields
+        if key_fields:
+            key_values = tuple(record.get(field) for field in key_fields)
+        else:
+            key_values = tuple(sorted(record.items()))
 
-        for old_field, new_field in field_mapping.items():
-            if old_field in new_record:
-                new_record[new_field] = new_record[old_field]
-                if old_field != new_field:
-                    del new_record[old_field]
+        if key_values not in seen:
+            seen.add(key_values)
+            deduplicated_data.append(record)
 
-        result.append(new_record)
-
-    return result
-
-
-def convert_data_types(
-    data: DataList, type_conversions: Dict[str, Callable[[Any], Any]]
-) -> DataList:
-    """Convert field values to specified types in a list of data records.
-
-    Args:
-        data: List of dictionary records
-        type_conversions: Dictionary mapping field names to conversion functions
-
-    Returns:
-        New list of records with converted field values
-
-    Raises:
-        DataError: If the input data is not a list of dictionaries
-        ValueError: If a conversion function fails
-
-    Example:
-        >>> data = [{"id": "1", "amount": "42.5", "active": "true"}]
-        >>> conversions = {
-        ...     "id": int,
-        ...     "amount": float,
-        ...     "active": lambda x: x.lower() == "true"
-        ... }
-        >>> convert_data_types(data, conversions)
-        [{"id": 1, "amount": 42.5, "active": True}]
-    """
-    if not isinstance(data, list):
-        raise DataError("Input data must be a list of records")
-
-    result = []
-
-    for record in data:
-        if not isinstance(record, dict):
-            raise DataError("Each record must be a dictionary")
-
-        new_record = copy.deepcopy(record)
-
-        for field, converter in type_conversions.items():
-            if field in new_record and new_record[field] is not None:
-                try:
-                    new_record[field] = converter(new_record[field])
-                except Exception as e:
-                    raise ValueError(
-                        f"Failed to convert field '{field}' with value '{new_record[field]}': {str(e)}"
-                    )
-
-        result.append(new_record)
-
-    return result
-
-
-def apply_data_transformations(
-    data: DataList, transformations: List[Callable[[DataList], DataList]]
-) -> DataList:
-    """Apply multiple transformation functions to data in sequence.
-
-    Args:
-        data: List of dictionary records
-        transformations: List of transformation functions to apply in order
-
-    Returns:
-        Transformed data after applying all transformations
-
-    Raises:
-        DataError: If any transformation doesn't return a list of dictionaries
-
-    Example:
-        >>> data = [{"name": "John Doe", "age": "42"}]
-        >>> def clean_names(d):
-        ...     return [{"name": r["name"].upper(), **{k:v for k,v in r.items() if k != "name"}} for r in d]
-        >>> def convert_ages(d):
-        ...     return [{**r, "age": int(r["age"])} for r in d]
-        >>> apply_data_transformations(data, [clean_names, convert_ages])
-        [{"name": "JOHN DOE", "age": 42}]
-    """
-    if not isinstance(data, list):
-        raise DataError("Input data must be a list of records")
-
-    result = copy.deepcopy(data)
-
-    for transform_func in transformations:
-        if not callable(transform_func):
-            raise DataError("Each transformation must be a callable function")
-
-        result = transform_func(result)
-
-        if not isinstance(result, list):
-            raise DataError("Each transformation must return a list of records")
-
-        if result and not all(isinstance(r, dict) for r in result):
-            raise DataError(
-                "Each transformation must return a list of dictionary records"
-            )
-
-    return result
-
-
-def clean_data(
-    data: DataList, rules: Dict[str, List[Callable[[Any], Any]]]
-) -> DataList:
-    """Apply cleaning rules to data fields.
-
-    Args:
-        data: List of dictionary records
-        rules: Dictionary mapping field names to lists of cleaning functions
-
-    Returns:
-        New list of records with cleaned field values
-
-    Raises:
-        DataError: If the input data is not a list of dictionaries
-
-    Example:
-        >>> data = [{"name": "  John  ", "email": "JOHN@example.com"}]
-        >>> rules = {
-        ...     "name": [str.strip, str.title],
-        ...     "email": [str.lower]
-        ... }
-        >>> clean_data(data, rules)
-        [{"name": "John", "email": "john@example.com"}]
-    """
-    if not isinstance(data, list):
-        raise DataError("Input data must be a list of records")
-
-    result = []
-
-    for record in data:
-        if not isinstance(record, dict):
-            raise DataError("Each record must be a dictionary")
-
-        new_record = copy.deepcopy(record)
-
-        for field, cleaners in rules.items():
-            if field in new_record and new_record[field] is not None:
-                value = new_record[field]
-
-                for cleaner in cleaners:
-                    if not callable(cleaner):
-                        raise DataError(
-                            f"Cleaning rule for field '{field}' must be callable"
-                        )
-
-                    try:
-                        value = cleaner(value)
-                    except Exception as e:
-                        raise DataError(
-                            f"Failed to apply cleaner to field '{field}': {str(e)}"
-                        )
-
-                new_record[field] = value
-
-        result.append(new_record)
-
-    return result
-
-
-def deduplicate_records(data: DataList, key_fields: List[str]) -> DataList:
-    """Remove duplicate records based on specified key fields.
-
-    Args:
-        data: List of dictionary records
-        key_fields: List of field names that form a unique key
-
-    Returns:
-        New list with duplicates removed (keeping first occurrence)
-
-    Raises:
-        DataError: If the input data is not a list of dictionaries
-
-    Example:
-        >>> data = [
-        ...     {"id": 1, "name": "John", "dept": "HR"},
-        ...     {"id": 2, "name": "Jane", "dept": "IT"},
-        ...     {"id": 1, "name": "John", "dept": "Sales"}
-        ... ]
-        >>> deduplicate_records(data, ["id"])
-        [{"id": 1, "name": "John", "dept": "HR"}, {"id": 2, "name": "Jane", "dept": "IT"}]
-    """
-    if not isinstance(data, list):
-        raise DataError("Input data must be a list of records")
-
-    if not key_fields:
-        raise DataError("At least one key field must be specified")
-
-    result = []
-    seen_keys = set()
-
-    for record in data:
-        if not isinstance(record, dict):
-            raise DataError("Each record must be a dictionary")
-
-        # Create a tuple of the key field values
-        try:
-            key_values = tuple(record[field] for field in key_fields)
-        except KeyError as e:
-            raise DataError(f"Key field {str(e)} not found in record")
-
-        # Only add the record if we haven't seen this key before
-        if key_values not in seen_keys:
-            seen_keys.add(key_values)
-            result.append(copy.deepcopy(record))
-
-    return result
+    return deduplicated_data
 
 
 def normalize_data(
-    data: DataList, normalization_rules: Dict[str, Callable[[Any], Any]]
-) -> DataList:
-    """Normalize data values according to specified rules.
+    data: list, field: str, min_val: float = 0.0, max_val: float = 1.0
+) -> list:
+    """Normalize numeric values in a field to a specified range.
 
     Args:
-        data: List of dictionary records
-        normalization_rules: Dictionary mapping field names to normalization functions
+        data: List of dictionaries
+        field: Field name to normalize
+        min_val: Minimum value for normalization
+        max_val: Maximum value for normalization
 
     Returns:
-        New list of records with normalized field values
-
-    Raises:
-        DataError: If the input data is not a list of dictionaries
+        List with normalized values
 
     Example:
-        >>> data = [{"temp_f": 98.6}, {"temp_f": 100.4}]
-        >>> rules = {"temp_f": lambda f: (f - 32) * 5/9}
-        >>> normalize_data(data, rules)
-        [{"temp_f": 37.0}, {"temp_f": 38.0}]
+        >>> data = [{"score": 80}, {"score": 90}, {"score": 100}]
+        >>> normalize_data(data, "score", 0, 1)
+        [{"score": 0.0}, {"score": 0.5}, {"score": 1.0}]
     """
     if not isinstance(data, list):
-        raise DataError("Input data must be a list of records")
+        raise DataError("Data must be a list")
 
-    result = []
-
+    # Find min and max values in the field
+    values = []
     for record in data:
-        if not isinstance(record, dict):
-            raise DataError("Each record must be a dictionary")
+        if isinstance(record, dict) and field in record:
+            value = record[field]
+            if isinstance(value, (int, float)):
+                values.append(value)
 
-        new_record = copy.deepcopy(record)
+    if not values:
+        return data
 
-        for field, normalizer in normalization_rules.items():
-            if field in new_record and new_record[field] is not None:
-                try:
-                    new_record[field] = normalizer(new_record[field])
-                except Exception as e:
-                    raise DataError(f"Failed to normalize field '{field}': {str(e)}")
+    data_min = min(values)
+    data_max = max(values)
+    data_range = data_max - data_min
 
-        result.append(new_record)
+    if data_range == 0:
+        # All values are the same
+        normalized_data = copy.deepcopy(data)
+        for record in normalized_data:
+            if isinstance(record, dict) and field in record:
+                record[field] = min_val
+        return normalized_data
 
-    return result
+    # Normalize the data
+    normalized_data = copy.deepcopy(data)
+    for record in normalized_data:
+        if isinstance(record, dict) and field in record:
+            value = record[field]
+            if isinstance(value, (int, float)):
+                normalized_value = min_val + (value - data_min) / data_range * (
+                    max_val - min_val
+                )
+                record[field] = normalized_value
+
+    return normalized_data
 
 
 def pivot_data(
-    data: DataList, row_key: str, col_key: str, value_key: str
-) -> Dict[Any, Dict[Any, Any]]:
-    """Transform a list of records into a pivot table structure.
+    data: list, index_field: str, column_field: str, value_field: str
+) -> dict:
+    """Pivot data from long format to wide format.
 
     Args:
-        data: List of dictionary records
-        row_key: Field name to use for row identifiers
-        col_key: Field name to use for column identifiers
-        value_key: Field name containing the values to pivot
+        data: List of dictionaries in long format
+        index_field: Field to use as row index
+        column_field: Field to use as column headers
+        value_field: Field containing values to pivot
 
     Returns:
-        Nested dictionary with row_key values as outer keys and col_key values as inner keys
-
-    Raises:
-        DataError: If the input data is not a list of dictionaries or required keys are missing
+        Dictionary with pivoted data
 
     Example:
         >>> data = [
-        ...     {"product": "Apple", "region": "East", "sales": 100},
-        ...     {"product": "Apple", "region": "West", "sales": 150},
-        ...     {"product": "Banana", "region": "East", "sales": 200},
-        ...     {"product": "Banana", "region": "West", "sales": 250}
+        ...     {"name": "Alice", "metric": "age", "value": 25},
+        ...     {"name": "Alice", "metric": "score", "value": 95},
+        ...     {"name": "Bob", "metric": "age", "value": 30}
         ... ]
-        >>> pivot_data(data, "product", "region", "sales")
-        {
-            "Apple": {"East": 100, "West": 150},
-            "Banana": {"East": 200, "West": 250}
-        }
+        >>> pivot_data(data, "name", "metric", "value")
+        {"Alice": {"age": 25, "score": 95}, "Bob": {"age": 30}}
     """
     if not isinstance(data, list):
-        raise DataError("Input data must be a list of records")
+        raise DataError("Data must be a list")
 
-    result: Dict[Any, Dict[Any, Any]] = defaultdict(dict)
+    pivoted = {}
 
     for record in data:
         if not isinstance(record, dict):
-            raise DataError("Each record must be a dictionary")
+            continue
 
-        try:
-            row = record[row_key]
-            col = record[col_key]
-            value = record[value_key]
-        except KeyError as e:
-            raise DataError(f"Required key {str(e)} not found in record")
+        if (
+            index_field not in record
+            or column_field not in record
+            or value_field not in record
+        ):
+            continue
 
-        result[row][col] = value
+        index_val = record[index_field]
+        column_val = record[column_field]
+        value_val = record[value_field]
 
-    # Convert defaultdict to regular dict
-    return {k: dict(v) for k, v in result.items()}
+        if index_val not in pivoted:
+            pivoted[index_val] = {}
+
+        pivoted[index_val][column_val] = value_val
+
+    return pivoted

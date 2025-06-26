@@ -3,18 +3,17 @@
 import pytest
 
 from basic_open_agent_tools.data.validation import (
-    aggregate_validation_errors,
     check_required_fields,
     create_validation_report,
-    validate_data_types,
-    validate_range,
-    validate_schema,
+    validate_data_types_simple,
+    validate_range_simple,
+    validate_schema_simple,
 )
 from basic_open_agent_tools.exceptions import ValidationError
 
 
 class TestValidateSchema:
-    """Test validate_schema function."""
+    """Test validate_schema_simple function."""
 
     def test_validate_simple_object_schema(self):
         """Test validating against simple object schema."""
@@ -26,11 +25,11 @@ class TestValidateSchema:
 
         # Valid data
         data = {"name": "Alice", "age": 25}
-        assert validate_schema(data, schema) is True
+        assert validate_schema_simple(data, schema) is True
 
         # Valid data without optional field
         data = {"name": "Alice"}
-        assert validate_schema(data, schema) is True
+        assert validate_schema_simple(data, schema) is True
 
     def test_validate_array_schema(self):
         """Test validating against array schema."""
@@ -38,29 +37,29 @@ class TestValidateSchema:
 
         # Valid array
         data = ["Alice", "Bob", "Charlie"]
-        assert validate_schema(data, schema) is True
+        assert validate_schema_simple(data, schema) is True
 
         # Empty array is valid
         data = []
-        assert validate_schema(data, schema) is True
+        assert validate_schema_simple(data, schema) is True
 
     def test_validate_primitive_schemas(self):
         """Test validating against primitive type schemas."""
         # String schema
-        assert validate_schema("hello", {"type": "string"}) is True
+        assert validate_schema_simple("hello", {"type": "string"}) is True
 
         # Number schema
-        assert validate_schema(42, {"type": "number"}) is True
-        assert validate_schema(3.14, {"type": "number"}) is True
+        assert validate_schema_simple(42, {"type": "number"}) is True
+        assert validate_schema_simple(3.14, {"type": "number"}) is True
 
         # Integer schema
-        assert validate_schema(42, {"type": "integer"}) is True
+        assert validate_schema_simple(42, {"type": "integer"}) is True
 
         # Boolean schema
-        assert validate_schema(True, {"type": "boolean"}) is True
+        assert validate_schema_simple(True, {"type": "boolean"}) is True
 
         # Null schema
-        assert validate_schema(None, {"type": "null"}) is True
+        assert validate_schema_simple(None, {"type": "null"}) is True
 
     def test_validate_nested_schema(self):
         """Test validating against nested schema."""
@@ -82,9 +81,9 @@ class TestValidateSchema:
         data = {
             "user": {"name": "Alice", "contacts": ["alice@example.com", "+1234567890"]}
         }
-        assert validate_schema(data, schema) is True
+        assert validate_schema_simple(data, schema) is True
 
-    def test_validate_schema_failures(self):
+    def test_validate_schema_simple_failures(self):
         """Test schema validation failures."""
         schema = {
             "type": "object",
@@ -96,20 +95,20 @@ class TestValidateSchema:
         with pytest.raises(
             ValidationError, match="Required property 'name' is missing"
         ):
-            validate_schema({}, schema)
+            validate_schema_simple({}, schema)
 
         # Wrong type
         with pytest.raises(ValidationError, match="Expected string, got int"):
-            validate_schema({"name": 123}, schema)
+            validate_schema_simple({"name": 123}, schema)
 
         # Wrong top-level type
         with pytest.raises(ValidationError, match="Expected object, got str"):
-            validate_schema("not an object", schema)
+            validate_schema_simple("not an object", schema)
 
-    def test_validate_schema_invalid_types(self):
+    def test_validate_schema_simple_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="schema must be a dictionary"):
-            validate_schema({"name": "Alice"}, "not a dict")
+            validate_schema_simple({"name": "Alice"}, "not a dict")
 
 
 class TestCheckRequiredFields:
@@ -144,107 +143,107 @@ class TestCheckRequiredFields:
 
 
 class TestValidateDataTypes:
-    """Test validate_data_types function."""
+    """Test validate_data_types_simple function."""
 
-    def test_validate_data_types_success(self):
+    def test_validate_data_types_simple_success(self):
         """Test successful type validation."""
         data = {"name": "Alice", "age": 25, "active": True}
-        type_map = {"name": str, "age": int, "active": bool}
-        assert validate_data_types(data, type_map) is True
+        type_map = {"name": "str", "age": "int", "active": "bool"}
+        assert validate_data_types_simple(data, type_map) is True
 
-    def test_validate_data_types_partial_mapping(self):
+    def test_validate_data_types_simple_partial_mapping(self):
         """Test validation with partial type mapping."""
         data = {"name": "Alice", "age": 25, "other": "value"}
-        type_map = {"name": str, "age": int}
+        type_map = {"name": "str", "age": "int"}
         # Should only validate fields in type_map
-        assert validate_data_types(data, type_map) is True
+        assert validate_data_types_simple(data, type_map) is True
 
-    def test_validate_data_types_missing_fields(self):
+    def test_validate_data_types_simple_missing_fields(self):
         """Test validation when data is missing some mapped fields."""
         data = {"name": "Alice"}
-        type_map = {"name": str, "age": int}
+        type_map = {"name": "str", "age": "int"}
         # Should not fail for missing fields, only validate present ones
-        assert validate_data_types(data, type_map) is True
+        assert validate_data_types_simple(data, type_map) is True
 
-    def test_validate_data_types_failure(self):
+    def test_validate_data_types_simple_failure(self):
         """Test type validation failure."""
         data = {"name": "Alice", "age": "25"}  # age should be int
-        type_map = {"name": str, "age": int}
+        type_map = {"name": "str", "age": "int"}
 
         with pytest.raises(ValidationError, match="Type validation errors"):
-            validate_data_types(data, type_map)
+            validate_data_types_simple(data, type_map)
 
-    def test_validate_data_types_multiple_failures(self):
+    def test_validate_data_types_simple_multiple_failures(self):
         """Test multiple type validation failures."""
         data = {"name": 123, "age": "25"}
-        type_map = {"name": str, "age": int}
+        type_map = {"name": "str", "age": "int"}
 
         with pytest.raises(ValidationError) as exc_info:
-            validate_data_types(data, type_map)
+            validate_data_types_simple(data, type_map)
 
         error_msg = str(exc_info.value)
         assert "name" in error_msg
         assert "age" in error_msg
 
-    def test_validate_data_types_invalid_types(self):
+    def test_validate_data_types_simple_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="data must be a dictionary"):
-            validate_data_types("not a dict", {})
+            validate_data_types_simple("not a dict", {})
 
         with pytest.raises(TypeError, match="type_map must be a dictionary"):
-            validate_data_types({"name": "Alice"}, "not a dict")
+            validate_data_types_simple({"name": "Alice"}, "not a dict")
 
 
 class TestValidateRange:
-    """Test validate_range function."""
+    """Test validate_range_simple function."""
 
-    def test_validate_range_within_bounds(self):
+    def test_validate_range_simple_within_bounds(self):
         """Test validation within range bounds."""
-        assert validate_range(25, min_val=18, max_val=65) is True
-        assert validate_range(18, min_val=18, max_val=65) is True  # Inclusive min
-        assert validate_range(65, min_val=18, max_val=65) is True  # Inclusive max
+        assert validate_range_simple(25, min_val=18, max_val=65) is True
+        assert validate_range_simple(18, min_val=18, max_val=65) is True  # Inclusive min
+        assert validate_range_simple(65, min_val=18, max_val=65) is True  # Inclusive max
 
-    def test_validate_range_only_min(self):
+    def test_validate_range_simple_only_min(self):
         """Test validation with only minimum bound."""
-        assert validate_range(25, min_val=18) is True
-        assert validate_range(100, min_val=18) is True
+        assert validate_range_simple(25, min_val=18) is True
+        assert validate_range_simple(100, min_val=18) is True
 
-    def test_validate_range_only_max(self):
+    def test_validate_range_simple_only_max(self):
         """Test validation with only maximum bound."""
-        assert validate_range(25, max_val=65) is True
-        assert validate_range(1, max_val=65) is True
+        assert validate_range_simple(25, max_val=65) is True
+        assert validate_range_simple(1, max_val=65) is True
 
-    def test_validate_range_no_bounds(self):
+    def test_validate_range_simple_no_bounds(self):
         """Test validation with no bounds."""
-        assert validate_range(25) is True
-        assert validate_range(-100) is True
-        assert validate_range(1000) is True
+        assert validate_range_simple(25) is True
+        assert validate_range_simple(-100) is True
+        assert validate_range_simple(1000) is True
 
-    def test_validate_range_float_values(self):
+    def test_validate_range_simple_float_values(self):
         """Test validation with float values."""
-        assert validate_range(25.5, min_val=18.0, max_val=65.0) is True
-        assert validate_range(3.14, min_val=3, max_val=4) is True
+        assert validate_range_simple(25.5, min_val=18.0, max_val=65.0) is True
+        assert validate_range_simple(3.14, min_val=3, max_val=4) is True
 
-    def test_validate_range_below_minimum(self):
+    def test_validate_range_simple_below_minimum(self):
         """Test validation failure below minimum."""
         with pytest.raises(ValidationError, match="Value 10 is below minimum 18"):
-            validate_range(10, min_val=18)
+            validate_range_simple(10, min_val=18)
 
-    def test_validate_range_above_maximum(self):
+    def test_validate_range_simple_above_maximum(self):
         """Test validation failure above maximum."""
         with pytest.raises(ValidationError, match="Value 70 is above maximum 65"):
-            validate_range(70, max_val=65)
+            validate_range_simple(70, max_val=65)
 
-    def test_validate_range_invalid_types(self):
+    def test_validate_range_simple_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="value must be numeric"):
-            validate_range("not numeric")
+            validate_range_simple("not numeric")
 
         with pytest.raises(TypeError, match="min_val must be numeric or None"):
-            validate_range(25, min_val="not numeric")
+            validate_range_simple(25, min_val="not numeric")
 
         with pytest.raises(TypeError, match="max_val must be numeric or None"):
-            validate_range(25, max_val="not numeric")
+            validate_range_simple(25, max_val="not numeric")
 
 
 class TestAggregateValidationErrors:
@@ -314,7 +313,7 @@ class TestCreateValidationReport:
         data = {"name": "Alice", "age": 25}
         rules = {
             "required": ["name", "age"],
-            "types": {"name": str, "age": int},
+            "types": {"name": "str", "age": "int"},
             "ranges": {"age": {"min": 18, "max": 65}},
         }
 
@@ -327,7 +326,7 @@ class TestCreateValidationReport:
     def test_create_validation_report_with_errors(self):
         """Test creating validation report with errors."""
         data = {"name": "Alice"}  # Missing age
-        rules = {"required": ["name", "age"], "types": {"name": str, "age": int}}
+        rules = {"required": ["name", "age"], "types": {"name": "str", "age": "int"}}
 
         result = create_validation_report(data, rules)
         assert result["valid"] is False
@@ -337,7 +336,7 @@ class TestCreateValidationReport:
     def test_create_validation_report_type_errors(self):
         """Test validation report with type errors."""
         data = {"name": 123, "age": "25"}
-        rules = {"types": {"name": str, "age": int}}
+        rules = {"types": {"name": "str", "age": "int"}}
 
         result = create_validation_report(data, rules)
         assert result["valid"] is False
@@ -441,7 +440,7 @@ class TestIntegrationScenarios:
 
         validation_results = []
         for user in users:
-            rules = {"required": ["name", "age"], "types": {"name": str, "age": int}}
+            rules = {"required": ["name", "age"], "types": {"name": "str", "age": "int"}}
             result = create_validation_report(user, rules)
             validation_results.append(result)
 

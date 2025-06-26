@@ -117,8 +117,8 @@ def load_data_csv_tools() -> List[Callable[..., Any]]:
 
     tools = []
     csv_function_names = [
-        "read_csv_file",
-        "write_csv_file",
+        "read_csv_simple",
+        "write_csv_simple",
         "csv_to_dict_list",
         "dict_list_to_csv",
         "detect_csv_delimiter",
@@ -149,11 +149,11 @@ def load_data_structure_tools() -> List[Callable[..., Any]]:
 
     tools = []
     structure_function_names = [
-        "flatten_dict",
+        "flatten_dict_simple",
         "unflatten_dict",
-        "get_nested_value",
+        "get_nested_value_simple",
         "set_nested_value",
-        "merge_dicts",
+        "merge_dicts_simple",
         "compare_data_structures",
         "safe_get",
         "remove_empty_values",
@@ -177,18 +177,17 @@ def load_data_validation_tools() -> List[Callable[..., Any]]:
 
     Example:
         >>> validation_tools = load_data_validation_tools()
-        >>> len(validation_tools) == 6
+        >>> len(validation_tools) == 5
         True
     """
     from .data import validation
 
     tools = []
     validation_function_names = [
-        "validate_schema",
+        "validate_schema_simple",
         "check_required_fields",
-        "validate_data_types",
-        "validate_range",
-        "aggregate_validation_errors",
+        "validate_data_types_simple",
+        "validate_range_simple",
         "create_validation_report",
     ]
 
@@ -208,7 +207,7 @@ def load_data_transformation_tools() -> List[Callable[..., Any]]:
 
     Example:
         >>> transform_tools = load_data_transformation_tools()
-        >>> len(transform_tools) == 8
+        >>> len(transform_tools) == 7
         True
     """
     from .data import transform
@@ -218,7 +217,6 @@ def load_data_transformation_tools() -> List[Callable[..., Any]]:
         "transform_data",
         "rename_fields",
         "convert_data_types",
-        "apply_data_transformations",
         "clean_data",
         "deduplicate_records",
         "normalize_data",
@@ -453,7 +451,7 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
 
     Example:
         >>> read_only_tools = load_all_read_only_tools()
-        >>> len(read_only_tools) > 40  # Should have 40+ read-only tools
+        >>> len(read_only_tools) > 50  # Should have 50+ read-only tools
         True
     """
     tools = []
@@ -481,7 +479,7 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
     # Text Processing Tools (10 tools - ALL are read-only)
     tools.extend(load_all_text_tools())
 
-    # Data Read-Only Tools (35 tools)
+    # Data Read-Only Tools (34 tools)
     from .data import (
         archive_processing,
         binary_processing,
@@ -503,7 +501,7 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
 
     # CSV read-only tools (4)
     data_csv_read_only = [
-        "read_csv_file",
+        "read_csv_simple",
         "csv_to_dict_list",
         "detect_csv_delimiter",
         "validate_csv_structure",
@@ -545,10 +543,10 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
 
     # Structure read-only tools (8)
     data_structure_read_only = [
-        "flatten_dict",
+        "flatten_dict_simple",
         "unflatten_dict",
-        "get_nested_value",
-        "merge_dicts",
+        "get_nested_value_simple",
+        "merge_dicts_simple",
         "compare_data_structures",
         "safe_get",
         "remove_empty_values",
@@ -559,13 +557,12 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
         if callable(func):
             tools.append(func)
 
-    # Validation tools (6 - ALL are read-only)
+    # Validation tools (5 - ALL are read-only)
     data_validation_read_only = [
-        "validate_schema",
+        "validate_schema_simple",
         "check_required_fields",
-        "validate_data_types",
-        "validate_range",
-        "aggregate_validation_errors",
+        "validate_data_types_simple",
+        "validate_range_simple",
         "create_validation_report",
     ]
     for name in data_validation_read_only:

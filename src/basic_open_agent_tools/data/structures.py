@@ -1,13 +1,11 @@
 """Data structure manipulation utilities for AI agents."""
 
 import re
-from typing import Any, Dict, List, Tuple
 
 from ..exceptions import DataError
-from ..types import DataDict
 
 
-def flatten_dict(data: DataDict, separator: str = ".") -> DataDict:
+def flatten_dict_simple(data: dict, separator: str = ".") -> dict:
     """Flatten nested dictionaries into a single level.
 
     Args:
@@ -17,24 +15,14 @@ def flatten_dict(data: DataDict, separator: str = ".") -> DataDict:
     Returns:
         Flattened dictionary with dot-separated keys
 
-    Raises:
-        TypeError: If arguments have wrong types
-        DataError: If separator is empty or invalid
-
     Example:
         >>> data = {"a": {"b": {"c": 1}}, "d": 2}
-        >>> flatten_dict(data)
+        >>> flatten_dict_simple(data)
         {"a.b.c": 1, "d": 2}
     """
-    if not isinstance(data, dict):
-        raise TypeError("data must be a dictionary")
-    if not isinstance(separator, str):
-        raise TypeError("separator must be a string")
-    if not separator:
-        raise DataError("separator cannot be empty")
 
-    def _flatten(obj: Any, parent_key: str = "") -> DataDict:
-        items: List[Tuple[str, Any]] = []
+    def _flatten(obj, parent_key=""):
+        items = []
         if isinstance(obj, dict):
             for key, value in obj.items():
                 new_key = f"{parent_key}{separator}{key}" if parent_key else key
@@ -49,7 +37,7 @@ def flatten_dict(data: DataDict, separator: str = ".") -> DataDict:
     return _flatten(data)
 
 
-def unflatten_dict(data: DataDict, separator: str = ".") -> DataDict:
+def unflatten_dict(data: dict, separator: str = ".") -> dict:
     """Reconstruct nested dictionary from flattened structure.
 
     Args:
@@ -59,23 +47,12 @@ def unflatten_dict(data: DataDict, separator: str = ".") -> DataDict:
     Returns:
         Nested dictionary structure
 
-    Raises:
-        TypeError: If arguments have wrong types
-        DataError: If separator is empty or invalid
-
     Example:
         >>> data = {"a.b.c": 1, "d": 2}
         >>> unflatten_dict(data)
         {"a": {"b": {"c": 1}}, "d": 2}
     """
-    if not isinstance(data, dict):
-        raise TypeError("data must be a dictionary")
-    if not isinstance(separator, str):
-        raise TypeError("separator must be a string")
-    if not separator:
-        raise DataError("separator cannot be empty")
-
-    result: DataDict = {}
+    result = {}
     for key, value in data.items():
         parts = key.split(separator)
         current = result
@@ -93,7 +70,7 @@ def unflatten_dict(data: DataDict, separator: str = ".") -> DataDict:
     return result
 
 
-def get_nested_value(data: DataDict, key_path: str, default: Any = None) -> Any:
+def get_nested_value_simple(data: dict, key_path: str, default=None):
     """Safely access nested dictionary values using dot notation.
 
     Args:
@@ -104,21 +81,13 @@ def get_nested_value(data: DataDict, key_path: str, default: Any = None) -> Any:
     Returns:
         Value at the key path or default
 
-    Raises:
-        TypeError: If arguments have wrong types
-
     Example:
         >>> data = {"a": {"b": {"c": 1}}}
-        >>> get_nested_value(data, "a.b.c")
+        >>> get_nested_value_simple(data, "a.b.c")
         1
-        >>> get_nested_value(data, "a.b.x", "missing")
+        >>> get_nested_value_simple(data, "a.b.x", "missing")
         "missing"
     """
-    if not isinstance(data, dict):
-        raise TypeError("data must be a dictionary")
-    if not isinstance(key_path, str):
-        raise TypeError("key_path must be a string")
-
     if not key_path:
         return data
 
@@ -133,7 +102,7 @@ def get_nested_value(data: DataDict, key_path: str, default: Any = None) -> Any:
         return default
 
 
-def set_nested_value(data: DataDict, key_path: str, value: Any) -> DataDict:
+def set_nested_value(data: dict, key_path: str, value) -> dict:
     """Set nested dictionary value using dot notation (immutable).
 
     Args:
@@ -144,22 +113,11 @@ def set_nested_value(data: DataDict, key_path: str, value: Any) -> DataDict:
     Returns:
         New dictionary with updated value
 
-    Raises:
-        TypeError: If arguments have wrong types
-        DataError: If key_path is empty
-
     Example:
         >>> data = {"a": {"b": 1}}
         >>> set_nested_value(data, "a.c", 2)
         {"a": {"b": 1, "c": 2}}
     """
-    if not isinstance(data, dict):
-        raise TypeError("data must be a dictionary")
-    if not isinstance(key_path, str):
-        raise TypeError("key_path must be a string")
-    if not key_path:
-        raise DataError("key_path cannot be empty")
-
     import copy
 
     result = copy.deepcopy(data)
@@ -179,30 +137,22 @@ def set_nested_value(data: DataDict, key_path: str, value: Any) -> DataDict:
     return result
 
 
-def merge_dicts(*dicts: DataDict, deep: bool = True) -> DataDict:
+def merge_dicts_simple(dicts: list, deep: bool = True) -> dict:
     """Deep merge multiple dictionaries.
 
     Args:
-        *dicts: Dictionaries to merge
+        dicts: List of dictionaries to merge
         deep: Whether to perform deep merge
 
     Returns:
         Merged dictionary
 
-    Raises:
-        TypeError: If arguments have wrong types
-
     Example:
         >>> dict1 = {"a": {"b": 1}, "c": 2}
         >>> dict2 = {"a": {"d": 3}, "e": 4}
-        >>> merge_dicts(dict1, dict2)
+        >>> merge_dicts_simple([dict1, dict2])
         {"a": {"b": 1, "d": 3}, "c": 2, "e": 4}
     """
-    if not all(isinstance(d, dict) for d in dicts):
-        raise TypeError("All arguments must be dictionaries")
-    if not isinstance(deep, bool):
-        raise TypeError("deep must be a boolean")
-
     if not dicts:
         return {}
 
@@ -228,7 +178,7 @@ def _deep_merge(target: dict, source: dict) -> None:
             target[key] = value
 
 
-def compare_data_structures(data1: Any, data2: Any, ignore_order: bool = False) -> bool:
+def compare_data_structures(data1, data2, ignore_order: bool = False) -> bool:
     """Compare two data structures for equality.
 
     Args:
@@ -239,18 +189,12 @@ def compare_data_structures(data1: Any, data2: Any, ignore_order: bool = False) 
     Returns:
         True if structures are equal
 
-    Raises:
-        TypeError: If ignore_order is not boolean
-
     Example:
         >>> compare_data_structures({"a": [1, 2]}, {"a": [2, 1]}, ignore_order=True)
         True
         >>> compare_data_structures({"a": [1, 2]}, {"a": [2, 1]})
         False
     """
-    if not isinstance(ignore_order, bool):
-        raise TypeError("ignore_order must be a boolean")
-
     if type(data1) is not type(data2):
         return False
 
@@ -286,7 +230,7 @@ def compare_data_structures(data1: Any, data2: Any, ignore_order: bool = False) 
         return bool(data1 == data2)
 
 
-def safe_get(data: DataDict, key: str, default: Any = None) -> Any:
+def safe_get(data: dict, key: str, default=None):
     """Safely get value from dictionary with default.
 
     Args:
@@ -297,21 +241,16 @@ def safe_get(data: DataDict, key: str, default: Any = None) -> Any:
     Returns:
         Value for key or default
 
-    Raises:
-        TypeError: If data is not a dictionary
-
     Example:
         >>> safe_get({"a": 1}, "a")
         1
         >>> safe_get({"a": 1}, "b", "missing")
         "missing"
     """
-    if not isinstance(data, dict):
-        raise TypeError("data must be a dictionary")
     return data.get(key, default)
 
 
-def remove_empty_values(data: DataDict, recursive: bool = True) -> DataDict:
+def remove_empty_values(data: dict, recursive: bool = True) -> dict:
     """Remove empty values from dictionary.
 
     Args:
@@ -321,20 +260,13 @@ def remove_empty_values(data: DataDict, recursive: bool = True) -> DataDict:
     Returns:
         Dictionary with empty values removed
 
-    Raises:
-        TypeError: If arguments have wrong types
-
     Example:
         >>> data = {"a": "", "b": {"c": None, "d": 1}, "e": []}
         >>> remove_empty_values(data)
         {"b": {"d": 1}}
     """
-    if not isinstance(data, dict):
-        raise TypeError("data must be a dictionary")
-    if not isinstance(recursive, bool):
-        raise TypeError("recursive must be a boolean")
 
-    def _is_empty(value: Any) -> bool:
+    def _is_empty(value):
         return value is None or value == "" or value == [] or value == {}
 
     result = {}
@@ -349,7 +281,7 @@ def remove_empty_values(data: DataDict, recursive: bool = True) -> DataDict:
     return result
 
 
-def extract_keys(data: DataDict, key_pattern: str) -> List[str]:
+def extract_keys(data: dict, key_pattern: str) -> list:
     """Extract keys matching a pattern from dictionary.
 
     Args:
@@ -359,20 +291,11 @@ def extract_keys(data: DataDict, key_pattern: str) -> List[str]:
     Returns:
         List of matching keys
 
-    Raises:
-        TypeError: If arguments have wrong types
-        DataError: If pattern is invalid
-
     Example:
         >>> data = {"user_name": "Alice", "user_age": 25, "admin_role": "super"}
         >>> extract_keys(data, r"user_.*")
         ["user_name", "user_age"]
     """
-    if not isinstance(data, dict):
-        raise TypeError("data must be a dictionary")
-    if not isinstance(key_pattern, str):
-        raise TypeError("key_pattern must be a string")
-
     try:
         pattern = re.compile(key_pattern)
     except re.error as e:
@@ -381,7 +304,7 @@ def extract_keys(data: DataDict, key_pattern: str) -> List[str]:
     return [key for key in data.keys() if pattern.match(key)]
 
 
-def rename_keys(data: DataDict, key_mapping: Dict[str, str]) -> DataDict:
+def rename_keys(data: dict, key_mapping: dict) -> dict:
     """Rename dictionary keys according to mapping.
 
     Args:
@@ -391,20 +314,12 @@ def rename_keys(data: DataDict, key_mapping: Dict[str, str]) -> DataDict:
     Returns:
         Dictionary with renamed keys
 
-    Raises:
-        TypeError: If arguments have wrong types
-
     Example:
         >>> data = {"old_name": "Alice", "old_age": 25}
         >>> mapping = {"old_name": "name", "old_age": "age"}
         >>> rename_keys(data, mapping)
         {"name": "Alice", "age": 25}
     """
-    if not isinstance(data, dict):
-        raise TypeError("data must be a dictionary")
-    if not isinstance(key_mapping, dict):
-        raise TypeError("key_mapping must be a dictionary")
-
     result = {}
     for key, value in data.items():
         new_key = key_mapping.get(key, key)

@@ -7,15 +7,15 @@ from basic_open_agent_tools.data.csv_tools import (
     csv_to_dict_list,
     detect_csv_delimiter,
     dict_list_to_csv,
-    read_csv_file,
+    read_csv_simple,
     validate_csv_structure,
-    write_csv_file,
+    write_csv_simple,
 )
 from basic_open_agent_tools.exceptions import DataError
 
 
-class TestReadCsvFile:
-    """Test read_csv_file function."""
+class TestReadCsvSimple:
+    """Test read_csv_simple function."""
 
     def test_read_simple_csv(self, tmp_path):
         """Test reading a simple CSV file."""
@@ -23,7 +23,7 @@ class TestReadCsvFile:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = read_csv_file(csv_file)
+        result = read_csv_simple(csv_file)
         expected = [{"name": "Alice", "age": "25"}, {"name": "Bob", "age": "30"}]
         assert result == expected
 
@@ -33,7 +33,7 @@ class TestReadCsvFile:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = read_csv_file(csv_file, headers=False)
+        result = read_csv_simple(csv_file, headers=False)
         expected = [{"col_0": "Alice", "col_1": "25"}, {"col_0": "Bob", "col_1": "30"}]
         assert result == expected
 
@@ -43,7 +43,7 @@ class TestReadCsvFile:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = read_csv_file(csv_file, delimiter=";")
+        result = read_csv_simple(csv_file, delimiter=";")
         expected = [{"name": "Alice", "age": "25"}, {"name": "Bob", "age": "30"}]
         assert result == expected
 
@@ -52,7 +52,7 @@ class TestReadCsvFile:
         csv_file = tmp_path / "empty.csv"
         csv_file.write_text("")
 
-        result = read_csv_file(csv_file)
+        result = read_csv_simple(csv_file)
         assert result == []
 
     def test_read_csv_headers_only(self, tmp_path):
@@ -61,36 +61,36 @@ class TestReadCsvFile:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = read_csv_file(csv_file)
+        result = read_csv_simple(csv_file)
         assert result == []
 
     def test_read_nonexistent_file(self, tmp_path):
         """Test reading non-existent file."""
         nonexistent = tmp_path / "nonexistent.csv"
         with pytest.raises(DataError, match="CSV file not found"):
-            read_csv_file(nonexistent)
+            read_csv_simple(nonexistent)
 
     def test_read_csv_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="file_path must be a string or Path"):
-            read_csv_file(123)
+            read_csv_simple(123)
 
         with pytest.raises(TypeError, match="delimiter must be a string"):
-            read_csv_file("test.csv", delimiter=123)
+            read_csv_simple("test.csv", delimiter=123)
 
         with pytest.raises(TypeError, match="headers must be a boolean"):
-            read_csv_file("test.csv", headers="yes")
+            read_csv_simple("test.csv", headers="yes")
 
 
 class TestWriteCsvFile:
-    """Test write_csv_file function."""
+    """Test write_csv_simple function."""
 
     def test_write_simple_csv(self, tmp_path):
         """Test writing a simple CSV file."""
         data = [{"name": "Alice", "age": 25}, {"name": "Bob", "age": 30}]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_file(data, csv_file)
+        write_csv_simple(data, csv_file)
 
         # Verify content
         content = csv_file.read_text()
@@ -103,7 +103,7 @@ class TestWriteCsvFile:
         data = [{"name": "Alice", "age": 25}]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_file(data, csv_file, headers=False)
+        write_csv_simple(data, csv_file, headers=False)
 
         content = csv_file.read_text()
         assert "name,age" not in content
@@ -114,7 +114,7 @@ class TestWriteCsvFile:
         data = [{"name": "Alice", "age": 25}]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_file(data, csv_file, delimiter=";")
+        write_csv_simple(data, csv_file, delimiter=";")
 
         content = csv_file.read_text()
         assert "name;age" in content
@@ -123,7 +123,7 @@ class TestWriteCsvFile:
     def test_write_empty_data(self, tmp_path):
         """Test writing empty data."""
         csv_file = tmp_path / "empty.csv"
-        write_csv_file([], csv_file)
+        write_csv_simple([], csv_file)
 
         assert csv_file.read_text() == ""
 
@@ -136,7 +136,7 @@ class TestWriteCsvFile:
         ]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_file(data, csv_file)
+        write_csv_simple(data, csv_file)
 
         # Should include all unique fields
         content = csv_file.read_text()
@@ -150,13 +150,13 @@ class TestWriteCsvFile:
         csv_file = tmp_path / "test.csv"
 
         with pytest.raises(TypeError, match="data must be a list"):
-            write_csv_file("not a list", csv_file)
+            write_csv_simple("not a list", csv_file)
 
         with pytest.raises(TypeError, match="file_path must be a string or Path"):
-            write_csv_file([], 123)
+            write_csv_simple([], 123)
 
         with pytest.raises(TypeError, match="All items in data must be dictionaries"):
-            write_csv_file(["not", "dicts"], csv_file)
+            write_csv_simple(["not", "dicts"], csv_file)
 
 
 class TestCsvToDictList:
@@ -433,8 +433,8 @@ class TestRoundTripCsvOperations:
         ]
 
         csv_file = tmp_path / "roundtrip.csv"
-        write_csv_file(original_data, csv_file)
-        read_data = read_csv_file(csv_file)
+        write_csv_simple(original_data, csv_file)
+        read_data = read_csv_simple(csv_file)
 
         # Convert age back to string for comparison (CSV always returns strings)
         expected = []

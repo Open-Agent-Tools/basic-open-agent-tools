@@ -15,9 +15,9 @@ class TestReadOnlyTools:
     def test_load_all_read_only_tools_count(self):
         """Test that we get the expected number of read-only tools."""
         tools = boat.load_all_read_only_tools()
-        # Should have 56 read-only tools total:
-        # 11 file system + 10 text + 35 data = 56
-        assert len(tools) == 56
+        # Should have 55 read-only tools total:
+        # 11 file system + 10 text + 34 data = 55
+        assert len(tools) == 55
 
     def test_all_returned_items_are_callable(self):
         """Test that all returned items are callable functions."""
@@ -37,7 +37,7 @@ class TestReadOnlyTools:
         # Verify counts
         assert len(fs_tools) == 11  # File system read-only tools
         assert len(text_tools) == 10  # All text tools are read-only
-        assert len(data_tools) == 35  # Data read-only tools
+        assert len(data_tools) == 34  # Data read-only tools
 
     def test_read_only_tools_exclude_write_operations(self):
         """Test that read-only tools exclude write/modify operations."""
@@ -81,12 +81,12 @@ class TestReadOnlyTools:
             "read_file_to_string",
             "list_directory_contents",
             "validate_json_string",
-            "read_csv_file",
+            "read_csv_simple",
             "read_yaml_file",
-            "validate_schema",
+            "validate_schema_simple",
             "clean_whitespace",
             "extract_sentences",
-            "flatten_dict",
+            "flatten_dict_simple",
             "validate_binary_format",
             "list_archive_contents",
         ]
@@ -126,5 +126,5 @@ class TestReadOnlyTools:
         assert "read_only" in all_tools
         assert isinstance(all_tools["read_only"], list)
         assert (
-            len(all_tools["read_only"]) == 56
+            len(all_tools["read_only"]) == 55
         )  # Should match our read-only tool count
