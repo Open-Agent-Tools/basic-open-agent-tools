@@ -2,6 +2,7 @@
 
 import configparser
 import json
+from typing import Optional
 
 from ..exceptions import DataError
 
@@ -246,7 +247,7 @@ def validate_config_schema(config_data: dict, schema: dict) -> list:
     return errors
 
 
-def merge_config_files(config_paths: list, format_type: str = None) -> dict:
+def merge_config_files(config_paths: list, format_type: Optional[str] = None) -> dict:
     """Merge multiple configuration files into a single dictionary.
 
     Args:

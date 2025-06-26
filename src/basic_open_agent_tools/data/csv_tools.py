@@ -2,6 +2,7 @@
 
 import csv
 import io
+from typing import Optional
 
 from ..exceptions import DataError
 
@@ -164,7 +165,7 @@ def detect_csv_delimiter(file_path: str, sample_size: int = 1024) -> str:
         raise DataError(f"Failed to detect delimiter in {file_path}: {e}")
 
 
-def validate_csv_structure(file_path: str, expected_columns: list = None) -> bool:
+def validate_csv_structure(file_path: str, expected_columns: Optional[list] = None) -> bool:
     """Validate CSV file structure and column headers.
 
     Args:
@@ -214,7 +215,7 @@ def validate_csv_structure(file_path: str, expected_columns: list = None) -> boo
         raise DataError(f"Invalid CSV structure in {file_path}: {e}")
 
 
-def clean_csv_data(data: list, rules: dict = None) -> list:
+def clean_csv_data(data: list, rules: Optional[dict] = None) -> list:
     """Clean CSV data according to specified rules.
 
     Args:

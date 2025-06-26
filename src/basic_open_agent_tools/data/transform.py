@@ -1,6 +1,7 @@
 """Data transformation tools for AI agents."""
 
 import copy
+from typing import Optional
 
 from ..exceptions import DataError
 
@@ -124,7 +125,7 @@ def convert_data_types(data: list, type_mapping: dict) -> list:
     return converted_data
 
 
-def clean_data(data: list, rules: dict = None) -> list:
+def clean_data(data: list, rules: Optional[dict] = None) -> list:
     """Clean data according to specified rules.
 
     Args:
@@ -185,7 +186,7 @@ def clean_data(data: list, rules: dict = None) -> list:
     return cleaned_data
 
 
-def deduplicate_records(data: list, key_fields: list = None) -> list:
+def deduplicate_records(data: list, key_fields: Optional[list] = None) -> list:
     """Remove duplicate records from a list.
 
     Args:
