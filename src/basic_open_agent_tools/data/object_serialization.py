@@ -130,7 +130,7 @@ def sanitize_for_serialization(data: Any) -> Any:
     return str(data)
 
 
-def validate_pickle_safety(data: bytes) -> bool:
+def validate_pickle_safety(data: Any) -> bool:
     """Check if pickle data is potentially safe to deserialize.
 
     This function performs basic safety checks on pickle data to reduce the risk
@@ -147,7 +147,10 @@ def validate_pickle_safety(data: bytes) -> bool:
         >>> safe_data = pickle.dumps({"name": "test"})
         >>> validate_pickle_safety(safe_data)
         True
+        >>> validate_pickle_safety("not bytes")
+        False
     """
+    # Check that input is bytes
     if not isinstance(data, bytes):
         return False
 

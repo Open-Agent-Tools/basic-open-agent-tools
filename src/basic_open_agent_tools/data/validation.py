@@ -1,9 +1,11 @@
 """Data validation utilities for AI agents."""
 
+from typing import Any, Dict, List, Optional, Union
+
 from ..exceptions import ValidationError
 
 
-def validate_schema_simple(data, schema: dict) -> bool:
+def validate_schema_simple(data: Any, schema: Dict[str, Any]) -> bool:
     """Validate data against a JSON Schema-style schema.
 
     Args:
@@ -15,12 +17,16 @@ def validate_schema_simple(data, schema: dict) -> bool:
 
     Raises:
         ValidationError: If data doesn't match schema
+        TypeError: If schema is not a dictionary
 
     Example:
         >>> schema = {"type": "object", "properties": {"name": {"type": "string"}}}
         >>> validate_schema_simple({"name": "Alice"}, schema)
         True
     """
+    if not isinstance(schema, dict):
+        raise TypeError("schema must be a dictionary")
+
     try:
         _validate_against_schema(data, schema)
         return True
@@ -28,7 +34,7 @@ def validate_schema_simple(data, schema: dict) -> bool:
         raise
 
 
-def _validate_against_schema(data, schema: dict) -> None:
+def _validate_against_schema(data: Any, schema: Dict[str, Any]) -> None:
     """Internal helper to validate data against schema."""
     schema_type = schema.get("type")
 
@@ -82,7 +88,7 @@ def _validate_against_schema(data, schema: dict) -> None:
             raise ValidationError(f"Expected null, got {type(data).__name__}")
 
 
-def check_required_fields(data: dict, required: list) -> bool:
+def check_required_fields(data: Dict[str, Any], required: List[str]) -> bool:
     """Check if all required fields are present in data.
 
     Args:
@@ -94,6 +100,7 @@ def check_required_fields(data: dict, required: list) -> bool:
 
     Raises:
         ValidationError: If any required fields are missing
+        TypeError: If data is not a dictionary or required is not a list
 
     Example:
         >>> check_required_fields({"name": "Alice", "age": 25}, ["name", "age"])
@@ -101,6 +108,12 @@ def check_required_fields(data: dict, required: list) -> bool:
         >>> check_required_fields({"name": "Alice"}, ["name", "age"])
         False
     """
+    if not isinstance(data, dict):
+        raise TypeError("data must be a dictionary")
+
+    if not isinstance(required, list):
+        raise TypeError("required must be a list")
+
     missing_fields = [field for field in required if field not in data]
 
     if missing_fields:
@@ -109,7 +122,7 @@ def check_required_fields(data: dict, required: list) -> bool:
     return True
 
 
-def validate_data_types_simple(data: dict, type_map: dict) -> bool:
+def validate_data_types_simple(data: Dict[str, Any], type_map: Dict[str, str]) -> bool:
     """Check that field types match expectations.
 
     Args:
@@ -121,6 +134,7 @@ def validate_data_types_simple(data: dict, type_map: dict) -> bool:
 
     Raises:
         ValidationError: If any field has wrong type
+        TypeError: If data is not a dictionary or type_map is not a dictionary
 
     Example:
         >>> data = {"name": "Alice", "age": 25}
@@ -128,6 +142,12 @@ def validate_data_types_simple(data: dict, type_map: dict) -> bool:
         >>> validate_data_types_simple(data, type_map)
         True
     """
+    if not isinstance(data, dict):
+        raise TypeError("data must be a dictionary")
+
+    if not isinstance(type_map, dict):
+        raise TypeError("type_map must be a dictionary")
+
     type_errors = []
 
     type_mapping = {
@@ -155,7 +175,7 @@ def validate_data_types_simple(data: dict, type_map: dict) -> bool:
     return True
 
 
-def validate_range_simple(value, min_val=None, max_val=None) -> bool:
+def validate_range_simple(value: Union[int, float], min_val: Optional[Union[int, float]]=None, max_val: Optional[Union[int, float]]=None) -> bool:
     """Validate numeric value is within range.
 
     Args:
@@ -166,6 +186,10 @@ def validate_range_simple(value, min_val=None, max_val=None) -> bool:
     Returns:
         True if value is within range
 
+    Raises:
+        ValidationError: If value is outside the specified range
+        TypeError: If value, min_val, or max_val are not numeric types
+
     Example:
         >>> validate_range_simple(5, 1, 10)
         True
@@ -173,18 +197,24 @@ def validate_range_simple(value, min_val=None, max_val=None) -> bool:
         False
     """
     if not isinstance(value, (int, float)):
-        return False
+        raise TypeError("value must be numeric")
+
+    if min_val is not None and not isinstance(min_val, (int, float)):
+        raise TypeError("min_val must be numeric or None")
+
+    if max_val is not None and not isinstance(max_val, (int, float)):
+        raise TypeError("max_val must be numeric or None")
 
     if min_val is not None and value < min_val:
-        return False
+        raise ValidationError(f"Value {value} is below minimum {min_val}")
 
     if max_val is not None and value > max_val:
-        return False
+        raise ValidationError(f"Value {value} is above maximum {max_val}")
 
     return True
 
 
-def create_validation_report(data: dict, rules: dict) -> dict:
+def create_validation_report(data: Dict[str, Any], rules: Dict[str, Any]) -> Dict[str, Any]:
     """Create comprehensive validation report for data.
 
     Args:
@@ -194,12 +224,21 @@ def create_validation_report(data: dict, rules: dict) -> dict:
     Returns:
         Validation report with results and errors
 
+    Raises:
+        TypeError: If data is not a dictionary or rules is not a dictionary
+
     Example:
         >>> data = {"name": "Alice", "age": 25}
         >>> rules = {"required": ["name", "age"], "types": {"name": "str", "age": "int"}}
         >>> create_validation_report(data, rules)
         {"valid": True, "errors": [], "warnings": []}
     """
+    if not isinstance(data, dict):
+        raise TypeError("data must be a dictionary")
+
+    if not isinstance(rules, dict):
+        raise TypeError("rules must be a dictionary")
+
     errors = []
     warnings = []
 
@@ -224,10 +263,10 @@ def create_validation_report(data: dict, rules: dict) -> dict:
             value = data[field]
             min_val = range_spec.get("min")
             max_val = range_spec.get("max")
-            if not validate_range_simple(value, min_val, max_val):
-                errors.append(
-                    f"Range validation failed for '{field}': value {value} not in range [{min_val}, {max_val}]"
-                )
+            try:
+                validate_range_simple(value, min_val, max_val)
+            except (ValidationError, TypeError) as e:
+                errors.append(f"Range validation failed for '{field}': {str(e)}")
 
     # Check custom patterns
     patterns = rules.get("patterns", {})
@@ -256,3 +295,47 @@ def create_validation_report(data: dict, rules: dict) -> dict:
         "fields_validated": len(data),
         "rules_applied": len([k for k in rules.keys() if rules[k]]),
     }
+
+
+def check_required_fields_simple(data: Dict[str, Any], required: List[str]) -> bool:
+    """Check if all required fields are present in data.
+
+    This is an alias for check_required_fields for LLM agent compatibility.
+
+    Args:
+        data: Dictionary to check
+        required: List of required field names
+
+    Returns:
+        True if all required fields are present
+
+    Raises:
+        ValidationError: If any required fields are missing
+        TypeError: If data is not a dictionary or required is not a list
+
+    Example:
+        >>> check_required_fields_simple({"name": "Alice", "age": 25}, ["name", "age"])
+        True
+    """
+    return check_required_fields(data, required)
+
+
+def create_validation_report_simple(data: Dict[str, Any], rules: Dict[str, Any]) -> Dict[str, Any]:
+    """Create simplified validation report for data.
+
+    This is an alias for create_validation_report for LLM agent compatibility.
+
+    Args:
+        data: Dictionary to validate
+        rules: Dictionary of validation rules
+
+    Returns:
+        Validation report with results and errors
+
+    Example:
+        >>> data = {"name": "Alice", "age": 25}
+        >>> rules = {"required": ["name", "age"], "types": {"name": "str", "age": "int"}}
+        >>> create_validation_report_simple(data, rules)
+        {"valid": True, "errors": [], "warnings": []}
+    """
+    return create_validation_report(data, rules)

@@ -146,7 +146,7 @@ def decode_binary_data(encoded_data: str, encoding: str = "base64") -> bytes:
         raise ValueError(f"Invalid {encoding} data: {str(e)}")
 
 
-def validate_binary_format(data: bytes, expected_format: str) -> bool:
+def validate_binary_format(data: Any, expected_format: str) -> bool:
     """Validate that binary data matches an expected format.
 
     Args:

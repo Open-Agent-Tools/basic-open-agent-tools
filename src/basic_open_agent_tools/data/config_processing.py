@@ -2,7 +2,7 @@
 
 import configparser
 import json
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from ..exceptions import DataError
 
@@ -48,9 +48,9 @@ def read_yaml_file(file_path: str) -> dict:
             data = yaml.safe_load(f)
             return data if data is not None else {}
     except FileNotFoundError:
-        raise DataError(f"YAML file not found: {file_path}")
+        raise FileNotFoundError(f"YAML file not found: {file_path}")
     except yaml.YAMLError as e:
-        raise DataError(f"Failed to parse YAML file {file_path}: {e}")
+        raise ValueError(f"Failed to parse YAML file {file_path}: {e}")
     except Exception as e:
         raise DataError(f"Failed to read YAML file {file_path}: {e}")
 
@@ -102,11 +102,12 @@ def read_toml_file(file_path: str) -> dict:
 
     try:
         with open(file_path, "rb") as f:
-            return tomli.load(f)
+            result: Dict[Any, Any] = tomli.load(f)
+            return result
     except FileNotFoundError:
-        raise DataError(f"TOML file not found: {file_path}")
+        raise FileNotFoundError(f"TOML file not found: {file_path}")
     except tomli.TOMLDecodeError as e:
-        raise DataError(f"Failed to parse TOML file {file_path}: {e}")
+        raise ValueError(f"Failed to parse TOML file {file_path}: {e}")
     except Exception as e:
         raise DataError(f"Failed to read TOML file {file_path}: {e}")
 
@@ -153,6 +154,11 @@ def read_ini_file(file_path: str) -> dict:
         >>> read_ini_file("config.ini")
         {"database": {"host": "localhost", "port": "5432"}}
     """
+    # Check if file exists first (ConfigParser.read doesn't raise FileNotFoundError)
+    import os
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"INI file not found: {file_path}")
+
     try:
         config = configparser.ConfigParser()
         config.read(file_path, encoding="utf-8")
@@ -204,72 +210,104 @@ def validate_config_schema(config_data: dict, schema: dict) -> list:
 
     Args:
         config_data: Configuration data to validate
-        schema: Schema definition
+        schema: Schema definition with field specifications
 
     Returns:
         List of validation errors (empty if valid)
 
     Example:
         >>> config = {"host": "localhost", "port": 5432}
-        >>> schema = {"required": ["host", "port"], "types": {"port": "int"}}
+        >>> schema = {
+        ...     "port": {"type": int, "required": True},
+        ...     "host": {"type": str, "required": True}
+        ... }
         >>> validate_config_schema(config, schema)
         []
     """
     errors = []
 
-    # Check required fields
-    required_fields = schema.get("required", [])
-    for field in required_fields:
-        if field not in config_data:
-            errors.append(f"Required field '{field}' is missing")
+    # Check each field in the schema
+    for field_name, field_spec in schema.items():
+        # Check if required field is present
+        if field_spec.get("required", False) and field_name not in config_data:
+            errors.append(f"Required field '{field_name}' is missing")
+            continue
 
-    # Check data types (simplified)
-    type_map = schema.get("types", {})
-    type_mapping = {
-        "str": str,
-        "int": int,
-        "float": float,
-        "bool": bool,
-        "list": list,
-        "dict": dict,
-    }
+        # Skip validation if field is not in config data
+        if field_name not in config_data:
+            continue
 
-    for field, expected_type_name in type_map.items():
-        if field in config_data:
-            value = config_data[field]
-            expected_type = type_mapping.get(expected_type_name)
-            if expected_type and not isinstance(value, expected_type):
-                actual_type = type(value).__name__
-                errors.append(
-                    f"Field '{field}': expected {expected_type_name}, got {actual_type}"
-                )
+        # Check type
+        expected_type = field_spec.get("type")
+        if expected_type and not isinstance(config_data[field_name], expected_type):
+            actual_type = type(config_data[field_name]).__name__
+            expected_type_name = expected_type.__name__
+            errors.append(f"Field '{field_name}' has incorrect type: expected {expected_type_name}, got {actual_type}")
+
+        # Check allowed values
+        allowed_values = field_spec.get("allowed_values")
+        if allowed_values and config_data[field_name] not in allowed_values:
+            errors.append(f"Field '{field_name}' has invalid value: {config_data[field_name]}. Allowed values: {allowed_values}")
+
+    # Check for unknown fields
+    for field_name in config_data:
+        if field_name not in schema:
+            errors.append(f"Unknown field '{field_name}' in configuration")
 
     return errors
 
 
-def merge_config_files(config_paths: list, format_type: Optional[str] = None) -> dict:
+def merge_config_files(*config_paths: Any, format_type: Optional[str] = None) -> dict:
     """Merge multiple configuration files into a single dictionary.
 
     Args:
-        config_paths: List of paths to configuration files
+        *config_paths: Paths to configuration files (either as separate arguments or a list)
         format_type: Format of the files ("yaml", "toml", "ini", or None for auto-detect)
 
     Returns:
         Merged configuration dictionary
 
     Raises:
+        ValueError: If no config paths are provided
         DataError: If files cannot be read or merged
 
     Example:
-        >>> merge_config_files(["base.yaml", "override.yaml"], "yaml")
+        >>> merge_config_files("base.yaml", "override.yaml", format_type="yaml")
+        {"database": {"host": "override-host", "port": 5432}}
+        >>> merge_config_files(["base.yaml", "override.yaml"], format_type="yaml")
         {"database": {"host": "override-host", "port": 5432}}
     """
-    if not config_paths:
-        return {}
+    # Handle both list input and variable arguments
+    paths = []
+    if len(config_paths) == 1 and isinstance(config_paths[0], list):
+        paths = config_paths[0]
+    else:
+        paths = list(config_paths)
 
-    merged_config = {}
+    if not paths:
+        raise ValueError("No configuration files provided")
 
-    for config_path in config_paths:
+    # Check if all files have the same format if format_type is not specified
+    if format_type is None and len(paths) > 1:
+        detected_formats = set()
+        for path in paths:
+            if path.endswith((".yml", ".yaml")):
+                detected_formats.add("yaml")
+            elif path.endswith(".toml"):
+                detected_formats.add("toml")
+            elif path.endswith(".ini"):
+                detected_formats.add("ini")
+            elif path.endswith(".json"):
+                detected_formats.add("json")
+            else:
+                raise DataError(f"Cannot determine format for file: {path}")
+
+        if len(detected_formats) > 1:
+            raise DataError(f"Cannot merge files with different formats: {detected_formats}")
+
+    merged_config: Dict[str, Any] = {}
+
+    for config_path in paths:
         # Auto-detect format if not specified
         if format_type is None:
             if config_path.endswith((".yml", ".yaml")):
