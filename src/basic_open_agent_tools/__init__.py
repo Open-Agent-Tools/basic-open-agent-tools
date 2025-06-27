@@ -6,7 +6,7 @@ with minimal dependencies for local (non-HTTP/API) actions.
 
 from typing import List
 
-__version__ = "0.6.1"
+__version__ = "0.7.1"
 
 # Modular structure
 from . import data, exceptions, file_system, text, types
@@ -20,7 +20,6 @@ from .helpers import (
     load_all_read_only_tools,
     load_all_text_tools,
     load_data_archive_tools,
-    load_data_binary_tools,
     load_data_config_tools,
     load_data_csv_tools,
     load_data_json_tools,
@@ -63,7 +62,6 @@ __all__: List[str] = [
     "load_data_transformation_tools",
     "load_data_object_tools",
     "load_data_config_tools",
-    "load_data_binary_tools",
     "load_data_archive_tools",
     "merge_tool_lists",
     "get_tool_info",

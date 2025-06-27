@@ -9,7 +9,6 @@ This module provides data processing and manipulation tools organized into logic
 - transform: Data transformation, cleaning, and normalization
 - object_serialization: Object serialization and deserialization
 - config_processing: Configuration file processing (YAML, TOML, INI)
-- binary_processing: Binary data handling and encoding
 - archive_processing: Archive file creation and extraction (ZIP, TAR)
 """
 
@@ -24,14 +23,6 @@ from .archive_processing import (
     extract_zip_archive,
     list_archive_contents,
     validate_archive_integrity,
-)
-from .binary_processing import (
-    decode_binary_data,
-    encode_binary_data,
-    extract_binary_metadata,
-    read_binary_file,
-    validate_binary_format,
-    write_binary_file,
 )
 from .config_processing import (
     merge_config_files,
@@ -149,13 +140,6 @@ __all__: List[str] = [
     "write_ini_file",
     "validate_config_schema",
     "merge_config_files",
-    # Binary processing
-    "read_binary_file",
-    "write_binary_file",
-    "encode_binary_data",
-    "decode_binary_data",
-    "validate_binary_format",
-    "extract_binary_metadata",
     # Archive processing
     "create_zip_archive",
     "extract_zip_archive",

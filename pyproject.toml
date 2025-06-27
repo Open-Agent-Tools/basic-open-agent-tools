@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [project]
 name = "basic-open-agent-tools"
-version = "0.7.0"  # Major breaking changes for Google ADK compatibility - removed all default parameters
+version = "0.7.1"  # Remove binary data support for agent compatibility
 description = "An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions."
 readme = "README.md"
 requires-python = ">=3.8"

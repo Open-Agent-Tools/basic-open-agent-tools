@@ -293,35 +293,6 @@ def load_data_config_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_data_binary_tools() -> List[Callable[..., Any]]:
-    """Load binary data processing tools as a list of callable functions.
-
-    Returns:
-        List of binary data processing tool functions
-
-    Example:
-        >>> binary_tools = load_data_binary_tools()
-        >>> len(binary_tools) == 6
-        True
-    """
-    from .data import binary_processing
-
-    tools = []
-    binary_function_names = [
-        "read_binary_file",
-        "write_binary_file",
-        "encode_binary_data",
-        "decode_binary_data",
-        "validate_binary_format",
-        "extract_binary_metadata",
-    ]
-
-    for name in binary_function_names:
-        func = getattr(binary_processing, name)
-        if callable(func):
-            tools.append(func)
-
-    return tools
 
 
 def load_data_archive_tools() -> List[Callable[..., Any]]:
@@ -451,7 +422,7 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
 
     Example:
         >>> read_only_tools = load_all_read_only_tools()
-        >>> len(read_only_tools) > 50  # Should have 50+ read-only tools
+        >>> len(read_only_tools) > 45  # Should have 45+ read-only tools
         True
     """
     tools = []
@@ -479,10 +450,9 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
     # Text Processing Tools (10 tools - ALL are read-only)
     tools.extend(load_all_text_tools())
 
-    # Data Read-Only Tools (34 tools)
+    # Data Read-Only Tools (31 tools)
     from .data import (
         archive_processing,
-        binary_processing,
         config_processing,
         csv_tools,
         json_tools,
@@ -523,16 +493,6 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
         if callable(func):
             tools.append(func)
 
-    # Binary read-only tools (3)
-    data_binary_read_only = [
-        "read_binary_file",
-        "validate_binary_format",
-        "extract_binary_metadata",
-    ]
-    for name in data_binary_read_only:
-        func = getattr(binary_processing, name)
-        if callable(func):
-            tools.append(func)
 
     # Archive read-only tools (2)
     data_archive_read_only = ["list_archive_contents", "validate_archive_integrity"]
