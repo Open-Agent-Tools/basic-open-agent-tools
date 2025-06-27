@@ -1,12 +1,10 @@
 """File and directory information utilities."""
 
-from typing import Dict, Union
-
 from ..exceptions import FileSystemError
 from .validation import validate_path
 
 
-def get_file_info(file_path: str) -> Dict[str, Union[str, int, float, bool]]:
+def get_file_info(file_path: str) -> dict:
     """Get file or directory information.
 
     Args:

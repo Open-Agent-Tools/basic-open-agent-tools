@@ -134,8 +134,6 @@ def load_data_csv_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-
-
 def load_data_validation_tools() -> List[Callable[..., Any]]:
     """Load data validation tools as a list of callable functions.
 
@@ -164,10 +162,6 @@ def load_data_validation_tools() -> List[Callable[..., Any]]:
             tools.append(func)
 
     return tools
-
-
-
-
 
 
 def load_data_config_tools() -> List[Callable[..., Any]]:
@@ -201,10 +195,6 @@ def load_data_config_tools() -> List[Callable[..., Any]]:
             tools.append(func)
 
     return tools
-
-
-
-
 
 
 def merge_tool_lists(
@@ -288,8 +278,6 @@ def get_tool_info(tool: Callable[..., Any]) -> Dict[str, Any]:
         "module": getattr(tool, "__module__", "unknown"),
         "parameters": list(sig.parameters.keys()),
     }
-
-
 
 
 def list_all_available_tools() -> Dict[str, List[Dict[str, Any]]]:

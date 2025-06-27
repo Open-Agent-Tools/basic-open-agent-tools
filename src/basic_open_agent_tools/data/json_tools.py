@@ -2,12 +2,11 @@
 
 import gzip
 import json
-from typing import Union, cast
 
 from ..exceptions import SerializationError
 
 
-def safe_json_serialize(data: Union[dict, list, str, int, float, bool], indent: int) -> str:
+def safe_json_serialize(data: dict, indent: int) -> str:
     """Safely serialize data to JSON string with error handling.
 
     Args:
@@ -38,7 +37,7 @@ def safe_json_serialize(data: Union[dict, list, str, int, float, bool], indent: 
         raise SerializationError(f"Failed to serialize data to JSON: {e}")
 
 
-def safe_json_deserialize(json_str: str) -> Union[dict, list, str, int, float, bool, None]:
+def safe_json_deserialize(json_str: str) -> dict:
     """Safely deserialize JSON string to Python object with error handling.
 
     Args:
@@ -61,7 +60,13 @@ def safe_json_deserialize(json_str: str) -> Union[dict, list, str, int, float, b
         raise TypeError("Input must be a string")
 
     try:
-        return cast(Union[dict, list, str, int, float, bool, None], json.loads(json_str))
+        result = json.loads(json_str)
+        # Always return dict for agent compatibility
+        if isinstance(result, dict):
+            return result
+        else:
+            # Wrap non-dict results in a dict for consistency
+            return {"result": result}
     except (json.JSONDecodeError, ValueError) as e:
         raise SerializationError(f"Failed to deserialize JSON string: {e}")
 
@@ -91,7 +96,7 @@ def validate_json_string(json_str: str) -> bool:
         return False
 
 
-def compress_json_data(data: Union[dict, list, str, int, float, bool]) -> bytes:
+def compress_json_data(data: dict) -> bytes:
     """Compress JSON data for storage or transmission.
 
     Args:
@@ -116,7 +121,7 @@ def compress_json_data(data: Union[dict, list, str, int, float, bool]) -> bytes:
         raise SerializationError(f"Failed to compress JSON data: {e}")
 
 
-def decompress_json_data(compressed_data: bytes) -> Union[dict, list, str, int, float, bool, None]:
+def decompress_json_data(compressed_data: bytes) -> dict:
     """Decompress and deserialize JSON data.
 
     Args:

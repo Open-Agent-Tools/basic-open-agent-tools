@@ -1,11 +1,11 @@
 """Data validation utilities for AI agents."""
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List
 
 from ..exceptions import ValidationError
 
 
-def validate_schema_simple(data: Union[dict, list, str, int, float, bool], schema: dict) -> bool:
+def validate_schema_simple(data: dict, schema: dict) -> bool:
     """Validate data against a JSON Schema-style schema.
 
     Args:
@@ -34,7 +34,7 @@ def validate_schema_simple(data: Union[dict, list, str, int, float, bool], schem
         raise
 
 
-def _validate_against_schema(data: Union[dict, list, str, int, float, bool], schema: dict) -> None:
+def _validate_against_schema(data: dict, schema: dict) -> None:
     """Internal helper to validate data against schema."""
     schema_type = schema.get("type")
 
@@ -53,39 +53,14 @@ def _validate_against_schema(data: Union[dict, list, str, int, float, bool], sch
         # Validate properties
         for prop, value in data.items():
             if prop in properties:
-                _validate_against_schema(value, properties[prop])
+                # Only validate dict values recursively
+                if isinstance(value, dict):
+                    _validate_against_schema(value, properties[prop])
 
     elif schema_type == "array":
-        if not isinstance(data, list):
-            raise ValidationError(f"Expected array, got {type(data).__name__}")
-
-        items_schema = schema.get("items")
-        if items_schema:
-            for i, item in enumerate(data):
-                try:
-                    _validate_against_schema(item, items_schema)
-                except ValidationError as e:
-                    raise ValidationError(f"Array item {i}: {e}")
-
-    elif schema_type == "string":
-        if not isinstance(data, str):
-            raise ValidationError(f"Expected string, got {type(data).__name__}")
-
-    elif schema_type == "number":
-        if not isinstance(data, (int, float)):
-            raise ValidationError(f"Expected number, got {type(data).__name__}")
-
-    elif schema_type == "integer":
-        if not isinstance(data, int):
-            raise ValidationError(f"Expected integer, got {type(data).__name__}")
-
-    elif schema_type == "boolean":
-        if not isinstance(data, bool):
-            raise ValidationError(f"Expected boolean, got {type(data).__name__}")
-
-    elif schema_type == "null":
-        if data is not None:
-            raise ValidationError(f"Expected null, got {type(data).__name__}")
+        # For dict-only validation, we can't handle arrays directly
+        # This would need to be a dict with array-like structure
+        raise ValidationError("Array validation not supported with dict-only input")
 
 
 def check_required_fields(data: dict, required: List[str]) -> bool:
@@ -176,16 +151,16 @@ def validate_data_types_simple(data: dict, type_map: Dict[str, str]) -> bool:
 
 
 def validate_range_simple(
-    value: Union[int, float],
-    min_val: Optional[Union[int, float]] = None,
-    max_val: Optional[Union[int, float]] = None,
+    value: float,
+    min_val: float,
+    max_val: float,
 ) -> bool:
     """Validate numeric value is within range.
 
     Args:
         value: Numeric value to validate
-        min_val: Minimum allowed value (optional)
-        max_val: Maximum allowed value (optional)
+        min_val: Minimum allowed value
+        max_val: Maximum allowed value
 
     Returns:
         True if value is within range
@@ -195,32 +170,30 @@ def validate_range_simple(
         TypeError: If value, min_val, or max_val are not numeric types
 
     Example:
-        >>> validate_range_simple(5, 1, 10)
+        >>> validate_range_simple(5.0, 1.0, 10.0)
         True
-        >>> validate_range_simple(15, 1, 10)
+        >>> validate_range_simple(15.0, 1.0, 10.0)
         False
     """
     if not isinstance(value, (int, float)):
         raise TypeError("value must be numeric")
 
-    if min_val is not None and not isinstance(min_val, (int, float)):
-        raise TypeError("min_val must be numeric or None")
+    if not isinstance(min_val, (int, float)):
+        raise TypeError("min_val must be numeric")
 
-    if max_val is not None and not isinstance(max_val, (int, float)):
-        raise TypeError("max_val must be numeric or None")
+    if not isinstance(max_val, (int, float)):
+        raise TypeError("max_val must be numeric")
 
-    if min_val is not None and value < min_val:
+    if value < min_val:
         raise ValidationError(f"Value {value} is below minimum {min_val}")
 
-    if max_val is not None and value > max_val:
+    if value > max_val:
         raise ValidationError(f"Value {value} is above maximum {max_val}")
 
     return True
 
 
-def create_validation_report(
-    data: dict, rules: dict
-) -> dict:
+def create_validation_report(data: dict, rules: dict) -> dict:
     """Create comprehensive validation report for data.
 
     Args:
@@ -326,9 +299,7 @@ def check_required_fields_simple(data: dict, required: List[str]) -> bool:
     return check_required_fields(data, required)
 
 
-def create_validation_report_simple(
-    data: dict, rules: dict
-) -> dict:
+def create_validation_report_simple(data: dict, rules: dict) -> dict:
     """Create simplified validation report for data.
 
     This is an alias for create_validation_report for LLM agent compatibility.

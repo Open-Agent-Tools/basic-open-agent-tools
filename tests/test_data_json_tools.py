@@ -75,7 +75,7 @@ class TestSafeJsonDeserialize:
         """Test deserializing a list."""
         json_str = "[1, 2, 3]"
         result = safe_json_deserialize(json_str)
-        assert result == [1, 2, 3]
+        assert result == {"result": [1, 2, 3]}
 
     def test_deserialize_unicode(self):
         """Test deserializing Unicode characters."""
@@ -86,7 +86,7 @@ class TestSafeJsonDeserialize:
     def test_deserialize_null(self):
         """Test deserializing null."""
         result = safe_json_deserialize("null")
-        assert result is None
+        assert result == {"result": None}
 
     def test_deserialize_invalid_type(self):
         """Test with invalid input type."""
@@ -213,16 +213,14 @@ class TestRoundTripSerialization:
 
     def test_serialize_deserialize_roundtrip(self):
         """Test that serialize -> deserialize returns original data."""
+        # Only test dict types since function now requires dict input
         test_cases = [
             {"simple": "dict"},
-            [1, 2, 3, "mixed", {"nested": "list"}],
-            None,
-            True,
-            False,
-            42,
-            3.14,
-            "string with unicode 世界",
             {"complex": {"nested": {"deeply": [1, 2, {"more": "nesting"}]}}},
+            {"unicode": "string with unicode 世界"},
+            {"numbers": {"int": 42, "float": 3.14}},
+            {"booleans": {"true": True, "false": False}},
+            {"null_value": None},
         ]
 
         for original in test_cases:
@@ -232,11 +230,12 @@ class TestRoundTripSerialization:
 
     def test_compress_decompress_roundtrip(self):
         """Test that compress -> decompress returns original data."""
+        # Only test dict types since function now requires dict input
         test_cases = [
             {"simple": "dict"},
-            [1, 2, 3, "mixed", {"nested": "list"}],
             {"large": "data" * 1000},  # Test compression benefits
             {"unicode": "世界 🌍 🚀"},
+            {"nested": {"list": [1, 2, 3, "mixed"]}},
         ]
 
         for original in test_cases:

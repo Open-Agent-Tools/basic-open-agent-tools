@@ -2,7 +2,7 @@
 
 import configparser
 import json
-from typing import List, Union
+from typing import List
 
 from ..exceptions import DataError
 
@@ -262,11 +262,11 @@ def validate_config_schema(config_data: dict, schema: dict) -> list:
     return errors
 
 
-def merge_config_files(config_paths: Union[str, List[str]], format_type: str) -> dict:
+def merge_config_files(config_paths: List[str], format_type: str) -> dict:
     """Merge multiple configuration files into a single dictionary.
 
     Args:
-        config_paths: Paths to configuration files (either a single path or list of paths)
+        config_paths: List of paths to configuration files
         format_type: Format of the files ("yaml", "toml", "ini", or "json")
 
     Returns:
@@ -279,14 +279,11 @@ def merge_config_files(config_paths: Union[str, List[str]], format_type: str) ->
     Example:
         >>> merge_config_files(["base.yaml", "override.yaml"], "yaml")
         {"database": {"host": "override-host", "port": 5432}}
-        >>> merge_config_files("single.yaml", "yaml")
+        >>> merge_config_files(["single.yaml"], "yaml")
         {"database": {"host": "localhost", "port": 5432}}
     """
-    # Handle both single string and list input
-    if isinstance(config_paths, str):
-        paths = [config_paths]
-    else:
-        paths = config_paths
+    # Use the provided list directly
+    paths = config_paths
 
     if not paths:
         raise ValueError("No configuration files provided")
