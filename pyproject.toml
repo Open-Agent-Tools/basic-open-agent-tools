@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [project]
 name = "basic-open-agent-tools"
-version = "0.7.3"  # Remove Any types from function parameters for Google ADK compatibility
+version = "0.7.4"  # Clean up module structure and remove transform functionality
 description = "An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions."
 readme = "README.md"
 requires-python = ">=3.8"
