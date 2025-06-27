@@ -90,7 +90,7 @@ class TestTextProcessing:
         """Test Unicode normalization."""
         # Basic normalization (this test might be system-dependent)
         text = "café"
-        result = normalize_unicode(text)
+        result = normalize_unicode(text, "NFC")
         assert isinstance(result, str)
         assert "é" in result or "e" in result  # Handle different Unicode forms
 

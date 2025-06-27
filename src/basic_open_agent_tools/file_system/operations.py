@@ -79,9 +79,7 @@ def append_to_file(file_path: str, content: str) -> bool:
         raise FileSystemError(f"Failed to append to file {path}: {e}")
 
 
-def list_directory_contents(
-    directory_path: str, include_hidden: bool = False
-) -> List[str]:
+def list_directory_contents(directory_path: str, include_hidden: bool) -> List[str]:
     """List contents of a directory.
 
     Args:
@@ -235,9 +233,7 @@ def copy_file(source_path: str, destination_path: str) -> bool:
         raise FileSystemError(f"Failed to copy {src_path} to {dst_path}: {e}")
 
 
-def replace_in_file(
-    file_path: str, old_text: str, new_text: str, count: int = -1
-) -> bool:
+def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) -> bool:
     """Replace occurrences of text within a file without rewriting the entire content.
 
     This function performs targeted text replacement, making it safer for agents

@@ -362,7 +362,7 @@ class TestCleanCsvData:
         result = clean_csv_data(data, {})
         expected = [
             {"name": "Alice", "age": "25", "score": ""},
-            {"name": "Bob", "age": None, "score": "95"},
+            {"name": "Bob", "age": "", "score": "95"},
         ]
         assert result == expected
 

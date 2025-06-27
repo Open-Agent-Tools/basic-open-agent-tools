@@ -2,11 +2,14 @@
 
 import csv
 import io
+from typing import Dict, List
 
 from ..exceptions import DataError
 
 
-def read_csv_simple(file_path: str, delimiter: str, headers: bool) -> list:
+def read_csv_simple(
+    file_path: str, delimiter: str, headers: bool
+) -> List[Dict[str, str]]:
     """Read CSV file and return as list of dictionaries.
 
     Args:
@@ -63,7 +66,9 @@ def read_csv_simple(file_path: str, delimiter: str, headers: bool) -> list:
         raise DataError(f"Failed to parse CSV file {file_path_str}: {e}")
 
 
-def write_csv_simple(data: list, file_path: str, delimiter: str, headers: bool) -> None:
+def write_csv_simple(
+    data: List[Dict[str, str]], file_path: str, delimiter: str, headers: bool
+) -> None:
     """Write list of dictionaries to CSV file.
 
     Args:
@@ -123,7 +128,7 @@ def write_csv_simple(data: list, file_path: str, delimiter: str, headers: bool) 
         raise DataError(f"Failed to write CSV file {file_path_str}: {e}")
 
 
-def csv_to_dict_list(csv_data: str, delimiter: str) -> list:
+def csv_to_dict_list(csv_data: str, delimiter: str) -> List[Dict[str, str]]:
     """Convert CSV string to list of dictionaries.
 
     Args:
@@ -158,7 +163,7 @@ def csv_to_dict_list(csv_data: str, delimiter: str) -> list:
         raise DataError(f"Failed to parse CSV data: {e}")
 
 
-def dict_list_to_csv(data: list, delimiter: str) -> str:
+def dict_list_to_csv(data: List[Dict[str, str]], delimiter: str) -> str:
     """Convert list of dictionaries to CSV string.
 
     Args:
@@ -249,7 +254,7 @@ def detect_csv_delimiter(file_path: str, sample_size: int) -> str:
         raise DataError(f"Failed to detect delimiter in {file_path_str}: {e}")
 
 
-def validate_csv_structure(file_path: str, expected_columns: list) -> bool:
+def validate_csv_structure(file_path: str, expected_columns: List[str]) -> bool:
     """Validate CSV file structure and column headers.
 
     Args:
@@ -308,7 +313,7 @@ def validate_csv_structure(file_path: str, expected_columns: list) -> bool:
         raise DataError(f"Invalid CSV structure in {file_path_str}: {e}")
 
 
-def clean_csv_data(data: list, rules: dict) -> list:
+def clean_csv_data(data: List[Dict[str, str]], rules: dict) -> List[Dict[str, str]]:
     """Clean CSV data according to specified rules.
 
     Args:
@@ -366,11 +371,11 @@ def clean_csv_data(data: list, rules: dict) -> list:
             # Handle NA values
             na_values = default_rules.get("na_values", [])
             if isinstance(na_values, list) and value in na_values:
-                value = None
+                value = ""
 
             # Remove empty fields if requested
             if default_rules.get("remove_empty", False):
-                if value == "" or value is None:
+                if value == "":
                     continue
 
             cleaned_row[key] = value

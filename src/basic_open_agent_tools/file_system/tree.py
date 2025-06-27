@@ -1,7 +1,7 @@
 """Directory tree listing functionality."""
 
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 from ..exceptions import FileSystemError
 from .validation import validate_path
@@ -69,7 +69,7 @@ def list_all_directory_contents(directory_path: str) -> str:
 
 
 def generate_directory_tree(
-    directory_path: str, max_depth: Optional[int] = None, include_hidden: bool = False
+    directory_path: str, max_depth: int, include_hidden: bool
 ) -> str:
     """Generate a customizable directory tree.
 
@@ -102,7 +102,7 @@ def generate_directory_tree(
         tree_lines: List[str] = []
 
         # Check depth limit
-        if max_depth is not None and depth > max_depth:
+        if depth > max_depth:
             return tree_lines
 
         # Prepare prefix for current level

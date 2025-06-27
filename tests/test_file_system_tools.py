@@ -46,7 +46,7 @@ class TestFileSystemModule:
             assert file_system.directory_exists(test_subdir) is True
 
             # Test listing directory contents
-            contents = file_system.list_directory_contents(temp_dir)
+            contents = file_system.list_directory_contents(temp_dir, False)
             assert "test_subdir" in contents
 
     def test_enhanced_tree_functionality(self):
@@ -62,13 +62,13 @@ class TestFileSystemModule:
                 f.write("test")
 
             # Test enhanced tree function
-            tree = file_system.generate_directory_tree(temp_dir, max_depth=2)
+            tree = file_system.generate_directory_tree(temp_dir, 2, False)
             assert "subdir1" in tree
             assert "file1.txt" in tree
             assert "file2.txt" in tree
 
             # Test depth limiting
-            shallow_tree = file_system.generate_directory_tree(temp_dir, max_depth=1)
+            shallow_tree = file_system.generate_directory_tree(temp_dir, 1, False)
             assert "subdir1" in shallow_tree
             assert "nested" not in shallow_tree
 
@@ -83,7 +83,7 @@ class TestFileSystemModule:
             file_system.write_file_from_string(test_file, content)
 
             # Test replacement
-            result = file_system.replace_in_file(test_file, "Hello", "Hi")
+            result = file_system.replace_in_file(test_file, "Hello", "Hi", -1)
             assert result is True
 
             # Verify replacement

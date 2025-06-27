@@ -3,7 +3,7 @@
 import re
 import textwrap
 import unicodedata
-from typing import List, Literal, Match
+from typing import List, Match
 
 
 def clean_whitespace(text: str) -> str:
@@ -88,9 +88,7 @@ def strip_html_tags(text: str) -> str:
     return clean_whitespace(cleaned)
 
 
-def normalize_unicode(
-    text: str, form: Literal["NFC", "NFD", "NFKC", "NFKD"] = "NFC"
-) -> str:
+def normalize_unicode(text: str, form: str) -> str:
     """Normalize Unicode text.
 
     Args:
@@ -114,7 +112,7 @@ def normalize_unicode(
     if form not in valid_forms:
         raise ValueError(f"Unsupported normalization form: {form}")
 
-    return unicodedata.normalize(form, text)
+    return unicodedata.normalize(form, text)  # type: ignore[arg-type]
 
 
 def to_snake_case(text: str) -> str:
