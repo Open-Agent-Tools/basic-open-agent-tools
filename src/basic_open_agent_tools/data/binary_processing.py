@@ -11,17 +11,17 @@ import imghdr
 import mimetypes
 import os
 import struct
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from ..exceptions import DataError
 
 
-def read_binary_file(file_path: str, max_size: Optional[int] = None) -> bytes:
+def read_binary_file(file_path: str, max_size: int = 0) -> bytes:
     """Read binary data from a file.
 
     Args:
         file_path: Path to the binary file
-        max_size: Maximum file size in bytes to read (None for no limit)
+        max_size: Maximum file size in bytes to read (0 for no limit)
 
     Returns:
         Binary data as bytes
@@ -38,8 +38,8 @@ def read_binary_file(file_path: str, max_size: Optional[int] = None) -> bytes:
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
 
-    # Check file size if max_size is specified
-    if max_size is not None:
+    # Check file size if max_size is specified (0 means no limit)
+    if max_size > 0:
         file_size = os.path.getsize(file_path)
         if file_size > max_size:
             raise DataError(
@@ -146,11 +146,11 @@ def decode_binary_data(encoded_data: str, encoding: str = "base64") -> bytes:
         raise ValueError(f"Invalid {encoding} data: {str(e)}")
 
 
-def validate_binary_format(data: Any, expected_format: str) -> bool:
+def validate_binary_format(data: bytes, expected_format: str) -> bool:
     """Validate that binary data matches an expected format.
 
     Args:
-        data: Binary data to validate
+        data: Binary data to validate as bytes
         expected_format: Expected format ("png", "jpeg", "gif", "pdf", etc.)
 
     Returns:

@@ -47,7 +47,7 @@ class TestSafeJsonSerialize:
 
     def test_serialize_invalid_indent_type(self):
         """Test with invalid indent type."""
-        with pytest.raises(TypeError, match="indent must be an integer or None"):
+        with pytest.raises(TypeError, match="indent must be an integer"):
             safe_json_serialize({"test": "data"}, indent="invalid")
 
     def test_serialize_non_serializable_object(self):

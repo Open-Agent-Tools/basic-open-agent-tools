@@ -2,17 +2,17 @@
 
 import gzip
 import json
-from typing import Any, Optional
+from typing import Any
 
 from ..exceptions import SerializationError
 
 
-def safe_json_serialize(data: Any, indent: Optional[int] = None) -> str:
+def safe_json_serialize(data: dict, indent: int = 0) -> str:
     """Safely serialize data to JSON string with error handling.
 
     Args:
-        data: Data to serialize to JSON
-        indent: Number of spaces for indentation (None for compact)
+        data: Data to serialize to JSON (accepts any serializable type)
+        indent: Number of spaces for indentation (0 for compact)
 
     Returns:
         JSON string representation of the data
@@ -27,11 +27,13 @@ def safe_json_serialize(data: Any, indent: Optional[int] = None) -> str:
         >>> safe_json_serialize({"a": 1, "b": 2}, indent=2)
         '{\\n  "a": 1,\\n  "b": 2\\n}'
     """
-    if not isinstance(indent, (int, type(None))):
-        raise TypeError("indent must be an integer or None")
+    if not isinstance(indent, int):
+        raise TypeError("indent must be an integer")
 
     try:
-        return json.dumps(data, indent=indent, ensure_ascii=False)
+        # Use None for compact format when indent is 0
+        actual_indent = None if indent == 0 else indent
+        return json.dumps(data, indent=actual_indent, ensure_ascii=False)
     except (TypeError, ValueError) as e:
         raise SerializationError(f"Failed to serialize data to JSON: {e}")
 
