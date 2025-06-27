@@ -150,7 +150,7 @@ def delete_file(file_path: str) -> bool:
         raise FileSystemError(f"Failed to delete file {path}: {e}")
 
 
-def delete_directory(directory_path: str, recursive: bool = False) -> bool:
+def delete_directory(directory_path: str, recursive: bool) -> bool:
     """Delete a directory.
 
     Args:

@@ -18,13 +18,13 @@ class TestSafeJsonSerialize:
     def test_serialize_dict(self):
         """Test serializing a dictionary."""
         data = {"name": "test", "value": 42}
-        result = safe_json_serialize(data)
+        result = safe_json_serialize(data, 0)
         assert result == '{"name": "test", "value": 42}'
 
     def test_serialize_list(self):
         """Test serializing a list."""
         data = [1, 2, 3]
-        result = safe_json_serialize(data)
+        result = safe_json_serialize(data, 0)
         assert result == "[1, 2, 3]"
 
     def test_serialize_with_indent(self):
@@ -37,12 +37,12 @@ class TestSafeJsonSerialize:
     def test_serialize_unicode(self):
         """Test serializing Unicode characters."""
         data = {"message": "Hello 世界"}
-        result = safe_json_serialize(data)
+        result = safe_json_serialize(data, 0)
         assert "世界" in result
 
     def test_serialize_none(self):
         """Test serializing None."""
-        result = safe_json_serialize(None)
+        result = safe_json_serialize(None, 0)
         assert result == "null"
 
     def test_serialize_invalid_indent_type(self):
@@ -59,7 +59,7 @@ class TestSafeJsonSerialize:
         with pytest.raises(
             SerializationError, match="Failed to serialize data to JSON"
         ):
-            safe_json_serialize({"obj": CustomClass()})
+            safe_json_serialize({"obj": CustomClass()}, 0)
 
 
 class TestSafeJsonDeserialize:
@@ -147,7 +147,7 @@ class TestCompressJsonData:
         """Test compressing larger data for better compression."""
         data = {"repeated": "data" * 100, "numbers": list(range(100))}
         compressed = compress_json_data(data)
-        original_json = safe_json_serialize(data)
+        original_json = safe_json_serialize(data, 0)
 
         # Compressed should be smaller than original for repetitive data
         assert len(compressed) < len(original_json.encode("utf-8"))
@@ -226,7 +226,7 @@ class TestRoundTripSerialization:
         ]
 
         for original in test_cases:
-            serialized = safe_json_serialize(original)
+            serialized = safe_json_serialize(original, 0)
             deserialized = safe_json_deserialize(serialized)
             assert deserialized == original
 

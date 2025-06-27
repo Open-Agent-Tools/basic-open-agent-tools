@@ -1,11 +1,11 @@
 """Data validation utilities for AI agents."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from ..exceptions import ValidationError
 
 
-def validate_schema_simple(data: Any, schema: Dict[str, Any]) -> bool:
+def validate_schema_simple(data: Union[dict, list, str, int, float, bool], schema: dict) -> bool:
     """Validate data against a JSON Schema-style schema.
 
     Args:
@@ -34,7 +34,7 @@ def validate_schema_simple(data: Any, schema: Dict[str, Any]) -> bool:
         raise
 
 
-def _validate_against_schema(data: Any, schema: Dict[str, Any]) -> None:
+def _validate_against_schema(data: Union[dict, list, str, int, float, bool], schema: dict) -> None:
     """Internal helper to validate data against schema."""
     schema_type = schema.get("type")
 
@@ -88,7 +88,7 @@ def _validate_against_schema(data: Any, schema: Dict[str, Any]) -> None:
             raise ValidationError(f"Expected null, got {type(data).__name__}")
 
 
-def check_required_fields(data: Dict[str, Any], required: List[str]) -> bool:
+def check_required_fields(data: dict, required: List[str]) -> bool:
     """Check if all required fields are present in data.
 
     Args:
@@ -122,7 +122,7 @@ def check_required_fields(data: Dict[str, Any], required: List[str]) -> bool:
     return True
 
 
-def validate_data_types_simple(data: Dict[str, Any], type_map: Dict[str, str]) -> bool:
+def validate_data_types_simple(data: dict, type_map: Dict[str, str]) -> bool:
     """Check that field types match expectations.
 
     Args:
@@ -219,8 +219,8 @@ def validate_range_simple(
 
 
 def create_validation_report(
-    data: Dict[str, Any], rules: Dict[str, Any]
-) -> Dict[str, Any]:
+    data: dict, rules: dict
+) -> dict:
     """Create comprehensive validation report for data.
 
     Args:
@@ -303,7 +303,7 @@ def create_validation_report(
     }
 
 
-def check_required_fields_simple(data: Dict[str, Any], required: List[str]) -> bool:
+def check_required_fields_simple(data: dict, required: List[str]) -> bool:
     """Check if all required fields are present in data.
 
     This is an alias for check_required_fields for LLM agent compatibility.
@@ -327,8 +327,8 @@ def check_required_fields_simple(data: Dict[str, Any], required: List[str]) -> b
 
 
 def create_validation_report_simple(
-    data: Dict[str, Any], rules: Dict[str, Any]
-) -> Dict[str, Any]:
+    data: dict, rules: dict
+) -> dict:
     """Create simplified validation report for data.
 
     This is an alias for create_validation_report for LLM agent compatibility.

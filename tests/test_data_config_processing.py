@@ -12,7 +12,6 @@ from basic_open_agent_tools.data.config_processing import (
     validate_config_schema,
     write_ini_file,
 )
-from basic_open_agent_tools.exceptions import DataError
 
 # Import optional dependencies if available
 try:
@@ -229,7 +228,7 @@ class TestMergeConfigFiles:
             write_ini_file(config2, temp2_path)
 
             # Merge configs
-            merged = merge_config_files(temp1_path, temp2_path)
+            merged = merge_config_files([temp1_path, temp2_path], "ini")
 
             # Verify
             assert merged["server"]["host"] == "localhost"
@@ -247,7 +246,7 @@ class TestMergeConfigFiles:
     def test_merge_config_files_no_paths(self):
         """Test merging with no config paths."""
         with pytest.raises(ValueError):
-            merge_config_files()
+            merge_config_files([], "ini")
 
     def test_merge_config_files_mixed_formats(self):
         """Test merging files with different formats."""
@@ -263,8 +262,8 @@ class TestMergeConfigFiles:
             write_ini_file(config, temp1_path)
 
             # Try to merge different formats
-            with pytest.raises(DataError):
-                merge_config_files(temp1_path, temp2_path)
+            with pytest.raises(ValueError):  # Now raises ValueError for invalid format
+                merge_config_files([temp1_path, temp2_path], "invalid_format")
 
         finally:
             # Clean up

@@ -2,12 +2,12 @@
 
 import gzip
 import json
-from typing import Any
+from typing import Union, cast
 
 from ..exceptions import SerializationError
 
 
-def safe_json_serialize(data: dict, indent: int = 0) -> str:
+def safe_json_serialize(data: Union[dict, list, str, int, float, bool], indent: int) -> str:
     """Safely serialize data to JSON string with error handling.
 
     Args:
@@ -38,7 +38,7 @@ def safe_json_serialize(data: dict, indent: int = 0) -> str:
         raise SerializationError(f"Failed to serialize data to JSON: {e}")
 
 
-def safe_json_deserialize(json_str: str) -> Any:
+def safe_json_deserialize(json_str: str) -> Union[dict, list, str, int, float, bool, None]:
     """Safely deserialize JSON string to Python object with error handling.
 
     Args:
@@ -61,7 +61,7 @@ def safe_json_deserialize(json_str: str) -> Any:
         raise TypeError("Input must be a string")
 
     try:
-        return json.loads(json_str)
+        return cast(Union[dict, list, str, int, float, bool, None], json.loads(json_str))
     except (json.JSONDecodeError, ValueError) as e:
         raise SerializationError(f"Failed to deserialize JSON string: {e}")
 
@@ -91,7 +91,7 @@ def validate_json_string(json_str: str) -> bool:
         return False
 
 
-def compress_json_data(data: Any) -> bytes:
+def compress_json_data(data: Union[dict, list, str, int, float, bool]) -> bytes:
     """Compress JSON data for storage or transmission.
 
     Args:
@@ -110,13 +110,13 @@ def compress_json_data(data: Any) -> bytes:
         True
     """
     try:
-        json_str = safe_json_serialize(data)
+        json_str = safe_json_serialize(data, 0)
         return gzip.compress(json_str.encode("utf-8"))
     except Exception as e:
         raise SerializationError(f"Failed to compress JSON data: {e}")
 
 
-def decompress_json_data(compressed_data: bytes) -> Any:
+def decompress_json_data(compressed_data: bytes) -> Union[dict, list, str, int, float, bool, None]:
     """Decompress and deserialize JSON data.
 
     Args:

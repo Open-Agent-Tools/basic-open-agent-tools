@@ -2,7 +2,7 @@
 
 import configparser
 import json
-from typing import Any, Dict, Optional
+from typing import List, Union
 
 from ..exceptions import DataError
 
@@ -102,7 +102,7 @@ def read_toml_file(file_path: str) -> dict:
 
     try:
         with open(file_path, "rb") as f:
-            result: Dict[Any, Any] = tomli.load(f)
+            result: dict = tomli.load(f)
             return result
     except FileNotFoundError:
         raise FileNotFoundError(f"TOML file not found: {file_path}")
@@ -262,12 +262,12 @@ def validate_config_schema(config_data: dict, schema: dict) -> list:
     return errors
 
 
-def merge_config_files(*config_paths: Any, format_type: Optional[str] = None) -> dict:
+def merge_config_files(config_paths: Union[str, List[str]], format_type: str) -> dict:
     """Merge multiple configuration files into a single dictionary.
 
     Args:
-        *config_paths: Paths to configuration files (either as separate arguments or a list)
-        format_type: Format of the files ("yaml", "toml", "ini", or None for auto-detect)
+        config_paths: Paths to configuration files (either a single path or list of paths)
+        format_type: Format of the files ("yaml", "toml", "ini", or "json")
 
     Returns:
         Merged configuration dictionary
@@ -277,58 +277,29 @@ def merge_config_files(*config_paths: Any, format_type: Optional[str] = None) ->
         DataError: If files cannot be read or merged
 
     Example:
-        >>> merge_config_files("base.yaml", "override.yaml", format_type="yaml")
+        >>> merge_config_files(["base.yaml", "override.yaml"], "yaml")
         {"database": {"host": "override-host", "port": 5432}}
-        >>> merge_config_files(["base.yaml", "override.yaml"], format_type="yaml")
-        {"database": {"host": "override-host", "port": 5432}}
+        >>> merge_config_files("single.yaml", "yaml")
+        {"database": {"host": "localhost", "port": 5432}}
     """
-    # Handle both list input and variable arguments
-    paths = []
-    if len(config_paths) == 1 and isinstance(config_paths[0], list):
-        paths = config_paths[0]
+    # Handle both single string and list input
+    if isinstance(config_paths, str):
+        paths = [config_paths]
     else:
-        paths = list(config_paths)
+        paths = config_paths
 
     if not paths:
         raise ValueError("No configuration files provided")
 
-    # Check if all files have the same format if format_type is not specified
-    if format_type is None and len(paths) > 1:
-        detected_formats = set()
-        for path in paths:
-            if path.endswith((".yml", ".yaml")):
-                detected_formats.add("yaml")
-            elif path.endswith(".toml"):
-                detected_formats.add("toml")
-            elif path.endswith(".ini"):
-                detected_formats.add("ini")
-            elif path.endswith(".json"):
-                detected_formats.add("json")
-            else:
-                raise DataError(f"Cannot determine format for file: {path}")
+    # Validate format_type
+    valid_formats = ["yaml", "toml", "ini", "json"]
+    if format_type not in valid_formats:
+        raise ValueError(f"format_type must be one of {valid_formats}")
 
-        if len(detected_formats) > 1:
-            raise DataError(
-                f"Cannot merge files with different formats: {detected_formats}"
-            )
-
-    merged_config: Dict[str, Any] = {}
+    merged_config: dict = {}
 
     for config_path in paths:
-        # Auto-detect format if not specified
-        if format_type is None:
-            if config_path.endswith((".yml", ".yaml")):
-                file_format = "yaml"
-            elif config_path.endswith(".toml"):
-                file_format = "toml"
-            elif config_path.endswith(".ini"):
-                file_format = "ini"
-            elif config_path.endswith(".json"):
-                file_format = "json"
-            else:
-                raise DataError(f"Cannot determine format for file: {config_path}")
-        else:
-            file_format = format_type
+        file_format = format_type
 
         # Read the file
         if file_format == "yaml":
