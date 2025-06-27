@@ -23,7 +23,7 @@ class TestReadCsvSimple:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = read_csv_simple(csv_file)
+        result = read_csv_simple(str(csv_file), ",", True)
         expected = [{"name": "Alice", "age": "25"}, {"name": "Bob", "age": "30"}]
         assert result == expected
 
@@ -33,7 +33,7 @@ class TestReadCsvSimple:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = read_csv_simple(csv_file, headers=False)
+        result = read_csv_simple(str(csv_file), ",", False)
         expected = [{"col_0": "Alice", "col_1": "25"}, {"col_0": "Bob", "col_1": "30"}]
         assert result == expected
 
@@ -43,7 +43,7 @@ class TestReadCsvSimple:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = read_csv_simple(csv_file, delimiter=";")
+        result = read_csv_simple(str(csv_file), ";", True)
         expected = [{"name": "Alice", "age": "25"}, {"name": "Bob", "age": "30"}]
         assert result == expected
 
@@ -52,7 +52,7 @@ class TestReadCsvSimple:
         csv_file = tmp_path / "empty.csv"
         csv_file.write_text("")
 
-        result = read_csv_simple(csv_file)
+        result = read_csv_simple(str(csv_file), ",", True)
         assert result == []
 
     def test_read_csv_headers_only(self, tmp_path):
@@ -61,25 +61,25 @@ class TestReadCsvSimple:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = read_csv_simple(csv_file)
+        result = read_csv_simple(str(csv_file), ",", True)
         assert result == []
 
     def test_read_nonexistent_file(self, tmp_path):
         """Test reading non-existent file."""
         nonexistent = tmp_path / "nonexistent.csv"
         with pytest.raises(DataError, match="CSV file not found"):
-            read_csv_simple(nonexistent)
+            read_csv_simple(str(nonexistent), ",", True)
 
     def test_read_csv_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="file_path must be a string"):
-            read_csv_simple(123)
+            read_csv_simple(123, ",", True)
 
         with pytest.raises(TypeError, match="delimiter must be a string"):
-            read_csv_simple("test.csv", delimiter=123)
+            read_csv_simple("test.csv", 123, True)
 
         with pytest.raises(TypeError, match="headers must be a boolean"):
-            read_csv_simple("test.csv", headers="yes")
+            read_csv_simple("test.csv", ",", "yes")
 
 
 class TestWriteCsvFile:
@@ -90,7 +90,7 @@ class TestWriteCsvFile:
         data = [{"name": "Alice", "age": 25}, {"name": "Bob", "age": 30}]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_simple(data, csv_file)
+        write_csv_simple(data, str(csv_file), ",", True)
 
         # Verify content
         content = csv_file.read_text()
@@ -103,7 +103,7 @@ class TestWriteCsvFile:
         data = [{"name": "Alice", "age": 25}]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_simple(data, csv_file, headers=False)
+        write_csv_simple(data, str(csv_file), ",", False)
 
         content = csv_file.read_text()
         assert "name,age" not in content
@@ -114,7 +114,7 @@ class TestWriteCsvFile:
         data = [{"name": "Alice", "age": 25}]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_simple(data, csv_file, delimiter=";")
+        write_csv_simple(data, str(csv_file), ";", True)
 
         content = csv_file.read_text()
         assert "name;age" in content
@@ -123,7 +123,7 @@ class TestWriteCsvFile:
     def test_write_empty_data(self, tmp_path):
         """Test writing empty data."""
         csv_file = tmp_path / "empty.csv"
-        write_csv_simple([], csv_file)
+        write_csv_simple([], str(csv_file), ",", True)
 
         assert csv_file.read_text() == ""
 
@@ -136,7 +136,7 @@ class TestWriteCsvFile:
         ]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_simple(data, csv_file)
+        write_csv_simple(data, str(csv_file), ",", True)
 
         # Should include all unique fields
         content = csv_file.read_text()
@@ -150,13 +150,13 @@ class TestWriteCsvFile:
         csv_file = tmp_path / "test.csv"
 
         with pytest.raises(TypeError, match="data must be a list"):
-            write_csv_simple("not a list", csv_file)
+            write_csv_simple("not a list", str(csv_file), ",", True)
 
         with pytest.raises(TypeError, match="file_path must be a string"):
-            write_csv_simple([], 123)
+            write_csv_simple([], 123, ",", True)
 
         with pytest.raises(TypeError, match="All items in data must be dictionaries"):
-            write_csv_simple(["not", "dicts"], csv_file)
+            write_csv_simple(["not", "dicts"], str(csv_file), ",", True)
 
 
 class TestCsvToDictList:
@@ -165,7 +165,7 @@ class TestCsvToDictList:
     def test_convert_simple_csv(self):
         """Test converting simple CSV string."""
         csv_str = "name,age\nAlice,25\nBob,30"
-        result = csv_to_dict_list(csv_str)
+        result = csv_to_dict_list(csv_str, ",")
         expected = [{"name": "Alice", "age": "25"}, {"name": "Bob", "age": "30"}]
         assert result == expected
 
@@ -178,21 +178,21 @@ class TestCsvToDictList:
 
     def test_convert_empty_csv(self):
         """Test converting empty CSV."""
-        result = csv_to_dict_list("")
+        result = csv_to_dict_list("", ",")
         assert result == []
 
     def test_convert_headers_only(self):
         """Test converting CSV with headers only."""
-        result = csv_to_dict_list("name,age")
+        result = csv_to_dict_list("name,age", ",")
         assert result == []
 
     def test_convert_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="csv_data must be a string"):
-            csv_to_dict_list(123)
+            csv_to_dict_list(123, ",")
 
         with pytest.raises(TypeError, match="delimiter must be a string"):
-            csv_to_dict_list("name,age", delimiter=123)
+            csv_to_dict_list("name,age", 123)
 
 
 class TestDictListToCsv:
@@ -201,7 +201,7 @@ class TestDictListToCsv:
     def test_convert_simple_data(self):
         """Test converting simple data to CSV."""
         data = [{"name": "Alice", "age": 25}, {"name": "Bob", "age": 30}]
-        result = dict_list_to_csv(data)
+        result = dict_list_to_csv(data, ",")
 
         assert "name,age" in result
         assert "Alice,25" in result
@@ -217,13 +217,13 @@ class TestDictListToCsv:
 
     def test_convert_empty_data(self):
         """Test converting empty data."""
-        result = dict_list_to_csv([])
+        result = dict_list_to_csv([], ",")
         assert result == ""
 
     def test_convert_mixed_fields(self):
         """Test converting data with mixed fields."""
         data = [{"name": "Alice", "age": 25}, {"name": "Bob", "city": "NYC"}]
-        result = dict_list_to_csv(data)
+        result = dict_list_to_csv(data, ",")
 
         lines = result.strip().split("\n")
         header = lines[0]
@@ -234,10 +234,10 @@ class TestDictListToCsv:
     def test_convert_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="data must be a list"):
-            dict_list_to_csv("not a list")
+            dict_list_to_csv("not a list", ",")
 
         with pytest.raises(TypeError, match="All items in data must be dictionaries"):
-            dict_list_to_csv(["not", "dicts"])
+            dict_list_to_csv(["not", "dicts"], ",")
 
 
 class TestDetectCsvDelimiter:
@@ -249,7 +249,7 @@ class TestDetectCsvDelimiter:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = detect_csv_delimiter(csv_file)
+        result = detect_csv_delimiter(str(csv_file), 1024)
         assert result == ","
 
     def test_detect_semicolon_delimiter(self, tmp_path):
@@ -258,7 +258,7 @@ class TestDetectCsvDelimiter:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = detect_csv_delimiter(csv_file)
+        result = detect_csv_delimiter(str(csv_file), 1024)
         assert result == ";"
 
     def test_detect_tab_delimiter(self, tmp_path):
@@ -267,7 +267,7 @@ class TestDetectCsvDelimiter:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = detect_csv_delimiter(csv_file)
+        result = detect_csv_delimiter(str(csv_file), 1024)
         assert result == "\t"
 
     def test_detect_custom_sample_size(self, tmp_path):
@@ -276,7 +276,7 @@ class TestDetectCsvDelimiter:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = detect_csv_delimiter(csv_file, sample_size=100)
+        result = detect_csv_delimiter(str(csv_file), 100)
         assert result == ","
 
     def test_detect_empty_file(self, tmp_path):
@@ -285,21 +285,21 @@ class TestDetectCsvDelimiter:
         csv_file.write_text("")
 
         with pytest.raises(DataError, match="File is empty, cannot detect delimiter"):
-            detect_csv_delimiter(csv_file)
+            detect_csv_delimiter(str(csv_file), 1024)
 
     def test_detect_nonexistent_file(self, tmp_path):
         """Test detecting delimiter in non-existent file."""
         nonexistent = tmp_path / "nonexistent.csv"
         with pytest.raises(DataError, match="CSV file not found"):
-            detect_csv_delimiter(nonexistent)
+            detect_csv_delimiter(str(nonexistent), 1024)
 
     def test_detect_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="file_path must be a string"):
-            detect_csv_delimiter(123)
+            detect_csv_delimiter(123, 1024)
 
         with pytest.raises(TypeError, match="sample_size must be a positive integer"):
-            detect_csv_delimiter("test.csv", sample_size=0)
+            detect_csv_delimiter("test.csv", 0)
 
 
 class TestValidateCsvStructure:
@@ -311,7 +311,7 @@ class TestValidateCsvStructure:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = validate_csv_structure(csv_file, ["name", "age"])
+        result = validate_csv_structure(str(csv_file), ["name", "age"])
         assert result is True
 
     def test_validate_missing_columns(self, tmp_path):
@@ -321,7 +321,7 @@ class TestValidateCsvStructure:
         csv_file.write_text(csv_content)
 
         with pytest.raises(DataError, match="Missing expected columns"):
-            validate_csv_structure(csv_file, ["name", "age", "email"])
+            validate_csv_structure(str(csv_file), ["name", "age", "email"])
 
     def test_validate_no_expected_columns(self, tmp_path):
         """Test validating without expected columns."""
@@ -329,7 +329,7 @@ class TestValidateCsvStructure:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        result = validate_csv_structure(csv_file)
+        result = validate_csv_structure(str(csv_file), [])
         assert result is True
 
     def test_validate_empty_file(self, tmp_path):
@@ -337,15 +337,15 @@ class TestValidateCsvStructure:
         csv_file = tmp_path / "empty.csv"
         csv_file.write_text("")
 
-        result = validate_csv_structure(csv_file)
+        result = validate_csv_structure(str(csv_file), [])
         assert result is True
 
     def test_validate_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="file_path must be a string"):
-            validate_csv_structure(123)
+            validate_csv_structure(123, [])
 
-        with pytest.raises(TypeError, match="expected_columns must be a list or None"):
+        with pytest.raises(TypeError, match="expected_columns must be a list"):
             validate_csv_structure("test.csv", "not a list")
 
 
@@ -359,7 +359,7 @@ class TestCleanCsvData:
             {"name": "Bob", "age": "N/A", "score": "95"},
         ]
 
-        result = clean_csv_data(data)
+        result = clean_csv_data(data, {})
         expected = [
             {"name": "Alice", "age": "25", "score": ""},
             {"name": "Bob", "age": None, "score": "95"},
@@ -396,15 +396,15 @@ class TestCleanCsvData:
 
     def test_clean_empty_data(self):
         """Test cleaning empty data."""
-        result = clean_csv_data([])
+        result = clean_csv_data([], {})
         assert result == []
 
     def test_clean_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="data must be a list"):
-            clean_csv_data("not a list")
+            clean_csv_data("not a list", {})
 
-        with pytest.raises(TypeError, match="rules must be a dictionary or None"):
+        with pytest.raises(TypeError, match="rules must be a dictionary"):
             clean_csv_data([], "not a dict")
 
     def test_clean_skip_non_dict_items(self):
@@ -415,7 +415,7 @@ class TestCleanCsvData:
             {"name": "Bob", "age": "30"},
         ]
 
-        result = clean_csv_data(data)
+        result = clean_csv_data(data, {})
         assert len(result) == 2
         assert result[0]["name"] == "Alice"
         assert result[1]["name"] == "Bob"
@@ -433,8 +433,8 @@ class TestRoundTripCsvOperations:
         ]
 
         csv_file = tmp_path / "roundtrip.csv"
-        write_csv_simple(original_data, csv_file)
-        read_data = read_csv_simple(csv_file)
+        write_csv_simple(original_data, str(csv_file), ",", True)
+        read_data = read_csv_simple(str(csv_file), ",", True)
 
         # Convert age back to string for comparison (CSV always returns strings)
         expected = []
@@ -447,7 +447,7 @@ class TestRoundTripCsvOperations:
         """Test that dict_list -> CSV string -> dict_list returns original."""
         original_data = [{"name": "Alice", "age": "25"}, {"name": "Bob", "age": "30"}]
 
-        csv_string = dict_list_to_csv(original_data)
-        converted_back = csv_to_dict_list(csv_string)
+        csv_string = dict_list_to_csv(original_data, ",")
+        converted_back = csv_to_dict_list(csv_string, ",")
 
         assert converted_back == original_data
