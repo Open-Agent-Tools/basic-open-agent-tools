@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [project]
 name = "basic-open-agent-tools"
-version = "0.6.3"  # Fixed CSV function signatures for agent framework compatibility
+version = "0.6.4"  # Fixed binary and JSON function signatures for agent framework compatibility
 description = "An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions."
 readme = "README.md"
 requires-python = ">=3.8"
