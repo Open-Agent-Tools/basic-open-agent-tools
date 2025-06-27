@@ -2,28 +2,16 @@
 
 This module provides data processing and manipulation tools organized into logical submodules:
 
-- structures: Data structure manipulation and transformation
 - json_tools: JSON serialization, compression, and validation
 - csv_tools: CSV file processing, parsing, and cleaning
 - validation: Data validation and schema checking
 - transform: Data transformation, cleaning, and normalization
-- object_serialization: Object serialization and deserialization
 - config_processing: Configuration file processing (YAML, TOML, INI)
-- archive_processing: Archive file creation and extraction (ZIP, TAR)
 """
 
 from typing import List
 
 # Import all functions from submodules
-from .archive_processing import (
-    add_to_archive,
-    create_tar_archive,
-    create_zip_archive,
-    extract_tar_archive,
-    extract_zip_archive,
-    list_archive_contents,
-    validate_archive_integrity,
-)
 from .config_processing import (
     merge_config_files,
     read_ini_file,
@@ -50,24 +38,6 @@ from .json_tools import (
     safe_json_serialize,
     validate_json_string,
 )
-from .object_serialization import (
-    deserialize_object,
-    sanitize_for_serialization,
-    serialize_object,
-    validate_pickle_safety,
-)
-from .structures import (
-    compare_data_structures,
-    extract_keys,
-    flatten_dict_simple,
-    get_nested_value_simple,
-    merge_dicts_simple,
-    remove_empty_values,
-    rename_keys,
-    safe_get,
-    set_nested_value,
-    unflatten_dict,
-)
 from .transform import (
     clean_data,
     convert_data_types,
@@ -87,17 +57,6 @@ from .validation import (
 
 # Re-export all functions at module level for convenience
 __all__: List[str] = [
-    # Data structures
-    "flatten_dict_simple",
-    "unflatten_dict",
-    "get_nested_value_simple",
-    "set_nested_value",
-    "merge_dicts_simple",
-    "compare_data_structures",
-    "safe_get",
-    "remove_empty_values",
-    "extract_keys",
-    "rename_keys",
     # JSON processing
     "safe_json_serialize",
     "safe_json_deserialize",
@@ -126,11 +85,6 @@ __all__: List[str] = [
     "validate_data_types_simple",
     "validate_range_simple",
     "create_validation_report",
-    # Object serialization
-    "serialize_object",
-    "deserialize_object",
-    "sanitize_for_serialization",
-    "validate_pickle_safety",
     # Configuration processing
     "read_yaml_file",
     "write_yaml_file",
@@ -140,12 +94,4 @@ __all__: List[str] = [
     "write_ini_file",
     "validate_config_schema",
     "merge_config_files",
-    # Archive processing
-    "create_zip_archive",
-    "extract_zip_archive",
-    "list_archive_contents",
-    "add_to_archive",
-    "create_tar_archive",
-    "extract_tar_archive",
-    "validate_archive_integrity",
 ]

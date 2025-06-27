@@ -134,39 +134,6 @@ def load_data_csv_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_data_structure_tools() -> List[Callable[..., Any]]:
-    """Load data structure manipulation tools as a list of callable functions.
-
-    Returns:
-        List of data structure tool functions
-
-    Example:
-        >>> structure_tools = load_data_structure_tools()
-        >>> len(structure_tools) == 10
-        True
-    """
-    from .data import structures
-
-    tools = []
-    structure_function_names = [
-        "flatten_dict_simple",
-        "unflatten_dict",
-        "get_nested_value_simple",
-        "set_nested_value",
-        "merge_dicts_simple",
-        "compare_data_structures",
-        "safe_get",
-        "remove_empty_values",
-        "extract_keys",
-        "rename_keys",
-    ]
-
-    for name in structure_function_names:
-        func = getattr(structures, name)
-        if callable(func):
-            tools.append(func)
-
-    return tools
 
 
 def load_data_validation_tools() -> List[Callable[..., Any]]:
@@ -231,33 +198,6 @@ def load_data_transformation_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_data_object_tools() -> List[Callable[..., Any]]:
-    """Load object serialization tools as a list of callable functions.
-
-    Returns:
-        List of object serialization tool functions
-
-    Example:
-        >>> object_tools = load_data_object_tools()
-        >>> len(object_tools) == 4
-        True
-    """
-    from .data import object_serialization
-
-    tools = []
-    object_function_names = [
-        "serialize_object",
-        "deserialize_object",
-        "sanitize_for_serialization",
-        "validate_pickle_safety",
-    ]
-
-    for name in object_function_names:
-        func = getattr(object_serialization, name)
-        if callable(func):
-            tools.append(func)
-
-    return tools
 
 
 def load_data_config_tools() -> List[Callable[..., Any]]:
@@ -295,36 +235,6 @@ def load_data_config_tools() -> List[Callable[..., Any]]:
 
 
 
-def load_data_archive_tools() -> List[Callable[..., Any]]:
-    """Load archive processing tools as a list of callable functions.
-
-    Returns:
-        List of archive processing tool functions
-
-    Example:
-        >>> archive_tools = load_data_archive_tools()
-        >>> len(archive_tools) == 7
-        True
-    """
-    from .data import archive_processing
-
-    tools = []
-    archive_function_names = [
-        "create_zip_archive",
-        "extract_zip_archive",
-        "list_archive_contents",
-        "add_to_archive",
-        "create_tar_archive",
-        "extract_tar_archive",
-        "validate_archive_integrity",
-    ]
-
-    for name in archive_function_names:
-        func = getattr(archive_processing, name)
-        if callable(func):
-            tools.append(func)
-
-    return tools
 
 
 def merge_tool_lists(
@@ -422,7 +332,7 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
 
     Example:
         >>> read_only_tools = load_all_read_only_tools()
-        >>> len(read_only_tools) > 45  # Should have 45+ read-only tools
+        >>> len(read_only_tools) > 35  # Should have 35+ read-only tools
         True
     """
     tools = []
@@ -450,14 +360,11 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
     # Text Processing Tools (10 tools - ALL are read-only)
     tools.extend(load_all_text_tools())
 
-    # Data Read-Only Tools (31 tools)
+    # Data Read-Only Tools (21 tools)
     from .data import (
-        archive_processing,
         config_processing,
         csv_tools,
         json_tools,
-        object_serialization,
-        structures,
         transform,
         validation,
     )
@@ -494,28 +401,7 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
             tools.append(func)
 
 
-    # Archive read-only tools (2)
-    data_archive_read_only = ["list_archive_contents", "validate_archive_integrity"]
-    for name in data_archive_read_only:
-        func = getattr(archive_processing, name)
-        if callable(func):
-            tools.append(func)
 
-    # Structure read-only tools (8)
-    data_structure_read_only = [
-        "flatten_dict_simple",
-        "unflatten_dict",
-        "get_nested_value_simple",
-        "merge_dicts_simple",
-        "compare_data_structures",
-        "safe_get",
-        "remove_empty_values",
-        "extract_keys",
-    ]
-    for name in data_structure_read_only:
-        func = getattr(structures, name)
-        if callable(func):
-            tools.append(func)
 
     # Validation tools (5 - ALL are read-only)
     data_validation_read_only = [
@@ -530,12 +416,6 @@ def load_all_read_only_tools() -> List[Callable[..., Any]]:
         if callable(func):
             tools.append(func)
 
-    # Object serialization read-only tools (2)
-    data_object_read_only = ["sanitize_for_serialization", "validate_pickle_safety"]
-    for name in data_object_read_only:
-        func = getattr(object_serialization, name)
-        if callable(func):
-            tools.append(func)
 
     # Transform read-only tools (4 - analysis/cleaning without modification)
     data_transform_read_only = [
