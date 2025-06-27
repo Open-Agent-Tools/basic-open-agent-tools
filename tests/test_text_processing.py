@@ -44,7 +44,7 @@ class TestTextProcessing:
         """Test line ending normalization."""
         # Unix style (default)
         assert (
-            normalize_line_endings("line1\r\nline2\rline3\n") == "line1\nline2\nline3\n"
+            normalize_line_endings("line1\r\nline2\rline3\n", "unix") == "line1\nline2\nline3\n"
         )
 
         # Windows style
@@ -59,7 +59,7 @@ class TestTextProcessing:
 
         # Type error
         with pytest.raises(TypeError):
-            normalize_line_endings(123)
+            normalize_line_endings(123, "unix")
 
     def test_strip_html_tags(self):
         """Test HTML tag removal."""
@@ -136,27 +136,27 @@ class TestTextProcessing:
     def test_to_camel_case(self):
         """Test camelCase conversion."""
         # Snake case
-        assert to_camel_case("hello_world") == "helloWorld"
+        assert to_camel_case("hello_world", False) == "helloWorld"
 
         # Spaces
-        assert to_camel_case("hello world") == "helloWorld"
+        assert to_camel_case("hello world", False) == "helloWorld"
 
         # Hyphens
-        assert to_camel_case("hello-world") == "helloWorld"
+        assert to_camel_case("hello-world", False) == "helloWorld"
 
         # PascalCase mode
         assert to_camel_case("hello_world", upper_first=True) == "HelloWorld"
 
         # Single word
-        assert to_camel_case("hello") == "hello"
+        assert to_camel_case("hello", False) == "hello"
         assert to_camel_case("hello", upper_first=True) == "Hello"
 
         # Empty string
-        assert to_camel_case("") == ""
+        assert to_camel_case("", False) == ""
 
         # Type error
         with pytest.raises(TypeError):
-            to_camel_case(123)
+            to_camel_case(123, False)
 
     def test_to_title_case(self):
         """Test Title Case conversion."""
@@ -183,27 +183,27 @@ class TestTextProcessing:
         """Test smart line splitting."""
         # Word-preserving split
         text = "This is a long line that needs splitting"
-        result = smart_split_lines(text, 15)
+        result = smart_split_lines(text, 15, True)
         assert all(len(line) <= 15 for line in result)
         assert " ".join(result) == text
 
         # Character-based split
-        result = smart_split_lines("abcdefghij", 3, preserve_words=False)
+        result = smart_split_lines("abcdefghij", 3, False)
         assert result == ["abc", "def", "ghi", "j"]
 
         # Short text
-        assert smart_split_lines("short", 10) == ["short"]
+        assert smart_split_lines("short", 10, True) == ["short"]
 
         # Empty string
-        assert smart_split_lines("", 10) == []
+        assert smart_split_lines("", 10, True) == []
 
         # Invalid max_length
         with pytest.raises(ValueError):
-            smart_split_lines("text", 0)
+            smart_split_lines("text", 0, True)
 
         # Type error
         with pytest.raises(TypeError):
-            smart_split_lines(123, 10)
+            smart_split_lines(123, 10, True)
 
     def test_extract_sentences(self):
         """Test sentence extraction."""
@@ -236,17 +236,17 @@ class TestTextProcessing:
         """Test Oxford comma joining."""
         # Three items
         items = ["apples", "bananas", "oranges"]
-        assert join_with_oxford_comma(items) == "apples, bananas, and oranges"
+        assert join_with_oxford_comma(items, "and") == "apples, bananas, and oranges"
 
         # Two items
         items = ["apples", "bananas"]
-        assert join_with_oxford_comma(items) == "apples and bananas"
+        assert join_with_oxford_comma(items, "and") == "apples and bananas"
 
         # One item
-        assert join_with_oxford_comma(["apples"]) == "apples"
+        assert join_with_oxford_comma(["apples"], "and") == "apples"
 
         # Empty list
-        assert join_with_oxford_comma([]) == ""
+        assert join_with_oxford_comma([], "and") == ""
 
         # Custom conjunction
         items = ["A", "B", "C"]
@@ -254,7 +254,7 @@ class TestTextProcessing:
 
         # Type error
         with pytest.raises(TypeError):
-            join_with_oxford_comma("not a list")
+            join_with_oxford_comma("not a list", "and")
 
 
 class TestTextProcessingIntegration:
@@ -275,7 +275,7 @@ class TestTextProcessingIntegration:
         original = "hello_world_test"
 
         # snake -> camel -> snake
-        camel = to_camel_case(original)
+        camel = to_camel_case(original, False)
         back_to_snake = to_snake_case(camel)
 
         assert back_to_snake == original
@@ -285,7 +285,7 @@ class TestTextProcessingIntegration:
         original = "The quick brown fox jumps over the lazy dog"
 
         # Split into lines
-        lines = smart_split_lines(original, 15)
+        lines = smart_split_lines(original, 15, True)
 
         # Join back together
         rejoined = " ".join(lines)
