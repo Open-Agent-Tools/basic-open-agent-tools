@@ -44,7 +44,8 @@ class TestTextProcessing:
         """Test line ending normalization."""
         # Unix style (default)
         assert (
-            normalize_line_endings("line1\r\nline2\rline3\n", "unix") == "line1\nline2\nline3\n"
+            normalize_line_endings("line1\r\nline2\rline3\n", "unix")
+            == "line1\nline2\nline3\n"
         )
 
         # Windows style

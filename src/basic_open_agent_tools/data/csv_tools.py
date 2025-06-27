@@ -29,7 +29,7 @@ def read_csv_simple(file_path: str, delimiter: str, headers: bool) -> list:
     """
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
-    
+
     file_path_str = file_path
 
     if not isinstance(delimiter, str):
@@ -86,7 +86,7 @@ def write_csv_simple(data: list, file_path: str, delimiter: str, headers: bool) 
 
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
-    
+
     file_path_str = file_path
 
     if not isinstance(delimiter, str):
@@ -225,7 +225,7 @@ def detect_csv_delimiter(file_path: str, sample_size: int) -> str:
     """
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
-    
+
     file_path_str = file_path
 
     if not isinstance(sample_size, int) or sample_size <= 0:
@@ -271,7 +271,7 @@ def validate_csv_structure(file_path: str, expected_columns: list) -> bool:
     """
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
-    
+
     file_path_str = file_path
 
     if not isinstance(expected_columns, list):
