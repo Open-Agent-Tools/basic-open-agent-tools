@@ -80,7 +80,7 @@ def load_data_json_tools() -> List[Callable[..., Any]]:
 
     Example:
         >>> json_tools = load_data_json_tools()
-        >>> len(json_tools) == 5
+        >>> len(json_tools) == 3
         True
     """
     from .data import json_tools
@@ -90,8 +90,6 @@ def load_data_json_tools() -> List[Callable[..., Any]]:
         "safe_json_serialize",
         "safe_json_deserialize",
         "validate_json_string",
-        "compress_json_data",
-        "decompress_json_data",
     ]
 
     for name in json_function_names:

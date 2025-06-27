@@ -3,8 +3,6 @@
 import pytest
 
 from basic_open_agent_tools.data.json_tools import (
-    compress_json_data,
-    decompress_json_data,
     safe_json_deserialize,
     safe_json_serialize,
     validate_json_string,
@@ -133,81 +131,6 @@ class TestValidateJsonString:
         assert validate_json_string([1, 2, 3]) is False
 
 
-class TestCompressJsonData:
-    """Test compress_json_data function."""
-
-    def test_compress_simple_data(self):
-        """Test compressing simple data."""
-        data = {"test": "data"}
-        compressed = compress_json_data(data)
-        assert isinstance(compressed, bytes)
-        assert len(compressed) > 0
-
-    def test_compress_large_data(self):
-        """Test compressing larger data for better compression."""
-        data = {"repeated": "data" * 100, "numbers": list(range(100))}
-        compressed = compress_json_data(data)
-        original_json = safe_json_serialize(data, 0)
-
-        # Compressed should be smaller than original for repetitive data
-        assert len(compressed) < len(original_json.encode("utf-8"))
-
-    def test_compress_unicode_data(self):
-        """Test compressing Unicode data."""
-        data = {"unicode": "Hello 世界", "emoji": "🚀"}
-        compressed = compress_json_data(data)
-        assert isinstance(compressed, bytes)
-
-    def test_compress_non_serializable(self):
-        """Test compressing non-serializable data."""
-
-        class CustomClass:
-            pass
-
-        with pytest.raises(SerializationError, match="Failed to compress JSON data"):
-            compress_json_data({"obj": CustomClass()})
-
-
-class TestDecompressJsonData:
-    """Test decompress_json_data function."""
-
-    def test_decompress_simple_data(self):
-        """Test decompressing simple data."""
-        original = {"test": "data"}
-        compressed = compress_json_data(original)
-        decompressed = decompress_json_data(compressed)
-        assert decompressed == original
-
-    def test_decompress_complex_data(self):
-        """Test decompressing complex data."""
-        original = {
-            "string": "Hello 世界",
-            "number": 42,
-            "list": [1, 2, 3],
-            "nested": {"key": "value"},
-            "null": None,
-            "boolean": True,
-        }
-        compressed = compress_json_data(original)
-        decompressed = decompress_json_data(compressed)
-        assert decompressed == original
-
-    def test_decompress_invalid_type(self):
-        """Test decompressing invalid input type."""
-        with pytest.raises(TypeError, match="Input must be bytes"):
-            decompress_json_data("not bytes")
-
-    def test_decompress_invalid_data(self):
-        """Test decompressing invalid compressed data."""
-        with pytest.raises(SerializationError, match="Failed to decompress JSON data"):
-            decompress_json_data(b"invalid compressed data")
-
-    def test_decompress_empty_bytes(self):
-        """Test decompressing empty bytes."""
-        with pytest.raises(SerializationError, match="Failed to decompress JSON data"):
-            decompress_json_data(b"")
-
-
 class TestRoundTripSerialization:
     """Test round-trip serialization scenarios."""
 
@@ -227,18 +150,3 @@ class TestRoundTripSerialization:
             serialized = safe_json_serialize(original, 0)
             deserialized = safe_json_deserialize(serialized)
             assert deserialized == original
-
-    def test_compress_decompress_roundtrip(self):
-        """Test that compress -> decompress returns original data."""
-        # Only test dict types since function now requires dict input
-        test_cases = [
-            {"simple": "dict"},
-            {"large": "data" * 1000},  # Test compression benefits
-            {"unicode": "世界 🌍 🚀"},
-            {"nested": {"list": [1, 2, 3, "mixed"]}},
-        ]
-
-        for original in test_cases:
-            compressed = compress_json_data(original)
-            decompressed = decompress_json_data(compressed)
-            assert decompressed == original

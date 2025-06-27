@@ -1,6 +1,5 @@
 """JSON processing utilities for AI agents."""
 
-import gzip
 import json
 
 from ..exceptions import SerializationError
@@ -94,58 +93,3 @@ def validate_json_string(json_str: str) -> bool:
         return True
     except (json.JSONDecodeError, ValueError):
         return False
-
-
-def compress_json_data(data: dict) -> bytes:
-    """Compress JSON data for storage or transmission.
-
-    Args:
-        data: Data to serialize and compress
-
-    Returns:
-        Compressed JSON data as bytes
-
-    Raises:
-        SerializationError: If data cannot be serialized or compressed
-        TypeError: If data contains non-serializable objects
-
-    Example:
-        >>> compressed = compress_json_data({"test": "data"})
-        >>> isinstance(compressed, bytes)
-        True
-    """
-    try:
-        json_str = safe_json_serialize(data, 0)
-        return gzip.compress(json_str.encode("utf-8"))
-    except Exception as e:
-        raise SerializationError(f"Failed to compress JSON data: {e}")
-
-
-def decompress_json_data(compressed_data: bytes) -> dict:
-    """Decompress and deserialize JSON data.
-
-    Args:
-        compressed_data: Compressed JSON data as bytes
-
-    Returns:
-        Deserialized Python object
-
-    Raises:
-        SerializationError: If data cannot be decompressed or deserialized
-        TypeError: If input is not bytes
-
-    Example:
-        >>> original = {"test": "data"}
-        >>> compressed = compress_json_data(original)
-        >>> decompressed = decompress_json_data(compressed)
-        >>> decompressed == original
-        True
-    """
-    if not isinstance(compressed_data, bytes):
-        raise TypeError("Input must be bytes")
-
-    try:
-        json_str = gzip.decompress(compressed_data).decode("utf-8")
-        return safe_json_deserialize(json_str)
-    except Exception as e:
-        raise SerializationError(f"Failed to decompress JSON data: {e}")

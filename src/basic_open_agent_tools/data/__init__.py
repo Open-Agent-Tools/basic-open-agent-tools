@@ -31,8 +31,6 @@ from .csv_tools import (
     write_csv_simple,
 )
 from .json_tools import (
-    compress_json_data,
-    decompress_json_data,
     safe_json_deserialize,
     safe_json_serialize,
     validate_json_string,
@@ -51,8 +49,6 @@ __all__: List[str] = [
     "safe_json_serialize",
     "safe_json_deserialize",
     "validate_json_string",
-    "compress_json_data",
-    "decompress_json_data",
     # CSV processing
     "read_csv_simple",
     "write_csv_simple",
