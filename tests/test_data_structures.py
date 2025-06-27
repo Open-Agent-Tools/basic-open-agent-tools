@@ -23,7 +23,7 @@ class TestFlattenDict:
     def test_flatten_simple_dict(self):
         """Test flattening a simple nested dictionary."""
         data = {"a": {"b": {"c": 1}}, "d": 2}
-        result = flatten_dict_simple(data)
+        result = flatten_dict_simple(data, ".")
         expected = {"a.b.c": 1, "d": 2}
         assert result == expected
 
@@ -36,32 +36,32 @@ class TestFlattenDict:
 
     def test_flatten_empty_dict(self):
         """Test flattening empty dictionary."""
-        result = flatten_dict_simple({})
+        result = flatten_dict_simple({}, ".")
         assert result == {}
 
     def test_flatten_single_level(self):
         """Test flattening single-level dictionary."""
         data = {"a": 1, "b": 2}
-        result = flatten_dict_simple(data)
+        result = flatten_dict_simple(data, ".")
         assert result == data
 
     def test_flatten_mixed_types(self):
         """Test flattening with mixed value types."""
         data = {"a": {"b": [1, 2, 3]}, "c": "string", "d": {"e": None}}
-        result = flatten_dict_simple(data)
+        result = flatten_dict_simple(data, ".")
         expected = {"a.b": [1, 2, 3], "c": "string", "d.e": None}
         assert result == expected
 
     def test_flatten_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="data must be a dictionary"):
-            flatten_dict_simple("not a dict")
+            flatten_dict_simple("not a dict", ".")
 
         with pytest.raises(TypeError, match="separator must be a string"):
-            flatten_dict_simple({"a": 1}, separator=123)
+            flatten_dict_simple({"a": 1}, 123)
 
         with pytest.raises(DataError, match="separator cannot be empty"):
-            flatten_dict_simple({"a": 1}, separator="")
+            flatten_dict_simple({"a": 1}, "")
 
 
 class TestUnflattenDict:
@@ -70,7 +70,7 @@ class TestUnflattenDict:
     def test_unflatten_simple_dict(self):
         """Test unflattening a simple flattened dictionary."""
         data = {"a.b.c": 1, "d": 2}
-        result = unflatten_dict(data)
+        result = unflatten_dict(data, ".")
         expected = {"a": {"b": {"c": 1}}, "d": 2}
         assert result == expected
 
@@ -83,19 +83,19 @@ class TestUnflattenDict:
 
     def test_unflatten_empty_dict(self):
         """Test unflattening empty dictionary."""
-        result = unflatten_dict({})
+        result = unflatten_dict({}, ".")
         assert result == {}
 
     def test_unflatten_single_level(self):
         """Test unflattening single-level dictionary."""
         data = {"a": 1, "b": 2}
-        result = unflatten_dict(data)
+        result = unflatten_dict(data, ".")
         assert result == data
 
     def test_unflatten_conflict_resolution(self):
         """Test handling conflicts when unflattening."""
         data = {"a": 1, "a.b": 2}
-        result = unflatten_dict(data)
+        result = unflatten_dict(data, ".")
         # Later key should create nested structure
         expected = {"a": {"b": 2}}
         assert result == expected
@@ -103,13 +103,13 @@ class TestUnflattenDict:
     def test_unflatten_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="data must be a dictionary"):
-            unflatten_dict("not a dict")
+            unflatten_dict("not a dict", ".")
 
         with pytest.raises(TypeError, match="separator must be a string"):
-            unflatten_dict({"a": 1}, separator=123)
+            unflatten_dict({"a": 1}, 123)
 
         with pytest.raises(DataError, match="separator cannot be empty"):
-            unflatten_dict({"a": 1}, separator="")
+            unflatten_dict({"a": 1}, "")
 
 
 class TestGetNestedValue:
@@ -118,7 +118,7 @@ class TestGetNestedValue:
     def test_get_existing_nested_value(self):
         """Test getting existing nested value."""
         data = {"a": {"b": {"c": 1}}}
-        result = get_nested_value_simple(data, "a.b.c")
+        result = get_nested_value_simple(data, "a.b.c", None)
         assert result == 1
 
     def test_get_nonexistent_nested_value(self):
@@ -130,22 +130,22 @@ class TestGetNestedValue:
     def test_get_top_level_value(self):
         """Test getting top-level value."""
         data = {"a": 1}
-        result = get_nested_value_simple(data, "a")
+        result = get_nested_value_simple(data, "a", None)
         assert result == 1
 
     def test_get_empty_key_path(self):
         """Test getting with empty key path."""
         data = {"a": 1}
-        result = get_nested_value_simple(data, "")
+        result = get_nested_value_simple(data, "", None)
         assert result == data
 
     def test_get_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="data must be a dictionary"):
-            get_nested_value_simple("not a dict", "a.b")
+            get_nested_value_simple("not a dict", "a.b", None)
 
         with pytest.raises(TypeError, match="key_path must be a string"):
-            get_nested_value_simple({"a": 1}, 123)
+            get_nested_value_simple({"a": 1}, 123, None)
 
 
 class TestSetNestedValue:
@@ -193,7 +193,7 @@ class TestMergeDicts:
         """Test merging simple dictionaries."""
         dict1 = {"a": 1, "b": 2}
         dict2 = {"c": 3, "d": 4}
-        result = merge_dicts_simple([dict1, dict2])
+        result = merge_dicts_simple([dict1, dict2], deep=True)
         expected = {"a": 1, "b": 2, "c": 3, "d": 4}
         assert result == expected
 
@@ -218,22 +218,22 @@ class TestMergeDicts:
         dict1 = {"a": 1}
         dict2 = {"b": 2}
         dict3 = {"c": 3}
-        result = merge_dicts_simple(dict1, dict2, dict3)
+        result = merge_dicts_simple(dict1, dict2, dict3, deep=True)
         expected = {"a": 1, "b": 2, "c": 3}
         assert result == expected
 
     def test_merge_empty_dicts(self):
         """Test merging empty dictionaries."""
-        result = merge_dicts_simple()
+        result = merge_dicts_simple(deep=True)
         assert result == {}
 
-        result = merge_dicts_simple({}, {"a": 1})
+        result = merge_dicts_simple({}, {"a": 1}, deep=True)
         assert result == {"a": 1}
 
     def test_merge_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="All arguments must be dictionaries"):
-            merge_dicts_simple({"a": 1}, "not a dict")
+            merge_dicts_simple({"a": 1}, "not a dict", deep=True)
 
         with pytest.raises(TypeError, match="deep must be a boolean"):
             merge_dicts_simple({"a": 1}, {"b": 2}, deep="not bool")
@@ -246,13 +246,13 @@ class TestCompareDataStructures:
         """Test comparing identical structures."""
         data1 = {"a": [1, 2, {"b": 3}]}
         data2 = {"a": [1, 2, {"b": 3}]}
-        assert compare_data_structures(data1, data2) is True
+        assert compare_data_structures(data1, data2, False) is True
 
     def test_compare_different_structures(self):
         """Test comparing different structures."""
         data1 = {"a": [1, 2]}
         data2 = {"a": [2, 1]}
-        assert compare_data_structures(data1, data2) is False
+        assert compare_data_structures(data1, data2, False) is False
 
     def test_compare_ignore_order(self):
         """Test comparing with order ignored."""
@@ -262,8 +262,8 @@ class TestCompareDataStructures:
 
     def test_compare_different_types(self):
         """Test comparing different types."""
-        assert compare_data_structures({"a": 1}, ["a", 1]) is False
-        assert compare_data_structures(1, "1") is False
+        assert compare_data_structures({"a": 1}, ["a", 1], False) is False
+        assert compare_data_structures(1, "1", False) is False
 
     def test_compare_complex_structures(self):
         """Test comparing complex nested structures."""
@@ -274,7 +274,7 @@ class TestCompareDataStructures:
     def test_compare_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="ignore_order must be a boolean"):
-            compare_data_structures({"a": 1}, {"a": 1}, ignore_order="not bool")
+            compare_data_structures({"a": 1}, {"a": 1}, "not bool")
 
 
 class TestSafeGet:
@@ -283,7 +283,7 @@ class TestSafeGet:
     def test_safe_get_existing_key(self):
         """Test getting existing key."""
         data = {"a": 1, "b": 2}
-        result = safe_get(data, "a")
+        result = safe_get(data, "a", None)
         assert result == 1
 
     def test_safe_get_missing_key(self):
@@ -295,13 +295,13 @@ class TestSafeGet:
     def test_safe_get_missing_key_no_default(self):
         """Test getting missing key without default."""
         data = {"a": 1}
-        result = safe_get(data, "b")
+        result = safe_get(data, "b", None)
         assert result is None
 
     def test_safe_get_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="data must be a dictionary"):
-            safe_get("not a dict", "key")
+            safe_get("not a dict", "key", None)
 
 
 class TestRemoveEmptyValues:
@@ -310,7 +310,7 @@ class TestRemoveEmptyValues:
     def test_remove_empty_values_simple(self):
         """Test removing empty values from simple dictionary."""
         data = {"a": "", "b": None, "c": 1, "d": []}
-        result = remove_empty_values(data)
+        result = remove_empty_values(data, True)
         expected = {"c": 1}
         assert result == expected
 
@@ -331,7 +331,7 @@ class TestRemoveEmptyValues:
     def test_remove_empty_values_invalid_types(self):
         """Test with invalid argument types."""
         with pytest.raises(TypeError, match="data must be a dictionary"):
-            remove_empty_values("not a dict")
+            remove_empty_values("not a dict", True)
 
         with pytest.raises(TypeError, match="recursive must be a boolean"):
             remove_empty_values({"a": 1}, recursive="not bool")
@@ -414,22 +414,22 @@ class TestRoundTripOperations:
     def test_flatten_unflatten_roundtrip(self):
         """Test that flatten -> unflatten returns original."""
         original = {"a": {"b": {"c": 1}}, "d": 2, "e": {"f": 3}}
-        flattened = flatten_dict_simple(original)
-        result = unflatten_dict(flattened)
+        flattened = flatten_dict_simple(original, ".")
+        result = unflatten_dict(flattened, ".")
         assert result == original
 
     def test_set_get_nested_roundtrip(self):
         """Test that set_nested_value -> get_nested_value_simple works."""
         data = {"a": {"b": 1}}
         updated = set_nested_value(data, "a.c", 2)
-        result = get_nested_value_simple(updated, "a.c")
+        result = get_nested_value_simple(updated, "a.c", None)
         assert result == 2
 
     def test_merge_compare_operations(self):
         """Test merge and compare operations together."""
         dict1 = {"a": {"x": 1}}
         dict2 = {"a": {"y": 2}}
-        merged = merge_dicts_simple(dict1, dict2)
+        merged = merge_dicts_simple(dict1, dict2, deep=True)
 
         expected = {"a": {"x": 1, "y": 2}}
-        assert compare_data_structures(merged, expected) is True
+        assert compare_data_structures(merged, expected, False) is True
