@@ -2,17 +2,16 @@
 
 import csv
 import io
-from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 from ..exceptions import DataError
 
 
-def read_csv_simple(file_path: Union[str, Path], delimiter: str = ',', headers: bool = True) -> list:
+def read_csv_simple(file_path: str, delimiter: str = ",", headers: bool = True) -> list:
     """Read CSV file and return as list of dictionaries.
 
     Args:
-        file_path: Path to the CSV file (string or Path object)
+        file_path: Path to the CSV file as a string
         delimiter: CSV delimiter character (default: ',')
         headers: Whether the CSV file has headers (default: True)
 
@@ -20,7 +19,7 @@ def read_csv_simple(file_path: Union[str, Path], delimiter: str = ',', headers: 
         List of dictionaries representing CSV rows with string values
 
     Raises:
-        TypeError: If file_path is not a string or Path object
+        TypeError: If file_path is not a string
         DataError: If file cannot be read or parsed
 
     Example:
@@ -29,9 +28,13 @@ def read_csv_simple(file_path: Union[str, Path], delimiter: str = ',', headers: 
         >>> data
         [{'name': 'Alice', 'age': '25'}, {'name': 'Bob', 'age': '30'}]
     """
-    # Check if file_path is a string or a Path-like object
-    if not (isinstance(file_path, str) or hasattr(file_path, '__fspath__')):
-        raise TypeError("file_path must be a string or Path")
+    # Check if file_path is a string or Path object and convert to string
+    if isinstance(file_path, str):
+        file_path_str = file_path
+    elif hasattr(file_path, "__fspath__"):
+        file_path_str = str(file_path)
+    else:
+        raise TypeError("file_path must be a string")
 
     if not isinstance(delimiter, str):
         raise TypeError("delimiter must be a string")
@@ -40,7 +43,7 @@ def read_csv_simple(file_path: Union[str, Path], delimiter: str = ',', headers: 
         raise TypeError("headers must be a boolean")
 
     try:
-        with open(file_path, encoding="utf-8", newline="") as csvfile:
+        with open(file_path_str, encoding="utf-8", newline="") as csvfile:
             if headers:
                 dict_reader = csv.DictReader(csvfile, delimiter=delimiter)
                 return [dict(row) for row in dict_reader]
@@ -57,24 +60,26 @@ def read_csv_simple(file_path: Union[str, Path], delimiter: str = ',', headers: 
                     result.append(row_dict)
                 return result
     except FileNotFoundError:
-        raise DataError(f"CSV file not found: {file_path}")
+        raise DataError(f"CSV file not found: {file_path_str}")
     except UnicodeDecodeError as e:
-        raise DataError(f"Failed to decode CSV file {file_path}: {e}")
+        raise DataError(f"Failed to decode CSV file {file_path_str}: {e}")
     except csv.Error as e:
-        raise DataError(f"Failed to parse CSV file {file_path}: {e}")
+        raise DataError(f"Failed to parse CSV file {file_path_str}: {e}")
 
 
-def write_csv_simple(data: list, file_path: Union[str, Path], delimiter: str = ',', headers: bool = True) -> None:
+def write_csv_simple(
+    data: list, file_path: str, delimiter: str = ",", headers: bool = True
+) -> None:
     """Write list of dictionaries to CSV file.
 
     Args:
         data: List of dictionaries to write
-        file_path: Path where CSV file will be created (string or Path object)
+        file_path: Path where CSV file will be created as a string
         delimiter: CSV delimiter character (default: ',')
         headers: Whether to write headers (default: True)
 
     Raises:
-        TypeError: If data is not a list, contains non-dictionary items, or file_path is not a string or Path
+        TypeError: If data is not a list, contains non-dictionary items, or file_path is not a string
         DataError: If file cannot be written
 
     Example:
@@ -85,9 +90,13 @@ def write_csv_simple(data: list, file_path: Union[str, Path], delimiter: str = '
     if not isinstance(data, list):
         raise TypeError("data must be a list")
 
-    # Check if file_path is a string or a Path-like object
-    if not (isinstance(file_path, str) or hasattr(file_path, '__fspath__')):
-        raise TypeError("file_path must be a string or Path")
+    # Check if file_path is a string or Path object and convert to string
+    if isinstance(file_path, str):
+        file_path_str = file_path
+    elif hasattr(file_path, "__fspath__"):
+        file_path_str = str(file_path)
+    else:
+        raise TypeError("file_path must be a string")
 
     if not isinstance(delimiter, str):
         raise TypeError("delimiter must be a string")
@@ -97,7 +106,7 @@ def write_csv_simple(data: list, file_path: Union[str, Path], delimiter: str = '
 
     if not data:
         # Write empty file for empty data
-        with open(file_path, "w", encoding="utf-8") as f:
+        with open(file_path_str, "w", encoding="utf-8") as f:
             f.write("")
         return
 
@@ -114,16 +123,16 @@ def write_csv_simple(data: list, file_path: Union[str, Path], delimiter: str = '
                 if key not in fieldnames:
                     fieldnames.append(key)
 
-        with open(file_path, "w", encoding="utf-8", newline="") as csvfile:
+        with open(file_path_str, "w", encoding="utf-8", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=delimiter)
             if headers:
                 writer.writeheader()
             writer.writerows(data)
     except OSError as e:
-        raise DataError(f"Failed to write CSV file {file_path}: {e}")
+        raise DataError(f"Failed to write CSV file {file_path_str}: {e}")
 
 
-def csv_to_dict_list(csv_data: str, delimiter: str = ',') -> list:
+def csv_to_dict_list(csv_data: str, delimiter: str = ",") -> list:
     """Convert CSV string to list of dictionaries.
 
     Args:
@@ -158,7 +167,7 @@ def csv_to_dict_list(csv_data: str, delimiter: str = ',') -> list:
         raise DataError(f"Failed to parse CSV data: {e}")
 
 
-def dict_list_to_csv(data: list, delimiter: str = ',') -> str:
+def dict_list_to_csv(data: list, delimiter: str = ",") -> str:
     """Convert list of dictionaries to CSV string.
 
     Args:
@@ -203,18 +212,18 @@ def dict_list_to_csv(data: list, delimiter: str = ',') -> str:
     return output.getvalue()
 
 
-def detect_csv_delimiter(file_path: Union[str, Path], sample_size: int = 1024) -> str:
+def detect_csv_delimiter(file_path: str, sample_size: int = 1024) -> str:
     """Auto-detect CSV delimiter by analyzing file content.
 
     Args:
-        file_path: Path to the CSV file (string or Path object)
+        file_path: Path to the CSV file as a string
         sample_size: Number of characters to sample for detection
 
     Returns:
         Detected delimiter character
 
     Raises:
-        TypeError: If file_path is not a string or Path object, or sample_size is not a positive integer
+        TypeError: If file_path is not a string, or sample_size is not a positive integer
         DataError: If file cannot be read or delimiter cannot be detected
 
     Example:
@@ -223,15 +232,19 @@ def detect_csv_delimiter(file_path: Union[str, Path], sample_size: int = 1024) -
         >>> detect_csv_delimiter("data.tsv")
         '\\t'
     """
-    # Check if file_path is a string or a Path-like object
-    if not (isinstance(file_path, str) or hasattr(file_path, '__fspath__')):
-        raise TypeError("file_path must be a string or Path")
+    # Check if file_path is a string or Path object and convert to string
+    if isinstance(file_path, str):
+        file_path_str = file_path
+    elif hasattr(file_path, "__fspath__"):
+        file_path_str = str(file_path)
+    else:
+        raise TypeError("file_path must be a string")
 
     if not isinstance(sample_size, int) or sample_size <= 0:
         raise TypeError("sample_size must be a positive integer")
 
     try:
-        with open(file_path, encoding="utf-8") as csvfile:
+        with open(file_path_str, encoding="utf-8") as csvfile:
             sample = csvfile.read(sample_size)
 
         if not sample:
@@ -241,27 +254,27 @@ def detect_csv_delimiter(file_path: Union[str, Path], sample_size: int = 1024) -
         delimiter = sniffer.sniff(sample).delimiter
         return delimiter
     except FileNotFoundError:
-        raise DataError(f"CSV file not found: {file_path}")
+        raise DataError(f"CSV file not found: {file_path_str}")
     except UnicodeDecodeError as e:
-        raise DataError(f"Failed to decode CSV file {file_path}: {e}")
+        raise DataError(f"Failed to decode CSV file {file_path_str}: {e}")
     except csv.Error as e:
-        raise DataError(f"Failed to detect delimiter in {file_path}: {e}")
+        raise DataError(f"Failed to detect delimiter in {file_path_str}: {e}")
 
 
 def validate_csv_structure(
-    file_path: Union[str, Path], expected_columns: Optional[list] = None
+    file_path: str, expected_columns: Optional[list] = None
 ) -> bool:
     """Validate CSV file structure and column headers.
 
     Args:
-        file_path: Path to the CSV file (string or Path object)
+        file_path: Path to the CSV file as a string
         expected_columns: List of expected column names (optional)
 
     Returns:
         True if CSV structure is valid
 
     Raises:
-        TypeError: If file_path is not a string or Path object, or expected_columns is not a list
+        TypeError: If file_path is not a string, or expected_columns is not a list
         DataError: If file cannot be read or structure is invalid
 
     Example:
@@ -270,9 +283,13 @@ def validate_csv_structure(
         >>> validate_csv_structure("malformed.csv")
         False
     """
-    # Check if file_path is a string or a Path-like object
-    if not (isinstance(file_path, str) or hasattr(file_path, '__fspath__')):
-        raise TypeError("file_path must be a string or Path")
+    # Check if file_path is a string or Path object and convert to string
+    if isinstance(file_path, str):
+        file_path_str = file_path
+    elif hasattr(file_path, "__fspath__"):
+        file_path_str = str(file_path)
+    else:
+        raise TypeError("file_path must be a string")
 
     if expected_columns is not None and not isinstance(expected_columns, list):
         raise TypeError("expected_columns must be a list or None")
@@ -281,11 +298,11 @@ def validate_csv_structure(
         # Check if file is empty first
         import os
 
-        if os.path.getsize(file_path) == 0:
+        if os.path.getsize(file_path_str) == 0:
             return True  # Empty file is considered valid
 
         # Read first few rows to validate structure
-        data = read_csv_simple(file_path)
+        data = read_csv_simple(file_path_str)
 
         if not data:
             return True  # Empty file is considered valid
@@ -305,7 +322,7 @@ def validate_csv_structure(
         # Re-raise DataError as-is
         raise
     except Exception as e:
-        raise DataError(f"Invalid CSV structure in {file_path}: {e}")
+        raise DataError(f"Invalid CSV structure in {file_path_str}: {e}")
 
 
 def clean_csv_data(data: list, rules: Optional[dict] = None) -> list:

@@ -96,7 +96,9 @@ def unflatten_dict(data: Dict[str, Any], separator: str = ".") -> Dict[str, Any]
     return result
 
 
-def get_nested_value_simple(data: Dict[str, Any], key_path: str, default: Any = None) -> Any:
+def get_nested_value_simple(
+    data: Dict[str, Any], key_path: str, default: Any = None
+) -> Any:
     """Safely access nested dictionary values using dot notation.
 
     Args:
@@ -461,7 +463,9 @@ def unflatten_dict_simple(data: Dict[str, Any], separator: str = ".") -> Dict[st
     return unflatten_dict(data, separator)
 
 
-def set_nested_value_simple(data: Dict[str, Any], key_path: str, value: Any) -> Dict[str, Any]:
+def set_nested_value_simple(
+    data: Dict[str, Any], key_path: str, value: Any
+) -> Dict[str, Any]:
     """Set nested dictionary value using dot notation (immutable).
 
     This is an alias for set_nested_value for LLM agent compatibility.
@@ -482,7 +486,9 @@ def set_nested_value_simple(data: Dict[str, Any], key_path: str, value: Any) -> 
     return set_nested_value(data, key_path, value)
 
 
-def compare_data_structures_simple(data1: Any, data2: Any, ignore_order: bool = False) -> bool:
+def compare_data_structures_simple(
+    data1: Any, data2: Any, ignore_order: bool = False
+) -> bool:
     """Compare two data structures for equality.
 
     This is an alias for compare_data_structures for LLM agent compatibility.
@@ -524,7 +530,9 @@ def safe_get_simple(data: Dict[str, Any], key: str, default: Any = None) -> Any:
     return safe_get(data, key, default)
 
 
-def remove_empty_values_simple(data: Dict[str, Any], recursive: bool = True) -> Dict[str, Any]:
+def remove_empty_values_simple(
+    data: Dict[str, Any], recursive: bool = True
+) -> Dict[str, Any]:
     """Remove empty values from dictionary.
 
     This is an alias for remove_empty_values for LLM agent compatibility.
@@ -564,7 +572,9 @@ def extract_keys_simple(data: Dict[str, Any], key_pattern: str) -> List[str]:
     return extract_keys(data, key_pattern)
 
 
-def rename_keys_simple(data: Dict[str, Any], key_mapping: Dict[str, str]) -> Dict[str, Any]:
+def rename_keys_simple(
+    data: Dict[str, Any], key_mapping: Dict[str, str]
+) -> Dict[str, Any]:
     """Rename dictionary keys according to mapping.
 
     This is an alias for rename_keys for LLM agent compatibility.

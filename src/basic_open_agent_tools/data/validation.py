@@ -175,7 +175,11 @@ def validate_data_types_simple(data: Dict[str, Any], type_map: Dict[str, str]) -
     return True
 
 
-def validate_range_simple(value: Union[int, float], min_val: Optional[Union[int, float]]=None, max_val: Optional[Union[int, float]]=None) -> bool:
+def validate_range_simple(
+    value: Union[int, float],
+    min_val: Optional[Union[int, float]] = None,
+    max_val: Optional[Union[int, float]] = None,
+) -> bool:
     """Validate numeric value is within range.
 
     Args:
@@ -214,7 +218,9 @@ def validate_range_simple(value: Union[int, float], min_val: Optional[Union[int,
     return True
 
 
-def create_validation_report(data: Dict[str, Any], rules: Dict[str, Any]) -> Dict[str, Any]:
+def create_validation_report(
+    data: Dict[str, Any], rules: Dict[str, Any]
+) -> Dict[str, Any]:
     """Create comprehensive validation report for data.
 
     Args:
@@ -320,7 +326,9 @@ def check_required_fields_simple(data: Dict[str, Any], required: List[str]) -> b
     return check_required_fields(data, required)
 
 
-def create_validation_report_simple(data: Dict[str, Any], rules: Dict[str, Any]) -> Dict[str, Any]:
+def create_validation_report_simple(
+    data: Dict[str, Any], rules: Dict[str, Any]
+) -> Dict[str, Any]:
     """Create simplified validation report for data.
 
     This is an alias for create_validation_report for LLM agent compatibility.

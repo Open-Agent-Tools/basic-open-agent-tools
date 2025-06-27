@@ -72,7 +72,7 @@ class TestReadCsvSimple:
 
     def test_read_csv_invalid_types(self):
         """Test with invalid argument types."""
-        with pytest.raises(TypeError, match="file_path must be a string or Path"):
+        with pytest.raises(TypeError, match="file_path must be a string"):
             read_csv_simple(123)
 
         with pytest.raises(TypeError, match="delimiter must be a string"):
@@ -152,7 +152,7 @@ class TestWriteCsvFile:
         with pytest.raises(TypeError, match="data must be a list"):
             write_csv_simple("not a list", csv_file)
 
-        with pytest.raises(TypeError, match="file_path must be a string or Path"):
+        with pytest.raises(TypeError, match="file_path must be a string"):
             write_csv_simple([], 123)
 
         with pytest.raises(TypeError, match="All items in data must be dictionaries"):
@@ -295,7 +295,7 @@ class TestDetectCsvDelimiter:
 
     def test_detect_invalid_types(self):
         """Test with invalid argument types."""
-        with pytest.raises(TypeError, match="file_path must be a string or Path"):
+        with pytest.raises(TypeError, match="file_path must be a string"):
             detect_csv_delimiter(123)
 
         with pytest.raises(TypeError, match="sample_size must be a positive integer"):
@@ -342,7 +342,7 @@ class TestValidateCsvStructure:
 
     def test_validate_invalid_types(self):
         """Test with invalid argument types."""
-        with pytest.raises(TypeError, match="file_path must be a string or Path"):
+        with pytest.raises(TypeError, match="file_path must be a string"):
             validate_csv_structure(123)
 
         with pytest.raises(TypeError, match="expected_columns must be a list or None"):

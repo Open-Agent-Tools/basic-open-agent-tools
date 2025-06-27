@@ -156,6 +156,7 @@ def read_ini_file(file_path: str) -> dict:
     """
     # Check if file exists first (ConfigParser.read doesn't raise FileNotFoundError)
     import os
+
     if not os.path.isfile(file_path):
         raise FileNotFoundError(f"INI file not found: {file_path}")
 
@@ -242,12 +243,16 @@ def validate_config_schema(config_data: dict, schema: dict) -> list:
         if expected_type and not isinstance(config_data[field_name], expected_type):
             actual_type = type(config_data[field_name]).__name__
             expected_type_name = expected_type.__name__
-            errors.append(f"Field '{field_name}' has incorrect type: expected {expected_type_name}, got {actual_type}")
+            errors.append(
+                f"Field '{field_name}' has incorrect type: expected {expected_type_name}, got {actual_type}"
+            )
 
         # Check allowed values
         allowed_values = field_spec.get("allowed_values")
         if allowed_values and config_data[field_name] not in allowed_values:
-            errors.append(f"Field '{field_name}' has invalid value: {config_data[field_name]}. Allowed values: {allowed_values}")
+            errors.append(
+                f"Field '{field_name}' has invalid value: {config_data[field_name]}. Allowed values: {allowed_values}"
+            )
 
     # Check for unknown fields
     for field_name in config_data:
@@ -303,7 +308,9 @@ def merge_config_files(*config_paths: Any, format_type: Optional[str] = None) ->
                 raise DataError(f"Cannot determine format for file: {path}")
 
         if len(detected_formats) > 1:
-            raise DataError(f"Cannot merge files with different formats: {detected_formats}")
+            raise DataError(
+                f"Cannot merge files with different formats: {detected_formats}"
+            )
 
     merged_config: Dict[str, Any] = {}
 
