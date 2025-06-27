@@ -2,7 +2,7 @@
 
 import csv
 import io
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from ..exceptions import DataError
 
@@ -313,7 +313,7 @@ def validate_csv_structure(file_path: str, expected_columns: List[str]) -> bool:
         raise DataError(f"Invalid CSV structure in {file_path_str}: {e}")
 
 
-def clean_csv_data(data: List[Dict[str, str]], rules: dict) -> List[Dict[str, str]]:
+def clean_csv_data(data: List[Any], rules: dict) -> List[Dict[str, str]]:
     """Clean CSV data according to specified rules.
 
     Args:
