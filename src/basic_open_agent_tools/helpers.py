@@ -166,36 +166,6 @@ def load_data_validation_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_data_transformation_tools() -> List[Callable[..., Any]]:
-    """Load data transformation tools as a list of callable functions.
-
-    Returns:
-        List of data transformation tool functions
-
-    Example:
-        >>> transform_tools = load_data_transformation_tools()
-        >>> len(transform_tools) == 7
-        True
-    """
-    from .data import transform
-
-    tools = []
-    transform_function_names = [
-        "transform_data",
-        "rename_fields",
-        "convert_data_types",
-        "clean_data",
-        "deduplicate_records",
-        "normalize_data",
-        "pivot_data",
-    ]
-
-    for name in transform_function_names:
-        func = getattr(transform, name)
-        if callable(func):
-            tools.append(func)
-
-    return tools
 
 
 
@@ -320,116 +290,6 @@ def get_tool_info(tool: Callable[..., Any]) -> Dict[str, Any]:
     }
 
 
-def load_all_read_only_tools() -> List[Callable[..., Any]]:
-    """Load all read-only tools (non-destructive operations) from all modules.
-
-    This function returns tools that only read, analyze, validate, or transform data
-    without modifying files, creating new files, or performing destructive operations.
-    Perfect for agents that need to analyze and process information safely.
-
-    Returns:
-        List of all read-only tool functions from file_system, data, and text modules
-
-    Example:
-        >>> read_only_tools = load_all_read_only_tools()
-        >>> len(read_only_tools) > 35  # Should have 35+ read-only tools
-        True
-    """
-    tools = []
-
-    # File System Read-Only Tools (11 tools)
-    fs_read_only = [
-        "file_exists",
-        "directory_exists",
-        "get_file_info",
-        "get_file_size",
-        "is_empty_directory",
-        "read_file_to_string",
-        "list_directory_contents",
-        "list_all_directory_contents",
-        "generate_directory_tree",
-        "validate_path",
-        "validate_file_content",
-    ]
-
-    for name in fs_read_only:
-        func = getattr(file_system, name)
-        if callable(func):
-            tools.append(func)
-
-    # Text Processing Tools (10 tools - ALL are read-only)
-    tools.extend(load_all_text_tools())
-
-    # Data Read-Only Tools (21 tools)
-    from .data import (
-        config_processing,
-        csv_tools,
-        json_tools,
-        transform,
-        validation,
-    )
-
-    # JSON read-only tools (2)
-    data_json_read_only = ["safe_json_deserialize", "validate_json_string"]
-    for name in data_json_read_only:
-        func = getattr(json_tools, name)
-        if callable(func):
-            tools.append(func)
-
-    # CSV read-only tools (4)
-    data_csv_read_only = [
-        "read_csv_simple",
-        "csv_to_dict_list",
-        "detect_csv_delimiter",
-        "validate_csv_structure",
-    ]
-    for name in data_csv_read_only:
-        func = getattr(csv_tools, name)
-        if callable(func):
-            tools.append(func)
-
-    # Config read-only tools (4)
-    data_config_read_only = [
-        "read_yaml_file",
-        "read_toml_file",
-        "read_ini_file",
-        "validate_config_schema",
-    ]
-    for name in data_config_read_only:
-        func = getattr(config_processing, name)
-        if callable(func):
-            tools.append(func)
-
-
-
-
-    # Validation tools (5 - ALL are read-only)
-    data_validation_read_only = [
-        "validate_schema_simple",
-        "check_required_fields",
-        "validate_data_types_simple",
-        "validate_range_simple",
-        "create_validation_report",
-    ]
-    for name in data_validation_read_only:
-        func = getattr(validation, name)
-        if callable(func):
-            tools.append(func)
-
-
-    # Transform read-only tools (4 - analysis/cleaning without modification)
-    data_transform_read_only = [
-        "clean_data",
-        "deduplicate_records",
-        "normalize_data",
-        "convert_data_types",
-    ]
-    for name in data_transform_read_only:
-        func = getattr(transform, name)
-        if callable(func):
-            tools.append(func)
-
-    return tools
 
 
 def list_all_available_tools() -> Dict[str, List[Dict[str, Any]]]:
@@ -449,5 +309,4 @@ def list_all_available_tools() -> Dict[str, List[Dict[str, Any]]]:
         "file_system": [get_tool_info(tool) for tool in load_all_filesystem_tools()],
         "text": [get_tool_info(tool) for tool in load_all_text_tools()],
         "data": [get_tool_info(tool) for tool in load_all_data_tools()],
-        "read_only": [get_tool_info(tool) for tool in load_all_read_only_tools()],
     }

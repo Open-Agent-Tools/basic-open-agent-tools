@@ -225,6 +225,7 @@ class TestHelperFunctions:
         # Should have expected categories
         assert "file_system" in tools
         assert "text" in tools
+        assert "data" in tools
 
         # Each category should contain tool info
         for _category, category_tools in tools.items():
