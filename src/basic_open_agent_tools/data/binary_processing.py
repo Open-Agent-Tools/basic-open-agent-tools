@@ -16,7 +16,7 @@ from typing import Any, Dict
 from ..exceptions import DataError
 
 
-def read_binary_file(file_path: str, max_size: int = 0) -> bytes:
+def read_binary_file(file_path: str, max_size: int) -> bytes:
     """Read binary data from a file.
 
     Args:
@@ -81,7 +81,7 @@ def write_binary_file(data: bytes, file_path: str) -> None:
         raise DataError(f"Failed to write binary file: {str(e)}")
 
 
-def encode_binary_data(data: bytes, encoding: str = "base64") -> str:
+def encode_binary_data(data: bytes, encoding: str) -> str:
     """Encode binary data to a string representation.
 
     Args:
@@ -112,7 +112,7 @@ def encode_binary_data(data: bytes, encoding: str = "base64") -> str:
         raise ValueError(f"Unsupported encoding method: {encoding}")
 
 
-def decode_binary_data(encoded_data: str, encoding: str = "base64") -> bytes:
+def decode_binary_data(encoded_data: str, encoding: str) -> bytes:
     """Decode a string representation back to binary data.
 
     Args:

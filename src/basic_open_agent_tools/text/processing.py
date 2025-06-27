@@ -28,7 +28,7 @@ def clean_whitespace(text: str) -> str:
     return cleaned.strip()
 
 
-def normalize_line_endings(text: str, style: str = "unix") -> str:
+def normalize_line_endings(text: str, style: str) -> str:
     """Normalize line endings in text.
 
     Args:
@@ -145,7 +145,7 @@ def to_snake_case(text: str) -> str:
     return text.lower()
 
 
-def to_camel_case(text: str, upper_first: bool = False) -> str:
+def to_camel_case(text: str, upper_first: bool) -> str:
     """Convert text to camelCase or PascalCase.
 
     Args:
@@ -214,9 +214,7 @@ def to_title_case(text: str) -> str:
     return "".join(result)
 
 
-def smart_split_lines(
-    text: str, max_length: int, preserve_words: bool = True
-) -> List[str]:
+def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> List[str]:
     """Split text into lines with maximum length.
 
     Args:
@@ -296,7 +294,7 @@ def extract_sentences(text: str) -> List[str]:
     return result
 
 
-def join_with_oxford_comma(items: List[str], conjunction: str = "and") -> str:
+def join_with_oxford_comma(items: List[str], conjunction: str) -> str:
     """Join a list of items with Oxford comma.
 
     Args:

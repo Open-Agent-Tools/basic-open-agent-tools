@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Tuple
 from ..exceptions import DataError
 
 
-def flatten_dict_simple(data: Dict[str, Any], separator: str = ".") -> Dict[str, Any]:
+def flatten_dict_simple(data: Dict[str, Any], separator: str) -> Dict[str, Any]:
     """Flatten nested dictionaries into a single level.
 
     Args:
@@ -34,7 +34,7 @@ def flatten_dict_simple(data: Dict[str, Any], separator: str = ".") -> Dict[str,
     if not separator:
         raise DataError("separator cannot be empty")
 
-    def _flatten(obj: Any, parent_key: str = "") -> Dict[str, Any]:
+    def _flatten(obj: Any, parent_key: str) -> Dict[str, Any]:
         items: List[Tuple[str, Any]] = []
         if isinstance(obj, dict):
             for key, value in obj.items():
@@ -47,10 +47,10 @@ def flatten_dict_simple(data: Dict[str, Any], separator: str = ".") -> Dict[str,
             items.append((parent_key, obj))
         return dict(items)
 
-    return _flatten(data)
+    return _flatten(data, "")
 
 
-def unflatten_dict(data: Dict[str, Any], separator: str = ".") -> Dict[str, Any]:
+def unflatten_dict(data: Dict[str, Any], separator: str) -> Dict[str, Any]:
     """Reconstruct nested dictionary from flattened structure.
 
     Args:
@@ -96,9 +96,7 @@ def unflatten_dict(data: Dict[str, Any], separator: str = ".") -> Dict[str, Any]
     return result
 
 
-def get_nested_value_simple(
-    data: Dict[str, Any], key_path: str, default: Any = None
-) -> Any:
+def get_nested_value_simple(data: Dict[str, Any], key_path: str, default: Any) -> Any:
     """Safely access nested dictionary values using dot notation.
 
     Args:
@@ -187,7 +185,7 @@ def set_nested_value(data: Dict[str, Any], key_path: str, value: Any) -> Dict[st
     return result
 
 
-def merge_dicts_simple(*args: Any, deep: bool = True) -> Dict[str, Any]:
+def merge_dicts_simple(*args: Any, deep: bool) -> Dict[str, Any]:
     """Deep merge multiple dictionaries.
 
     Args:
@@ -254,7 +252,7 @@ def _deep_merge(target: Dict[str, Any], source: Dict[str, Any]) -> None:
             target[key] = value
 
 
-def compare_data_structures(data1: Any, data2: Any, ignore_order: bool = False) -> bool:
+def compare_data_structures(data1: Any, data2: Any, ignore_order: bool) -> bool:
     """Compare two data structures for equality.
 
     Args:
@@ -312,7 +310,7 @@ def compare_data_structures(data1: Any, data2: Any, ignore_order: bool = False) 
         return bool(data1 == data2)
 
 
-def safe_get(data: Dict[str, Any], key: str, default: Any = None) -> Any:
+def safe_get(data: Dict[str, Any], key: str, default: Any) -> Any:
     """Safely get value from dictionary with default.
 
     Args:
@@ -338,7 +336,7 @@ def safe_get(data: Dict[str, Any], key: str, default: Any = None) -> Any:
     return data.get(key, default)
 
 
-def remove_empty_values(data: Dict[str, Any], recursive: bool = True) -> Dict[str, Any]:
+def remove_empty_values(data: Dict[str, Any], recursive: bool) -> Dict[str, Any]:
     """Remove empty values from dictionary.
 
     Args:
@@ -443,7 +441,7 @@ def rename_keys(data: Dict[str, Any], key_mapping: Dict[str, str]) -> Dict[str, 
     return result
 
 
-def unflatten_dict_simple(data: Dict[str, Any], separator: str = ".") -> Dict[str, Any]:
+def unflatten_dict_simple(data: Dict[str, Any], separator: str) -> Dict[str, Any]:
     """Reconstruct nested dictionary from flattened structure.
 
     This is an alias for unflatten_dict for LLM agent compatibility.
@@ -486,9 +484,7 @@ def set_nested_value_simple(
     return set_nested_value(data, key_path, value)
 
 
-def compare_data_structures_simple(
-    data1: Any, data2: Any, ignore_order: bool = False
-) -> bool:
+def compare_data_structures_simple(data1: Any, data2: Any, ignore_order: bool) -> bool:
     """Compare two data structures for equality.
 
     This is an alias for compare_data_structures for LLM agent compatibility.
@@ -508,7 +504,7 @@ def compare_data_structures_simple(
     return compare_data_structures(data1, data2, ignore_order)
 
 
-def safe_get_simple(data: Dict[str, Any], key: str, default: Any = None) -> Any:
+def safe_get_simple(data: Dict[str, Any], key: str, default: Any) -> Any:
     """Safely get value from dictionary with default.
 
     This is an alias for safe_get for LLM agent compatibility.
@@ -530,9 +526,7 @@ def safe_get_simple(data: Dict[str, Any], key: str, default: Any = None) -> Any:
     return safe_get(data, key, default)
 
 
-def remove_empty_values_simple(
-    data: Dict[str, Any], recursive: bool = True
-) -> Dict[str, Any]:
+def remove_empty_values_simple(data: Dict[str, Any], recursive: bool) -> Dict[str, Any]:
     """Remove empty values from dictionary.
 
     This is an alias for remove_empty_values for LLM agent compatibility.

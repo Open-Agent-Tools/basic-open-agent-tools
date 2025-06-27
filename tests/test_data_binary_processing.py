@@ -29,7 +29,7 @@ class TestReadBinaryFile:
 
         try:
             # Read the file
-            data = read_binary_file(temp_path)
+            data = read_binary_file(temp_path, 0)
 
             # Verify
             assert isinstance(data, bytes)
@@ -43,7 +43,7 @@ class TestReadBinaryFile:
     def test_read_binary_file_not_found(self):
         """Test reading a non-existent file."""
         with pytest.raises(FileNotFoundError):
-            read_binary_file("nonexistent_file.bin")
+            read_binary_file("nonexistent_file.bin", 0)
 
     def test_read_binary_file_max_size(self):
         """Test reading with max_size limit."""
@@ -54,12 +54,12 @@ class TestReadBinaryFile:
 
         try:
             # Read with sufficient max_size
-            data = read_binary_file(temp_path, max_size=200)
+            data = read_binary_file(temp_path, 200)
             assert data == test_data
 
             # Read with insufficient max_size
             with pytest.raises(DataError):
-                read_binary_file(temp_path, max_size=100)
+                read_binary_file(temp_path, 100)
 
         finally:
             # Clean up

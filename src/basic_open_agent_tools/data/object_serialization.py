@@ -11,7 +11,7 @@ from typing import Any
 from ..exceptions import DataError
 
 
-def serialize_object(obj: Any, method: str = "pickle") -> bytes:
+def serialize_object(obj: Any, method: str) -> bytes:
     """Serialize a Python object to bytes using the specified method.
 
     Args:
@@ -47,7 +47,7 @@ def serialize_object(obj: Any, method: str = "pickle") -> bytes:
             raise TypeError(f"Object is not pickle serializable: {str(e)}")
 
 
-def deserialize_object(data: bytes, method: str = "pickle") -> Any:
+def deserialize_object(data: bytes, method: str) -> Any:
     """Safely deserialize bytes back into a Python object.
 
     Args:

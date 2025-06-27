@@ -2,12 +2,11 @@
 
 import csv
 import io
-from typing import Optional
 
 from ..exceptions import DataError
 
 
-def read_csv_simple(file_path: str, delimiter: str = ",", headers: bool = True) -> list:
+def read_csv_simple(file_path: str, delimiter: str, headers: bool) -> list:
     """Read CSV file and return as list of dictionaries.
 
     Args:
@@ -28,13 +27,10 @@ def read_csv_simple(file_path: str, delimiter: str = ",", headers: bool = True) 
         >>> data
         [{'name': 'Alice', 'age': '25'}, {'name': 'Bob', 'age': '30'}]
     """
-    # Check if file_path is a string or Path object and convert to string
-    if isinstance(file_path, str):
-        file_path_str = file_path
-    elif hasattr(file_path, "__fspath__"):
-        file_path_str = str(file_path)
-    else:
+    if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
+    
+    file_path_str = file_path
 
     if not isinstance(delimiter, str):
         raise TypeError("delimiter must be a string")
@@ -67,16 +63,14 @@ def read_csv_simple(file_path: str, delimiter: str = ",", headers: bool = True) 
         raise DataError(f"Failed to parse CSV file {file_path_str}: {e}")
 
 
-def write_csv_simple(
-    data: list, file_path: str, delimiter: str = ",", headers: bool = True
-) -> None:
+def write_csv_simple(data: list, file_path: str, delimiter: str, headers: bool) -> None:
     """Write list of dictionaries to CSV file.
 
     Args:
         data: List of dictionaries to write
         file_path: Path where CSV file will be created as a string
-        delimiter: CSV delimiter character (default: ',')
-        headers: Whether to write headers (default: True)
+        delimiter: CSV delimiter character
+        headers: Whether to write headers
 
     Raises:
         TypeError: If data is not a list, contains non-dictionary items, or file_path is not a string
@@ -90,13 +84,10 @@ def write_csv_simple(
     if not isinstance(data, list):
         raise TypeError("data must be a list")
 
-    # Check if file_path is a string or Path object and convert to string
-    if isinstance(file_path, str):
-        file_path_str = file_path
-    elif hasattr(file_path, "__fspath__"):
-        file_path_str = str(file_path)
-    else:
+    if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
+    
+    file_path_str = file_path
 
     if not isinstance(delimiter, str):
         raise TypeError("delimiter must be a string")
@@ -132,7 +123,7 @@ def write_csv_simple(
         raise DataError(f"Failed to write CSV file {file_path_str}: {e}")
 
 
-def csv_to_dict_list(csv_data: str, delimiter: str = ",") -> list:
+def csv_to_dict_list(csv_data: str, delimiter: str) -> list:
     """Convert CSV string to list of dictionaries.
 
     Args:
@@ -167,7 +158,7 @@ def csv_to_dict_list(csv_data: str, delimiter: str = ",") -> list:
         raise DataError(f"Failed to parse CSV data: {e}")
 
 
-def dict_list_to_csv(data: list, delimiter: str = ",") -> str:
+def dict_list_to_csv(data: list, delimiter: str) -> str:
     """Convert list of dictionaries to CSV string.
 
     Args:
@@ -212,7 +203,7 @@ def dict_list_to_csv(data: list, delimiter: str = ",") -> str:
     return output.getvalue()
 
 
-def detect_csv_delimiter(file_path: str, sample_size: int = 1024) -> str:
+def detect_csv_delimiter(file_path: str, sample_size: int) -> str:
     """Auto-detect CSV delimiter by analyzing file content.
 
     Args:
@@ -232,13 +223,10 @@ def detect_csv_delimiter(file_path: str, sample_size: int = 1024) -> str:
         >>> detect_csv_delimiter("data.tsv")
         '\\t'
     """
-    # Check if file_path is a string or Path object and convert to string
-    if isinstance(file_path, str):
-        file_path_str = file_path
-    elif hasattr(file_path, "__fspath__"):
-        file_path_str = str(file_path)
-    else:
+    if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
+    
+    file_path_str = file_path
 
     if not isinstance(sample_size, int) or sample_size <= 0:
         raise TypeError("sample_size must be a positive integer")
@@ -261,14 +249,12 @@ def detect_csv_delimiter(file_path: str, sample_size: int = 1024) -> str:
         raise DataError(f"Failed to detect delimiter in {file_path_str}: {e}")
 
 
-def validate_csv_structure(
-    file_path: str, expected_columns: Optional[list] = None
-) -> bool:
+def validate_csv_structure(file_path: str, expected_columns: list) -> bool:
     """Validate CSV file structure and column headers.
 
     Args:
         file_path: Path to the CSV file as a string
-        expected_columns: List of expected column names (optional)
+        expected_columns: List of expected column names
 
     Returns:
         True if CSV structure is valid
@@ -283,16 +269,13 @@ def validate_csv_structure(
         >>> validate_csv_structure("malformed.csv")
         False
     """
-    # Check if file_path is a string or Path object and convert to string
-    if isinstance(file_path, str):
-        file_path_str = file_path
-    elif hasattr(file_path, "__fspath__"):
-        file_path_str = str(file_path)
-    else:
+    if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
+    
+    file_path_str = file_path
 
-    if expected_columns is not None and not isinstance(expected_columns, list):
-        raise TypeError("expected_columns must be a list or None")
+    if not isinstance(expected_columns, list):
+        raise TypeError("expected_columns must be a list")
 
     try:
         # Check if file is empty first
@@ -302,13 +285,13 @@ def validate_csv_structure(
             return True  # Empty file is considered valid
 
         # Read first few rows to validate structure
-        data = read_csv_simple(file_path_str)
+        data = read_csv_simple(file_path_str, ",", True)
 
         if not data:
             return True  # Empty file is considered valid
 
         # Check if expected columns are present
-        if expected_columns is not None:
+        if expected_columns:
             first_row = data[0]
             actual_columns = set(first_row.keys())
             expected_set = set(expected_columns)
@@ -325,12 +308,12 @@ def validate_csv_structure(
         raise DataError(f"Invalid CSV structure in {file_path_str}: {e}")
 
 
-def clean_csv_data(data: list, rules: Optional[dict] = None) -> list:
+def clean_csv_data(data: list, rules: dict) -> list:
     """Clean CSV data according to specified rules.
 
     Args:
         data: List of dictionaries to clean
-        rules: Dictionary of cleaning rules (optional)
+        rules: Dictionary of cleaning rules
 
     Returns:
         Cleaned list of dictionaries
@@ -347,8 +330,8 @@ def clean_csv_data(data: list, rules: Optional[dict] = None) -> list:
     if not isinstance(data, list):
         raise TypeError("data must be a list")
 
-    if rules is not None and not isinstance(rules, dict):
-        raise TypeError("rules must be a dictionary or None")
+    if not isinstance(rules, dict):
+        raise TypeError("rules must be a dictionary")
 
     if not data:
         return data
@@ -361,8 +344,7 @@ def clean_csv_data(data: list, rules: Optional[dict] = None) -> list:
     }
 
     # Merge with provided rules
-    if rules:
-        default_rules.update(rules)
+    default_rules.update(rules)
 
     cleaned_data = []
 
