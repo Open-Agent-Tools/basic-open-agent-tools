@@ -39,8 +39,8 @@ async def agent_evaluation_sequential(request, agent_evaluation_lock):
     if request.node.get_closest_marker("agent_evaluation"):
         async with agent_evaluation_lock:
             # Add extra delay between agent tests to prevent API rate limiting
-            await asyncio.sleep(1)
+            await asyncio.sleep(5)
             yield
-            await asyncio.sleep(2)  # Extra delay after test completion
+            await asyncio.sleep(5)  # Extra delay after test completion
     else:
         yield

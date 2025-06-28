@@ -9,7 +9,7 @@ import pytest
 def rate_limit_delay():
     """Add configurable delay between tests to prevent API rate limiting."""
     yield
-    delay = float(os.getenv("PYTEST_API_DELAY", "0"))
+    delay = float(os.getenv("PYTEST_API_DELAY", "5"))
     if delay > 0:
         import time
 
