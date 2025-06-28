@@ -1,0 +1,339 @@
+{
+  "eval_set_id": "info_comprehensive_test_set",
+  "name": "File Info Comprehensive Test",
+  "description": "Comprehensive test cases using multiple info functions in complex workflows",
+  "eval_cases": [
+    {
+      "eval_id": "complete_file_analysis",
+      "conversation": [
+        {
+          "invocation_id": "comp-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "I want to do a complete analysis of the 'README.md' file. First tell me if it exists, then what size it is, and finally give me all the detailed information about it"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Complete file analysis performed"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "README.md"
+                },
+                "name": "file_exists"
+              },
+              {
+                "args": {
+                  "file_path": "README.md"
+                },
+                "name": "get_file_size"
+              },
+              {
+                "args": {
+                  "file_path": "README.md"
+                },
+                "name": "get_file_info"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "info_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "directory_structure_analysis",
+      "conversation": [
+        {
+          "invocation_id": "comp-002",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Help me understand the project structure. Do the 'src', 'tests', and 'examples' directories exist? And are any of them empty?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Directory structure analysis completed"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "directory_path": "src"
+                },
+                "name": "directory_exists"
+              },
+              {
+                "args": {
+                  "directory_path": "tests"
+                },
+                "name": "directory_exists"
+              },
+              {
+                "args": {
+                  "directory_path": "examples"
+                },
+                "name": "directory_exists"
+              },
+              {
+                "args": {
+                  "directory_path": "src"
+                },
+                "name": "is_empty_directory"
+              },
+              {
+                "args": {
+                  "directory_path": "tests"
+                },
+                "name": "is_empty_directory"
+              },
+              {
+                "args": {
+                  "directory_path": "examples"
+                },
+                "name": "is_empty_directory"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "info_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "file_vs_directory_comparison",
+      "conversation": [
+        {
+          "invocation_id": "comp-003",
+          "user_content": {
+            "parts": [
+              {
+                "text": "I want to compare 'pyproject.toml' and 'src'. Tell me what type each one is (file or directory), then give me detailed information about both"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "File vs directory comparison completed"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "pyproject.toml"
+                },
+                "name": "file_exists"
+              },
+              {
+                "args": {
+                  "directory_path": "pyproject.toml"
+                },
+                "name": "directory_exists"
+              },
+              {
+                "args": {
+                  "file_path": "src"
+                },
+                "name": "file_exists"
+              },
+              {
+                "args": {
+                  "directory_path": "src"
+                },
+                "name": "directory_exists"
+              },
+              {
+                "args": {
+                  "file_path": "pyproject.toml"
+                },
+                "name": "get_file_info"
+              },
+              {
+                "args": {
+                  "file_path": "src"
+                },
+                "name": "get_file_info"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "info_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "size_comparison_workflow",
+      "conversation": [
+        {
+          "invocation_id": "comp-004",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Which configuration file is largest? Compare the sizes of 'pyproject.toml', 'CLAUDE.md', and 'README.md', then give me detailed information about the biggest one"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "File size comparison and analysis completed"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "pyproject.toml"
+                },
+                "name": "get_file_size"
+              },
+              {
+                "args": {
+                  "file_path": "CLAUDE.md"
+                },
+                "name": "get_file_size"
+              },
+              {
+                "args": {
+                  "file_path": "README.md"
+                },
+                "name": "get_file_size"
+              },
+              {
+                "args": {
+                  "file_path": "CLAUDE.md"
+                },
+                "name": "get_file_info"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "info_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "validation_workflow",
+      "conversation": [
+        {
+          "invocation_id": "comp-005",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Help me validate this project setup. Do the essential files (README.md, pyproject.toml, CLAUDE.md) exist? Are the src and tests directories present and not empty? Also give me details about the main source directory"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Project structure validation completed"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "README.md"
+                },
+                "name": "file_exists"
+              },
+              {
+                "args": {
+                  "file_path": "pyproject.toml"
+                },
+                "name": "file_exists"
+              },
+              {
+                "args": {
+                  "file_path": "CLAUDE.md"
+                },
+                "name": "file_exists"
+              },
+              {
+                "args": {
+                  "directory_path": "src"
+                },
+                "name": "directory_exists"
+              },
+              {
+                "args": {
+                  "directory_path": "tests"
+                },
+                "name": "directory_exists"
+              },
+              {
+                "args": {
+                  "directory_path": "src"
+                },
+                "name": "is_empty_directory"
+              },
+              {
+                "args": {
+                  "directory_path": "tests"
+                },
+                "name": "is_empty_directory"
+              },
+              {
+                "args": {
+                  "file_path": "src/basic_open_agent_tools"
+                },
+                "name": "get_file_info"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "info_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

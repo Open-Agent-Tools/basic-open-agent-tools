@@ -1,0 +1,167 @@
+{
+  "eval_set_id": "info_basic_test_set",
+  "name": "File Info Basic Test",
+  "description": "Basic test cases for file system info functions through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "check_file_exists_true",
+      "conversation": [
+        {
+          "invocation_id": "basic-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Does the file 'src/basic_open_agent_tools/__init__.py' exist?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "true"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "src/basic_open_agent_tools/__init__.py"
+                },
+                "name": "file_exists"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "info_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "check_file_exists_false",
+      "conversation": [
+        {
+          "invocation_id": "basic-002",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Is there a file called 'nonexistent_file.txt' in this directory?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "false"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "nonexistent_file.txt"
+                },
+                "name": "file_exists"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "info_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "check_directory_exists_true",
+      "conversation": [
+        {
+          "invocation_id": "basic-003",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Does the 'src' directory exist?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "true"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "directory_path": "src"
+                },
+                "name": "directory_exists"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "info_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "get_file_size",
+      "conversation": [
+        {
+          "invocation_id": "basic-004",
+          "user_content": {
+            "parts": [
+              {
+                "text": "How big is the 'pyproject.toml' file?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "file size in bytes"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "pyproject.toml"
+                },
+                "name": "get_file_size"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "info_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

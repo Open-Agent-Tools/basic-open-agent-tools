@@ -1,0 +1,55 @@
+{
+  "eval_set_id": "tree_comprehensive_test_set",
+  "name": "Comprehensive Tree Tools Test",
+  "description": "Comprehensive test set validating both tree functions in complex scenarios",
+  "eval_cases": [
+    {
+      "eval_id": "compare_tree_functions",
+      "conversation": [
+        {
+          "invocation_id": "comp-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "I want to compare two ways of viewing the tests directory. First show me everything inside it, then show me a tree view that's only 2 levels deep without hidden files"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Directory contents listed and tree generated"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "directory_path": "tests"
+                },
+                "name": "list_all_directory_contents"
+              },
+              {
+                "args": {
+                  "directory_path": "tests",
+                  "max_depth": 2,
+                  "include_hidden": false
+                },
+                "name": "generate_directory_tree"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "tree_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}
