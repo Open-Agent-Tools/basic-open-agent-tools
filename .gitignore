@@ -296,3 +296,6 @@ node_modules/
 cache/
 .npm/
 .yarn/
+
+# Agent Development Kit (ADK) evaluation history
+.adk/
