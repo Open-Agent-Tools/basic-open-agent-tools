@@ -1,0 +1,45 @@
+{
+  "eval_set_id": "list_all_available_tools_test_set",
+  "name": "List All Available Tools Test",
+  "description": "Test case for list_all_available_tools function through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "list_all_available_tools_test",
+      "conversation": [
+        {
+          "invocation_id": "list-tools-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "I need to know what tools are available in the system. Can you list all available tools organized by category?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "I'll list all available tools organized by category for you.\n\nHere are all the available tools:\n\n**File System Tools (20 tools):**\n- read_file_to_string\n- write_file_from_string\n- append_to_file\n- replace_in_file\n- insert_at_line\n- list_directory_contents\n- create_directory\n- delete_file\n- delete_directory\n- move_file\n- copy_file\n- get_file_info\n- file_exists\n- directory_exists\n- get_file_size\n- is_empty_directory\n- list_all_directory_contents\n- generate_directory_tree\n- validate_path\n- validate_file_content\n\n**Text Processing Tools (10 tools):**\n- clean_whitespace\n- normalize_line_endings\n- strip_html_tags\n- normalize_unicode\n- to_snake_case\n- to_camel_case\n- to_title_case\n- smart_split_lines\n- extract_sentences\n- join_with_oxford_comma\n\n**Data Processing Tools (23 tools):**\n- safe_json_serialize\n- safe_json_deserialize\n- validate_json_string\n- read_csv_simple\n- write_csv_simple\n- csv_to_dict_list\n- dict_list_to_csv\n- detect_csv_delimiter\n- validate_csv_structure\n- clean_csv_data\n- validate_schema_simple\n- check_required_fields\n- validate_data_types_simple\n- validate_range_simple\n- create_validation_report\n- read_yaml_file\n- write_yaml_file\n- read_toml_file\n- write_toml_file\n- read_ini_file\n- write_ini_file\n- validate_config_schema\n- merge_config_files\n\nTotal: 53 tools across 3 categories"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {},
+                "name": "list_all_available_tools"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "helpers_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

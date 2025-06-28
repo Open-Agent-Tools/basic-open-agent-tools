@@ -1,0 +1,40 @@
+{
+  "eval_set_id": "list_available_tools_test_set",
+  "name": "List Available Tools Test",
+  "description": "Test case for listing available tools through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "list_available_tools_test",
+      "conversation": [
+        {
+          "invocation_id": "list-tools-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "List your available tools"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "  Here are the tools I have available:\n\n  *   `read_file_to_string`: Load string from a text file.\n  *   `write_file_from_string`: Write string content to a text file.\n  *   `append_to_file`: Append string content to a text file.\n  *   `list_directory_contents`: List contents of a directory.\n  *   `create_directory`: Create a directory and any necessary parent directories.\n  *   `delete_file`: Delete a file.\n  *   `delete_directory`: Delete a directory.\n  *   `move_file`: Move or rename a file or directory.\n  *   `copy_file`: Copy a file or directory.\n  *   `replace_in_file`: Replace occurrences of text within a file without rewriting the entire content.\n  *   `insert_at_line`: Insert content at a specific line number in a file."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

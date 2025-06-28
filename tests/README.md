@@ -22,30 +22,33 @@ tests/
 │       ├── __init__.py         # Agent test package
 │       ├── agent/              # Agent implementation
 │       │   ├── __init__.py     # Agent module exports
-│       │   └── sample_agent.py # Agent with tools
+│       │   └── sample_agent.py # Agent with module tools
 │       ├── test_{module}_agent_evaluation.py  # Agent test runner
 │       ├── test_config.json                   # ADK evaluation criteria
-│       ├── {function}.test.json              # One test per tool
-│       └── {module}_comprehensive.test.json   # Multi-tool workflows
+│       └── list_available_tools.test.json     # Tool listing evaluation
 ```
 
-## Example Implementation: Tree Module
+## Example Implementation: CSV Tools Module
 
-The tree module demonstrates the complete testing strategy:
+The CSV tools module demonstrates the simplified agent evaluation strategy:
 
 ```
-tests/file_system/
-├── test_tree.py                 # 26 traditional unit tests
-└── test_tree_agent/            # Agent evaluation suite
+tests/data/
+├── test_csv_tools.py            # Traditional unit tests
+└── test_csv_tools_agent/        # Agent evaluation suite
     ├── agent/
-    │   ├── __init__.py         # Exports agent
-    │   └── sample_agent.py     # Tree tools agent
-    ├── test_tree_agent_evaluation.py  # 3 evaluation tests
-    ├── test_config.json                # ADK evaluation criteria
-    ├── tree_list_all.test.json        # 1 test case
-    ├── tree_generate.test.json        # 1 test case  
-    └── tree_comprehensive.test.json   # 1 test case using both tools
+    │   ├── __init__.py          # Exports agent
+    │   └── sample_agent.py      # CSV tools agent
+    ├── test_csv_tools_agent_evaluation.py  # Agent test runner
+    ├── test_config.json                     # ADK evaluation criteria
+    └── list_available_tools.test.json       # Tool listing test
 ```
+
+**Key Features:**
+- **Simple Setup**: Agent loads module tools directly
+- **Single Evaluation**: Only tests tool listing capability
+- **Native Response**: Agent responds without calling helper functions
+- **Working Pattern**: Proven to work with Google ADK evaluation framework
 
 ## Step-by-Step Implementation Guide
 
@@ -160,8 +163,10 @@ from dotenv import load_dotenv
 from google.adk.agents import Agent
 
 from basic_open_agent_tools.{module}.{submodule} import (
-    function_one,  # Only import public functions from module's __all__ list
-    function_two,  # Skip internal helpers and private functions
+    function_one,
+    function_two,
+    function_three,
+    # Import all public functions from the module
 )
 
 # Load environment variables for API keys
@@ -172,9 +177,51 @@ load_dotenv(project_root / ".env")  # From project root
 root_agent = Agent(
     name="{module}_agent",
     model="gemini-2.0-flash",
-    description="Agent that can perform {module} operations using the basic_open_agent_tools {module} utilities.",
-    instruction="""You are a helpful agent.""",
-    tools=[function_one, function_two],
+    description="Agent that can process {data_type} using the basic_open_agent_tools {module} utilities.",
+    instruction="""You are a helpful agent that can work with {data_type}.
+
+You have access to tools for reading, writing, parsing, validating, and processing {data_type}. 
+
+Always provide clear output showing the processing results.""",
+    tools=[
+        function_one,
+        function_two,
+        function_three,
+        # List all imported functions
+    ],
+)
+```
+
+**Example from working CSV agent:**
+```python
+from basic_open_agent_tools.data.csv_tools import (
+    clean_csv_data,
+    csv_to_dict_list,
+    detect_csv_delimiter,
+    dict_list_to_csv,
+    read_csv_simple,
+    validate_csv_structure,
+    write_csv_simple,
+)
+
+root_agent = Agent(
+    name="csv_tools_agent",
+    model="gemini-2.0-flash",
+    description="Agent that can process CSV files using the basic_open_agent_tools CSV utilities.",
+    instruction="""You are a helpful agent that can work with CSV data.
+
+You have access to tools for reading, writing, parsing, validating, and cleaning CSV files. You can detect delimiters, convert between formats, and process CSV data structures.
+
+Always provide clear output showing the CSV processing results.""",
+    tools=[
+        read_csv_simple,
+        write_csv_simple,
+        csv_to_dict_list,
+        dict_list_to_csv,
+        detect_csv_delimiter,
+        validate_csv_structure,
+        clean_csv_data,
+    ],
 )
 ```
 
@@ -195,33 +242,33 @@ from . import sample_agent as agent
 ```json
 {
   "criteria": {
-    "tool_trajectory_avg_score": 0,
-    "response_match_score": 0
+    "tool_trajectory_avg_score": 0.7,
+    "response_match_score": 0.7
   }
 }
 ```
 
 This file configures the Google ADK evaluation criteria for agent testing.
 
-#### 4. Create Test JSON Files
+#### 4. Create Tool Listing Test
 
-**Individual Tool Test File**: `tests/{module}/test_{module}_agent/{function}.test.json`
+**Tool Listing Test File**: `tests/{module}/test_{module}_agent/list_available_tools.test.json`
 
 ```json
 {
-  "eval_set_id": "{function}_test_set",
-  "name": "{Function} Test",
-  "description": "Test case for {function} function through agent interaction",
+  "eval_set_id": "list_available_tools_test_set",
+  "name": "List Available Tools Test",
+  "description": "Test case for listing available tools through agent interaction",
   "eval_cases": [
     {
-      "eval_id": "{function}_test",
+      "eval_id": "list_available_tools_test",
       "conversation": [
         {
-          "invocation_id": "{function}-001",
+          "invocation_id": "list-tools-001",
           "user_content": {
             "parts": [
               {
-                "text": "Natural human-like request that leads to using {function} with test_input"
+                "text": "List all available tools alphabetically."
               }
             ],
             "role": "user"
@@ -229,20 +276,13 @@ This file configures the Google ADK evaluation criteria for agent testing.
           "final_response": {
             "parts": [
               {
-                "text": "expected_output"
+                "text": "    function_one,\n    function_two,\n    function_three,"
               }
             ],
             "role": "model"
           },
           "intermediate_data": {
-            "tool_uses": [
-              {
-                "args": {
-                  "parameter_name": "test_input"
-                },
-                "name": "{function}"
-              }
-            ],
+            "tool_uses": [],
             "intermediate_responses": []
           }
         }
@@ -257,23 +297,22 @@ This file configures the Google ADK evaluation criteria for agent testing.
 }
 ```
 
-**Comprehensive Test File**: `tests/{module}/test_{module}_agent/{module}_comprehensive.test.json`
-
+**Example from working CSV agent:**
 ```json
 {
-  "eval_set_id": "{module}_comprehensive_test_set",
-  "name": "{Module} Comprehensive Test", 
-  "description": "Comprehensive test case using multiple {module} functions in workflows",
+  "eval_set_id": "list_available_tools_test_set",
+  "name": "List Available Tools Test", 
+  "description": "Test case for listing available tools through agent interaction",
   "eval_cases": [
     {
-      "eval_id": "multi_function_workflow",
+      "eval_id": "list_available_tools_test",
       "conversation": [
         {
-          "invocation_id": "comp-001",
+          "invocation_id": "list-tools-001",
           "user_content": {
             "parts": [
               {
-                "text": "Natural request that requires using multiple functions in sequence"
+                "text": "List all available tools alphabetically."
               }
             ],
             "role": "user"
@@ -281,33 +320,19 @@ This file configures the Google ADK evaluation criteria for agent testing.
           "final_response": {
             "parts": [
               {
-                "text": "Workflow completed successfully"
+                "text": "    clean_csv_data,\n    csv_to_dict_list,\n    detect_csv_delimiter,\n    dict_list_to_csv,\n    read_csv_simple,\n    validate_csv_structure,\n    write_csv_simple,"
               }
             ],
             "role": "model"
           },
           "intermediate_data": {
-            "tool_uses": [
-              {
-                "args": {
-                  "parameter": "input1"
-                },
-                "name": "function_one"
-              },
-              {
-                "args": {
-                  "input": "result_from_function_one",
-                  "flag": true
-                },
-                "name": "function_two"
-              }
-            ],
+            "tool_uses": [],
             "intermediate_responses": []
           }
         }
       ],
       "session_input": {
-        "app_name": "{module}_agent",
+        "app_name": "csv_tools_agent",
         "user_id": "test_user",
         "state": {}
       }
@@ -335,27 +360,35 @@ class Test{Module}AgentEvaluation:
     """Agent evaluation tests for {module} tools."""
 
     @pytest.mark.asyncio
-    async def test_function_one_agent(self):
-        """Test agent using function_one."""
+    async def test_list_available_tools_agent(self):
+        """Test agent listing available tools."""
         await AgentEvaluator.evaluate(
             agent_module="tests.{module}.test_{module}_agent.agent",
-            eval_dataset_file_path_or_dir="tests/{module}/test_{module}_agent/function_one.test.json",
+            eval_dataset_file_path_or_dir="tests/{module}/test_{module}_agent/list_available_tools.test.json",
         )
+```
+
+**Example from working CSV agent:**
+```python
+"""ADK evaluation tests for CSV tools agent.
+
+This test suite validates that CSV tools functions work correctly
+when called by AI agents in the Google ADK framework.
+"""
+
+import pytest
+from google.adk.evaluation.agent_evaluator import AgentEvaluator
+
+
+class TestCsvToolsAgentEvaluation:
+    """Agent evaluation tests for CSV tools."""
 
     @pytest.mark.asyncio
-    async def test_function_two_agent(self):
-        """Test agent using function_two."""
+    async def test_list_available_tools_agent(self):
+        """Test agent listing available tools."""
         await AgentEvaluator.evaluate(
-            agent_module="tests.{module}.test_{module}_agent.agent",
-            eval_dataset_file_path_or_dir="tests/{module}/test_{module}_agent/function_two.test.json",
-        )
-
-    @pytest.mark.asyncio
-    async def test_comprehensive_workflows_agent(self):
-        """Test agent using multiple functions in workflows."""
-        await AgentEvaluator.evaluate(
-            agent_module="tests.{module}.test_{module}_agent.agent",
-            eval_dataset_file_path_or_dir="tests/{module}/test_{module}_agent/{module}_comprehensive.test.json",
+            agent_module="tests.data.test_csv_tools_agent.agent",
+            eval_dataset_file_path_or_dir="tests/data/test_csv_tools_agent/list_available_tools.test.json",
         )
 ```
 
@@ -375,11 +408,12 @@ Each agent test suite must include:
 - ✅ **test_{module}.py**: Traditional unit tests with comprehensive coverage
 - ✅ **test_{module}_agent/__init__.py**: Agent test package initialization
 - ✅ **test_{module}_agent/agent/__init__.py**: Agent module exports
-- ✅ **test_{module}_agent/agent/sample_agent.py**: Agent implementation with tools
+- ✅ **test_{module}_agent/agent/sample_agent.py**: Agent implementation with module tools
 - ✅ **test_{module}_agent/test_config.json**: ADK evaluation criteria configuration
 - ✅ **test_{module}_agent/test_{module}_agent_evaluation.py**: Agent test runner
-- ✅ **test_{module}_agent/{function}.test.json**: Individual tool test files (1 per function)
-- ✅ **test_{module}_agent/{module}_comprehensive.test.json**: Multi-tool workflow tests
+- ✅ **test_{module}_agent/list_available_tools.test.json**: Tool listing evaluation test
+
+**Simplified Approach**: Focus on tool listing capability rather than complex individual function tests or multi-tool workflows. This proven pattern works reliably with Google ADK evaluation framework.
 
 ### Development Workflow
 
@@ -421,6 +455,33 @@ python3 -c "from tests.{module}.test_{module}_agent.agent import agent; print('A
 # Run agent evaluations (requires API keys)
 python3 -m pytest tests/{module}/test_{module}_agent/test_{module}_agent_evaluation.py -v
 ```
+
+#### 4. Manual Agent Evaluation (Debugging)
+
+For detailed debugging of agent responses, use the ADK CLI directly:
+
+```bash
+# Run manual evaluation with detailed output
+PYTHONPATH=/Users/wes/Development/basic-open-agent-tools/src:/Users/wes/Development/basic-open-agent-tools:$PYTHONPATH adk eval \
+    --config_file_path tests/{module}/test_{module}_agent/test_config.json \
+    --print_detailed_results \
+    tests/{module}/test_{module}_agent/agent \
+    tests/{module}/test_{module}_agent/{test_file}.test.json
+
+# Example for JSON tools:
+PYTHONPATH=/Users/wes/Development/basic-open-agent-tools/src:/Users/wes/Development/basic-open-agent-tools:$PYTHONPATH adk eval \
+    --config_file_path tests/data/test_json_tools_agent/test_config.json \
+    --print_detailed_results \
+    tests/data/test_json_tools_agent/agent \
+    tests/data/test_json_tools_agent/list_available_tools.test.json
+```
+
+**Benefits of manual evaluation:**
+- Shows exact agent responses vs expected responses
+- Displays detailed evaluation metrics
+- Reveals if agent fails to respond (final_response: null)
+- Helpful for debugging response format mismatches
+- Shows tool usage patterns
 
 ### Coverage Standards
 

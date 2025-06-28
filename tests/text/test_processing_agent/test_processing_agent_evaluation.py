@@ -1,0 +1,23 @@
+"""ADK evaluation tests for text processing agent.
+
+This test suite validates that text processing functions work correctly
+when called by AI agents in the Google ADK framework.
+"""
+
+import asyncio
+
+import pytest
+from google.adk.evaluation.agent_evaluator import AgentEvaluator
+
+
+class TestTextProcessingAgentEvaluation:
+    """Agent evaluation tests for text processing tools."""
+
+    @pytest.mark.asyncio
+    async def test_list_available_tools_agent(self):
+        """Test agent listing available tools."""
+        await AgentEvaluator.evaluate(
+            agent_module="tests.text.test_processing_agent.agent",
+            eval_dataset_file_path_or_dir="tests/text/test_processing_agent/list_available_tools.test.json",
+        )
+        await asyncio.sleep(2)  # Rate limiting delay
