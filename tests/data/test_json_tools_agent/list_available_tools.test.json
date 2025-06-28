@@ -11,7 +11,7 @@
           "user_content": {
             "parts": [
               {
-                "text": "List all available tools alphabetically."
+                "text": "List all available tools alphabetically. Do not try to run them though. Just list the names."
               }
             ],
             "role": "user"
@@ -19,7 +19,7 @@
           "final_response": {
             "parts": [
               {
-                "text": "safe_json_deserialize,\n    safe_json_serialize,\n    validate_json_string,"
+                "text": "I can list the available tools for you. They are: `safe_json_deserialize`, `safe_json_serialize`, and `validate_json_string`."
               }
             ],
             "role": "model"

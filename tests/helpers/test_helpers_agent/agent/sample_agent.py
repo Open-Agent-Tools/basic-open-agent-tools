@@ -5,6 +5,7 @@ helper utilities for ADK evaluation testing.
 """
 
 from pathlib import Path
+import os
 
 from dotenv import load_dotenv
 from google.adk.agents import Agent
@@ -29,7 +30,7 @@ agent_tools = merge_tool_lists(
 
 root_agent = Agent(
     name="helpers_agent",
-    model="gemini-2.0-flash",
+    model=os.environ.get("GOOGLE_MODEL_NAME"),
     description="Agent that can discover and manage available tools using the basic_open_agent_tools helper utilities.",
     instruction="""You are a helpful agent that can discover and work with tools.
 

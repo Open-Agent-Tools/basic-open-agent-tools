@@ -13,6 +13,7 @@ from google.adk.evaluation.agent_evaluator import AgentEvaluator
 class TestValidationAgentEvaluation:
     """Agent evaluation tests for file system validation tools."""
 
+    @pytest.mark.agent_evaluation
     @pytest.mark.asyncio
     async def test_list_available_tools_agent(self):
         """Test agent listing available tools."""

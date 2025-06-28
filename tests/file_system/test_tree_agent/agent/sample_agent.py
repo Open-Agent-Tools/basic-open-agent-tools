@@ -5,6 +5,7 @@ tree generation functions for ADK evaluation testing.
 """
 
 from pathlib import Path
+import os
 
 from dotenv import load_dotenv
 from google.adk.agents import Agent
@@ -22,7 +23,7 @@ load_dotenv(project_root / ".env")  # From project root
 
 root_agent = Agent(
     name="tree_agent",
-    model="gemini-2.0-flash",
+    model=os.environ.get("GOOGLE_MODEL_NAME"),
     description="Agent that can generate directory trees and list directory contents using the basic_open_agent_tools filesystem utilities.",
     instruction="""You are a helpful agent it directory skills.""",
     tools=[generate_directory_tree, list_all_directory_contents],

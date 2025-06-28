@@ -5,6 +5,7 @@ CSV utilities for ADK evaluation testing.
 """
 
 from pathlib import Path
+import os
 
 from dotenv import load_dotenv
 from google.adk.agents import Agent
@@ -26,7 +27,7 @@ load_dotenv(project_root / ".env")  # From project root
 
 root_agent = Agent(
     name="csv_tools_agent",
-    model="gemini-2.0-flash",
+    model=os.environ.get("GOOGLE_MODEL_NAME"),
     description="Agent that can process CSV files using the basic_open_agent_tools CSV utilities.",
     instruction="""You are a helpful agent that can work with CSV data.
 

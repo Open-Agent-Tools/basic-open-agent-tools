@@ -11,7 +11,7 @@
           "user_content": {
             "parts": [
               {
-                "text": "List all available tools alphabetically."
+                "text": "List all available tools alphabetically. Do not try to run them though. Just list the names."
               }
             ],
             "role": "user"

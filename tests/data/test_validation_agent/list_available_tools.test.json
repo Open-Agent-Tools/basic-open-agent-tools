@@ -11,7 +11,7 @@
           "user_content": {
             "parts": [
               {
-                "text": "List all available tools alphabetically."
+                "text": "List all available tools alphabetically. Do not try to run them though. Just list the names."
               }
             ],
             "role": "user"
@@ -19,7 +19,7 @@
           "final_response": {
             "parts": [
               {
-                "text": "check_required_fields,\n    check_required_fields_simple,\n    create_validation_report,\n    create_validation_report_simple,\n    validate_data_types_simple,\n    validate_range_simple,\n    validate_schema_simple,"
+                "text": "The available tools are:\n\n* check_required_fields\n* check_required_fields_simple\n* create_validation_report\n* create_validation_report_simple\n* validate_data_types_simple\n* validate_range_simple\n* validate_schema_simple"
               }
             ],
             "role": "model"

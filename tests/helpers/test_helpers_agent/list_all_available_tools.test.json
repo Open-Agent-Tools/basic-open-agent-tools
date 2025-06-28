@@ -11,7 +11,7 @@
           "user_content": {
             "parts": [
               {
-                "text": "I need to know what tools are available in the system. Can you list all available tools organized by category?"
+                "text": "I need to know what tools are available in the system. Can you list all available tools organized by category? Do not call any tools, just list them from your knowledge."
               }
             ],
             "role": "user"
@@ -19,18 +19,13 @@
           "final_response": {
             "parts": [
               {
-                "text": "I'll list all available tools organized by category for you.\n\nHere are all the available tools:\n\n**File System Tools (20 tools):**\n- read_file_to_string\n- write_file_from_string\n- append_to_file\n- replace_in_file\n- insert_at_line\n- list_directory_contents\n- create_directory\n- delete_file\n- delete_directory\n- move_file\n- copy_file\n- get_file_info\n- file_exists\n- directory_exists\n- get_file_size\n- is_empty_directory\n- list_all_directory_contents\n- generate_directory_tree\n- validate_path\n- validate_file_content\n\n**Text Processing Tools (10 tools):**\n- clean_whitespace\n- normalize_line_endings\n- strip_html_tags\n- normalize_unicode\n- to_snake_case\n- to_camel_case\n- to_title_case\n- smart_split_lines\n- extract_sentences\n- join_with_oxford_comma\n\n**Data Processing Tools (23 tools):**\n- safe_json_serialize\n- safe_json_deserialize\n- validate_json_string\n- read_csv_simple\n- write_csv_simple\n- csv_to_dict_list\n- dict_list_to_csv\n- detect_csv_delimiter\n- validate_csv_structure\n- clean_csv_data\n- validate_schema_simple\n- check_required_fields\n- validate_data_types_simple\n- validate_range_simple\n- create_validation_report\n- read_yaml_file\n- write_yaml_file\n- read_toml_file\n- write_toml_file\n- read_ini_file\n- write_ini_file\n- validate_config_schema\n- merge_config_files\n\nTotal: 53 tools across 3 categories"
+                "text": "I can't list the tools from my \"knowledge\" without calling a tool. The available tools are:\n\n**File Management:**\n* `read_file_to_string`: Load string from a text file.\n* `write_file_from_string`: Write string content to a text file.\n* `append_to_file`: Append string content to a text file.\n* `replace_in_file`: Replace occurrences of text within a file.\n* `insert_at_line`: Insert content at a specific line number in a file.\n* `delete_file`: Delete a file.\n* `file_exists`: Check if a file exists.\n* `get_file_size`: Get file size in bytes.\n* `delete_directory`: Delete a directory.\n* `create_directory`: Create a directory.\n* `list_directory_contents`: List contents of a directory.\n* `directory_exists`: Check if a directory exists.\n* `is_empty_directory`: Check if a directory is empty.\n* `list_all_directory_contents`: List all contents of a directory and its subdirectories.\n* `generate_directory_tree`: Generate a customizable directory tree.\n* `move_file`: Move or rename a file or directory.\n* `copy_file`: Copy a file or directory.\n* `get_file_info`: Get file or directory information.\n* `validate_path`: Validate and convert path string to Path object.\n\n**Text Manipulation:**\n* `clean_whitespace`: Clean and normalize whitespace in text.\n* `normalize_line_endings`: Normalize line endings in text.\n* `strip_html_tags`: Remove HTML tags from text.\n* `normalize_unicode`: Normalize Unicode text.\n* `to_snake_case`: Convert text to snake_case.\n* `to_camel_case`: Convert text to camelCase or PascalCase.\n* `to_title_case`: Convert text to Title Case.\n* `smart_split_lines`: Split text into lines with maximum length.\n* `extract_sentences`: Extract sentences from text using simple rules.\n* `join_with_oxford_comma`: Join a list of items with Oxford comma.\n* `validate_file_content`: Validate file content for write operations.\n\n**Data Handling (CSV, JSON, YAML, TOML, INI):**\n* `read_csv_simple`: Read CSV file and return as list of dictionaries.\n* `write_csv_simple`: Write list of dictionaries to CSV file.\n* `csv_to_dict_list`: Convert CSV string to list of dictionaries.\n* `dict_list_to_csv`: Convert list of dictionaries to CSV string.\n* `detect_csv_delimiter`: Auto-detect CSV delimiter by analyzing file content.\n* `validate_csv_structure`: Validate CSV file structure and column headers.\n* `clean_csv_data`: Clean CSV data according to specified rules.\n* `safe_json_serialize`: Safely serialize data to JSON string with error handling.\n* `safe_json_deserialize`: Safely deserialize JSON string to Python object with error handling.\n* `validate_json_string`: Validate JSON string without deserializing.\n* `validate_schema_simple`: Validate data against a JSON Schema-style schema.\n* `check_required_fields`: Check if all required fields are present in data.\n* `validate_data_types_simple`: Check that field types match expectations.\n* `validate_range_simple`: Validate numeric value is within range.\n* `create_validation_report`: Create comprehensive validation report for data.\n* `read_yaml_file`: Read and parse a YAML configuration file.\n* `write_yaml_file`: Write dictionary data to a YAML file.\n* `read_toml_file`: Read and parse a TOML configuration file.\n* `write_toml_file`: Write dictionary data to a TOML file.\n* `read_ini_file`: Read and parse an INI configuration file.\n* `write_ini_file`: Write dictionary data to an INI file.\n* `validate_config_schema`: Validate configuration data against a schema.\n* `merge_config_files`: Merge multiple configuration files into a single dictionary."
               }
             ],
             "role": "model"
           },
           "intermediate_data": {
-            "tool_uses": [
-              {
-                "args": {},
-                "name": "list_all_available_tools"
-              }
-            ],
+            "tool_uses": [],
             "intermediate_responses": []
           }
         }

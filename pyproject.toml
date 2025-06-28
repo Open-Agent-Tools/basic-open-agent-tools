@@ -50,6 +50,7 @@ dev = [
 test = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
+    "pytest-xdist>=3.0.0",
 ]
 
 [tool.setuptools.packages.find]
@@ -106,6 +107,15 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
+]
+markers = [
+    "agent_evaluation: marks tests as agent evaluation tests (may be slow due to API calls)",
+    "slow: marks tests as slow running",
+]
+# Additional options for agent evaluation tests
+filterwarnings = [
+    "ignore::pytest.PytestUnhandledThreadExceptionWarning",
+    "ignore::DeprecationWarning",
 ]
 
 [tool.coverage.run]
