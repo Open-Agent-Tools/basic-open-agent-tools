@@ -142,6 +142,8 @@ Ensure comprehensive coverage for each function:
 
 ### Phase 2: Agent Evaluation Tests
 
+**Important**: Agent evaluation tests should only cover **public functions** that are intended for use by AI agents. Internal helper functions, private methods, and utility functions that are not exposed in the module's `__all__` list do not need agent evaluation tests.
+
 #### 1. Create Agent Implementation
 
 **File**: `tests/{module}/test_{module}_agent/agent/sample_agent.py`
@@ -158,8 +160,8 @@ from dotenv import load_dotenv
 from google.adk.agents import Agent
 
 from basic_open_agent_tools.{module}.{submodule} import (
-    function_one,
-    function_two,
+    function_one,  # Only import public functions from module's __all__ list
+    function_two,  # Skip internal helpers and private functions
 )
 
 # Load environment variables for API keys
@@ -430,7 +432,8 @@ python3 -m pytest tests/{module}/test_{module}_agent/test_{module}_agent_evaluat
 - **Edge Case Coverage**: Boundary conditions
 
 **Agent Tests:**
-- **Tool Coverage**: Each function tested individually (1 test per tool)
+- **Public Function Coverage**: Only functions in module's `__all__` list (not internal helpers)
+- **Tool Coverage**: Each public function tested individually (1 test per tool)
 - **Natural Language**: Human-like requests instead of explicit function calls
 - **Workflow Coverage**: Comprehensive tests for multi-function scenarios
 - **Error Recovery**: Invalid parameter handling in workflows
@@ -495,6 +498,7 @@ tools=[function_one, function_two]  # List of actual function objects
 - ✅ **Mock external dependencies** when needed
 
 ### Agent Tests
+- ✅ **Public functions only** - Test functions in module's `__all__` list, skip internal helpers
 - ✅ **Natural language requests** in test scenarios (not explicit function calls)
 - ✅ **One test per tool** to maintain simplicity
 - ✅ **Realistic workflows** that agents would encounter  
