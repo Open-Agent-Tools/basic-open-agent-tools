@@ -2,7 +2,7 @@
 
 import csv
 import io
-from typing import Any, Dict, List
+from typing import Dict, List
 
 from ..exceptions import DataError
 
@@ -285,9 +285,12 @@ def validate_csv_structure(file_path: str, expected_columns: List[str]) -> bool:
     try:
         # Check if file is empty first
         import os
-
-        if os.path.getsize(file_path_str) == 0:
-            return True  # Empty file is considered valid
+        
+        try:
+            if os.path.getsize(file_path_str) == 0:
+                return True  # Empty file is considered valid
+        except FileNotFoundError:
+            raise DataError(f"CSV file not found: {file_path_str}")
 
         # Read first few rows to validate structure
         data = read_csv_simple(file_path_str, ",", True)
@@ -313,7 +316,7 @@ def validate_csv_structure(file_path: str, expected_columns: List[str]) -> bool:
         raise DataError(f"Invalid CSV structure in {file_path_str}: {e}")
 
 
-def clean_csv_data(data: List[Any], rules: dict) -> List[Dict[str, str]]:
+def clean_csv_data(data: List[Dict[str, str]], rules: dict) -> List[Dict[str, str]]:
     """Clean CSV data according to specified rules.
 
     Args:
