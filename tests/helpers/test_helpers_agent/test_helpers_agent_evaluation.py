@@ -17,7 +17,7 @@ class TestHelpersAgentEvaluation:
     async def test_list_available_tools_agent(self):
         """Test agent listing available tools."""
         await AgentEvaluator.evaluate(
-            agent_module="tests.test_helpers_agent.agent",
-            eval_dataset_file_path_or_dir="tests/test_helpers_agent/list_all_available_tools.test.json",
+            agent_module="tests.helpers.test_helpers_agent.agent",
+            eval_dataset_file_path_or_dir="tests/helpers/test_helpers_agent/list_all_available_tools.test.json",
         )
         await asyncio.sleep(2)  # Rate limiting delay

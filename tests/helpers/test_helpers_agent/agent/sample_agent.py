@@ -13,10 +13,6 @@ from basic_open_agent_tools.helpers import (
     load_all_data_tools,
     load_all_filesystem_tools,
     load_all_text_tools,
-    load_data_config_tools,
-    load_data_csv_tools,
-    load_data_json_tools,
-    load_data_validation_tools,
     merge_tool_lists,
 )
 
@@ -29,10 +25,6 @@ agent_tools = merge_tool_lists(
     load_all_filesystem_tools(),
     load_all_text_tools(),
     load_all_data_tools(),
-    load_data_json_tools(),
-    load_data_csv_tools(),
-    load_data_validation_tools(),
-    load_data_config_tools(),
 )
 
 root_agent = Agent(
