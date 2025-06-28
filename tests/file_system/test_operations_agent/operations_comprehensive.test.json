@@ -1,0 +1,173 @@
+{
+  "eval_set_id": "operations_comprehensive_test_set",
+  "name": "Operations Comprehensive Test",
+  "description": "Comprehensive test case using multiple operations functions in workflows",
+  "eval_cases": [
+    {
+      "eval_id": "file_workflow_test",
+      "conversation": [
+        {
+          "invocation_id": "comp-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "I want to create a complete file workflow. First create a directory called 'workflow_test', then create a file inside it called 'demo.txt' with content 'Hello World!', then copy that file to 'demo_copy.txt' in the same directory, and finally show me what's in the directory"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Complete file workflow executed successfully"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "directory_path": "workflow_test"
+                },
+                "name": "create_directory"
+              },
+              {
+                "args": {
+                  "file_path": "workflow_test/demo.txt",
+                  "content": "Hello World!"
+                },
+                "name": "write_file_from_string"
+              },
+              {
+                "args": {
+                  "source_path": "workflow_test/demo.txt",
+                  "destination_path": "workflow_test/demo_copy.txt"
+                },
+                "name": "copy_file"
+              },
+              {
+                "args": {
+                  "directory_path": "workflow_test",
+                  "include_hidden": false
+                },
+                "name": "list_directory_contents"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "text_editing_workflow",
+      "conversation": [
+        {
+          "invocation_id": "comp-002",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Take the demo.txt file from the workflow_test directory, read its contents, then modify it by adding a line 'This is line 2' at line 2, and finally replace any occurrence of 'Hello' with 'Goodbye'"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Text editing workflow completed"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "workflow_test/demo.txt"
+                },
+                "name": "read_file_to_string"
+              },
+              {
+                "args": {
+                  "file_path": "workflow_test/demo.txt",
+                  "line_number": 2,
+                  "content": "This is line 2"
+                },
+                "name": "insert_at_line"
+              },
+              {
+                "args": {
+                  "file_path": "workflow_test/demo.txt",
+                  "old_text": "Hello",
+                  "new_text": "Goodbye",
+                  "count": -1
+                },
+                "name": "replace_in_file"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "cleanup_workflow",
+      "conversation": [
+        {
+          "invocation_id": "comp-003",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Clean up our test by moving demo_copy.txt to backup_demo.txt, then deleting the entire workflow_test directory"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Cleanup workflow completed"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "source_path": "workflow_test/demo_copy.txt",
+                  "destination_path": "backup_demo.txt"
+                },
+                "name": "move_file"
+              },
+              {
+                "args": {
+                  "directory_path": "workflow_test",
+                  "recursive": true
+                },
+                "name": "delete_directory"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "eval_set_id": "replace_in_file_test_set",
+  "name": "Replace In File Test",
+  "description": "Test case for replace_in_file function through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "replace_in_file_test",
+      "conversation": [
+        {
+          "invocation_id": "replace-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "In the backup_README.md file, replace the word 'basic' with 'advanced' wherever it appears"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Text replacement completed"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "backup_README.md",
+                  "old_text": "basic",
+                  "new_text": "advanced",
+                  "count": -1
+                },
+                "name": "replace_in_file"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

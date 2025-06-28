@@ -1,0 +1,48 @@
+{
+  "eval_set_id": "write_file_from_string_test_set",
+  "name": "Write File From String Test",
+  "description": "Test case for write_file_from_string function through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "write_file_from_string_test",
+      "conversation": [
+        {
+          "invocation_id": "write-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Create a new file called test_output.txt with the content 'Hello from agent test!'"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "File created successfully"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "test_output.txt",
+                  "content": "Hello from agent test!"
+                },
+                "name": "write_file_from_string"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "eval_set_id": "delete_file_test_set",
+  "name": "Delete File Test",
+  "description": "Test case for delete_file function through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "delete_file_test",
+      "conversation": [
+        {
+          "invocation_id": "delete-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Remove the test_output.txt file for me"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "File deleted successfully"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "test_output.txt"
+                },
+                "name": "delete_file"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

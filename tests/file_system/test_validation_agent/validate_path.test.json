@@ -1,0 +1,48 @@
+{
+  "eval_set_id": "validate_path_test_set",
+  "name": "Validate Path Test",
+  "description": "Test case for validate_path function through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "validate_path_test",
+      "conversation": [
+        {
+          "invocation_id": "validate-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "I want to validate if 'src/basic_open_agent_tools' is a valid path for a read operation"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Path validation completed"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "path": "src/basic_open_agent_tools",
+                  "operation": "read"
+                },
+                "name": "validate_path"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "validation_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

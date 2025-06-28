@@ -1,0 +1,48 @@
+{
+  "eval_set_id": "list_directory_contents_test_set",
+  "name": "List Directory Contents Test",
+  "description": "Test case for list_directory_contents function through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "list_directory_contents_test",
+      "conversation": [
+        {
+          "invocation_id": "list-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Show me what files and directories are in the src folder, including any hidden ones"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Directory contents listed"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "directory_path": "src",
+                  "include_hidden": true
+                },
+                "name": "list_directory_contents"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

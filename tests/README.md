@@ -24,6 +24,7 @@ tests/
 │       │   ├── __init__.py     # Agent module exports
 │       │   └── sample_agent.py # Agent with tools
 │       ├── test_{module}_agent_evaluation.py  # Agent test runner
+│       ├── test_config.json                   # ADK evaluation criteria
 │       ├── {function}.test.json              # One test per tool
 │       └── {module}_comprehensive.test.json   # Multi-tool workflows
 ```
@@ -40,6 +41,7 @@ tests/file_system/
     │   ├── __init__.py         # Exports agent
     │   └── sample_agent.py     # Tree tools agent
     ├── test_tree_agent_evaluation.py  # 3 evaluation tests
+    ├── test_config.json                # ADK evaluation criteria
     ├── tree_list_all.test.json        # 1 test case
     ├── tree_generate.test.json        # 1 test case  
     └── tree_comprehensive.test.json   # 1 test case using both tools
@@ -169,12 +171,7 @@ root_agent = Agent(
     name="{module}_agent",
     model="gemini-2.0-flash",
     description="Agent that can perform {module} operations using the basic_open_agent_tools {module} utilities.",
-    instruction="""You are a helpful agent that can perform {module} operations.
-
-When asked to use function_one, call it with the appropriate parameter.
-When asked to use function_two, call it with the appropriate parameters.
-
-Always provide clear output that shows the operation results.""",
+    instruction="""You are a helpful agent.""",
     tools=[function_one, function_two],
 )
 ```
@@ -189,7 +186,22 @@ Always provide clear output that shows the operation results.""",
 from . import sample_agent as agent
 ```
 
-#### 3. Create Test JSON Files
+#### 3. Create ADK Evaluation Configuration
+
+**ADK Config File**: `tests/{module}/test_{module}_agent/test_config.json`
+
+```json
+{
+  "criteria": {
+    "tool_trajectory_avg_score": 0,
+    "response_match_score": 0
+  }
+}
+```
+
+This file configures the Google ADK evaluation criteria for agent testing.
+
+#### 4. Create Test JSON Files
 
 **Individual Tool Test File**: `tests/{module}/test_{module}_agent/{function}.test.json`
 
@@ -302,7 +314,7 @@ from . import sample_agent as agent
 }
 ```
 
-#### 4. Create Agent Evaluation Test Runner
+#### 5. Create Agent Evaluation Test Runner
 
 **File**: `tests/{module}/test_{module}_agent/test_{module}_agent_evaluation.py`
 
@@ -354,6 +366,18 @@ Before writing tests:
 - ✅ **Identify test scenarios**: Map all parameter combinations
 - ✅ **Plan error cases**: List all possible exceptions
 - ✅ **Design edge cases**: Consider boundary conditions
+
+### Required Files Checklist
+
+Each agent test suite must include:
+- ✅ **test_{module}.py**: Traditional unit tests with comprehensive coverage
+- ✅ **test_{module}_agent/__init__.py**: Agent test package initialization
+- ✅ **test_{module}_agent/agent/__init__.py**: Agent module exports
+- ✅ **test_{module}_agent/agent/sample_agent.py**: Agent implementation with tools
+- ✅ **test_{module}_agent/test_config.json**: ADK evaluation criteria configuration
+- ✅ **test_{module}_agent/test_{module}_agent_evaluation.py**: Agent test runner
+- ✅ **test_{module}_agent/{function}.test.json**: Individual tool test files (1 per function)
+- ✅ **test_{module}_agent/{module}_comprehensive.test.json**: Multi-tool workflow tests
 
 ### Development Workflow
 

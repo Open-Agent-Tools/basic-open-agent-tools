@@ -1,0 +1,48 @@
+{
+  "eval_set_id": "append_to_file_test_set",
+  "name": "Append To File Test",
+  "description": "Test case for append_to_file function through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "append_to_file_test",
+      "conversation": [
+        {
+          "invocation_id": "append-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Add a new line with 'Additional content added by agent' to the test_output.txt file"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Content appended successfully"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "file_path": "test_output.txt",
+                  "content": "\nAdditional content added by agent"
+                },
+                "name": "append_to_file"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

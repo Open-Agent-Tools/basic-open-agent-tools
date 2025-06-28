@@ -1,0 +1,48 @@
+{
+  "eval_set_id": "copy_file_test_set",
+  "name": "Copy File Test",
+  "description": "Test case for copy_file function through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "copy_file_test",
+      "conversation": [
+        {
+          "invocation_id": "copy-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Make a copy of the pyproject.toml file and call it pyproject_backup.toml"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "File copied successfully"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "source_path": "pyproject.toml",
+                  "destination_path": "pyproject_backup.toml"
+                },
+                "name": "copy_file"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}

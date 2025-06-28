@@ -1,0 +1,48 @@
+{
+  "eval_set_id": "move_file_test_set",
+  "name": "Move File Test",
+  "description": "Test case for move_file function through agent interaction",
+  "eval_cases": [
+    {
+      "eval_id": "move_file_test",
+      "conversation": [
+        {
+          "invocation_id": "move-001",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Move the README.md file to a new location called backup_README.md"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "File moved successfully"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "args": {
+                  "source_path": "README.md",
+                  "destination_path": "backup_README.md"
+                },
+                "name": "move_file"
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "operations_agent",
+        "user_id": "test_user",
+        "state": {}
+      }
+    }
+  ]
+}
