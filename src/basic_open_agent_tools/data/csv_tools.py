@@ -285,7 +285,7 @@ def validate_csv_structure(file_path: str, expected_columns: List[str]) -> bool:
     try:
         # Check if file is empty first
         import os
-        
+
         try:
             if os.path.getsize(file_path_str) == 0:
                 return True  # Empty file is considered valid

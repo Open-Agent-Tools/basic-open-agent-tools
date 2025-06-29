@@ -14,4 +14,5 @@ def rate_limit_delay(request):
         delay = float(os.getenv("PYTEST_API_DELAY", "5"))
         if delay > 0:
             import time
+
             time.sleep(delay)
