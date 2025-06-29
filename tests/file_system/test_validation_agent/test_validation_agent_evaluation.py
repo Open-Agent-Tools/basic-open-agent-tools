@@ -15,7 +15,7 @@ class TestValidationAgentEvaluation:
 
     @pytest.mark.agent_evaluation
     @pytest.mark.asyncio
-    async def test_list_available_tools_agent(self):
+    async def test_list_available_tools_agent(self, agent_evaluation_sequential):
         """Test agent listing available tools."""
         await AgentEvaluator.evaluate(
             agent_module="tests.file_system.test_validation_agent.agent",

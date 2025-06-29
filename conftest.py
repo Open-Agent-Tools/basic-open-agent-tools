@@ -33,7 +33,7 @@ def agent_evaluation_lock():
     return asyncio.Lock()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 async def agent_evaluation_sequential(request, agent_evaluation_lock):
     """Ensure agent evaluation tests run one at a time."""
     if request.node.get_closest_marker("agent_evaluation"):
