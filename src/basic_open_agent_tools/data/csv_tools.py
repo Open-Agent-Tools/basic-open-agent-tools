@@ -316,7 +316,7 @@ def validate_csv_structure(file_path: str, expected_columns: List[str]) -> bool:
         raise DataError(f"Invalid CSV structure in {file_path_str}: {e}")
 
 
-def clean_csv_data(data: List[Dict[str, str]], rules: dict) -> List[Dict[str, str]]:
+def clean_csv_data(data: list, rules: dict) -> List[Dict[str, str]]:
     """Clean CSV data according to specified rules.
 
     Args:
@@ -357,11 +357,15 @@ def clean_csv_data(data: List[Dict[str, str]], rules: dict) -> List[Dict[str, st
     cleaned_data = []
 
     for row in data:
+        if not isinstance(row, dict):
+            continue
+
         cleaned_row = {}
 
         for key, value in row.items():
-            # All values are guaranteed to be strings by type annotation
-            # This defensive conversion is kept for runtime safety
+            # Convert to string for processing (defensive against mixed types)
+            if not isinstance(value, str):
+                value = str(value) if value is not None else ""
 
             # Strip whitespace
             if default_rules.get("strip_whitespace", False):
