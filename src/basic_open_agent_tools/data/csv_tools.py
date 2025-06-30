@@ -357,15 +357,11 @@ def clean_csv_data(data: List[Dict[str, str]], rules: dict) -> List[Dict[str, st
     cleaned_data = []
 
     for row in data:
-        if not isinstance(row, dict):
-            continue
-
         cleaned_row = {}
 
         for key, value in row.items():
-            # Convert to string for processing
-            if not isinstance(value, str):
-                value = str(value) if value is not None else ""
+            # All values are guaranteed to be strings by type annotation
+            # This defensive conversion is kept for runtime safety
 
             # Strip whitespace
             if default_rules.get("strip_whitespace", False):

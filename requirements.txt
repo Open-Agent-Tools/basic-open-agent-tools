@@ -74,6 +74,7 @@ pre-commit>=3.0.0
 # Virtual environment and dependency management
 virtualenv
 pip-tools
+setuptools
 
 # Optional: Jupyter for experimentation and learning
 jupyter
