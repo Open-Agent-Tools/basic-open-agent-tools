@@ -5,3 +5,44 @@
 # Be aware that the files you included in .aiignore can still be accessed by Junie in two cases:
 # - If Brave Mode is turned on.
 # - If a command has been added to the Allowlist — Junie will not ask for confirmation, even if it accesses - files and folders listed in .aiignore.
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Linting and type checking
+.ruff_cache/
+.mypy_cache/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*~
+*.swp
+*.swo
+*.orig
+*.rej
+
+# Debug files
+debug.py
+test_debug.py
+scratch.py
