@@ -1,8 +1,8 @@
 # Data Tools TODO
 
-## Current Status (v0.8.0)
+## Current Status (v0.8.1)
 
-### ✅ Completed (v0.8.0+)
+### ✅ Completed (v0.8.1+)
 - [x] **Google ADK Function Tool Compliance**: Full compatibility with Google ADK standards
 - [x] **Enhanced Test Coverage**: Achieved 96%+ test coverage (255+ test cases)
 - [x] **Quality Assurance**: 100% ruff + mypy compliance across all modules
@@ -56,7 +56,7 @@
 
 ## Agent Framework Integration Notes
 
-As of v0.8.0, all data functions are fully compliant with Google ADK standards:
+As of v0.8.1, all data functions are fully compliant with Google ADK standards:
 - **Google ADK**: 100% Function Tool compliance with JSON-serializable types
 - **LangChain**: Functions integrate seamlessly with StructuredTool
 - **Custom Agents**: Broad compatibility with simple, consistent signatures
