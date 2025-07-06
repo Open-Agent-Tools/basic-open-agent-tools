@@ -6,7 +6,7 @@ This document provides an overview of planned development for the basic-open-age
 
 Create a comprehensive toolkit of **AI agent ready tools** providing essential functions for agent frameworks like Google ADK, LangChain, and custom agent implementations. Functions are designed with **agent-friendly type signatures** to eliminate "signature too complex" errors, while maintaining clean module-level APIs for direct usage.
 
-## Current Status (v0.8.1)
+## Current Status (v0.0.1)
 
 ### ✅ Fully Implemented Modules
 
@@ -15,7 +15,7 @@ Create a comprehensive toolkit of **AI agent ready tools** providing essential f
 - **Data Processing:** [src/basic_open_agent_tools/data/TODO.md](src/basic_open_agent_tools/data/TODO.md) ✅ *Complete with Google ADK Compliance (30+ functions)*
 - **Helper Functions:** ✅ *Complete with 58+ agent tools*
 
-### 🎯 Key Achievements (v0.8.1+)
+### 🎯 Key Achievements (v0.0.1+)
 - ✅ **Google ADK Function Tool Compliance**: Full compatibility with Google ADK standards
 - ✅ **Enhanced Test Coverage**: Achieved 96% overall test coverage (623 passing tests)
 - ✅ **Quality Assurance**: 100% ruff + mypy compliance across all modules
