@@ -40,8 +40,8 @@
 
 - [ ] Add comprehensive benchmarks for all data operations
 - [ ] Enhance documentation with more examples
-- [x] Add type hints for all return values (completed v0.6.0)
-- [x] Simplify type signatures for agent compatibility (completed v0.6.0)
+- [x] Add type hints for all return values (completed v0.8.1)
+- [x] Simplify type signatures for agent compatibility (completed v0.8.1)
 - [ ] Create more comprehensive test cases
 - [ ] Add performance comparison between simple and complex variants
 
