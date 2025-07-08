@@ -29,3 +29,9 @@ class SerializationError(DataError):
     """Exception for data serialization/deserialization operations."""
 
     pass
+
+
+class DateTimeError(BasicAgentToolsError):
+    """Exception for date and time operations."""
+
+    pass

@@ -9,13 +9,14 @@ from typing import List
 __version__ = "0.8.1"
 
 # Modular structure
-from . import data, exceptions, file_system, text, types
+from . import data, datetime, exceptions, file_system, text, types
 
 # Helper functions for tool management
 from .helpers import (
     get_tool_info,
     list_all_available_tools,
     load_all_data_tools,
+    load_all_datetime_tools,
     load_all_filesystem_tools,
     load_all_text_tools,
     load_data_config_tools,
@@ -37,6 +38,7 @@ __all__: List[str] = [
     "file_system",
     "text",
     "data",
+    "datetime",
     # Future modules (uncomment when implemented)
     # "system",
     # "network",
@@ -49,6 +51,7 @@ __all__: List[str] = [
     "load_all_filesystem_tools",
     "load_all_text_tools",
     "load_all_data_tools",
+    "load_all_datetime_tools",
     "load_data_json_tools",
     "load_data_csv_tools",
     "load_data_validation_tools",
