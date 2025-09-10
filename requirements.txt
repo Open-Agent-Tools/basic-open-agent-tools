@@ -15,7 +15,6 @@ basic-open-agent-tools
 # LLM and AI libraries
 openai
 transformers
-torch
 huggingface-hub
 
 # Web scraping and API tools

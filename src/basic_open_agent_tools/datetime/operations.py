@@ -7,7 +7,7 @@ All functions are designed to be agent-friendly with clear error handling.
 from datetime import date, datetime, time, timedelta
 
 try:
-    import zoneinfo  # type: ignore[import-not-found]
+    import zoneinfo
 except ImportError:
     import pytz as zoneinfo  # type: ignore
 

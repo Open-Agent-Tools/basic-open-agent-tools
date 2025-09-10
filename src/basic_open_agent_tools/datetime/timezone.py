@@ -7,7 +7,7 @@ strings and standard timezone names.
 from datetime import datetime
 
 try:
-    import zoneinfo  # type: ignore[import-not-found]
+    import zoneinfo
 except ImportError:
     import pytz as zoneinfo  # type: ignore
 
