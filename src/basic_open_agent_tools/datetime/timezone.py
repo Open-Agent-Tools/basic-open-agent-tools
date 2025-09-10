@@ -9,7 +9,7 @@ from datetime import datetime
 try:
     import zoneinfo  # type: ignore[import-not-found]
 except ImportError:
-    import pytz as zoneinfo  # type: ignore[import-not-found,no-redef]
+    import pytz as zoneinfo  # type: ignore
 
 
 def convert_timezone(datetime_string: str, from_timezone: str, to_timezone: str) -> str:

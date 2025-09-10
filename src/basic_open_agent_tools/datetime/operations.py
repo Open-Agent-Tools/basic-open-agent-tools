@@ -9,7 +9,7 @@ from datetime import date, datetime, time, timedelta
 try:
     import zoneinfo  # type: ignore[import-not-found]
 except ImportError:
-    import pytz as zoneinfo  # type: ignore[import-not-found,no-redef]
+    import pytz as zoneinfo  # type: ignore
 
 
 def get_current_datetime(timezone: str) -> str:

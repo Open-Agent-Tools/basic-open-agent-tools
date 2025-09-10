@@ -1,9 +1,18 @@
 """File and directory information utilities."""
 
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func):  # type: ignore
+        return func
+
+
 from ..exceptions import FileSystemError
 from .validation import validate_path
 
 
+@strands_tool
 def get_file_info(file_path: str) -> dict:
     """Get file or directory information.
 
@@ -39,6 +48,7 @@ def get_file_info(file_path: str) -> dict:
         raise FileSystemError(f"Failed to get info for {path}: {e}")
 
 
+@strands_tool
 def file_exists(file_path: str) -> bool:
     """Check if a file exists.
 
@@ -55,6 +65,7 @@ def file_exists(file_path: str) -> bool:
         return False
 
 
+@strands_tool
 def directory_exists(directory_path: str) -> bool:
     """Check if a directory exists.
 
@@ -71,6 +82,7 @@ def directory_exists(directory_path: str) -> bool:
         return False
 
 
+@strands_tool
 def get_file_size(file_path: str) -> int:
     """Get file size in bytes.
 
@@ -94,6 +106,7 @@ def get_file_size(file_path: str) -> int:
         raise FileSystemError(f"Failed to get size for {path}: {e}")
 
 
+@strands_tool
 def is_empty_directory(directory_path: str) -> bool:
     """Check if a directory is empty.
 

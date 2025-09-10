@@ -3,10 +3,19 @@
 from pathlib import Path
 from typing import List
 
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func):  # type: ignore
+        return func
+
+
 from ..exceptions import FileSystemError
 from .validation import validate_path
 
 
+@strands_tool
 def list_all_directory_contents(directory_path: str) -> str:
     """Generate a tree of all contents in a directory and its subdirectories.
 
@@ -68,6 +77,7 @@ def list_all_directory_contents(directory_path: str) -> str:
         raise FileSystemError(f"Failed to list directory contents {path}: {e}")
 
 
+@strands_tool
 def generate_directory_tree(
     directory_path: str, max_depth: int, include_hidden: bool
 ) -> str:

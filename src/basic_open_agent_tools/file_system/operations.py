@@ -3,10 +3,19 @@
 import shutil
 from typing import List
 
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func):  # type: ignore
+        return func
+
+
 from ..exceptions import FileSystemError
 from .validation import validate_file_content, validate_path
 
 
+@strands_tool
 def read_file_to_string(file_path: str) -> str:
     """Load string from a text file.
 
@@ -30,6 +39,7 @@ def read_file_to_string(file_path: str) -> str:
         raise FileSystemError(f"Failed to read file {path}: {e}")
 
 
+@strands_tool
 def write_file_from_string(file_path: str, content: str) -> bool:
     """Write string content to a text file.
 
@@ -54,6 +64,7 @@ def write_file_from_string(file_path: str, content: str) -> bool:
         raise FileSystemError(f"Failed to write file {path}: {e}")
 
 
+@strands_tool
 def append_to_file(file_path: str, content: str) -> bool:
     """Append string content to a text file.
 
@@ -79,6 +90,7 @@ def append_to_file(file_path: str, content: str) -> bool:
         raise FileSystemError(f"Failed to append to file {path}: {e}")
 
 
+@strands_tool
 def list_directory_contents(directory_path: str, include_hidden: bool) -> List[str]:
     """List contents of a directory.
 
@@ -106,6 +118,7 @@ def list_directory_contents(directory_path: str, include_hidden: bool) -> List[s
         raise FileSystemError(f"Failed to list directory {path}: {e}")
 
 
+@strands_tool
 def create_directory(directory_path: str) -> bool:
     """Create a directory and any necessary parent directories.
 
@@ -127,6 +140,7 @@ def create_directory(directory_path: str) -> bool:
         raise FileSystemError(f"Failed to create directory {path}: {e}")
 
 
+@strands_tool
 def delete_file(file_path: str) -> bool:
     """Delete a file.
 
@@ -148,6 +162,7 @@ def delete_file(file_path: str) -> bool:
         raise FileSystemError(f"Failed to delete file {path}: {e}")
 
 
+@strands_tool
 def delete_directory(directory_path: str, recursive: bool) -> bool:
     """Delete a directory.
 
@@ -176,6 +191,7 @@ def delete_directory(directory_path: str, recursive: bool) -> bool:
         raise FileSystemError(f"Failed to delete directory {path}: {e}")
 
 
+@strands_tool
 def move_file(source_path: str, destination_path: str) -> bool:
     """Move or rename a file or directory.
 
@@ -203,6 +219,7 @@ def move_file(source_path: str, destination_path: str) -> bool:
         raise FileSystemError(f"Failed to move {src_path} to {dst_path}: {e}")
 
 
+@strands_tool
 def copy_file(source_path: str, destination_path: str) -> bool:
     """Copy a file or directory.
 
@@ -233,6 +250,7 @@ def copy_file(source_path: str, destination_path: str) -> bool:
         raise FileSystemError(f"Failed to copy {src_path} to {dst_path}: {e}")
 
 
+@strands_tool
 def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) -> bool:
     """Replace occurrences of text within a file without rewriting the entire content.
 
@@ -275,6 +293,7 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
         raise FileSystemError(f"Failed to replace text in file {path}: {e}")
 
 
+@strands_tool
 def insert_at_line(file_path: str, line_number: int, content: str) -> bool:
     """Insert content at a specific line number in a file.
 
