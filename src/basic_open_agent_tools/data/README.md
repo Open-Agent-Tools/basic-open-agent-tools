@@ -75,3 +75,49 @@ All planned data modules have been implemented and tested:
 - `write_ini_file(data: dict, file_path: str)`
 - `validate_config_schema(config_data: dict, schema: dict)`
 - `merge_config_files(config_paths: Union[str, List[str]], format_type: str)`
+
+## Security Features
+- Safe JSON/YAML parsing without code execution
+- Input validation for all data transformation functions
+- File size limits for read operations
+- Protection against zip bombs in compressed data
+- Sanitization of configuration file inputs
+
+## Performance Considerations
+- Memory-efficient streaming for large datasets
+- Optimized CSV processing with minimal copying
+- Efficient JSON serialization with compression options
+- Bulk operations for data transformation
+
+## Agent Integration
+Compatible with:
+- **Google ADK**: Direct function imports as tools
+- **LangChain**: Wrappable with StructuredTool
+- **Strands Agents**: Native @strands_tool decorator support
+- **Custom Agents**: Simple function-based API
+
+## Example Usage
+
+```python
+import basic_open_agent_tools as boat
+
+# Load data processing tools
+data_tools = boat.load_all_data_tools()
+
+# Individual function usage
+from basic_open_agent_tools.data import safe_json_serialize, read_csv_simple
+
+# Process JSON data
+json_data = safe_json_serialize({"key": "value"}, indent=2)
+
+# Load CSV data
+csv_data = read_csv_simple("data.csv", ",", True)
+```
+
+## Module Structure
+- **json_tools.py** - JSON processing and validation (3 functions)
+- **csv_tools.py** - CSV reading, writing, and processing (7 functions) 
+- **validation.py** - Data validation and schema checking (5 functions)
+- **config_processing.py** - Configuration file handling (12 functions)
+
+**Total Functions**: 27 agent-ready tools with Google ADK compatibility

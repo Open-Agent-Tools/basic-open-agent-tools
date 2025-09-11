@@ -112,38 +112,47 @@ Text Processing Tools:
 
 ## Current Features
 
-### File System Tools ✅ (18 functions)
+### File System Tools ✅ (20 functions)
+📖 **[Complete Documentation](src/basic_open_agent_tools/file_system/README.md)**
+
 - File operations (read, write, append, delete, copy, move)
 - Directory operations (create, list, delete, tree visualization)
 - File information and existence checking
-- Path validation and error handling
+- Path validation and security features
 
 ### Text Processing Tools ✅ (10 functions)
-- Text cleaning and normalization
+📖 **[Complete Documentation](src/basic_open_agent_tools/text/README.md)**
+
+- Text cleaning and whitespace normalization
 - Case conversion utilities (snake_case, camelCase, Title Case)
 - Smart text splitting and sentence extraction
 - HTML tag removal and Unicode normalization
 
-### Data Tools ✅ (28+ functions with Agent-Friendly Signatures)
-**Enhanced for AI Agents**: All functions use simplified type signatures for maximum compatibility
-- **Structure Tools**: `flatten_dict_simple`, `merge_dicts_simple`, `get_nested_value_simple`
-- **CSV Tools**: `read_csv_simple`, `write_csv_simple` with basic types
-- **Validation Tools**: `validate_schema_simple`, `validate_data_types_simple`
-- **JSON & Config**: Safe serialization with compression and validation
-- **Transform Tools**: Data cleaning and normalization functions
+### Data Processing Tools ✅ (27 functions)
+📖 **[Complete Documentation](src/basic_open_agent_tools/data/README.md)**
 
-**Additional Data Modules** 📋:
-- Object serialization and configuration files (YAML, TOML, INI)
-- Binary data processing and archive handling
-- Advanced transformation and streaming utilities
+- **JSON Processing**: Safe serialization, validation, compression
+- **CSV Operations**: Reading, writing, cleaning, validation
+- **Configuration Files**: YAML, TOML, INI processing
+- **Data Validation**: Schema checking, type validation, field validation
+- **Agent-Friendly Signatures**: All functions use basic Python types for maximum AI framework compatibility
 
-**✨ Agent Compatibility**: All data functions use basic Python types (str, dict, list, bool) instead of complex Union types or custom type aliases, ensuring seamless integration with AI agent frameworks.
+### DateTime Tools ✅ (42 functions)
+📖 **[Complete Documentation](src/basic_open_agent_tools/datetime/README.md)**
+
+- **Current Date/Time**: Timezone-aware current date/time operations
+- **Date Arithmetic**: Add/subtract days, hours, minutes with proper handling
+- **Date Ranges**: Generate date ranges, quarters, business days
+- **Validation**: ISO format validation, range checking, format verification
+- **Business Logic**: Business day calculations, timezone conversions
+- **Information Extraction**: Weekday names, month names, leap years
 
 ### Future Modules 🚧
-- **Network Tools** - HTTP utilities, API helpers
-- **System Tools** - Process management, system information  
-- **Crypto Tools** - Hashing, encoding, basic cryptographic utilities
-- **Utilities** - Development and debugging helpers
+
+- **Network Tools** 📖 **[Planned Features](src/basic_open_agent_tools/network/README.md)** - Local network utilities, connectivity validation
+- **System Tools** 📖 **[Planned Features](src/basic_open_agent_tools/system/README.md)** - Process management, system information  
+- **Crypto Tools** 📖 **[Planned Features](src/basic_open_agent_tools/crypto/README.md)** - Hashing, encoding, basic cryptographic utilities
+- **Utilities** 📖 **[Planned Features](src/basic_open_agent_tools/utilities/README.md)** - Development and debugging helpers
 
 ## Contributing
 
