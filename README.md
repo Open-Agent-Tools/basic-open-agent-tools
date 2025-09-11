@@ -21,6 +21,8 @@ uv add basic-open-agent-tools
 
 🔧 **Modular Architecture**: Load only the tools you need with category-specific helpers
 
+🤝 **Multi-Framework Compatibility**: Native support for Google ADK, LangChain, Strands Agents, and custom agent frameworks
+
 ## Quick Start
 
 ```python
