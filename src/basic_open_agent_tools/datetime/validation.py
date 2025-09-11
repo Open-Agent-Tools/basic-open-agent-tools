@@ -6,7 +6,15 @@ format strings for consistent validation.
 
 from datetime import date, datetime
 
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func):  # type: ignore
+        return func
 
+
+@strands_tool
 def validate_date_range(date_string: str, min_date: str, max_date: str) -> bool:
     """Validate that a date falls within a specified range.
 
@@ -49,6 +57,7 @@ def validate_date_range(date_string: str, min_date: str, max_date: str) -> bool:
         raise ValueError(f"Invalid ISO date format: {e}")
 
 
+@strands_tool
 def validate_datetime_range(
     datetime_string: str, min_datetime: str, max_datetime: str
 ) -> bool:
@@ -90,6 +99,7 @@ def validate_datetime_range(
         raise ValueError(f"Invalid ISO datetime format: {e}")
 
 
+@strands_tool
 def is_valid_date_format(date_string: str, format_string: str) -> bool:
     """Check if a date string matches a specific format.
 
@@ -125,6 +135,7 @@ def is_valid_date_format(date_string: str, format_string: str) -> bool:
         return False
 
 
+@strands_tool
 def is_future_date(date_string: str, reference_date: str) -> bool:
     """Check if a date is in the future relative to a reference date.
 
@@ -161,6 +172,7 @@ def is_future_date(date_string: str, reference_date: str) -> bool:
         raise ValueError(f"Invalid ISO date format: {e}")
 
 
+@strands_tool
 def is_past_date(date_string: str, reference_date: str) -> bool:
     """Check if a date is in the past relative to a reference date.
 

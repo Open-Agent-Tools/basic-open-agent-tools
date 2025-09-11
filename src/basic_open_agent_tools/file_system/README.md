@@ -108,6 +108,6 @@ success = write_file_from_string("output.txt", processed_data)
 - **info.py** - File and directory information functions (5 functions)
 - **operations.py** - Core file and directory operations (11 functions)
 - **tree.py** - Directory tree and listing functions (2 functions) 
-- **validation.py** - Path and content validation utilities (2 functions)
+- **validation.py** - Path and content validation utilities (internal use, not exported as agent tools)
 
-**Total Functions**: 20 agent-ready tools with Google ADK compatibility
+**Total Functions**: 18 agent-ready tools with Google ADK compatibility

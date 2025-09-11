@@ -11,7 +11,15 @@ try:
 except ImportError:
     import pytz as zoneinfo  # type: ignore
 
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func):  # type: ignore
+        return func
 
+
+@strands_tool
 def convert_timezone(datetime_string: str, from_timezone: str, to_timezone: str) -> str:
     """Convert a datetime from one timezone to another.
 
@@ -57,6 +65,7 @@ def convert_timezone(datetime_string: str, from_timezone: str, to_timezone: str)
         raise ValueError(f"Timezone conversion failed: {e}")
 
 
+@strands_tool
 def get_timezone_offset(timezone: str) -> str:
     """Get the current UTC offset for a timezone.
 
@@ -93,6 +102,7 @@ def get_timezone_offset(timezone: str) -> str:
         raise ValueError(f"Invalid timezone '{timezone}': {e}")
 
 
+@strands_tool
 def is_daylight_saving_time(datetime_string: str, timezone: str) -> bool:
     """Check if daylight saving time is in effect for a datetime in a timezone.
 
@@ -131,6 +141,7 @@ def is_daylight_saving_time(datetime_string: str, timezone: str) -> bool:
         raise ValueError(f"DST check failed: {e}")
 
 
+@strands_tool
 def is_valid_timezone(timezone_string: str) -> bool:
     """Check if a string is a valid timezone name.
 

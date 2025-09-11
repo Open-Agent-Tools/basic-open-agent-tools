@@ -4,6 +4,14 @@ import configparser
 import json
 from typing import List
 
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func):  # type: ignore
+        return func
+
+
 from ..exceptions import DataError
 
 # Simple YAML support using json fallback
@@ -24,6 +32,7 @@ except ImportError:
     HAS_TOML = False
 
 
+@strands_tool
 def read_yaml_file(file_path: str) -> dict:
     """Read and parse a YAML configuration file.
 
@@ -55,6 +64,7 @@ def read_yaml_file(file_path: str) -> dict:
         raise DataError(f"Failed to read YAML file {file_path}: {e}")
 
 
+@strands_tool
 def write_yaml_file(data: dict, file_path: str) -> None:
     """Write dictionary data to a YAML file.
 
@@ -79,6 +89,7 @@ def write_yaml_file(data: dict, file_path: str) -> None:
         raise DataError(f"Failed to write YAML file {file_path}: {e}")
 
 
+@strands_tool
 def read_toml_file(file_path: str) -> dict:
     """Read and parse a TOML configuration file.
 
@@ -112,6 +123,7 @@ def read_toml_file(file_path: str) -> dict:
         raise DataError(f"Failed to read TOML file {file_path}: {e}")
 
 
+@strands_tool
 def write_toml_file(data: dict, file_path: str) -> None:
     """Write dictionary data to a TOML file.
 
@@ -138,6 +150,7 @@ def write_toml_file(data: dict, file_path: str) -> None:
         raise DataError(f"Failed to write TOML file {file_path}: {e}")
 
 
+@strands_tool
 def read_ini_file(file_path: str) -> dict:
     """Read and parse an INI configuration file.
 
@@ -177,6 +190,7 @@ def read_ini_file(file_path: str) -> dict:
         raise DataError(f"Failed to read INI file {file_path}: {e}")
 
 
+@strands_tool
 def write_ini_file(data: dict, file_path: str) -> None:
     """Write dictionary data to an INI file.
 
@@ -206,6 +220,7 @@ def write_ini_file(data: dict, file_path: str) -> None:
         raise DataError(f"Failed to write INI file {file_path}: {e}")
 
 
+@strands_tool
 def validate_config_schema(config_data: dict, schema: dict) -> list:
     """Validate configuration data against a schema.
 
@@ -262,6 +277,7 @@ def validate_config_schema(config_data: dict, schema: dict) -> list:
     return errors
 
 
+@strands_tool
 def merge_config_files(config_paths: List[str], format_type: str) -> dict:
     """Merge multiple configuration files into a single dictionary.
 

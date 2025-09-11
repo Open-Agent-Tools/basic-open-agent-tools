@@ -112,7 +112,7 @@ Text Processing Tools:
 
 ## Current Features
 
-### File System Tools ✅ (20 functions)
+### File System Tools ✅ (18 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/file_system/README.md)**
 
 - File operations (read, write, append, delete, copy, move)

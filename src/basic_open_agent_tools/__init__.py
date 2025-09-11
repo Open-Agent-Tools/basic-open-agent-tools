@@ -6,7 +6,7 @@ with minimal dependencies for local (non-HTTP/API) actions.
 
 from typing import List
 
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 
 # Modular structure
 from . import data, datetime, exceptions, file_system, text, types

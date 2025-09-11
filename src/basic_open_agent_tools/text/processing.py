@@ -5,7 +5,15 @@ import textwrap
 import unicodedata
 from typing import List, Match
 
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func):  # type: ignore
+        return func
 
+
+@strands_tool
 def clean_whitespace(text: str) -> str:
     """Clean and normalize whitespace in text.
 
@@ -28,6 +36,7 @@ def clean_whitespace(text: str) -> str:
     return cleaned.strip()
 
 
+@strands_tool
 def normalize_line_endings(text: str, style: str) -> str:
     """Normalize line endings in text.
 
@@ -63,6 +72,7 @@ def normalize_line_endings(text: str, style: str) -> str:
     return normalized
 
 
+@strands_tool
 def strip_html_tags(text: str) -> str:
     """Remove HTML tags from text.
 
@@ -85,9 +95,11 @@ def strip_html_tags(text: str) -> str:
     # Second pass: remove remaining tags with space replacement
     cleaned = re.sub(r"<[^>]+>", " ", cleaned)
     # Clean up extra whitespace that might result from tag removal
-    return clean_whitespace(cleaned)
+    result: str = clean_whitespace(cleaned)
+    return result
 
 
+@strands_tool
 def normalize_unicode(text: str, form: str) -> str:
     """Normalize Unicode text.
 
@@ -112,9 +124,10 @@ def normalize_unicode(text: str, form: str) -> str:
     if form not in valid_forms:
         raise ValueError(f"Unsupported normalization form: {form}")
 
-    return unicodedata.normalize(form, text)  # type: ignore[arg-type]
+    return str(unicodedata.normalize(form, text))  # type: ignore[arg-type]
 
 
+@strands_tool
 def to_snake_case(text: str) -> str:
     """Convert text to snake_case.
 
@@ -143,6 +156,7 @@ def to_snake_case(text: str) -> str:
     return text.lower()
 
 
+@strands_tool
 def to_camel_case(text: str, upper_first: bool) -> str:
     """Convert text to camelCase or PascalCase.
 
@@ -178,6 +192,7 @@ def to_camel_case(text: str, upper_first: bool) -> str:
         return words[0] + "".join(word.capitalize() for word in words[1:])
 
 
+@strands_tool
 def to_title_case(text: str) -> str:
     """Convert text to Title Case.
 
@@ -212,6 +227,7 @@ def to_title_case(text: str) -> str:
     return "".join(result)
 
 
+@strands_tool
 def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> List[str]:
     """Split text into lines with maximum length.
 
@@ -255,6 +271,7 @@ def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> List[
         return lines
 
 
+@strands_tool
 def extract_sentences(text: str) -> List[str]:
     """Extract sentences from text using simple rules.
 
@@ -292,6 +309,7 @@ def extract_sentences(text: str) -> List[str]:
     return result
 
 
+@strands_tool
 def join_with_oxford_comma(items: List[str], conjunction: str) -> str:
     """Join a list of items with Oxford comma.
 

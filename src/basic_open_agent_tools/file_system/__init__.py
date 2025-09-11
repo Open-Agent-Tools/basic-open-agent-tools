@@ -38,10 +38,12 @@ from .tree import (
     generate_directory_tree,
     list_all_directory_contents,
 )
-from .validation import (
-    validate_file_content,
-    validate_path,
-)
+
+# validation functions are internal utilities, not agent tools
+# from .validation import (
+#     validate_file_content,
+#     validate_path,
+# )
 
 # Re-export all functions at module level for convenience
 __all__ = [
@@ -67,7 +69,5 @@ __all__ = [
     # Tree operations
     "list_all_directory_contents",
     "generate_directory_tree",
-    # Validation utilities
-    "validate_path",
-    "validate_file_content",
+    # Note: validation utilities are internal, not exported as agent tools
 ]

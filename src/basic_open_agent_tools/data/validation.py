@@ -2,9 +2,18 @@
 
 from typing import Dict, List
 
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func):  # type: ignore
+        return func
+
+
 from ..exceptions import ValidationError
 
 
+@strands_tool
 def validate_schema_simple(data: dict, schema: dict) -> bool:
     """Validate data against a JSON Schema-style schema.
 
@@ -63,6 +72,7 @@ def _validate_against_schema(data: dict, schema: dict) -> None:
         raise ValidationError("Array validation not supported with dict-only input")
 
 
+@strands_tool
 def check_required_fields(data: dict, required: List[str]) -> bool:
     """Check if all required fields are present in data.
 
@@ -97,6 +107,7 @@ def check_required_fields(data: dict, required: List[str]) -> bool:
     return True
 
 
+@strands_tool
 def validate_data_types_simple(data: dict, type_map: Dict[str, str]) -> bool:
     """Check that field types match expectations.
 
@@ -150,6 +161,7 @@ def validate_data_types_simple(data: dict, type_map: Dict[str, str]) -> bool:
     return True
 
 
+@strands_tool
 def validate_range_simple(
     value: float,
     min_val: float,
@@ -193,6 +205,7 @@ def validate_range_simple(
     return True
 
 
+@strands_tool
 def create_validation_report(data: dict, rules: dict) -> dict:
     """Create comprehensive validation report for data.
 
@@ -276,6 +289,7 @@ def create_validation_report(data: dict, rules: dict) -> dict:
     }
 
 
+@strands_tool
 def check_required_fields_simple(data: dict, required: List[str]) -> bool:
     """Check if all required fields are present in data.
 
@@ -296,9 +310,11 @@ def check_required_fields_simple(data: dict, required: List[str]) -> bool:
         >>> check_required_fields_simple({"name": "Alice", "age": 25}, ["name", "age"])
         True
     """
-    return check_required_fields(data, required)
+    result: bool = check_required_fields(data, required)
+    return result
 
 
+@strands_tool
 def create_validation_report_simple(data: dict, rules: dict) -> dict:
     """Create simplified validation report for data.
 
@@ -317,4 +333,5 @@ def create_validation_report_simple(data: dict, rules: dict) -> dict:
         >>> create_validation_report_simple(data, rules)
         {"valid": True, "errors": [], "warnings": []}
     """
-    return create_validation_report(data, rules)
+    result: dict = create_validation_report(data, rules)
+    return result
