@@ -375,14 +375,14 @@ def clean_csv_data(
 
     for row in data:
         if not isinstance(row, dict):
-            continue
+            continue  # type: ignore[unreachable]
 
         cleaned_row = {}
 
         for key, value in row.items():
             # Convert to string for processing (defensive against mixed types)
             if not isinstance(value, str):
-                value = str(value) if value is not None else ""
+                value = str(value) if value is not None else ""  # type: ignore[unreachable]
 
             # Strip whitespace
             if default_rules.get("strip_whitespace", False):

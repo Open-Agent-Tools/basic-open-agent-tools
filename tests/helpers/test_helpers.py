@@ -6,6 +6,7 @@ from basic_open_agent_tools.helpers import (
     get_tool_info,
     list_all_available_tools,
     load_all_data_tools,
+    load_all_datetime_tools,
     load_all_filesystem_tools,
     load_all_text_tools,
     load_data_config_tools,
@@ -616,6 +617,7 @@ class TestHelpersIntegration:
             "file_system": load_all_filesystem_tools(),
             "text": load_all_text_tools(),
             "data": load_all_data_tools(),
+            "datetime": load_all_datetime_tools(),
         }
 
         # Step 2: Merge all tools
