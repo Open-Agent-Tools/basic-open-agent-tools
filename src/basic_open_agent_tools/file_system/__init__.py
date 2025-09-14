@@ -31,6 +31,7 @@ from .operations import (
     replace_in_file,
     write_file_from_string,
 )
+from .editor import file_editor
 from .tree import (
     generate_directory_tree,
     list_all_directory_contents,
@@ -66,5 +67,7 @@ __all__ = [
     # Tree operations
     "list_all_directory_contents",
     "generate_directory_tree",
+    # Unified file editor
+    "file_editor",
     # Note: validation utilities are internal, not exported as agent tools
 ]
