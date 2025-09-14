@@ -206,8 +206,12 @@ custom_tools = boat.merge_tool_lists(network_tools, fs_tools)
 
 ### Future Modules 🚧
 
-- **System Tools** 📖 **[Planned Features](src/basic_open_agent_tools/system/README.md)** - Process management, system information
-- **Crypto Tools** 📖 **[Planned Features](src/basic_open_agent_tools/crypto/README.md)** - Hashing, encoding, basic cryptographic utilities
+- **System Tools** 📖 **[Planned Features](src/basic_open_agent_tools/system/README.md)** - Cross-platform shell (`execute_shell_command`, `run_powershell`, `run_bash`), process management (`run_command`, `kill_process`, `list_processes`), system info (`get_cpu_usage`, `get_memory_usage`, `get_disk_space`), environment variables (`set_env_var`, `get_env_var`, `list_env_vars`)
+- **Crypto Tools** 📖 **[Planned Features](src/basic_open_agent_tools/crypto/README.md)** - Hashing (`hash_md5`, `hash_sha256`, `verify_hash`), encoding (`base64_encode`, `base64_decode`, `url_encode`), basic crypto (`generate_uuid`, `generate_random_string`)
+- **PDF Tools** 📋 **Planned** - Reading (`extract_text_from_pdf`, `get_pdf_info`), creation (`text_to_pdf`, `merge_pdfs`)
+- **Archive Tools** 📋 **Planned** - Compression (`create_zip`, `extract_zip`, `compress_files`), formats (`create_tar`, `extract_tar`)
+- **Logging Tools** 📋 **Planned** - Structured logging (`log_info`, `log_error`, `configure_logger`), file rotation (`setup_rotating_log`, `cleanup_old_logs`)
+- **Monitoring Tools** 📋 **Planned** - File watching (`watch_file_changes`, `monitor_directory`), health checks (`check_url_status`, `ping_host`)
 
 ## Contributing
 

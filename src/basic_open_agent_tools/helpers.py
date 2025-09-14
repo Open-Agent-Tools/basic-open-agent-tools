@@ -3,7 +3,7 @@
 import inspect
 from typing import Any, Callable, Dict, List, Union
 
-from . import data, datetime, file_system, network, text, utilities
+from . import data, datetime, file_system, network, text, utilities, system, crypto, pdf, archive, logging as log_module, monitoring
 
 
 def load_all_filesystem_tools() -> List[Callable[..., Any]]:
@@ -138,18 +138,78 @@ def load_all_utilities_tools() -> List[Callable[..., Any]]:
     return tools
 
 
+def load_all_system_tools() -> List[Callable[..., Any]]:
+    """Load all system tools as a list of callable functions."""
+    tools = []
+    for name in system.__all__:
+        func = getattr(system, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_crypto_tools() -> List[Callable[..., Any]]:
+    """Load all crypto tools as a list of callable functions."""
+    tools = []
+    for name in crypto.__all__:
+        func = getattr(crypto, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_pdf_tools() -> List[Callable[..., Any]]:
+    """Load all PDF tools as a list of callable functions."""
+    tools = []
+    for name in pdf.__all__:
+        func = getattr(pdf, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_archive_tools() -> List[Callable[..., Any]]:
+    """Load all archive tools as a list of callable functions."""
+    tools = []
+    for name in archive.__all__:
+        func = getattr(archive, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_logging_tools() -> List[Callable[..., Any]]:
+    """Load all logging tools as a list of callable functions."""
+    tools = []
+    for name in log_module.__all__:
+        func = getattr(log_module, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_monitoring_tools() -> List[Callable[..., Any]]:
+    """Load all monitoring tools as a list of callable functions."""
+    tools = []
+    for name in monitoring.__all__:
+        func = getattr(monitoring, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
 def load_all_tools() -> List[Callable[..., Any]]:
     """Load all tools from all modules as a single list of callable functions.
 
     This is a convenience function that loads and combines tools from all
-    implemented modules: file_system, text, data, datetime, network, and utilities.
+    implemented modules.
 
     Returns:
         List of all tool functions from all modules (automatically deduplicated)
 
     Example:
         >>> all_tools = load_all_tools()
-        >>> len(all_tools) >= 93  # Current total: 93 functions
+        >>> len(all_tools) >= 150  # Total with all new modules
         True
         >>> # Use with agent frameworks
         >>> agent = Agent(tools=load_all_tools())
@@ -159,8 +219,14 @@ def load_all_tools() -> List[Callable[..., Any]]:
         load_all_text_tools(),          # 10 functions
         load_all_data_tools(),          # 23 functions
         load_all_datetime_tools(),      # 40 functions
-        load_all_network_tools(),       # 1 function
-        load_all_utilities_tools(),     # 1 function
+        load_all_network_tools(),       # 3 functions
+        load_all_utilities_tools(),     # 3 functions
+        load_all_system_tools(),        # ~20 functions
+        load_all_crypto_tools(),        # ~13 functions
+        load_all_pdf_tools(),           # 4 functions
+        load_all_archive_tools(),       # 5 functions
+        load_all_logging_tools(),       # 5 functions
+        load_all_monitoring_tools(),    # 4 functions
     )
 
 
