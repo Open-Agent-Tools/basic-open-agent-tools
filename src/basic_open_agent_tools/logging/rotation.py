@@ -8,8 +8,10 @@ from typing import Dict, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
@@ -19,7 +21,7 @@ def setup_rotating_log(
     logger_name: str,
     log_file: str,
     max_bytes: int = 10485760,  # 10MB
-    backup_count: int = 5
+    backup_count: int = 5,
 ) -> Dict[str, Union[str, int]]:
     """Set up a rotating file handler for a logger."""
     try:
@@ -27,7 +29,9 @@ def setup_rotating_log(
         handler = logging.handlers.RotatingFileHandler(
             log_file, maxBytes=max_bytes, backupCount=backup_count
         )
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
@@ -36,14 +40,16 @@ def setup_rotating_log(
             "log_file": log_file,
             "max_bytes": max_bytes,
             "backup_count": backup_count,
-            "status": "configured"
+            "status": "configured",
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to setup rotating log: {str(e)}")
 
 
 @strands_tool
-def cleanup_old_logs(log_pattern: str, keep_count: int = 5) -> Dict[str, Union[str, int]]:
+def cleanup_old_logs(
+    log_pattern: str, keep_count: int = 5
+) -> Dict[str, Union[str, int]]:
     """Clean up old log files matching a pattern."""
     try:
         log_files = sorted(glob.glob(log_pattern), key=os.path.getmtime, reverse=True)
@@ -59,7 +65,7 @@ def cleanup_old_logs(log_pattern: str, keep_count: int = 5) -> Dict[str, Union[s
             "files_found": len(log_files),
             "files_deleted": deleted_count,
             "files_kept": len(log_files) - deleted_count,
-            "status": "completed"
+            "status": "completed",
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to cleanup old logs: {str(e)}")

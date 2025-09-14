@@ -7,9 +7,11 @@ from typing import Dict, Optional, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
@@ -19,7 +21,7 @@ def execute_shell_command(
     command: str,
     timeout: int = 30,
     capture_output: bool = True,
-    working_directory: Optional[str] = None
+    working_directory: Optional[str] = None,
 ) -> Dict[str, Union[str, int, bool]]:
     """
     Execute a shell command cross-platform (Windows cmd, Unix bash/sh).
@@ -40,7 +42,9 @@ def execute_shell_command(
         raise BasicAgentToolsError("Command must be a non-empty string")
 
     if not isinstance(timeout, int) or timeout <= 0 or timeout > 300:
-        raise BasicAgentToolsError("Timeout must be a positive integer up to 300 seconds")
+        raise BasicAgentToolsError(
+            "Timeout must be a positive integer up to 300 seconds"
+        )
 
     if working_directory and not isinstance(working_directory, str):
         raise BasicAgentToolsError("Working directory must be a string")
@@ -59,7 +63,7 @@ def execute_shell_command(
             shell = False
 
         # Execute the command
-        start_time = subprocess.time.time() if hasattr(subprocess, 'time') else 0
+        start_time = subprocess.time.time() if hasattr(subprocess, "time") else 0
 
         result = subprocess.run(
             shell_command,
@@ -67,10 +71,10 @@ def execute_shell_command(
             text=True,
             timeout=timeout,
             cwd=working_directory,
-            shell=shell
+            shell=shell,
         )
 
-        end_time = subprocess.time.time() if hasattr(subprocess, 'time') else 0
+        end_time = subprocess.time.time() if hasattr(subprocess, "time") else 0
         execution_time = end_time - start_time if start_time > 0 else 0
 
         return {
@@ -82,13 +86,15 @@ def execute_shell_command(
             "platform": system,
             "execution_time_seconds": round(execution_time, 3),
             "working_directory": working_directory or "current",
-            "timeout_seconds": timeout
+            "timeout_seconds": timeout,
         }
 
     except subprocess.TimeoutExpired:
         raise BasicAgentToolsError(f"Command timed out after {timeout} seconds")
     except subprocess.CalledProcessError as e:
-        raise BasicAgentToolsError(f"Command failed with return code {e.returncode}: {e.stderr}")
+        raise BasicAgentToolsError(
+            f"Command failed with return code {e.returncode}: {e.stderr}"
+        )
     except FileNotFoundError:
         raise BasicAgentToolsError("Shell not found - unsupported platform")
     except Exception as e:
@@ -100,7 +106,7 @@ def run_bash(
     command: str,
     timeout: int = 30,
     capture_output: bool = True,
-    working_directory: Optional[str] = None
+    working_directory: Optional[str] = None,
 ) -> Dict[str, Union[str, int, bool]]:
     """
     Execute a bash command (Unix/Linux/macOS only).
@@ -125,7 +131,9 @@ def run_bash(
         raise BasicAgentToolsError("Bash execution not available on Windows")
 
     if not isinstance(timeout, int) or timeout <= 0 or timeout > 300:
-        raise BasicAgentToolsError("Timeout must be a positive integer up to 300 seconds")
+        raise BasicAgentToolsError(
+            "Timeout must be a positive integer up to 300 seconds"
+        )
 
     try:
         # Use bash explicitly
@@ -134,7 +142,7 @@ def run_bash(
             capture_output=capture_output,
             text=True,
             timeout=timeout,
-            cwd=working_directory
+            cwd=working_directory,
         )
 
         return {
@@ -146,7 +154,7 @@ def run_bash(
             "shell": "bash",
             "platform": system,
             "working_directory": working_directory or "current",
-            "timeout_seconds": timeout
+            "timeout_seconds": timeout,
         }
 
     except subprocess.TimeoutExpired:
@@ -162,7 +170,7 @@ def run_powershell(
     command: str,
     timeout: int = 30,
     capture_output: bool = True,
-    working_directory: Optional[str] = None
+    working_directory: Optional[str] = None,
 ) -> Dict[str, Union[str, int, bool]]:
     """
     Execute a PowerShell command (Windows only).
@@ -187,7 +195,9 @@ def run_powershell(
         raise BasicAgentToolsError("PowerShell execution only available on Windows")
 
     if not isinstance(timeout, int) or timeout <= 0 or timeout > 300:
-        raise BasicAgentToolsError("Timeout must be a positive integer up to 300 seconds")
+        raise BasicAgentToolsError(
+            "Timeout must be a positive integer up to 300 seconds"
+        )
 
     try:
         # Use PowerShell with execution policy bypass for basic commands
@@ -196,7 +206,7 @@ def run_powershell(
             capture_output=capture_output,
             text=True,
             timeout=timeout,
-            cwd=working_directory
+            cwd=working_directory,
         )
 
         return {
@@ -208,12 +218,16 @@ def run_powershell(
             "shell": "powershell",
             "platform": system,
             "working_directory": working_directory or "current",
-            "timeout_seconds": timeout
+            "timeout_seconds": timeout,
         }
 
     except subprocess.TimeoutExpired:
-        raise BasicAgentToolsError(f"PowerShell command timed out after {timeout} seconds")
+        raise BasicAgentToolsError(
+            f"PowerShell command timed out after {timeout} seconds"
+        )
     except FileNotFoundError:
-        raise BasicAgentToolsError("PowerShell not found - not available on this system")
+        raise BasicAgentToolsError(
+            "PowerShell not found - not available on this system"
+        )
     except Exception as e:
         raise BasicAgentToolsError(f"PowerShell command execution failed: {str(e)}")

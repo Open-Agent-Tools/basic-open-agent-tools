@@ -8,9 +8,11 @@ from typing import Dict, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
@@ -51,7 +53,7 @@ def generate_uuid(version: int = 4) -> Dict[str, str]:
             "uuid_string": uuid_string,
             "uuid_hex": uuid_hex,
             "uuid_bytes_length": 16,
-            "uuid_string_length": len(uuid_string)
+            "uuid_string_length": len(uuid_string),
         }
 
     except Exception as e:
@@ -59,7 +61,9 @@ def generate_uuid(version: int = 4) -> Dict[str, str]:
 
 
 @strands_tool
-def generate_random_string(length: int = 16, character_set: str = "alphanumeric") -> Dict[str, Union[str, int]]:
+def generate_random_string(
+    length: int = 16, character_set: str = "alphanumeric"
+) -> Dict[str, Union[str, int]]:
     """
     Generate a cryptographically secure random string.
 
@@ -92,10 +96,12 @@ def generate_random_string(length: int = 16, character_set: str = "alphanumeric"
         elif character_set == "ascii":
             chars = string.ascii_letters + string.digits + string.punctuation
         else:
-            raise BasicAgentToolsError("Character set must be one of: alphanumeric, letters, digits, ascii")
+            raise BasicAgentToolsError(
+                "Character set must be one of: alphanumeric, letters, digits, ascii"
+            )
 
         # Generate random string
-        random_string = ''.join(secrets.choice(chars) for _ in range(length))
+        random_string = "".join(secrets.choice(chars) for _ in range(length))
 
         return {
             "random_string": random_string,
@@ -103,7 +109,7 @@ def generate_random_string(length: int = 16, character_set: str = "alphanumeric"
             "actual_length": len(random_string),
             "character_set": character_set,
             "character_set_size": len(chars),
-            "entropy_bits": length * len(chars).bit_length()
+            "entropy_bits": length * len(chars).bit_length(),
         }
 
     except Exception as e:
@@ -111,7 +117,9 @@ def generate_random_string(length: int = 16, character_set: str = "alphanumeric"
 
 
 @strands_tool
-def generate_random_bytes(length: int = 16, encoding: str = "hex") -> Dict[str, Union[str, int]]:
+def generate_random_bytes(
+    length: int = 16, encoding: str = "hex"
+) -> Dict[str, Union[str, int]]:
     """
     Generate cryptographically secure random bytes.
 
@@ -145,14 +153,15 @@ def generate_random_bytes(length: int = 16, encoding: str = "hex") -> Dict[str, 
             encoded_data = random_bytes.hex()
         else:  # base64
             import base64
-            encoded_data = base64.b64encode(random_bytes).decode('ascii')
+
+            encoded_data = base64.b64encode(random_bytes).decode("ascii")
 
         return {
             "random_bytes_length": length,
             "encoding": encoding,
             "encoded_data": encoded_data,
             "encoded_length": len(encoded_data),
-            "entropy_bits": length * 8
+            "entropy_bits": length * 8,
         }
 
     except Exception as e:

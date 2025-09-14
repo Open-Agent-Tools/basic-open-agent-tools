@@ -8,14 +8,18 @@ from typing import Dict, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def log_info(message: str, logger_name: str = "agent", **kwargs) -> Dict[str, Union[str, float]]:
+def log_info(
+    message: str, logger_name: str = "agent", **kwargs
+) -> Dict[str, Union[str, float]]:
     """Log an info message with structured data."""
     if not isinstance(message, str):
         raise BasicAgentToolsError("Message must be a string")
@@ -28,7 +32,7 @@ def log_info(message: str, logger_name: str = "agent", **kwargs) -> Dict[str, Un
             "timestamp": timestamp,
             "level": "INFO",
             "message": message,
-            **kwargs
+            **kwargs,
         }
 
         logger.info(json.dumps(log_entry))
@@ -38,14 +42,16 @@ def log_info(message: str, logger_name: str = "agent", **kwargs) -> Dict[str, Un
             "message": message,
             "logger_name": logger_name,
             "timestamp": timestamp,
-            "status": "logged"
+            "status": "logged",
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to log info message: {str(e)}")
 
 
 @strands_tool
-def log_error(message: str, logger_name: str = "agent", **kwargs) -> Dict[str, Union[str, float]]:
+def log_error(
+    message: str, logger_name: str = "agent", **kwargs
+) -> Dict[str, Union[str, float]]:
     """Log an error message with structured data."""
     if not isinstance(message, str):
         raise BasicAgentToolsError("Message must be a string")
@@ -58,7 +64,7 @@ def log_error(message: str, logger_name: str = "agent", **kwargs) -> Dict[str, U
             "timestamp": timestamp,
             "level": "ERROR",
             "message": message,
-            **kwargs
+            **kwargs,
         }
 
         logger.error(json.dumps(log_entry))
@@ -68,14 +74,16 @@ def log_error(message: str, logger_name: str = "agent", **kwargs) -> Dict[str, U
             "message": message,
             "logger_name": logger_name,
             "timestamp": timestamp,
-            "status": "logged"
+            "status": "logged",
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to log error message: {str(e)}")
 
 
 @strands_tool
-def configure_logger(logger_name: str, log_file: str, level: str = "INFO") -> Dict[str, str]:
+def configure_logger(
+    logger_name: str, log_file: str, level: str = "INFO"
+) -> Dict[str, str]:
     """Configure a logger with file output."""
     if level not in ["DEBUG", "INFO", "WARNING", "ERROR"]:
         raise BasicAgentToolsError("Level must be DEBUG, INFO, WARNING, or ERROR")
@@ -83,7 +91,9 @@ def configure_logger(logger_name: str, log_file: str, level: str = "INFO") -> Di
     try:
         logger = logging.getLogger(logger_name)
         handler = logging.FileHandler(log_file)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
 
         handler.setFormatter(formatter)
         logger.addHandler(handler)
@@ -93,7 +103,7 @@ def configure_logger(logger_name: str, log_file: str, level: str = "INFO") -> Di
             "logger_name": logger_name,
             "log_file": log_file,
             "level": level,
-            "status": "configured"
+            "status": "configured",
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to configure logger: {str(e)}")

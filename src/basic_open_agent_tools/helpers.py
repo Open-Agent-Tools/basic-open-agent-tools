@@ -228,18 +228,18 @@ def load_all_tools() -> List[Callable[..., Any]]:
         >>> agent = Agent(tools=load_all_tools())
     """
     return merge_tool_lists(
-        load_all_filesystem_tools(),    # 18 functions
-        load_all_text_tools(),          # 10 functions
-        load_all_data_tools(),          # 23 functions
-        load_all_datetime_tools(),      # 40 functions
-        load_all_network_tools(),       # 3 functions
-        load_all_utilities_tools(),     # 3 functions
-        load_all_system_tools(),        # ~20 functions
-        load_all_crypto_tools(),        # ~13 functions
-        load_all_pdf_tools(),           # 4 functions
-        load_all_archive_tools(),       # 5 functions
-        load_all_logging_tools(),       # 5 functions
-        load_all_monitoring_tools(),    # 4 functions
+        load_all_filesystem_tools(),  # 18 functions
+        load_all_text_tools(),  # 10 functions
+        load_all_data_tools(),  # 23 functions
+        load_all_datetime_tools(),  # 40 functions
+        load_all_network_tools(),  # 3 functions
+        load_all_utilities_tools(),  # 3 functions
+        load_all_system_tools(),  # ~20 functions
+        load_all_crypto_tools(),  # ~13 functions
+        load_all_pdf_tools(),  # 4 functions
+        load_all_archive_tools(),  # 5 functions
+        load_all_logging_tools(),  # 5 functions
+        load_all_monitoring_tools(),  # 4 functions
     )
 
 

@@ -7,14 +7,18 @@ from typing import Dict, List, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def watch_file_changes(file_path: str, check_interval: int = 1) -> Dict[str, Union[str, float, bool]]:
+def watch_file_changes(
+    file_path: str, check_interval: int = 1
+) -> Dict[str, Union[str, float, bool]]:
     """Watch a file for changes."""
     if not isinstance(file_path, str) or not file_path.strip():
         raise BasicAgentToolsError("File path must be a non-empty string")
@@ -42,7 +46,7 @@ def watch_file_changes(file_path: str, check_interval: int = 1) -> Dict[str, Uni
             "initial_size": initial_size,
             "current_size": current_size,
             "has_changed": has_changed,
-            "check_interval_seconds": check_interval
+            "check_interval_seconds": check_interval,
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to watch file changes: {str(e)}")
@@ -68,11 +72,9 @@ def monitor_directory(directory_path: str) -> Dict[str, Union[str, int, List[str
             item_path = os.path.join(directory_path, item)
             if os.path.isfile(item_path):
                 stat = os.stat(item_path)
-                files.append({
-                    "name": item,
-                    "size": stat.st_size,
-                    "modified_time": stat.st_mtime
-                })
+                files.append(
+                    {"name": item, "size": stat.st_size, "modified_time": stat.st_mtime}
+                )
                 total_size += stat.st_size
 
         return {
@@ -80,7 +82,7 @@ def monitor_directory(directory_path: str) -> Dict[str, Union[str, int, List[str
             "file_count": len(files),
             "total_size_bytes": total_size,
             "files": files,
-            "scan_timestamp": time.time()
+            "scan_timestamp": time.time(),
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to monitor directory: {str(e)}")

@@ -3,20 +3,24 @@
 import inspect
 import sys
 import traceback
-from typing import Dict, List, Union, Any, Optional
+from typing import Any, Dict, List, Optional, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def inspect_function_signature(function_name: str, module_name: str = None) -> Dict[str, Union[str, List, Dict]]:
+def inspect_function_signature(
+    function_name: str, module_name: Optional[str] = None
+) -> Dict[str, Union[str, List, Dict]]:
     """
     Inspect a function's signature, parameters, and documentation.
 
@@ -50,7 +54,9 @@ def inspect_function_signature(function_name: str, module_name: str = None) -> D
                 module = __import__(module_name)
 
             if not hasattr(module, function_name):
-                raise BasicAgentToolsError(f"Function '{function_name}' not found in module '{module_name}'")
+                raise BasicAgentToolsError(
+                    f"Function '{function_name}' not found in module '{module_name}'"
+                )
 
             func = getattr(module, function_name)
         else:
@@ -74,10 +80,13 @@ def inspect_function_signature(function_name: str, module_name: str = None) -> D
             # If not found in any frame, check builtins
             if func is None:
                 import builtins
+
                 if hasattr(builtins, function_name):
                     func = getattr(builtins, function_name)
                 else:
-                    raise BasicAgentToolsError(f"Function '{function_name}' not found in current scope")
+                    raise BasicAgentToolsError(
+                        f"Function '{function_name}' not found in current scope"
+                    )
 
         if not callable(func):
             raise BasicAgentToolsError(f"'{function_name}' is not a callable function")
@@ -92,13 +101,19 @@ def inspect_function_signature(function_name: str, module_name: str = None) -> D
                 "name": param_name,
                 "kind": param.kind.name,
                 "has_default": param.default != param.empty,
-                "default_value": str(param.default) if param.default != param.empty else None,
-                "annotation": str(param.annotation) if param.annotation != param.empty else None
+                "default_value": str(param.default)
+                if param.default != param.empty
+                else None,
+                "annotation": str(param.annotation)
+                if param.annotation != param.empty
+                else None,
             }
             parameters.append(param_info)
 
         # Get return annotation
-        return_annotation = str(sig.return_annotation) if sig.return_annotation != sig.empty else None
+        return_annotation = (
+            str(sig.return_annotation) if sig.return_annotation != sig.empty else None
+        )
 
         # Get docstring
         docstring = inspect.getdoc(func) or ""
@@ -111,14 +126,10 @@ def inspect_function_signature(function_name: str, module_name: str = None) -> D
             source_info = {
                 "file": source_file,
                 "line_number": source_lines[1],
-                "source_available": True
+                "source_available": True,
             }
         except (OSError, TypeError):
-            source_info = {
-                "file": None,
-                "line_number": None,
-                "source_available": False
-            }
+            source_info = {"file": None, "line_number": None, "source_available": False}
 
         return {
             "function_name": function_name,
@@ -130,11 +141,13 @@ def inspect_function_signature(function_name: str, module_name: str = None) -> D
             "docstring": docstring,
             "docstring_length": len(docstring),
             "source_info": source_info,
-            "inspection_status": "success"
+            "inspection_status": "success",
         }
 
     except Exception as e:
-        raise BasicAgentToolsError(f"Failed to inspect function '{function_name}': {str(e)}")
+        raise BasicAgentToolsError(
+            f"Failed to inspect function '{function_name}': {str(e)}"
+        )
 
 
 @strands_tool
@@ -160,18 +173,22 @@ def get_call_stack_info() -> Dict[str, Union[List, int, str]]:
                 "filename": frame_info.filename,
                 "function_name": frame_info.function,
                 "line_number": frame_info.lineno,
-                "code_context": frame_info.code_context[0].strip() if frame_info.code_context else "",
-                "is_current_function": i == 0
+                "code_context": frame_info.code_context[0].strip()
+                if frame_info.code_context
+                else "",
+                "is_current_function": i == 0,
             }
             stack_info.append(frame_dict)
 
         return {
             "stack_depth": len(stack_info),
-            "current_function": stack_info[0]["function_name"] if stack_info else "unknown",
+            "current_function": stack_info[0]["function_name"]
+            if stack_info
+            else "unknown",
             "current_file": stack_info[0]["filename"] if stack_info else "unknown",
             "current_line": stack_info[0]["line_number"] if stack_info else 0,
             "call_stack": stack_info,
-            "stack_retrieval_status": "success"
+            "stack_retrieval_status": "success",
         }
 
     except Exception as e:
@@ -179,7 +196,9 @@ def get_call_stack_info() -> Dict[str, Union[List, int, str]]:
 
 
 @strands_tool
-def format_exception_details(exception_info: str = None) -> Dict[str, Union[str, List, bool]]:
+def format_exception_details(
+    exception_info: str = None,
+) -> Dict[str, Union[str, List, bool]]:
     """
     Format detailed exception information from the last exception or provided info.
 
@@ -209,48 +228,56 @@ def format_exception_details(exception_info: str = None) -> Dict[str, Union[str,
                 "exception_source": "provided_string",
                 "exception_info": exception_info,
                 "formatted_details": exception_info,
-                "parsing_status": "string_provided_as_is"
+                "parsing_status": "string_provided_as_is",
             }
 
         # Format the exception
         exception_details = {
             "exception_type": exc_type.__name__,
             "exception_message": str(exc_value),
-            "has_traceback": exc_traceback is not None
+            "has_traceback": exc_traceback is not None,
         }
 
         # Format traceback if available
         if exc_traceback:
             tb_lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
-            exception_details.update({
-                "traceback_lines": tb_lines,
-                "traceback_formatted": "".join(tb_lines),
-                "traceback_summary": traceback.format_exception_only(exc_type, exc_value)
-            })
+            exception_details.update(
+                {
+                    "traceback_lines": tb_lines,
+                    "traceback_formatted": "".join(tb_lines),
+                    "traceback_summary": traceback.format_exception_only(
+                        exc_type, exc_value
+                    ),
+                }
+            )
 
             # Extract frame information
             frames = []
             tb = exc_traceback
             while tb:
                 frame = tb.tb_frame
-                frames.append({
-                    "filename": frame.f_code.co_filename,
-                    "function_name": frame.f_code.co_name,
-                    "line_number": tb.tb_lineno,
-                    "local_variables_count": len(frame.f_locals)
-                })
+                frames.append(
+                    {
+                        "filename": frame.f_code.co_filename,
+                        "function_name": frame.f_code.co_name,
+                        "line_number": tb.tb_lineno,
+                        "local_variables_count": len(frame.f_locals),
+                    }
+                )
                 tb = tb.tb_next
 
             exception_details["frames"] = frames
             exception_details["frame_count"] = len(frames)
         else:
-            exception_details.update({
-                "traceback_lines": [],
-                "traceback_formatted": "",
-                "traceback_summary": [],
-                "frames": [],
-                "frame_count": 0
-            })
+            exception_details.update(
+                {
+                    "traceback_lines": [],
+                    "traceback_formatted": "",
+                    "traceback_summary": [],
+                    "frames": [],
+                    "frame_count": 0,
+                }
+            )
 
         exception_details["formatting_status"] = "success"
         return exception_details
@@ -260,7 +287,9 @@ def format_exception_details(exception_info: str = None) -> Dict[str, Union[str,
 
 
 @strands_tool
-def validate_function_call(function_name: str, arguments: Dict[str, Any], module_name: str = None) -> Dict[str, Union[str, bool, List]]:
+def validate_function_call(
+    function_name: str, arguments: Dict[str, Any], module_name: str = None
+) -> Dict[str, Union[str, bool, List]]:
     """
     Validate if a function call would succeed with given arguments.
 
@@ -297,7 +326,9 @@ def validate_function_call(function_name: str, arguments: Dict[str, Any], module
                 module = __import__(module_name)
 
             if not hasattr(module, function_name):
-                raise BasicAgentToolsError(f"Function '{function_name}' not found in module '{module_name}'")
+                raise BasicAgentToolsError(
+                    f"Function '{function_name}' not found in module '{module_name}'"
+                )
 
             func = getattr(module, function_name)
         else:
@@ -318,10 +349,13 @@ def validate_function_call(function_name: str, arguments: Dict[str, Any], module
             # If not found in any frame, check builtins
             if func is None:
                 import builtins
+
                 if hasattr(builtins, function_name):
                     func = getattr(builtins, function_name)
                 else:
-                    raise BasicAgentToolsError(f"Function '{function_name}' not found in current scope")
+                    raise BasicAgentToolsError(
+                        f"Function '{function_name}' not found in current scope"
+                    )
 
         if not callable(func):
             raise BasicAgentToolsError(f"'{function_name}' is not callable")
@@ -336,7 +370,7 @@ def validate_function_call(function_name: str, arguments: Dict[str, Any], module
             "provided_arguments": list(arguments.keys()),
             "validation_issues": [],
             "is_valid": True,
-            "can_call": False
+            "can_call": False,
         }
 
         try:
@@ -359,18 +393,23 @@ def validate_function_call(function_name: str, arguments: Dict[str, Any], module
         optional_params = []
 
         for param_name, param in sig.parameters.items():
-            if param.default == param.empty and param.kind not in (param.VAR_POSITIONAL, param.VAR_KEYWORD):
+            if param.default == param.empty and param.kind not in (
+                param.VAR_POSITIONAL,
+                param.VAR_KEYWORD,
+            ):
                 required_params.append(param_name)
             else:
                 optional_params.append(param_name)
 
-        validation_results.update({
-            "required_parameters": required_params,
-            "optional_parameters": optional_params,
-            "missing_required": [p for p in required_params if p not in arguments],
-            "extra_arguments": [k for k in arguments if k not in sig.parameters],
-            "validation_status": "completed"
-        })
+        validation_results.update(
+            {
+                "required_parameters": required_params,
+                "optional_parameters": optional_params,
+                "missing_required": [p for p in required_params if p not in arguments],
+                "extra_arguments": [k for k in arguments if k not in sig.parameters],
+                "validation_status": "completed",
+            }
+        )
 
         return validation_results
 
@@ -379,7 +418,9 @@ def validate_function_call(function_name: str, arguments: Dict[str, Any], module
 
 
 @strands_tool
-def trace_variable_changes(variable_name: str, initial_value: Any, operations: List[str]) -> Dict[str, Union[str, Any, List]]:
+def trace_variable_changes(
+    variable_name: str, initial_value: Any, operations: List[str]
+) -> Dict[str, Union[str, Any, List]]:
     """
     Trace how a variable changes through a series of operations.
 
@@ -404,31 +445,39 @@ def trace_variable_changes(variable_name: str, initial_value: Any, operations: L
 
     # Basic validation of variable name
     if not variable_name.isidentifier():
-        raise BasicAgentToolsError(f"'{variable_name}' is not a valid Python identifier")
+        raise BasicAgentToolsError(
+            f"'{variable_name}' is not a valid Python identifier"
+        )
 
     try:
         # Create execution context
-        context = {variable_name: initial_value, '__builtins__': {}}
+        context = {variable_name: initial_value, "__builtins__": {}}
 
-        trace_steps = [{
-            "step": 0,
-            "operation": "initialization",
-            "value": initial_value,
-            "value_type": type(initial_value).__name__,
-            "status": "success"
-        }]
+        trace_steps = [
+            {
+                "step": 0,
+                "operation": "initialization",
+                "value": initial_value,
+                "value_type": type(initial_value).__name__,
+                "status": "success",
+            }
+        ]
 
         # Execute each operation and trace changes
         for i, operation in enumerate(operations):
             if not isinstance(operation, str):
-                trace_steps.append({
-                    "step": i + 1,
-                    "operation": str(operation),
-                    "value": context.get(variable_name),
-                    "value_type": type(context.get(variable_name)).__name__ if variable_name in context else "unknown",
-                    "status": "error",
-                    "error": "Operation must be a string"
-                })
+                trace_steps.append(
+                    {
+                        "step": i + 1,
+                        "operation": str(operation),
+                        "value": context.get(variable_name),
+                        "value_type": type(context.get(variable_name)).__name__
+                        if variable_name in context
+                        else "unknown",
+                        "status": "error",
+                        "error": "Operation must be a string",
+                    }
+                )
                 continue
 
             operation = operation.strip()
@@ -436,31 +485,41 @@ def trace_variable_changes(variable_name: str, initial_value: Any, operations: L
                 continue
 
             # Security check - prevent dangerous operations (check before try block)
-            dangerous_keywords = ['import', 'exec', 'eval', '__', 'open', 'file']
+            dangerous_keywords = ["import", "exec", "eval", "__", "open", "file"]
             if any(keyword in operation.lower() for keyword in dangerous_keywords):
-                raise BasicAgentToolsError(f"Operation contains potentially dangerous keyword")
+                raise BasicAgentToolsError(
+                    "Operation contains potentially dangerous keyword"
+                )
 
             try:
                 # Execute the operation
                 exec(operation, {"__builtins__": {}}, context)
 
-                trace_steps.append({
-                    "step": i + 1,
-                    "operation": operation,
-                    "value": context.get(variable_name),
-                    "value_type": type(context.get(variable_name)).__name__ if variable_name in context else "unknown",
-                    "status": "success"
-                })
+                trace_steps.append(
+                    {
+                        "step": i + 1,
+                        "operation": operation,
+                        "value": context.get(variable_name),
+                        "value_type": type(context.get(variable_name)).__name__
+                        if variable_name in context
+                        else "unknown",
+                        "status": "success",
+                    }
+                )
 
             except Exception as e:
-                trace_steps.append({
-                    "step": i + 1,
-                    "operation": operation,
-                    "value": context.get(variable_name),
-                    "value_type": type(context.get(variable_name)).__name__ if variable_name in context else "unknown",
-                    "status": "error",
-                    "error": str(e)
-                })
+                trace_steps.append(
+                    {
+                        "step": i + 1,
+                        "operation": operation,
+                        "value": context.get(variable_name),
+                        "value_type": type(context.get(variable_name)).__name__
+                        if variable_name in context
+                        else "unknown",
+                        "status": "error",
+                        "error": str(e),
+                    }
+                )
 
         return {
             "variable_name": variable_name,
@@ -468,9 +527,14 @@ def trace_variable_changes(variable_name: str, initial_value: Any, operations: L
             "final_value": context.get(variable_name),
             "operations_count": len(operations),
             "trace_steps": trace_steps,
-            "successful_operations": len([s for s in trace_steps if s["status"] == "success"]) - 1,  # Exclude initialization
-            "failed_operations": len([s for s in trace_steps if s["status"] == "error"]),
-            "tracing_status": "completed"
+            "successful_operations": len(
+                [s for s in trace_steps if s["status"] == "success"]
+            )
+            - 1,  # Exclude initialization
+            "failed_operations": len(
+                [s for s in trace_steps if s["status"] == "error"]
+            ),
+            "tracing_status": "completed",
         }
 
     except Exception as e:

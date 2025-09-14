@@ -7,12 +7,15 @@ from typing import Dict, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         return func
+
 
 # Import HTTP client from our network module
 try:
     from ..network.http_client import http_request
+
     HAS_HTTP_CLIENT = True
 except ImportError:
     HAS_HTTP_CLIENT = False
@@ -21,7 +24,9 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def check_url_status(url: str, timeout: int = 10) -> Dict[str, Union[str, int, float, bool]]:
+def check_url_status(
+    url: str, timeout: int = 10
+) -> Dict[str, Union[str, int, float, bool]]:
     """Check the status of a URL."""
     if not HAS_HTTP_CLIENT:
         raise BasicAgentToolsError("HTTP client not available for URL status checks")
@@ -43,7 +48,7 @@ def check_url_status(url: str, timeout: int = 10) -> Dict[str, Union[str, int, f
             "response_time_seconds": round(response_time, 3),
             "is_healthy": is_healthy,
             "check_timestamp": end_time,
-            "timeout_seconds": timeout
+            "timeout_seconds": timeout,
         }
     except Exception as e:
         return {
@@ -53,12 +58,14 @@ def check_url_status(url: str, timeout: int = 10) -> Dict[str, Union[str, int, f
             "is_healthy": False,
             "error": str(e),
             "check_timestamp": time.time(),
-            "timeout_seconds": timeout
+            "timeout_seconds": timeout,
         }
 
 
 @strands_tool
-def ping_host(hostname: str, port: int = 80, timeout: int = 5) -> Dict[str, Union[str, int, float, bool]]:
+def ping_host(
+    hostname: str, port: int = 80, timeout: int = 5
+) -> Dict[str, Union[str, int, float, bool]]:
     """Ping a host to check connectivity."""
     if not isinstance(hostname, str) or not hostname.strip():
         raise BasicAgentToolsError("Hostname must be a non-empty string")
@@ -84,7 +91,7 @@ def ping_host(hostname: str, port: int = 80, timeout: int = 5) -> Dict[str, Unio
             "is_reachable": is_reachable,
             "response_time_seconds": round(response_time, 3),
             "timeout_seconds": timeout,
-            "check_timestamp": end_time
+            "check_timestamp": end_time,
         }
     except Exception as e:
         return {
@@ -94,5 +101,5 @@ def ping_host(hostname: str, port: int = 80, timeout: int = 5) -> Dict[str, Unio
             "response_time_seconds": 0.0,
             "error": str(e),
             "timeout_seconds": timeout,
-            "check_timestamp": time.time()
+            "check_timestamp": time.time(),
         }

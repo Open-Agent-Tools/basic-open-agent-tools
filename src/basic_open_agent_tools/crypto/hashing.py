@@ -7,9 +7,11 @@ from typing import Dict, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
@@ -32,7 +34,7 @@ def hash_md5(data: str) -> Dict[str, str]:
         raise BasicAgentToolsError("Data must be a string")
 
     try:
-        hash_obj = hashlib.md5(data.encode('utf-8'))
+        hash_obj = hashlib.md5(data.encode("utf-8"))
         hex_hash = hash_obj.hexdigest()
 
         return {
@@ -40,7 +42,7 @@ def hash_md5(data: str) -> Dict[str, str]:
             "input_data": data,
             "input_length": len(data),
             "hash_hex": hex_hash,
-            "hash_length": len(hex_hash)
+            "hash_length": len(hex_hash),
         }
 
     except Exception as e:
@@ -65,7 +67,7 @@ def hash_sha256(data: str) -> Dict[str, str]:
         raise BasicAgentToolsError("Data must be a string")
 
     try:
-        hash_obj = hashlib.sha256(data.encode('utf-8'))
+        hash_obj = hashlib.sha256(data.encode("utf-8"))
         hex_hash = hash_obj.hexdigest()
 
         return {
@@ -73,7 +75,7 @@ def hash_sha256(data: str) -> Dict[str, str]:
             "input_data": data,
             "input_length": len(data),
             "hash_hex": hex_hash,
-            "hash_length": len(hex_hash)
+            "hash_length": len(hex_hash),
         }
 
     except Exception as e:
@@ -98,7 +100,7 @@ def hash_sha512(data: str) -> Dict[str, str]:
         raise BasicAgentToolsError("Data must be a string")
 
     try:
-        hash_obj = hashlib.sha512(data.encode('utf-8'))
+        hash_obj = hashlib.sha512(data.encode("utf-8"))
         hex_hash = hash_obj.hexdigest()
 
         return {
@@ -106,7 +108,7 @@ def hash_sha512(data: str) -> Dict[str, str]:
             "input_data": data,
             "input_length": len(data),
             "hash_hex": hex_hash,
-            "hash_length": len(hex_hash)
+            "hash_length": len(hex_hash),
         }
 
     except Exception as e:
@@ -131,7 +133,11 @@ def hash_file(file_path: str, algorithm: str = "sha256") -> Dict[str, Union[str,
     if not isinstance(file_path, str) or not file_path.strip():
         raise BasicAgentToolsError("File path must be a non-empty string")
 
-    if not isinstance(algorithm, str) or algorithm.lower() not in ['md5', 'sha256', 'sha512']:
+    if not isinstance(algorithm, str) or algorithm.lower() not in [
+        "md5",
+        "sha256",
+        "sha512",
+    ]:
         raise BasicAgentToolsError("Algorithm must be one of: md5, sha256, sha512")
 
     algorithm = algorithm.lower()
@@ -149,17 +155,17 @@ def hash_file(file_path: str, algorithm: str = "sha256") -> Dict[str, Union[str,
         file_size = os.path.getsize(file_path)
 
         # Create hash object
-        if algorithm == 'md5':
+        if algorithm == "md5":
             hash_obj = hashlib.md5()
-        elif algorithm == 'sha256':
+        elif algorithm == "sha256":
             hash_obj = hashlib.sha256()
-        elif algorithm == 'sha512':
+        elif algorithm == "sha512":
             hash_obj = hashlib.sha512()
 
         # Read and hash file in chunks to handle large files
         chunk_size = 64 * 1024  # 64KB chunks
 
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             while chunk := f.read(chunk_size):
                 hash_obj.update(chunk)
 
@@ -170,7 +176,7 @@ def hash_file(file_path: str, algorithm: str = "sha256") -> Dict[str, Union[str,
             "file_path": file_path,
             "file_size_bytes": file_size,
             "hash_hex": hex_hash,
-            "hash_length": len(hex_hash)
+            "hash_length": len(hex_hash),
         }
 
     except FileNotFoundError:
@@ -182,7 +188,9 @@ def hash_file(file_path: str, algorithm: str = "sha256") -> Dict[str, Union[str,
 
 
 @strands_tool
-def verify_checksum(data: str, expected_hash: str, algorithm: str = "sha256") -> Dict[str, Union[str, bool]]:
+def verify_checksum(
+    data: str, expected_hash: str, algorithm: str = "sha256"
+) -> Dict[str, Union[str, bool]]:
     """
     Verify data against an expected hash.
 
@@ -203,7 +211,11 @@ def verify_checksum(data: str, expected_hash: str, algorithm: str = "sha256") ->
     if not isinstance(expected_hash, str) or not expected_hash.strip():
         raise BasicAgentToolsError("Expected hash must be a non-empty string")
 
-    if not isinstance(algorithm, str) or algorithm.lower() not in ['md5', 'sha256', 'sha512']:
+    if not isinstance(algorithm, str) or algorithm.lower() not in [
+        "md5",
+        "sha256",
+        "sha512",
+    ]:
         raise BasicAgentToolsError("Algorithm must be one of: md5, sha256, sha512")
 
     algorithm = algorithm.lower()
@@ -214,11 +226,11 @@ def verify_checksum(data: str, expected_hash: str, algorithm: str = "sha256") ->
         int(expected_hash, 16)  # This will raise ValueError if not valid hex
 
         # Generate hash of the data
-        if algorithm == 'md5':
+        if algorithm == "md5":
             hash_result = hash_md5(data)
-        elif algorithm == 'sha256':
+        elif algorithm == "sha256":
             hash_result = hash_sha256(data)
-        elif algorithm == 'sha512':
+        elif algorithm == "sha512":
             hash_result = hash_sha512(data)
 
         calculated_hash = hash_result["hash_hex"].lower()
@@ -230,7 +242,7 @@ def verify_checksum(data: str, expected_hash: str, algorithm: str = "sha256") ->
             "expected_hash": expected_hash,
             "calculated_hash": calculated_hash,
             "matches": matches,
-            "verification_result": "valid" if matches else "invalid"
+            "verification_result": "valid" if matches else "invalid",
         }
 
     except ValueError:

@@ -6,21 +6,25 @@ from typing import Dict, List, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
+
 
 # Try to import PDF processing libraries
 try:
     from reportlab.lib.pagesizes import A4, letter
     from reportlab.lib.units import inch
     from reportlab.pdfgen import canvas
+
     HAS_REPORTLAB = True
 except ImportError:
     HAS_REPORTLAB = False
 
 try:
     import PyPDF2
+
     HAS_PYPDF2 = True
 except ImportError:
     HAS_PYPDF2 = False
@@ -34,7 +38,7 @@ def text_to_pdf(
     output_path: str,
     page_size: str = "letter",
     font_size: int = 12,
-    margin_inches: float = 1.0
+    margin_inches: float = 1.0,
 ) -> Dict[str, Union[str, int, float]]:
     """
     Convert text to a PDF file.
@@ -53,7 +57,9 @@ def text_to_pdf(
         BasicAgentToolsError: If parameters are invalid or creation fails
     """
     if not HAS_REPORTLAB:
-        raise BasicAgentToolsError("reportlab package required for PDF creation - install with: pip install reportlab")
+        raise BasicAgentToolsError(
+            "reportlab package required for PDF creation - install with: pip install reportlab"
+        )
 
     if not isinstance(text, str):
         raise BasicAgentToolsError("Text must be a string")
@@ -67,7 +73,11 @@ def text_to_pdf(
     if not isinstance(font_size, int) or font_size < 8 or font_size > 72:
         raise BasicAgentToolsError("Font size must be an integer between 8 and 72")
 
-    if not isinstance(margin_inches, (int, float)) or margin_inches < 0.5 or margin_inches > 2.0:
+    if (
+        not isinstance(margin_inches, (int, float))
+        or margin_inches < 0.5
+        or margin_inches > 2.0
+    ):
         raise BasicAgentToolsError("Margin must be a number between 0.5 and 2.0 inches")
 
     output_path = output_path.strip()
@@ -92,7 +102,7 @@ def text_to_pdf(
         lines_per_page = int(text_height / line_height)
 
         # Split text into lines
-        lines = text.split('\n')
+        lines = text.split("\n")
 
         # Handle text wrapping for long lines
         wrapped_lines = []
@@ -103,11 +113,13 @@ def text_to_pdf(
                 wrapped_lines.append(line)
             else:
                 # Simple word wrapping
-                words = line.split(' ')
+                words = line.split(" ")
                 current_line = ""
                 for word in words:
                     if len(current_line + " " + word) <= chars_per_line:
-                        current_line = current_line + " " + word if current_line else word
+                        current_line = (
+                            current_line + " " + word if current_line else word
+                        )
                     else:
                         if current_line:
                             wrapped_lines.append(current_line)
@@ -150,7 +162,7 @@ def text_to_pdf(
             "font_size": font_size,
             "margin_inches": margin_inches,
             "file_size_bytes": file_size,
-            "creation_status": "success"
+            "creation_status": "success",
         }
 
     except Exception as e:
@@ -158,7 +170,9 @@ def text_to_pdf(
 
 
 @strands_tool
-def merge_pdfs(input_paths: List[str], output_path: str) -> Dict[str, Union[str, int, List[str]]]:
+def merge_pdfs(
+    input_paths: List[str], output_path: str
+) -> Dict[str, Union[str, int, List[str]]]:
     """
     Merge multiple PDF files into a single PDF.
 
@@ -173,10 +187,14 @@ def merge_pdfs(input_paths: List[str], output_path: str) -> Dict[str, Union[str,
         BasicAgentToolsError: If parameters are invalid or merge fails
     """
     if not HAS_PYPDF2:
-        raise BasicAgentToolsError("PyPDF2 package required for PDF merging - install with: pip install PyPDF2")
+        raise BasicAgentToolsError(
+            "PyPDF2 package required for PDF merging - install with: pip install PyPDF2"
+        )
 
     if not isinstance(input_paths, list) or len(input_paths) < 2:
-        raise BasicAgentToolsError("Input paths must be a list with at least 2 PDF files")
+        raise BasicAgentToolsError(
+            "Input paths must be a list with at least 2 PDF files"
+        )
 
     if not isinstance(output_path, str) or not output_path.strip():
         raise BasicAgentToolsError("Output path must be a non-empty string")
@@ -201,7 +219,7 @@ def merge_pdfs(input_paths: List[str], output_path: str) -> Dict[str, Union[str,
                 raise BasicAgentToolsError(f"Input path is not a file: {path}")
 
             # Test if file is a valid PDF by trying to read it
-            with open(path, 'rb') as file:
+            with open(path, "rb") as file:
                 try:
                     reader = PyPDF2.PdfReader(file)
                     page_count = len(reader.pages)
@@ -215,11 +233,11 @@ def merge_pdfs(input_paths: List[str], output_path: str) -> Dict[str, Union[str,
 
         # Add all PDFs to merger
         for path in validated_paths:
-            with open(path, 'rb') as file:
+            with open(path, "rb") as file:
                 merger.append(file)
 
         # Write merged PDF
-        with open(output_path, 'wb') as output_file:
+        with open(output_path, "wb") as output_file:
             merger.write(output_file)
 
         merger.close()
@@ -238,8 +256,10 @@ def merge_pdfs(input_paths: List[str], output_path: str) -> Dict[str, Union[str,
             "total_input_pages": total_input_pages,
             "total_input_size_bytes": total_input_size,
             "output_size_bytes": output_size,
-            "compression_ratio": output_size / total_input_size if total_input_size > 0 else 1.0,
-            "merge_status": "success"
+            "compression_ratio": output_size / total_input_size
+            if total_input_size > 0
+            else 1.0,
+            "merge_status": "success",
         }
 
     except FileNotFoundError as e:

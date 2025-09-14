@@ -7,14 +7,18 @@ from typing import Dict, List, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def create_tar(source_paths: List[str], output_path: str, compression: str = "gzip") -> Dict[str, Union[str, int]]:
+def create_tar(
+    source_paths: List[str], output_path: str, compression: str = "gzip"
+) -> Dict[str, Union[str, int]]:
     """Create a TAR archive from files and directories."""
     if not isinstance(source_paths, list) or not source_paths:
         raise BasicAgentToolsError("Source paths must be a non-empty list")
@@ -34,7 +38,7 @@ def create_tar(source_paths: List[str], output_path: str, compression: str = "gz
             "output_path": output_path,
             "compression": compression,
             "file_size_bytes": os.path.getsize(output_path),
-            "status": "success"
+            "status": "success",
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to create TAR archive: {str(e)}")
@@ -47,7 +51,7 @@ def extract_tar(tar_path: str, extract_to: str) -> Dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"TAR file not found: {tar_path}")
 
     try:
-        with tarfile.open(tar_path, 'r:*') as tf:
+        with tarfile.open(tar_path, "r:*") as tf:
             tf.extractall(extract_to)
             files_extracted = len(tf.getnames())
 
@@ -55,7 +59,7 @@ def extract_tar(tar_path: str, extract_to: str) -> Dict[str, Union[str, int]]:
             "tar_path": tar_path,
             "extract_to": extract_to,
             "files_extracted": files_extracted,
-            "status": "success"
+            "status": "success",
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to extract TAR archive: {str(e)}")

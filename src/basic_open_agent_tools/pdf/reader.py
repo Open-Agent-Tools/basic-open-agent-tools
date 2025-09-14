@@ -6,13 +6,16 @@ from typing import Dict, List, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
 
+
 # Try to import PDF processing library
 try:
     import PyPDF2
+
     HAS_PYPDF2 = True
 except ImportError:
     HAS_PYPDF2 = False
@@ -21,7 +24,9 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def extract_text_from_pdf(file_path: str, page_range: str = "all") -> Dict[str, Union[str, int, List[str]]]:
+def extract_text_from_pdf(
+    file_path: str, page_range: str = "all"
+) -> Dict[str, Union[str, int, List[str]]]:
     """
     Extract text content from a PDF file.
 
@@ -36,7 +41,9 @@ def extract_text_from_pdf(file_path: str, page_range: str = "all") -> Dict[str, 
         BasicAgentToolsError: If file is invalid or extraction fails
     """
     if not HAS_PYPDF2:
-        raise BasicAgentToolsError("PyPDF2 package required for PDF text extraction - install with: pip install PyPDF2")
+        raise BasicAgentToolsError(
+            "PyPDF2 package required for PDF text extraction - install with: pip install PyPDF2"
+        )
 
     if not isinstance(file_path, str) or not file_path.strip():
         raise BasicAgentToolsError("File path must be a non-empty string")
@@ -55,7 +62,7 @@ def extract_text_from_pdf(file_path: str, page_range: str = "all") -> Dict[str, 
             raise BasicAgentToolsError(f"Path is not a file: {file_path}")
 
         # Open and read PDF
-        with open(file_path, 'rb') as file:
+        with open(file_path, "rb") as file:
             pdf_reader = PyPDF2.PdfReader(file)
             total_pages = len(pdf_reader.pages)
 
@@ -73,11 +80,13 @@ def extract_text_from_pdf(file_path: str, page_range: str = "all") -> Dict[str, 
                 if 0 <= page_num < total_pages:
                     page = pdf_reader.pages[page_num]
                     page_text = page.extract_text()
-                    extracted_pages.append({
-                        "page_number": page_num + 1,  # 1-based for user display
-                        "text": page_text,
-                        "character_count": len(page_text)
-                    })
+                    extracted_pages.append(
+                        {
+                            "page_number": page_num + 1,  # 1-based for user display
+                            "text": page_text,
+                            "character_count": len(page_text),
+                        }
+                    )
                     total_text += page_text + "\n"
 
             return {
@@ -87,7 +96,7 @@ def extract_text_from_pdf(file_path: str, page_range: str = "all") -> Dict[str, 
                 "page_range_requested": page_range,
                 "total_text": total_text.strip(),
                 "total_characters": len(total_text.strip()),
-                "pages_detail": extracted_pages
+                "pages_detail": extracted_pages,
             }
 
     except FileNotFoundError:
@@ -113,7 +122,9 @@ def get_pdf_info(file_path: str) -> Dict[str, Union[str, int, bool]]:
         BasicAgentToolsError: If file is invalid or reading fails
     """
     if not HAS_PYPDF2:
-        raise BasicAgentToolsError("PyPDF2 package required for PDF information - install with: pip install PyPDF2")
+        raise BasicAgentToolsError(
+            "PyPDF2 package required for PDF information - install with: pip install PyPDF2"
+        )
 
     if not isinstance(file_path, str) or not file_path.strip():
         raise BasicAgentToolsError("File path must be a non-empty string")
@@ -129,7 +140,7 @@ def get_pdf_info(file_path: str) -> Dict[str, Union[str, int, bool]]:
         file_size = os.path.getsize(file_path)
 
         # Open and analyze PDF
-        with open(file_path, 'rb') as file:
+        with open(file_path, "rb") as file:
             pdf_reader = PyPDF2.PdfReader(file)
 
             # Basic information
@@ -144,7 +155,7 @@ def get_pdf_info(file_path: str) -> Dict[str, Union[str, int, bool]]:
                 "file_size_bytes": file_size,
                 "total_pages": total_pages,
                 "is_encrypted": is_encrypted,
-                "has_metadata": metadata is not None
+                "has_metadata": metadata is not None,
             }
 
             # Extract metadata if available
@@ -157,7 +168,7 @@ def get_pdf_info(file_path: str) -> Dict[str, Union[str, int, bool]]:
                     ("/Creator", "creator"),
                     ("/Producer", "producer"),
                     ("/CreationDate", "creation_date"),
-                    ("/ModDate", "modification_date")
+                    ("/ModDate", "modification_date"),
                 ]
 
                 for pdf_field, result_field in metadata_fields:
@@ -169,9 +180,15 @@ def get_pdf_info(file_path: str) -> Dict[str, Union[str, int, bool]]:
 
             else:
                 # Set empty metadata fields
-                for _, field in [("/Title", "title"), ("/Author", "author"), ("/Subject", "subject"),
-                               ("/Creator", "creator"), ("/Producer", "producer"),
-                               ("/CreationDate", "creation_date"), ("/ModDate", "modification_date")]:
+                for _, field in [
+                    ("/Title", "title"),
+                    ("/Author", "author"),
+                    ("/Subject", "subject"),
+                    ("/Creator", "creator"),
+                    ("/Producer", "producer"),
+                    ("/CreationDate", "creation_date"),
+                    ("/ModDate", "modification_date"),
+                ]:
                     result[field] = ""
 
             return result
@@ -200,15 +217,15 @@ def _parse_page_range(page_range: str, total_pages: int) -> List[int]:
     """
     try:
         pages = []
-        parts = page_range.strip().split(',')
+        parts = page_range.strip().split(",")
 
         for part in parts:
             part = part.strip()
-            if '-' in part:
+            if "-" in part:
                 # Range like "1-3"
-                start, end = part.split('-', 1)
+                start, end = part.split("-", 1)
                 start_page = int(start.strip()) - 1  # Convert to 0-based
-                end_page = int(end.strip()) - 1      # Convert to 0-based
+                end_page = int(end.strip()) - 1  # Convert to 0-based
 
                 if start_page < 0 or end_page >= total_pages or start_page > end_page:
                     raise BasicAgentToolsError(f"Invalid page range: {part}")
@@ -222,7 +239,7 @@ def _parse_page_range(page_range: str, total_pages: int) -> List[int]:
                 pages.append(page_num)
 
         # Remove duplicates and sort
-        return sorted(list(set(pages)))
+        return sorted(set(pages))
 
     except ValueError:
         raise BasicAgentToolsError(f"Invalid page range format: {page_range}")

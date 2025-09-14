@@ -5,7 +5,7 @@ and basic connectivity operations. All functions use simplified type signatures 
 "signature too complex" errors when used with AI agent frameworks.
 """
 
+from .dns import check_port_open, resolve_hostname, reverse_dns_lookup
 from .http_client import http_request
-from .dns import resolve_hostname, reverse_dns_lookup, check_port_open
 
 __all__ = ["http_request", "resolve_hostname", "reverse_dns_lookup", "check_port_open"]

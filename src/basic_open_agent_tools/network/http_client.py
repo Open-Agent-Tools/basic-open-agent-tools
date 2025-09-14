@@ -17,6 +17,7 @@ except ImportError:
     def strands_tool(func):  # type: ignore
         return func
 
+
 from ..exceptions import BasicAgentToolsError
 
 
@@ -28,7 +29,7 @@ def http_request(
     body: Optional[str] = None,
     timeout: int = 30,
     follow_redirects: bool = True,
-    verify_ssl: bool = True
+    verify_ssl: bool = True,
 ) -> Dict[str, Union[str, int]]:
     """Make an HTTP request with simplified parameters.
 
@@ -62,7 +63,7 @@ def http_request(
     if not url or not isinstance(url, str):
         raise BasicAgentToolsError("URL must be a non-empty string")
 
-    if not url.startswith(('http://', 'https://')):
+    if not url.startswith(("http://", "https://")):
         raise BasicAgentToolsError("URL must start with http:// or https://")
 
     method = method.upper()
@@ -75,36 +76,34 @@ def http_request(
         request_headers.update(headers)
 
     # Set default User-Agent if not provided
-    if 'User-Agent' not in request_headers:
-        request_headers['User-Agent'] = 'basic-open-agent-tools/0.9.1'
+    if "User-Agent" not in request_headers:
+        request_headers["User-Agent"] = "basic-open-agent-tools/0.9.1"
 
     # Prepare request body
     request_body = None
     if body is not None:
         if not isinstance(body, str):
             raise BasicAgentToolsError("Body must be a string")
-        request_body = body.encode('utf-8')
+        request_body = body.encode("utf-8")
 
         # Set Content-Type if not provided and body contains JSON-like content
-        if 'Content-Type' not in request_headers:
+        if "Content-Type" not in request_headers:
             try:
                 json.loads(body)
-                request_headers['Content-Type'] = 'application/json'
+                request_headers["Content-Type"] = "application/json"
             except (json.JSONDecodeError, ValueError):
-                request_headers['Content-Type'] = 'text/plain'
+                request_headers["Content-Type"] = "text/plain"
 
     try:
         # Create request object
         req = urllib.request.Request(
-            url=url,
-            data=request_body,
-            headers=request_headers,
-            method=method
+            url=url, data=request_body, headers=request_headers, method=method
         )
 
         # Configure SSL context if needed
         if not verify_ssl:
             import ssl
+
             ssl_context = ssl.create_default_context()
             ssl_context.check_hostname = False
             ssl_context.verify_mode = ssl.CERT_NONE
@@ -113,9 +112,11 @@ def http_request(
 
         # Configure redirects
         if not follow_redirects:
+
             class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
                 def redirect_request(self, req, fp, code, msg, headers, newurl):
                     return None
+
             opener = urllib.request.build_opener(NoRedirectHandler)
             if ssl_context:
                 https_handler = urllib.request.HTTPSHandler(context=ssl_context)
@@ -139,32 +140,33 @@ def http_request(
 
         # Try to decode response body
         try:
-            decoded_body = response_body.decode('utf-8')
+            decoded_body = response_body.decode("utf-8")
         except UnicodeDecodeError:
             # If decoding fails, return as base64
             import base64
+
             decoded_body = f"[Binary content - base64]: {base64.b64encode(response_body).decode('ascii')}"
 
         return {
             "status_code": response.getcode(),
             "headers": json.dumps(response_headers, indent=2),
             "body": decoded_body,
-            "url": response.geturl()
+            "url": response.geturl(),
         }
 
     except urllib.error.HTTPError as e:
         # Handle HTTP errors (4xx, 5xx)
         error_body = ""
         try:
-            error_body = e.read().decode('utf-8')
-        except:
+            error_body = e.read().decode("utf-8")
+        except Exception:
             error_body = "[Could not decode error response]"
 
         return {
             "status_code": e.code,
             "headers": json.dumps(dict(e.headers) if e.headers else {}, indent=2),
             "body": error_body,
-            "url": url
+            "url": url,
         }
 
     except urllib.error.URLError as e:
@@ -175,7 +177,9 @@ def http_request(
 
 
 @strands_tool
-def http_get(url: str, headers: Optional[Dict[str, str]] = None, timeout: int = 30) -> Dict[str, Union[str, int]]:
+def http_get(
+    url: str, headers: Optional[Dict[str, str]] = None, timeout: int = 30
+) -> Dict[str, Union[str, int]]:
     """Convenience function for HTTP GET requests.
 
     Args:
@@ -199,7 +203,7 @@ def http_post(
     url: str,
     body: Optional[str] = None,
     headers: Optional[Dict[str, str]] = None,
-    timeout: int = 30
+    timeout: int = 30,
 ) -> Dict[str, Union[str, int]]:
     """Convenience function for HTTP POST requests.
 

@@ -6,9 +6,11 @@ from typing import Dict, Optional, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
@@ -39,11 +41,13 @@ def get_env_var(variable_name: str) -> Dict[str, Union[str, bool]]:
             "variable_name": variable_name,
             "value": value if value is not None else "",
             "exists": value is not None,
-            "is_empty": value == "" if value is not None else True
+            "is_empty": value == "" if value is not None else True,
         }
 
     except Exception as e:
-        raise BasicAgentToolsError(f"Failed to get environment variable '{variable_name}': {str(e)}")
+        raise BasicAgentToolsError(
+            f"Failed to get environment variable '{variable_name}': {str(e)}"
+        )
 
 
 @strands_tool
@@ -82,15 +86,19 @@ def set_env_var(variable_name: str, value: str) -> Dict[str, Union[str, bool]]:
             "previous_value": previous_value if previous_value is not None else "",
             "had_previous_value": previous_value is not None,
             "operation": "set",
-            "success": True
+            "success": True,
         }
 
     except Exception as e:
-        raise BasicAgentToolsError(f"Failed to set environment variable '{variable_name}': {str(e)}")
+        raise BasicAgentToolsError(
+            f"Failed to set environment variable '{variable_name}': {str(e)}"
+        )
 
 
 @strands_tool
-def list_env_vars(filter_pattern: Optional[str] = None, limit: int = 50) -> Dict[str, Union[int, Dict[str, str]]]:
+def list_env_vars(
+    filter_pattern: Optional[str] = None, limit: int = 50
+) -> Dict[str, Union[int, Dict[str, str]]]:
     """
     List environment variables, optionally filtered by name pattern.
 
@@ -129,7 +137,7 @@ def list_env_vars(filter_pattern: Optional[str] = None, limit: int = 50) -> Dict
             "total_found": len(variables),
             "filter_pattern": filter_pattern,
             "limit_applied": limit,
-            "variables": variables
+            "variables": variables,
         }
 
     except Exception as e:

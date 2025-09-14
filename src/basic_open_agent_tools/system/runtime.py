@@ -10,9 +10,11 @@ from typing import Dict, List, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
@@ -47,25 +49,37 @@ def inspect_runtime_environment() -> Dict[str, Union[str, int, float, List[str]]
             "processor": platform.processor(),
             "architecture": platform.architecture()[0],
             "platform": platform.platform(),
-            "node": platform.node()
+            "node": platform.node(),
         }
 
         # Get process information
         process_id = os.getpid()
-        parent_process_id = os.getppid() if hasattr(os, 'getppid') else None
+        parent_process_id = os.getppid() if hasattr(os, "getppid") else None
 
         # Get user information
         try:
             username = os.getlogin()
-        except:
-            username = os.environ.get('USER', os.environ.get('USERNAME', 'unknown'))
+        except Exception:
+            username = os.environ.get("USER", os.environ.get("USERNAME", "unknown"))
 
         # Get important environment variables
         important_env_vars = {}
         env_var_names = [
-            'PATH', 'HOME', 'USER', 'USERNAME', 'USERPROFILE', 'TEMP', 'TMP',
-            'PYTHONPATH', 'VIRTUAL_ENV', 'CONDA_DEFAULT_ENV', 'SHELL',
-            'TERM', 'LANG', 'LC_ALL', 'TZ'
+            "PATH",
+            "HOME",
+            "USER",
+            "USERNAME",
+            "USERPROFILE",
+            "TEMP",
+            "TMP",
+            "PYTHONPATH",
+            "VIRTUAL_ENV",
+            "CONDA_DEFAULT_ENV",
+            "SHELL",
+            "TERM",
+            "LANG",
+            "LC_ALL",
+            "TZ",
         ]
 
         for var_name in env_var_names:
@@ -87,13 +101,11 @@ def inspect_runtime_environment() -> Dict[str, Union[str, int, float, List[str]]
             "current_working_directory": cwd,
             "script_path": script_path,
             "command_line_args": command_args,
-
             # Python environment
             "python_executable": python_executable,
             "python_version": python_version_info,
-            "python_version_full": python_version.replace('\n', ' '),
+            "python_version_full": python_version.replace("\n", " "),
             "python_paths": python_paths,
-
             # System information
             "operating_system": system_info["system"],
             "os_release": system_info["release"],
@@ -103,15 +115,13 @@ def inspect_runtime_environment() -> Dict[str, Union[str, int, float, List[str]]
             "architecture": system_info["architecture"],
             "platform_string": system_info["platform"],
             "hostname": system_info["node"],
-
             # Environment variables
             "important_environment_variables": important_env_vars,
             "total_environment_variables": len(os.environ),
-
             # Runtime state
             "timestamp": time.time(),
             "timestamp_iso": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-            "timezone": time.tzname[0] if time.tzname else "unknown"
+            "timezone": time.tzname[0] if time.tzname else "unknown",
         }
 
     except Exception as e:
@@ -141,8 +151,11 @@ def get_python_module_info() -> Dict[str, Union[str, List[str]]]:
         # Try to get installed packages (may not work in all environments)
         try:
             import pkg_resources
-            installed_packages = [f"{pkg.project_name}=={pkg.version}"
-                                for pkg in pkg_resources.working_set]
+
+            installed_packages = [
+                f"{pkg.project_name}=={pkg.version}"
+                for pkg in pkg_resources.working_set
+            ]
             installed_packages.sort()
             has_pkg_resources = True
         except ImportError:
@@ -156,7 +169,7 @@ def get_python_module_info() -> Dict[str, Union[str, List[str]]]:
             "builtin_modules": builtin_modules,
             "installed_packages_count": len(installed_packages),
             "installed_packages": installed_packages,
-            "pkg_resources_available": has_pkg_resources
+            "pkg_resources_available": has_pkg_resources,
         }
 
     except Exception as e:
@@ -186,9 +199,18 @@ def get_file_system_context() -> Dict[str, Union[str, List[str], bool]]:
 
         # Check for common project files
         common_files = [
-            "requirements.txt", "setup.py", "pyproject.toml", "Pipfile",
-            "package.json", "Makefile", "Dockerfile", ".gitignore",
-            "README.md", "README.rst", "LICENSE", ".env"
+            "requirements.txt",
+            "setup.py",
+            "pyproject.toml",
+            "Pipfile",
+            "package.json",
+            "Makefile",
+            "Dockerfile",
+            ".gitignore",
+            "README.md",
+            "README.rst",
+            "LICENSE",
+            ".env",
         ]
 
         present_files = []
@@ -198,8 +220,19 @@ def get_file_system_context() -> Dict[str, Union[str, List[str], bool]]:
 
         # Check for common directories
         common_dirs = [
-            "src", "lib", "bin", "tests", "test", "docs", "examples",
-            ".git", ".github", "__pycache__", "venv", ".venv", "env"
+            "src",
+            "lib",
+            "bin",
+            "tests",
+            "test",
+            "docs",
+            "examples",
+            ".git",
+            ".github",
+            "__pycache__",
+            "venv",
+            ".venv",
+            "env",
         ]
 
         present_dirs = []
@@ -216,7 +249,7 @@ def get_file_system_context() -> Dict[str, Union[str, List[str], bool]]:
                 if current == current.parent:  # Reached root
                     break
                 parents.append(str(current))
-        except:
+        except Exception:
             pass
 
         return {
@@ -227,10 +260,13 @@ def get_file_system_context() -> Dict[str, Union[str, List[str], bool]]:
             "common_directories_present": present_dirs,
             "parent_directories": parents,
             "is_git_repository": (cwd / ".git").exists(),
-            "is_python_project": any((cwd / f).exists() for f in
-                                   ["setup.py", "pyproject.toml", "requirements.txt"]),
-            "has_virtual_environment": any((cwd / d).exists() for d in
-                                         ["venv", ".venv", "env"])
+            "is_python_project": any(
+                (cwd / f).exists()
+                for f in ["setup.py", "pyproject.toml", "requirements.txt"]
+            ),
+            "has_virtual_environment": any(
+                (cwd / d).exists() for d in ["venv", ".venv", "env"]
+            ),
         }
 
     except Exception as e:
@@ -255,7 +291,7 @@ def get_network_environment() -> Dict[str, Union[str, List[str], bool]]:
         hostname = socket.gethostname()
         try:
             fqdn = socket.getfqdn()
-        except:
+        except Exception:
             fqdn = hostname
 
         # Try to get local IP address
@@ -264,14 +300,20 @@ def get_network_environment() -> Dict[str, Union[str, List[str], bool]]:
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
                 s.connect(("8.8.8.8", 80))
                 local_ip = s.getsockname()[0]
-        except:
+        except Exception:
             local_ip = "unknown"
 
         # Check for common network environment variables
         network_env_vars = {}
         network_var_names = [
-            'HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY', 'http_proxy', 'https_proxy',
-            'no_proxy', 'PROXY', 'ALL_PROXY'
+            "HTTP_PROXY",
+            "HTTPS_PROXY",
+            "NO_PROXY",
+            "http_proxy",
+            "https_proxy",
+            "no_proxy",
+            "PROXY",
+            "ALL_PROXY",
         ]
 
         for var_name in network_var_names:
@@ -286,11 +328,13 @@ def get_network_environment() -> Dict[str, Union[str, List[str], bool]]:
             "has_proxy_configuration": len(network_env_vars) > 0,
             "proxy_environment_variables": network_env_vars,
             "socket_family_support": {
-                "ipv4": hasattr(socket, 'AF_INET'),
-                "ipv6": hasattr(socket, 'AF_INET6'),
-                "unix": hasattr(socket, 'AF_UNIX')
-            }
+                "ipv4": hasattr(socket, "AF_INET"),
+                "ipv6": hasattr(socket, "AF_INET6"),
+                "unix": hasattr(socket, "AF_UNIX"),
+            },
         }
 
     except Exception as e:
-        raise BasicAgentToolsError(f"Failed to get network environment information: {str(e)}")
+        raise BasicAgentToolsError(
+            f"Failed to get network environment information: {str(e)}"
+        )

@@ -1,11 +1,13 @@
 """PDF processing tools."""
 
 from .creator import merge_pdfs, text_to_pdf
-from .reader import extract_text_from_pdf, get_pdf_info
 from .manipulation import (
-    split_pdf_by_pages, extract_pages_from_pdf,
-    rotate_pdf_pages, add_watermark_to_pdf
+    add_watermark_to_pdf,
+    extract_pages_from_pdf,
+    rotate_pdf_pages,
+    split_pdf_by_pages,
 )
+from .reader import extract_text_from_pdf, get_pdf_info
 
 __all__ = [
     # PDF reading

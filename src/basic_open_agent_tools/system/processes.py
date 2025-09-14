@@ -4,6 +4,7 @@ from typing import Dict, List, Union
 
 try:
     import psutil
+
     HAS_PSUTIL = True
 except ImportError:
     HAS_PSUTIL = False
@@ -11,9 +12,11 @@ except ImportError:
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
@@ -30,7 +33,9 @@ def get_current_process_info() -> Dict[str, Union[str, int, float]]:
         BasicAgentToolsError: If process information cannot be retrieved
     """
     if not HAS_PSUTIL:
-        raise BasicAgentToolsError("psutil package required for process information - install with: pip install psutil")
+        raise BasicAgentToolsError(
+            "psutil package required for process information - install with: pip install psutil"
+        )
 
     try:
         current_process = psutil.Process()
@@ -45,11 +50,15 @@ def get_current_process_info() -> Dict[str, Union[str, int, float]]:
             "memory_info_vms": current_process.memory_info().vms,
             "create_time": current_process.create_time(),
             "num_threads": current_process.num_threads(),
-            "username": current_process.username() if hasattr(current_process, 'username') else 'unknown',
-            "cwd": current_process.cwd()
+            "username": current_process.username()
+            if hasattr(current_process, "username")
+            else "unknown",
+            "cwd": current_process.cwd(),
         }
     except Exception as e:
-        raise BasicAgentToolsError(f"Failed to get current process information: {str(e)}")
+        raise BasicAgentToolsError(
+            f"Failed to get current process information: {str(e)}"
+        )
 
 
 @strands_tool
@@ -67,7 +76,9 @@ def list_running_processes(limit: int = 20) -> List[Dict[str, Union[str, int, fl
         BasicAgentToolsError: If process list cannot be retrieved
     """
     if not HAS_PSUTIL:
-        raise BasicAgentToolsError("psutil package required for process information - install with: pip install psutil")
+        raise BasicAgentToolsError(
+            "psutil package required for process information - install with: pip install psutil"
+        )
 
     if not isinstance(limit, int) or limit < 1 or limit > 100:
         raise BasicAgentToolsError("Limit must be an integer between 1 and 100")
@@ -75,16 +86,20 @@ def list_running_processes(limit: int = 20) -> List[Dict[str, Union[str, int, fl
     try:
         processes = []
 
-        for proc in psutil.process_iter(['pid', 'name', 'status', 'cpu_percent', 'memory_percent']):
+        for proc in psutil.process_iter(
+            ["pid", "name", "status", "cpu_percent", "memory_percent"]
+        ):
             try:
                 process_info = proc.info
-                processes.append({
-                    "pid": process_info['pid'],
-                    "name": process_info['name'],
-                    "status": process_info['status'],
-                    "cpu_percent": process_info['cpu_percent'] or 0.0,
-                    "memory_percent": process_info['memory_percent'] or 0.0
-                })
+                processes.append(
+                    {
+                        "pid": process_info["pid"],
+                        "name": process_info["name"],
+                        "status": process_info["status"],
+                        "cpu_percent": process_info["cpu_percent"] or 0.0,
+                        "memory_percent": process_info["memory_percent"] or 0.0,
+                    }
+                )
 
                 if len(processes) >= limit:
                     break
@@ -94,7 +109,7 @@ def list_running_processes(limit: int = 20) -> List[Dict[str, Union[str, int, fl
                 continue
 
         # Sort by CPU usage (highest first)
-        processes.sort(key=lambda x: x['cpu_percent'], reverse=True)
+        processes.sort(key=lambda x: x["cpu_percent"], reverse=True)
 
         return processes[:limit]
 
@@ -117,7 +132,9 @@ def get_process_info(process_id: int) -> Dict[str, Union[str, int, float]]:
         BasicAgentToolsError: If process not found or information cannot be retrieved
     """
     if not HAS_PSUTIL:
-        raise BasicAgentToolsError("psutil package required for process information - install with: pip install psutil")
+        raise BasicAgentToolsError(
+            "psutil package required for process information - install with: pip install psutil"
+        )
 
     if not isinstance(process_id, int) or process_id <= 0:
         raise BasicAgentToolsError("Process ID must be a positive integer")
@@ -135,10 +152,12 @@ def get_process_info(process_id: int) -> Dict[str, Union[str, int, float]]:
             "memory_info_vms": process.memory_info().vms,
             "create_time": process.create_time(),
             "num_threads": process.num_threads(),
-            "username": process.username() if hasattr(process, 'username') else 'unknown',
-            "cwd": process.cwd() if process.cwd() else 'unknown',
-            "cmdline": ' '.join(process.cmdline()) if process.cmdline() else 'unknown',
-            "parent_pid": process.ppid() if process.ppid() else None
+            "username": process.username()
+            if hasattr(process, "username")
+            else "unknown",
+            "cwd": process.cwd() if process.cwd() else "unknown",
+            "cmdline": " ".join(process.cmdline()) if process.cmdline() else "unknown",
+            "parent_pid": process.ppid() if process.ppid() else None,
         }
 
     except psutil.NoSuchProcess:
@@ -146,7 +165,9 @@ def get_process_info(process_id: int) -> Dict[str, Union[str, int, float]]:
     except psutil.AccessDenied:
         raise BasicAgentToolsError(f"Access denied to process with PID {process_id}")
     except Exception as e:
-        raise BasicAgentToolsError(f"Failed to get information for process {process_id}: {str(e)}")
+        raise BasicAgentToolsError(
+            f"Failed to get information for process {process_id}: {str(e)}"
+        )
 
 
 @strands_tool
@@ -164,7 +185,9 @@ def is_process_running(process_name: str) -> Dict[str, Union[bool, int, List[int
         BasicAgentToolsError: If process name is invalid
     """
     if not HAS_PSUTIL:
-        raise BasicAgentToolsError("psutil package required for process information - install with: pip install psutil")
+        raise BasicAgentToolsError(
+            "psutil package required for process information - install with: pip install psutil"
+        )
 
     if not isinstance(process_name, str) or not process_name.strip():
         raise BasicAgentToolsError("Process name must be a non-empty string")
@@ -174,10 +197,10 @@ def is_process_running(process_name: str) -> Dict[str, Union[bool, int, List[int
     try:
         matching_pids = []
 
-        for proc in psutil.process_iter(['pid', 'name']):
+        for proc in psutil.process_iter(["pid", "name"]):
             try:
-                if proc.info['name'] and proc.info['name'].lower() == process_name:
-                    matching_pids.append(proc.info['pid'])
+                if proc.info["name"] and proc.info["name"].lower() == process_name:
+                    matching_pids.append(proc.info["pid"])
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 # Skip processes that disappeared or we can't access
                 continue
@@ -186,8 +209,10 @@ def is_process_running(process_name: str) -> Dict[str, Union[bool, int, List[int
             "process_name": process_name,
             "is_running": len(matching_pids) > 0,
             "process_count": len(matching_pids),
-            "pids": matching_pids
+            "pids": matching_pids,
         }
 
     except Exception as e:
-        raise BasicAgentToolsError(f"Failed to check if process '{process_name}' is running: {str(e)}")
+        raise BasicAgentToolsError(
+            f"Failed to check if process '{process_name}' is running: {str(e)}"
+        )

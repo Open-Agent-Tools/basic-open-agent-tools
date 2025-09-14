@@ -1,25 +1,29 @@
 """Advanced PDF manipulation tools."""
 
 import os
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
 
+
 # Try to import PDF processing libraries
 try:
     import PyPDF2
+
     HAS_PYPDF2 = True
 except ImportError:
     HAS_PYPDF2 = False
 
 try:
-    from reportlab.lib.pagesizes import A4, letter
-    from reportlab.pdfgen import canvas
+    import reportlab.lib.pagesizes  # noqa: F401
+    import reportlab.pdfgen  # noqa: F401
+
     HAS_REPORTLAB = True
 except ImportError:
     HAS_REPORTLAB = False
@@ -28,7 +32,9 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def split_pdf_by_pages(input_path: str, pages_per_file: int, output_prefix: str = None) -> Dict[str, Union[str, int, List[str]]]:
+def split_pdf_by_pages(
+    input_path: str, pages_per_file: int, output_prefix: str = None
+) -> Dict[str, Union[str, int, List[str]]]:
     """
     Split a PDF into multiple smaller PDFs based on page count.
 
@@ -44,7 +50,9 @@ def split_pdf_by_pages(input_path: str, pages_per_file: int, output_prefix: str 
         BasicAgentToolsError: If splitting fails
     """
     if not HAS_PYPDF2:
-        raise BasicAgentToolsError("PyPDF2 package required for PDF splitting - install with: pip install PyPDF2")
+        raise BasicAgentToolsError(
+            "PyPDF2 package required for PDF splitting - install with: pip install PyPDF2"
+        )
 
     if not isinstance(input_path, str) or not input_path.strip():
         raise BasicAgentToolsError("Input path must be a non-empty string")
@@ -66,7 +74,7 @@ def split_pdf_by_pages(input_path: str, pages_per_file: int, output_prefix: str 
 
         output_files = []
 
-        with open(input_path, 'rb') as input_file:
+        with open(input_path, "rb") as input_file:
             pdf_reader = PyPDF2.PdfReader(input_file)
             total_pages = len(pdf_reader.pages)
 
@@ -89,7 +97,7 @@ def split_pdf_by_pages(input_path: str, pages_per_file: int, output_prefix: str 
 
                 # Write the chunk to file
                 output_filename = f"{output_prefix}_part_{files_created + 1:03d}.pdf"
-                with open(output_filename, 'wb') as output_file:
+                with open(output_filename, "wb") as output_file:
                     pdf_writer.write(output_file)
 
                 output_files.append(output_filename)
@@ -101,7 +109,7 @@ def split_pdf_by_pages(input_path: str, pages_per_file: int, output_prefix: str 
             "pages_per_file": pages_per_file,
             "files_created": files_created,
             "output_files": output_files,
-            "split_status": "success"
+            "split_status": "success",
         }
 
     except Exception as e:
@@ -109,7 +117,9 @@ def split_pdf_by_pages(input_path: str, pages_per_file: int, output_prefix: str 
 
 
 @strands_tool
-def extract_pages_from_pdf(input_path: str, page_range: str, output_path: str) -> Dict[str, Union[str, int]]:
+def extract_pages_from_pdf(
+    input_path: str, page_range: str, output_path: str
+) -> Dict[str, Union[str, int]]:
     """
     Extract specific pages from a PDF to create a new PDF.
 
@@ -125,7 +135,9 @@ def extract_pages_from_pdf(input_path: str, page_range: str, output_path: str) -
         BasicAgentToolsError: If extraction fails
     """
     if not HAS_PYPDF2:
-        raise BasicAgentToolsError("PyPDF2 package required for PDF page extraction - install with: pip install PyPDF2")
+        raise BasicAgentToolsError(
+            "PyPDF2 package required for PDF page extraction - install with: pip install PyPDF2"
+        )
 
     if not isinstance(input_path, str) or not input_path.strip():
         raise BasicAgentToolsError("Input path must be a non-empty string")
@@ -144,7 +156,7 @@ def extract_pages_from_pdf(input_path: str, page_range: str, output_path: str) -
         raise BasicAgentToolsError(f"Input PDF not found: {input_path}")
 
     try:
-        with open(input_path, 'rb') as input_file:
+        with open(input_path, "rb") as input_file:
             pdf_reader = PyPDF2.PdfReader(input_file)
             total_pages = len(pdf_reader.pages)
 
@@ -152,7 +164,9 @@ def extract_pages_from_pdf(input_path: str, page_range: str, output_path: str) -
             if page_range.lower() == "all":
                 pages_to_extract = list(range(total_pages))
             else:
-                pages_to_extract = _parse_page_range_for_manipulation(page_range, total_pages)
+                pages_to_extract = _parse_page_range_for_manipulation(
+                    page_range, total_pages
+                )
 
             # Create new PDF with extracted pages
             pdf_writer = PyPDF2.PdfWriter()
@@ -162,7 +176,7 @@ def extract_pages_from_pdf(input_path: str, page_range: str, output_path: str) -
                     pdf_writer.add_page(pdf_reader.pages[page_index])
 
             # Write extracted pages
-            with open(output_path, 'wb') as output_file:
+            with open(output_path, "wb") as output_file:
                 pdf_writer.write(output_file)
 
             output_size = os.path.getsize(output_path)
@@ -174,7 +188,7 @@ def extract_pages_from_pdf(input_path: str, page_range: str, output_path: str) -
             "pages_extracted": len(pages_to_extract),
             "page_range_requested": page_range,
             "output_file_size_bytes": output_size,
-            "extraction_status": "success"
+            "extraction_status": "success",
         }
 
     except Exception as e:
@@ -182,7 +196,12 @@ def extract_pages_from_pdf(input_path: str, page_range: str, output_path: str) -
 
 
 @strands_tool
-def rotate_pdf_pages(input_path: str, rotation_angle: int, page_range: str = "all", output_path: str = None) -> Dict[str, Union[str, int]]:
+def rotate_pdf_pages(
+    input_path: str,
+    rotation_angle: int,
+    page_range: str = "all",
+    output_path: str = None,
+) -> Dict[str, Union[str, int]]:
     """
     Rotate pages in a PDF document.
 
@@ -199,13 +218,24 @@ def rotate_pdf_pages(input_path: str, rotation_angle: int, page_range: str = "al
         BasicAgentToolsError: If rotation fails
     """
     if not HAS_PYPDF2:
-        raise BasicAgentToolsError("PyPDF2 package required for PDF rotation - install with: pip install PyPDF2")
+        raise BasicAgentToolsError(
+            "PyPDF2 package required for PDF rotation - install with: pip install PyPDF2"
+        )
 
     if not isinstance(input_path, str) or not input_path.strip():
         raise BasicAgentToolsError("Input path must be a non-empty string")
 
-    if not isinstance(rotation_angle, int) or rotation_angle not in [90, 180, 270, -90, -180, -270]:
-        raise BasicAgentToolsError("Rotation angle must be one of: 90, 180, 270, -90, -180, -270")
+    if not isinstance(rotation_angle, int) or rotation_angle not in [
+        90,
+        180,
+        270,
+        -90,
+        -180,
+        -270,
+    ]:
+        raise BasicAgentToolsError(
+            "Rotation angle must be one of: 90, 180, 270, -90, -180, -270"
+        )
 
     input_path = input_path.strip()
 
@@ -221,7 +251,7 @@ def rotate_pdf_pages(input_path: str, rotation_angle: int, page_range: str = "al
         output_path = output_path.strip()
 
     try:
-        with open(input_path, 'rb') as input_file:
+        with open(input_path, "rb") as input_file:
             pdf_reader = PyPDF2.PdfReader(input_file)
             total_pages = len(pdf_reader.pages)
 
@@ -229,7 +259,9 @@ def rotate_pdf_pages(input_path: str, rotation_angle: int, page_range: str = "al
             if page_range.lower().strip() == "all":
                 pages_to_rotate = list(range(total_pages))
             else:
-                pages_to_rotate = _parse_page_range_for_manipulation(page_range, total_pages)
+                pages_to_rotate = _parse_page_range_for_manipulation(
+                    page_range, total_pages
+                )
 
             # Create new PDF with rotated pages
             pdf_writer = PyPDF2.PdfWriter()
@@ -241,7 +273,7 @@ def rotate_pdf_pages(input_path: str, rotation_angle: int, page_range: str = "al
                 pdf_writer.add_page(page)
 
             # Write rotated PDF
-            with open(output_path, 'wb') as output_file:
+            with open(output_path, "wb") as output_file:
                 pdf_writer.write(output_file)
 
             output_size = os.path.getsize(output_path)
@@ -254,7 +286,7 @@ def rotate_pdf_pages(input_path: str, rotation_angle: int, page_range: str = "al
             "rotation_angle": rotation_angle,
             "page_range": page_range,
             "output_file_size_bytes": output_size,
-            "rotation_status": "success"
+            "rotation_status": "success",
         }
 
     except Exception as e:
@@ -262,7 +294,9 @@ def rotate_pdf_pages(input_path: str, rotation_angle: int, page_range: str = "al
 
 
 @strands_tool
-def add_watermark_to_pdf(input_path: str, watermark_text: str, output_path: str = None, opacity: float = 0.3) -> Dict[str, Union[str, int, float]]:
+def add_watermark_to_pdf(
+    input_path: str, watermark_text: str, output_path: str = None, opacity: float = 0.3
+) -> Dict[str, Union[str, int, float]]:
     """
     Add a text watermark to all pages of a PDF.
 
@@ -279,7 +313,9 @@ def add_watermark_to_pdf(input_path: str, watermark_text: str, output_path: str 
         BasicAgentToolsError: If watermarking fails
     """
     if not HAS_REPORTLAB or not HAS_PYPDF2:
-        raise BasicAgentToolsError("Both reportlab and PyPDF2 packages required for watermarking - install with: pip install reportlab PyPDF2")
+        raise BasicAgentToolsError(
+            "Both reportlab and PyPDF2 packages required for watermarking - install with: pip install reportlab PyPDF2"
+        )
 
     if not isinstance(input_path, str) or not input_path.strip():
         raise BasicAgentToolsError("Input path must be a non-empty string")
@@ -306,11 +342,12 @@ def add_watermark_to_pdf(input_path: str, watermark_text: str, output_path: str 
 
     try:
         import tempfile
-        from reportlab.pdfgen import canvas
+
         from reportlab.lib.pagesizes import letter
+        from reportlab.pdfgen import canvas
 
         # Create temporary watermark PDF
-        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp_file:
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_file:
             watermark_path = temp_file.name
 
         # Create watermark PDF
@@ -323,7 +360,7 @@ def add_watermark_to_pdf(input_path: str, watermark_text: str, output_path: str 
 
         # Add diagonal watermark text
         c.saveState()
-        c.translate(width/2, height/2)
+        c.translate(width / 2, height / 2)
         c.rotate(45)  # Diagonal angle
         c.drawCentredText(0, 0, watermark_text)
         c.restoreState()
@@ -331,8 +368,8 @@ def add_watermark_to_pdf(input_path: str, watermark_text: str, output_path: str 
         c.save()
 
         # Apply watermark to input PDF
-        with open(input_path, 'rb') as input_file:
-            with open(watermark_path, 'rb') as watermark_file:
+        with open(input_path, "rb") as input_file:
+            with open(watermark_path, "rb") as watermark_file:
                 pdf_reader = PyPDF2.PdfReader(input_file)
                 watermark_reader = PyPDF2.PdfReader(watermark_file)
                 pdf_writer = PyPDF2.PdfWriter()
@@ -347,13 +384,13 @@ def add_watermark_to_pdf(input_path: str, watermark_text: str, output_path: str 
                     pages_watermarked += 1
 
                 # Write watermarked PDF
-                with open(output_path, 'wb') as output_file:
+                with open(output_path, "wb") as output_file:
                     pdf_writer.write(output_file)
 
         # Clean up temporary file
         try:
             os.unlink(watermark_path)
-        except:
+        except Exception:
             pass  # Best effort cleanup
 
         output_size = os.path.getsize(output_path)
@@ -365,14 +402,14 @@ def add_watermark_to_pdf(input_path: str, watermark_text: str, output_path: str 
             "pages_watermarked": pages_watermarked,
             "opacity": opacity,
             "output_file_size_bytes": output_size,
-            "watermarking_status": "success"
+            "watermarking_status": "success",
         }
 
     except Exception as e:
         # Clean up on error
         try:
             os.unlink(watermark_path)
-        except:
+        except Exception:
             pass
         raise BasicAgentToolsError(f"Failed to add watermark to PDF: {str(e)}")
 
@@ -393,15 +430,15 @@ def _parse_page_range_for_manipulation(page_range: str, total_pages: int) -> Lis
     """
     try:
         pages = []
-        parts = page_range.strip().split(',')
+        parts = page_range.strip().split(",")
 
         for part in parts:
             part = part.strip()
-            if '-' in part:
+            if "-" in part:
                 # Range like "1-3"
-                start, end = part.split('-', 1)
+                start, end = part.split("-", 1)
                 start_page = int(start.strip()) - 1  # Convert to 0-based
-                end_page = int(end.strip()) - 1      # Convert to 0-based
+                end_page = int(end.strip()) - 1  # Convert to 0-based
 
                 if start_page < 0 or end_page >= total_pages or start_page > end_page:
                     raise BasicAgentToolsError(f"Invalid page range: {part}")
@@ -415,7 +452,7 @@ def _parse_page_range_for_manipulation(page_range: str, total_pages: int) -> Lis
                 pages.append(page_num)
 
         # Remove duplicates and sort
-        return sorted(list(set(pages)))
+        return sorted(set(pages))
 
     except ValueError:
         raise BasicAgentToolsError(f"Invalid page range format: {page_range}")

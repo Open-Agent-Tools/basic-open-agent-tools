@@ -14,6 +14,7 @@ except ImportError:
     def strands_tool(func):  # type: ignore
         return func
 
+
 from ..exceptions import BasicAgentToolsError
 
 
@@ -62,7 +63,7 @@ def sleep_seconds(seconds: Union[int, float]) -> Dict[str, Union[str, float]]:
 
     # Set up signal handler for graceful interruption
     original_handler = None
-    if hasattr(signal, 'SIGINT'):
+    if hasattr(signal, "SIGINT"):
         try:
             original_handler = signal.signal(signal.SIGINT, signal_handler)
         except (ValueError, OSError):
@@ -88,14 +89,14 @@ def sleep_seconds(seconds: Union[int, float]) -> Dict[str, Union[str, float]]:
             "status": "interrupted",
             "requested_seconds": float(seconds),
             "actual_seconds": round(actual_seconds, 3),
-            "message": f"Sleep interrupted after {actual_seconds:.3f} seconds (requested {seconds} seconds)"
+            "message": f"Sleep interrupted after {actual_seconds:.3f} seconds (requested {seconds} seconds)",
         }
     else:
         return {
             "status": "completed",
             "requested_seconds": float(seconds),
             "actual_seconds": round(actual_seconds, 3),
-            "message": f"Successfully slept for {actual_seconds:.3f} seconds"
+            "message": f"Successfully slept for {actual_seconds:.3f} seconds",
         }
 
 
@@ -185,5 +186,5 @@ def precise_sleep(seconds: Union[int, float]) -> Dict[str, Union[str, float]]:
         "requested_seconds": float(seconds),
         "actual_seconds": round(actual_seconds, 6),
         "precision": "high",
-        "message": f"Precise sleep completed in {actual_seconds:.6f} seconds (requested {seconds} seconds)"
+        "message": f"Precise sleep completed in {actual_seconds:.6f} seconds (requested {seconds} seconds)",
     }

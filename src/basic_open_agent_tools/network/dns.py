@@ -6,9 +6,11 @@ from typing import Dict, List, Union
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
@@ -56,7 +58,7 @@ def resolve_hostname(hostname: str) -> Dict[str, Union[str, List[str]]]:
             "ipv4_addresses": ipv4_addresses,
             "ipv6_addresses": ipv6_addresses,
             "total_addresses": len(ipv4_addresses) + len(ipv6_addresses),
-            "resolution_status": "success"
+            "resolution_status": "success",
         }
 
     except socket.gaierror as e:
@@ -88,11 +90,11 @@ def reverse_dns_lookup(ip_address: str) -> Dict[str, Union[str, bool]]:
         # Validate IP address format
         socket.inet_pton(socket.AF_INET, ip_address)
         ip_family = "IPv4"
-    except socket.error:
+    except OSError:
         try:
             socket.inet_pton(socket.AF_INET6, ip_address)
             ip_family = "IPv6"
-        except socket.error:
+        except OSError:
             raise BasicAgentToolsError(f"Invalid IP address format: {ip_address}")
 
     try:
@@ -104,7 +106,7 @@ def reverse_dns_lookup(ip_address: str) -> Dict[str, Union[str, bool]]:
             "ip_family": ip_family,
             "hostname": hostname,
             "lookup_successful": True,
-            "lookup_status": "success"
+            "lookup_status": "success",
         }
 
     except socket.herror:
@@ -113,14 +115,16 @@ def reverse_dns_lookup(ip_address: str) -> Dict[str, Union[str, bool]]:
             "ip_family": ip_family,
             "hostname": "",
             "lookup_successful": False,
-            "lookup_status": "no_reverse_dns_record"
+            "lookup_status": "no_reverse_dns_record",
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Reverse DNS lookup error: {str(e)}")
 
 
 @strands_tool
-def check_port_open(host: str, port: int, timeout: int = 5) -> Dict[str, Union[str, int, bool, float]]:
+def check_port_open(
+    host: str, port: int, timeout: int = 5
+) -> Dict[str, Union[str, int, bool, float]]:
     """
     Check if a port is open on a host.
 
@@ -142,11 +146,14 @@ def check_port_open(host: str, port: int, timeout: int = 5) -> Dict[str, Union[s
         raise BasicAgentToolsError("Port must be an integer between 1 and 65535")
 
     if not isinstance(timeout, int) or timeout < 1 or timeout > 30:
-        raise BasicAgentToolsError("Timeout must be an integer between 1 and 30 seconds")
+        raise BasicAgentToolsError(
+            "Timeout must be an integer between 1 and 30 seconds"
+        )
 
     host = host.strip()
 
     import time
+
     start_time = time.time()
 
     try:
@@ -157,7 +164,9 @@ def check_port_open(host: str, port: int, timeout: int = 5) -> Dict[str, Union[s
         sock.close()
 
         end_time = time.time()
-        response_time = round((end_time - start_time) * 1000, 2)  # Convert to milliseconds
+        response_time = round(
+            (end_time - start_time) * 1000, 2
+        )  # Convert to milliseconds
 
         is_open = result == 0
 
@@ -167,7 +176,7 @@ def check_port_open(host: str, port: int, timeout: int = 5) -> Dict[str, Union[s
             "is_open": is_open,
             "response_time_ms": response_time,
             "timeout_seconds": timeout,
-            "check_status": "success" if is_open else "closed_or_filtered"
+            "check_status": "success" if is_open else "closed_or_filtered",
         }
 
     except socket.timeout:
@@ -180,7 +189,7 @@ def check_port_open(host: str, port: int, timeout: int = 5) -> Dict[str, Union[s
             "is_open": False,
             "response_time_ms": response_time,
             "timeout_seconds": timeout,
-            "check_status": "timeout"
+            "check_status": "timeout",
         }
     except Exception as e:
         raise BasicAgentToolsError(f"Port check error: {str(e)}")

@@ -7,7 +7,7 @@ name = "basic-open-agent-tools"
 version = "0.9.1"  # Strands agents compatibility with @strands_tool decorators
 description = "An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [
     { name = "Open Agent Tools", email = "unseriousai@gmail.com" },
 ]

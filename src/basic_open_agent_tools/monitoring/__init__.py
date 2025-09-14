@@ -3,8 +3,10 @@
 from .file_watching import monitor_directory, watch_file_changes
 from .health_checks import check_url_status, ping_host
 from .performance import (
-    monitor_function_performance, get_system_load_average,
-    profile_code_execution, benchmark_disk_io
+    benchmark_disk_io,
+    get_system_load_average,
+    monitor_function_performance,
+    profile_code_execution,
 )
 
 __all__ = [

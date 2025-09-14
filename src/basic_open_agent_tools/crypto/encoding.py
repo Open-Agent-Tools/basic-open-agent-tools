@@ -7,9 +7,11 @@ from typing import Dict
 try:
     from strands import tool as strands_tool
 except ImportError:
+
     def strands_tool(func):
         """Fallback decorator when strands is not available."""
         return func
+
 
 from ..exceptions import BasicAgentToolsError
 
@@ -33,16 +35,16 @@ def base64_encode(data: str) -> Dict[str, str]:
 
     try:
         # Encode string to bytes, then to base64
-        data_bytes = data.encode('utf-8')
+        data_bytes = data.encode("utf-8")
         encoded_bytes = base64.b64encode(data_bytes)
-        encoded_string = encoded_bytes.decode('ascii')
+        encoded_string = encoded_bytes.decode("ascii")
 
         return {
             "encoding": "base64",
             "original_data": data,
             "original_length": len(data),
             "encoded_data": encoded_string,
-            "encoded_length": len(encoded_string)
+            "encoded_length": len(encoded_string),
         }
 
     except Exception as e:
@@ -71,16 +73,16 @@ def base64_decode(encoded_data: str) -> Dict[str, str]:
 
     try:
         # Decode from base64
-        encoded_bytes = encoded_data.encode('ascii')
+        encoded_bytes = encoded_data.encode("ascii")
         decoded_bytes = base64.b64decode(encoded_bytes)
-        decoded_string = decoded_bytes.decode('utf-8')
+        decoded_string = decoded_bytes.decode("utf-8")
 
         return {
             "encoding": "base64",
             "encoded_data": encoded_data,
             "encoded_length": len(encoded_data),
             "decoded_data": decoded_string,
-            "decoded_length": len(decoded_string)
+            "decoded_length": len(decoded_string),
         }
 
     except Exception as e:
@@ -105,14 +107,14 @@ def url_encode(data: str) -> Dict[str, str]:
         raise BasicAgentToolsError("Data must be a string")
 
     try:
-        encoded_string = urllib.parse.quote(data, safe='')
+        encoded_string = urllib.parse.quote(data, safe="")
 
         return {
             "encoding": "url",
             "original_data": data,
             "original_length": len(data),
             "encoded_data": encoded_string,
-            "encoded_length": len(encoded_string)
+            "encoded_length": len(encoded_string),
         }
 
     except Exception as e:
@@ -144,7 +146,7 @@ def url_decode(encoded_data: str) -> Dict[str, str]:
             "encoded_data": encoded_data,
             "encoded_length": len(encoded_data),
             "decoded_data": decoded_string,
-            "decoded_length": len(decoded_string)
+            "decoded_length": len(decoded_string),
         }
 
     except Exception as e:
@@ -170,7 +172,7 @@ def hex_encode(data: str) -> Dict[str, str]:
 
     try:
         # Encode string to bytes, then to hex
-        data_bytes = data.encode('utf-8')
+        data_bytes = data.encode("utf-8")
         hex_string = data_bytes.hex()
 
         return {
@@ -178,7 +180,7 @@ def hex_encode(data: str) -> Dict[str, str]:
             "original_data": data,
             "original_length": len(data),
             "encoded_data": hex_string,
-            "encoded_length": len(hex_string)
+            "encoded_length": len(hex_string),
         }
 
     except Exception as e:
@@ -214,14 +216,14 @@ def hex_decode(encoded_data: str) -> Dict[str, str]:
 
         # Decode from hex
         decoded_bytes = bytes.fromhex(encoded_data)
-        decoded_string = decoded_bytes.decode('utf-8')
+        decoded_string = decoded_bytes.decode("utf-8")
 
         return {
             "encoding": "hex",
             "encoded_data": encoded_data,
             "encoded_length": len(encoded_data),
             "decoded_data": decoded_string,
-            "decoded_length": len(decoded_string)
+            "decoded_length": len(decoded_string),
         }
 
     except UnicodeDecodeError:
