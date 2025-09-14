@@ -6,13 +6,13 @@ import lzma
 import os
 import shutil
 import zipfile
-from typing import Dict, List, Union
+from typing import Any, Callable, Optional, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         return func
 
 
@@ -21,8 +21,8 @@ from ..exceptions import BasicAgentToolsError
 
 @strands_tool
 def create_zip(
-    source_paths: List[str], output_path: str
-) -> Dict[str, Union[str, int, List[str]]]:
+    source_paths: list[str], output_path: str
+) -> dict[str, Union[str, int, list[str]]]:
     """Create a ZIP archive from files and directories."""
     if not isinstance(source_paths, list) or not source_paths:
         raise BasicAgentToolsError("Source paths must be a non-empty list")
@@ -58,7 +58,7 @@ def create_zip(
 
 
 @strands_tool
-def extract_zip(zip_path: str, extract_to: str) -> Dict[str, Union[str, int]]:
+def extract_zip(zip_path: str, extract_to: str) -> dict[str, Union[str, int]]:
     """Extract a ZIP archive to a directory."""
     if not isinstance(zip_path, str) or not zip_path.strip():
         raise BasicAgentToolsError("ZIP path must be a non-empty string")
@@ -83,16 +83,16 @@ def extract_zip(zip_path: str, extract_to: str) -> Dict[str, Union[str, int]]:
 
 @strands_tool
 def compress_files(
-    file_paths: List[str], output_path: str
-) -> Dict[str, Union[str, int]]:
+    file_paths: list[str], output_path: str
+) -> dict[str, Union[str, int]]:
     """Compress multiple files into a ZIP archive."""
     return create_zip(file_paths, output_path)
 
 
 @strands_tool
 def compress_file_gzip(
-    input_path: str, output_path: str = None
-) -> Dict[str, Union[str, int, float]]:
+    input_path: str, output_path: Optional[str] = None
+) -> dict[str, Union[str, int, float]]:
     """
     Compress a file using gzip compression.
 
@@ -152,8 +152,8 @@ def compress_file_gzip(
 
 @strands_tool
 def decompress_file_gzip(
-    input_path: str, output_path: str = None
-) -> Dict[str, Union[str, int]]:
+    input_path: str, output_path: Optional[str] = None
+) -> dict[str, Union[str, int]]:
     """
     Decompress a gzip compressed file.
 
@@ -212,8 +212,8 @@ def decompress_file_gzip(
 
 @strands_tool
 def compress_file_bzip2(
-    input_path: str, output_path: str = None
-) -> Dict[str, Union[str, int, float]]:
+    input_path: str, output_path: Optional[str] = None
+) -> dict[str, Union[str, int, float]]:
     """
     Compress a file using bzip2 compression.
 
@@ -273,8 +273,8 @@ def compress_file_bzip2(
 
 @strands_tool
 def compress_file_xz(
-    input_path: str, output_path: str = None
-) -> Dict[str, Union[str, int, float]]:
+    input_path: str, output_path: Optional[str] = None
+) -> dict[str, Union[str, int, float]]:
     """
     Compress a file using XZ/LZMA compression.
 

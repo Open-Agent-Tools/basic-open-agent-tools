@@ -1,14 +1,14 @@
 """Tests for extended compression utilities."""
 
-import os
-import tempfile
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import mock_open, patch
+
 import pytest
+
 from basic_open_agent_tools.archive.compression import (
-    compress_file_gzip,
-    decompress_file_gzip,
     compress_file_bzip2,
-    compress_file_xz
+    compress_file_gzip,
+    compress_file_xz,
+    decompress_file_gzip,
 )
 from basic_open_agent_tools.exceptions import BasicAgentToolsError
 
@@ -28,14 +28,15 @@ class TestCompressFileGzip:
             compress_file_gzip("nonexistent.txt")
         assert "Input file not found" in str(exc_info.value)
 
-    @patch('os.path.exists')
-    @patch('os.path.isfile')
-    @patch('os.path.getsize')
-    @patch('gzip.open')
-    @patch('builtins.open', new_callable=mock_open, read_data=b"test content")
-    @patch('shutil.copyfileobj')
-    def test_successful_gzip_compression(self, mock_copy, mock_file, mock_gzip,
-                                       mock_getsize, mock_isfile, mock_exists):
+    @patch("os.path.exists")
+    @patch("os.path.isfile")
+    @patch("os.path.getsize")
+    @patch("gzip.open")
+    @patch("builtins.open", new_callable=mock_open, read_data=b"test content")
+    @patch("shutil.copyfileobj")
+    def test_successful_gzip_compression(
+        self, mock_copy, mock_file, mock_gzip, mock_getsize, mock_isfile, mock_exists
+    ):
         """Test successful GZIP compression."""
         mock_exists.return_value = True
         mock_isfile.return_value = True
@@ -53,8 +54,8 @@ class TestCompressFileGzip:
         assert result["compression_type"] == "gzip"
         assert result["compression_status"] == "success"
 
-    @patch('os.path.exists')
-    @patch('os.path.isfile')
+    @patch("os.path.exists")
+    @patch("os.path.isfile")
     def test_input_not_file(self, mock_isfile, mock_exists):
         """Test with input path that's not a file."""
         mock_exists.return_value = True
@@ -70,7 +71,7 @@ class TestDecompressFileGzip:
 
     def test_default_output_path_with_gz_extension(self):
         """Test default output path generation for .gz files."""
-        with patch('os.path.exists', return_value=False):
+        with patch("os.path.exists", return_value=False):
             with pytest.raises(BasicAgentToolsError):
                 # Will fail at exists check, but we can verify path logic
                 try:
@@ -79,13 +80,14 @@ class TestDecompressFileGzip:
                     # Should have tried to create "test.txt" as output
                     assert "not found" in str(e)
 
-    @patch('os.path.exists')
-    @patch('os.path.getsize')
-    @patch('gzip.open')
-    @patch('builtins.open', new_callable=mock_open)
-    @patch('shutil.copyfileobj')
-    def test_successful_gzip_decompression(self, mock_copy, mock_file, mock_gzip,
-                                         mock_getsize, mock_exists):
+    @patch("os.path.exists")
+    @patch("os.path.getsize")
+    @patch("gzip.open")
+    @patch("builtins.open", new_callable=mock_open)
+    @patch("shutil.copyfileobj")
+    def test_successful_gzip_decompression(
+        self, mock_copy, mock_file, mock_gzip, mock_getsize, mock_exists
+    ):
         """Test successful GZIP decompression."""
         mock_exists.return_value = True
         mock_getsize.side_effect = [300, 1000]  # Compressed: 300, Decompressed: 1000
@@ -104,14 +106,15 @@ class TestDecompressFileGzip:
 class TestCompressFileBzip2:
     """Test cases for compress_file_bzip2 function."""
 
-    @patch('os.path.exists')
-    @patch('os.path.isfile')
-    @patch('os.path.getsize')
-    @patch('bz2.BZ2File')
-    @patch('builtins.open', new_callable=mock_open)
-    @patch('shutil.copyfileobj')
-    def test_successful_bzip2_compression(self, mock_copy, mock_file, mock_bz2,
-                                        mock_getsize, mock_isfile, mock_exists):
+    @patch("os.path.exists")
+    @patch("os.path.isfile")
+    @patch("os.path.getsize")
+    @patch("bz2.BZ2File")
+    @patch("builtins.open", new_callable=mock_open)
+    @patch("shutil.copyfileobj")
+    def test_successful_bzip2_compression(
+        self, mock_copy, mock_file, mock_bz2, mock_getsize, mock_isfile, mock_exists
+    ):
         """Test successful BZIP2 compression."""
         mock_exists.return_value = True
         mock_isfile.return_value = True
@@ -128,14 +131,15 @@ class TestCompressFileBzip2:
 class TestCompressFileXz:
     """Test cases for compress_file_xz function."""
 
-    @patch('os.path.exists')
-    @patch('os.path.isfile')
-    @patch('os.path.getsize')
-    @patch('lzma.LZMAFile')
-    @patch('builtins.open', new_callable=mock_open)
-    @patch('shutil.copyfileobj')
-    def test_successful_xz_compression(self, mock_copy, mock_file, mock_lzma,
-                                     mock_getsize, mock_isfile, mock_exists):
+    @patch("os.path.exists")
+    @patch("os.path.isfile")
+    @patch("os.path.getsize")
+    @patch("lzma.LZMAFile")
+    @patch("builtins.open", new_callable=mock_open)
+    @patch("shutil.copyfileobj")
+    def test_successful_xz_compression(
+        self, mock_copy, mock_file, mock_lzma, mock_getsize, mock_isfile, mock_exists
+    ):
         """Test successful XZ compression."""
         mock_exists.return_value = True
         mock_isfile.return_value = True

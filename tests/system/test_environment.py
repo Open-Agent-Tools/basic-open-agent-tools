@@ -1,15 +1,16 @@
 """Tests for environment variable operations."""
 
-import pytest
 import os
 from unittest.mock import patch
 
+import pytest
+
+from basic_open_agent_tools.exceptions import BasicAgentToolsError
 from basic_open_agent_tools.system.environment import (
     get_env_var,
-    set_env_var,
     list_env_vars,
+    set_env_var,
 )
-from basic_open_agent_tools.exceptions import BasicAgentToolsError
 
 
 class TestGetEnvVar:
@@ -17,13 +18,19 @@ class TestGetEnvVar:
 
     def test_invalid_variable_name(self):
         """Test error handling for invalid variable names."""
-        with pytest.raises(BasicAgentToolsError, match="Variable name must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Variable name must be a non-empty string"
+        ):
             get_env_var("")
 
-        with pytest.raises(BasicAgentToolsError, match="Variable name must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Variable name must be a non-empty string"
+        ):
             get_env_var(None)
 
-        with pytest.raises(BasicAgentToolsError, match="Variable name must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Variable name must be a non-empty string"
+        ):
             get_env_var("   ")
 
     def test_existing_environment_variable(self):
@@ -74,10 +81,14 @@ class TestSetEnvVar:
 
     def test_invalid_variable_name(self):
         """Test error handling for invalid variable names."""
-        with pytest.raises(BasicAgentToolsError, match="Variable name must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Variable name must be a non-empty string"
+        ):
             set_env_var("", "value")
 
-        with pytest.raises(BasicAgentToolsError, match="Variable name must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Variable name must be a non-empty string"
+        ):
             set_env_var(None, "value")
 
     def test_invalid_value_type(self):
@@ -161,21 +172,31 @@ class TestListEnvVars:
 
     def test_invalid_filter_pattern_type(self):
         """Test error handling for invalid filter pattern type."""
-        with pytest.raises(BasicAgentToolsError, match="Filter pattern must be a string or None"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Filter pattern must be a string or None"
+        ):
             list_env_vars(filter_pattern=123)
 
     def test_invalid_limit(self):
         """Test error handling for invalid limit values."""
-        with pytest.raises(BasicAgentToolsError, match="Limit must be an integer between 1 and 200"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Limit must be an integer between 1 and 200"
+        ):
             list_env_vars(limit=0)
 
-        with pytest.raises(BasicAgentToolsError, match="Limit must be an integer between 1 and 200"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Limit must be an integer between 1 and 200"
+        ):
             list_env_vars(limit=-1)
 
-        with pytest.raises(BasicAgentToolsError, match="Limit must be an integer between 1 and 200"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Limit must be an integer between 1 and 200"
+        ):
             list_env_vars(limit=201)
 
-        with pytest.raises(BasicAgentToolsError, match="Limit must be an integer between 1 and 200"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Limit must be an integer between 1 and 200"
+        ):
             list_env_vars(limit="10")
 
     def test_list_all_variables_no_filter(self):
@@ -183,7 +204,7 @@ class TestListEnvVars:
         test_vars = {
             "TEST_VAR_1": "value1",
             "TEST_VAR_2": "value2",
-            "ANOTHER_VAR": "value3"
+            "ANOTHER_VAR": "value3",
         }
 
         with patch.dict(os.environ, test_vars, clear=False):
@@ -204,14 +225,16 @@ class TestListEnvVars:
         test_vars = {
             "TEST_FILTER_1": "value1",
             "TEST_FILTER_2": "value2",
-            "OTHER_VAR": "value3"
+            "OTHER_VAR": "value3",
         }
 
         with patch.dict(os.environ, test_vars, clear=False):
             result = list_env_vars(filter_pattern="FILTER", limit=50)
 
             assert result["filter_pattern"] == "FILTER"
-            assert result["total_found"] >= 2  # At least TEST_FILTER_1 and TEST_FILTER_2
+            assert (
+                result["total_found"] >= 2
+            )  # At least TEST_FILTER_1 and TEST_FILTER_2
 
             # Check that filtered variables are included
             filtered_vars = result["variables"]
@@ -227,7 +250,7 @@ class TestListEnvVars:
         test_vars = {
             "Test_Case_Var": "value1",
             "TEST_CASE_VAR2": "value2",
-            "other_var": "value3"
+            "other_var": "value3",
         }
 
         with patch.dict(os.environ, test_vars, clear=False):

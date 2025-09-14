@@ -1,7 +1,6 @@
 """File system tools for agent operations.
 
 This module provides comprehensive file and directory operations organized into logical submodules:
-from typing import List
 
 - operations: Core file/directory operations (read, write, create, delete, copy, move)
 - info: File information and existence checking
@@ -10,8 +9,6 @@ from typing import List
 
 All functions are also available directly from this module for convenience.
 """
-
-from typing import List
 
 # Import all functions from submodules
 from .info import (

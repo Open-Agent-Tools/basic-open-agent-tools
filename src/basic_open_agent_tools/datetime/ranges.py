@@ -6,18 +6,18 @@ for consistent date/time representation.
 """
 
 from datetime import date, timedelta
-from typing import Dict, List
+from typing import Any, Callable
 
 try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
         return func
 
 
 @strands_tool
-def get_date_range(start_date: str, end_date: str) -> List[str]:
+def get_date_range(start_date: str, end_date: str) -> list[str]:
     """Generate all dates between two dates (inclusive).
 
     Returns a list of all dates from start_date to end_date, inclusive.
@@ -63,7 +63,7 @@ def get_date_range(start_date: str, end_date: str) -> List[str]:
 
 
 @strands_tool
-def get_quarter_dates(year: int, quarter: int) -> Dict[str, str]:
+def get_quarter_dates(year: int, quarter: int) -> dict[str, str]:
     """Get start and end dates for a specific quarter.
 
     Returns the first and last dates of the specified quarter.
@@ -108,7 +108,7 @@ def get_quarter_dates(year: int, quarter: int) -> Dict[str, str]:
 
 
 @strands_tool
-def get_year_to_date_range(reference_date: str) -> Dict[str, str]:
+def get_year_to_date_range(reference_date: str) -> dict[str, str]:
     """Get the date range from January 1st to the reference date.
 
     Returns the start of the year and the reference date as a range.
@@ -320,7 +320,7 @@ def is_date_in_range(check_date: str, start_date: str, end_date: str) -> bool:
 
 
 @strands_tool
-def get_month_range(year: int, month: int) -> Dict[str, str]:
+def get_month_range(year: int, month: int) -> dict[str, str]:
     """Get the start and end dates for a specific month.
 
     Returns the first and last dates of the specified month.

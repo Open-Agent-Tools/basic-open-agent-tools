@@ -1,7 +1,7 @@
 """Helper functions for loading and managing tool collections."""
 
 import inspect
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Union
 
 from . import (
     archive,
@@ -11,7 +11,6 @@ from . import (
     file_system,
     monitoring,
     network,
-    pdf,
     system,
     text,
     utilities,
@@ -19,7 +18,7 @@ from . import (
 from . import logging as log_module
 
 
-def load_all_filesystem_tools() -> List[Callable[..., Any]]:
+def load_all_filesystem_tools() -> list[Callable[..., Any]]:
     """Load all file system tools as a list of callable functions.
 
     Returns:
@@ -41,7 +40,7 @@ def load_all_filesystem_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_text_tools() -> List[Callable[..., Any]]:
+def load_all_text_tools() -> list[Callable[..., Any]]:
     """Load all text processing tools as a list of callable functions.
 
     Returns:
@@ -63,7 +62,7 @@ def load_all_text_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_data_tools() -> List[Callable[..., Any]]:
+def load_all_data_tools() -> list[Callable[..., Any]]:
     """Load all data processing tools as a list of callable functions.
 
     Returns:
@@ -85,7 +84,7 @@ def load_all_data_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_datetime_tools() -> List[Callable[..., Any]]:
+def load_all_datetime_tools() -> list[Callable[..., Any]]:
     """Load all datetime tools as a list of callable functions.
 
     Returns:
@@ -107,7 +106,7 @@ def load_all_datetime_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_network_tools() -> List[Callable[..., Any]]:
+def load_all_network_tools() -> list[Callable[..., Any]]:
     """Load all network tools as a list of callable functions.
 
     Returns:
@@ -129,7 +128,7 @@ def load_all_network_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_utilities_tools() -> List[Callable[..., Any]]:
+def load_all_utilities_tools() -> list[Callable[..., Any]]:
     """Load all utilities tools as a list of callable functions.
 
     Returns:
@@ -151,7 +150,7 @@ def load_all_utilities_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_system_tools() -> List[Callable[..., Any]]:
+def load_all_system_tools() -> list[Callable[..., Any]]:
     """Load all system tools as a list of callable functions."""
     tools = []
     for name in system.__all__:
@@ -161,7 +160,7 @@ def load_all_system_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_crypto_tools() -> List[Callable[..., Any]]:
+def load_all_crypto_tools() -> list[Callable[..., Any]]:
     """Load all crypto tools as a list of callable functions."""
     tools = []
     for name in crypto.__all__:
@@ -171,17 +170,7 @@ def load_all_crypto_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_pdf_tools() -> List[Callable[..., Any]]:
-    """Load all PDF tools as a list of callable functions."""
-    tools = []
-    for name in pdf.__all__:
-        func = getattr(pdf, name)
-        if callable(func):
-            tools.append(func)
-    return tools
-
-
-def load_all_archive_tools() -> List[Callable[..., Any]]:
+def load_all_archive_tools() -> list[Callable[..., Any]]:
     """Load all archive tools as a list of callable functions."""
     tools = []
     for name in archive.__all__:
@@ -191,7 +180,7 @@ def load_all_archive_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_logging_tools() -> List[Callable[..., Any]]:
+def load_all_logging_tools() -> list[Callable[..., Any]]:
     """Load all logging tools as a list of callable functions."""
     tools = []
     for name in log_module.__all__:
@@ -201,7 +190,7 @@ def load_all_logging_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_monitoring_tools() -> List[Callable[..., Any]]:
+def load_all_monitoring_tools() -> list[Callable[..., Any]]:
     """Load all monitoring tools as a list of callable functions."""
     tools = []
     for name in monitoring.__all__:
@@ -211,7 +200,7 @@ def load_all_monitoring_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_all_tools() -> List[Callable[..., Any]]:
+def load_all_tools() -> list[Callable[..., Any]]:
     """Load all tools from all modules as a single list of callable functions.
 
     This is a convenience function that loads and combines tools from all
@@ -236,14 +225,13 @@ def load_all_tools() -> List[Callable[..., Any]]:
         load_all_utilities_tools(),  # 3 functions
         load_all_system_tools(),  # ~20 functions
         load_all_crypto_tools(),  # ~13 functions
-        load_all_pdf_tools(),  # 4 functions
         load_all_archive_tools(),  # 5 functions
         load_all_logging_tools(),  # 5 functions
         load_all_monitoring_tools(),  # 4 functions
     )
 
 
-def load_data_json_tools() -> List[Callable[..., Any]]:
+def load_data_json_tools() -> list[Callable[..., Any]]:
     """Load JSON processing tools as a list of callable functions.
 
     Returns:
@@ -271,7 +259,7 @@ def load_data_json_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_data_csv_tools() -> List[Callable[..., Any]]:
+def load_data_csv_tools() -> list[Callable[..., Any]]:
     """Load CSV processing tools as a list of callable functions.
 
     Returns:
@@ -303,7 +291,7 @@ def load_data_csv_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_data_validation_tools() -> List[Callable[..., Any]]:
+def load_data_validation_tools() -> list[Callable[..., Any]]:
     """Load data validation tools as a list of callable functions.
 
     Returns:
@@ -333,7 +321,7 @@ def load_data_validation_tools() -> List[Callable[..., Any]]:
     return tools
 
 
-def load_data_config_tools() -> List[Callable[..., Any]]:
+def load_data_config_tools() -> list[Callable[..., Any]]:
     """Load configuration file processing tools as a list of callable functions.
 
     Returns:
@@ -367,8 +355,8 @@ def load_data_config_tools() -> List[Callable[..., Any]]:
 
 
 def merge_tool_lists(
-    *args: Union[List[Callable[..., Any]], Callable[..., Any]],
-) -> List[Callable[..., Any]]:
+    *args: Union[list[Callable[..., Any]], Callable[..., Any]],
+) -> list[Callable[..., Any]]:
     """Merge multiple tool lists and individual functions into a single list.
 
     This function automatically deduplicates tools based on their function name and module.
@@ -420,7 +408,7 @@ def merge_tool_lists(
     return merged
 
 
-def get_tool_info(tool: Callable[..., Any]) -> Dict[str, Any]:
+def get_tool_info(tool: Callable[..., Any]) -> dict[str, Any]:
     """Get information about a tool function.
 
     Args:
@@ -449,7 +437,7 @@ def get_tool_info(tool: Callable[..., Any]) -> Dict[str, Any]:
     }
 
 
-def list_all_available_tools() -> Dict[str, List[Dict[str, Any]]]:
+def list_all_available_tools() -> dict[str, list[dict[str, Any]]]:
     """List all available tools organized by category.
 
     Returns:

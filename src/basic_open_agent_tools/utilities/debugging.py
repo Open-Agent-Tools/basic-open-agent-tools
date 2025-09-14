@@ -3,13 +3,13 @@
 import inspect
 import sys
 import traceback
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         """Fallback decorator when strands is not available."""
         return func
 
@@ -20,7 +20,7 @@ from ..exceptions import BasicAgentToolsError
 @strands_tool
 def inspect_function_signature(
     function_name: str, module_name: Optional[str] = None
-) -> Dict[str, Union[str, List, Dict]]:
+) -> dict[str, Union[str, int, list, dict, Any]]:
     """
     Inspect a function's signature, parameters, and documentation.
 
@@ -66,7 +66,7 @@ def inspect_function_signature(
             func = None
 
             # Walk up the frame stack to find the function
-            frame = current_frame.f_back
+            frame = current_frame.f_back if current_frame else None
             while frame is not None:
                 # Check locals first, then globals
                 if function_name in frame.f_locals:
@@ -151,7 +151,7 @@ def inspect_function_signature(
 
 
 @strands_tool
-def get_call_stack_info() -> Dict[str, Union[List, int, str]]:
+def get_call_stack_info() -> dict[str, Union[list, int, str, Any]]:
     """
     Get detailed information about the current call stack.
 
@@ -197,8 +197,8 @@ def get_call_stack_info() -> Dict[str, Union[List, int, str]]:
 
 @strands_tool
 def format_exception_details(
-    exception_info: str = None,
-) -> Dict[str, Union[str, List, bool]]:
+    exception_info: Optional[str] = None,
+) -> dict[str, Union[str, list, bool, Any]]:
     """
     Format detailed exception information from the last exception or provided info.
 
@@ -254,7 +254,7 @@ def format_exception_details(
             # Extract frame information
             frames = []
             tb = exc_traceback
-            while tb:
+            while tb is not None:
                 frame = tb.tb_frame
                 frames.append(
                     {
@@ -288,8 +288,8 @@ def format_exception_details(
 
 @strands_tool
 def validate_function_call(
-    function_name: str, arguments: Dict[str, Any], module_name: str = None
-) -> Dict[str, Union[str, bool, List]]:
+    function_name: str, arguments: dict[str, Any], module_name: Optional[str] = None
+) -> dict[str, Union[str, bool, list, Any]]:
     """
     Validate if a function call would succeed with given arguments.
 
@@ -336,7 +336,7 @@ def validate_function_call(
             current_frame = inspect.currentframe()
             func = None
 
-            frame = current_frame.f_back
+            frame = current_frame.f_back if current_frame else None
             while frame is not None:
                 if function_name in frame.f_locals:
                     func = frame.f_locals[function_name]
@@ -386,7 +386,9 @@ def validate_function_call(
             validation_results["is_valid"] = False
             validation_results["can_call"] = False
             validation_results["binding_error"] = str(e)
-            validation_results["validation_issues"].append(f"Binding failed: {str(e)}")
+            issues = validation_results["validation_issues"]
+            assert isinstance(issues, list)
+            issues.append(f"Binding failed: {str(e)}")
 
         # Additional parameter analysis
         required_params = []
@@ -419,8 +421,8 @@ def validate_function_call(
 
 @strands_tool
 def trace_variable_changes(
-    variable_name: str, initial_value: Any, operations: List[str]
-) -> Dict[str, Union[str, Any, List]]:
+    variable_name: str, initial_value: Any, operations: list[str]
+) -> dict[str, Union[str, Any, list]]:
     """
     Trace how a variable changes through a series of operations.
 

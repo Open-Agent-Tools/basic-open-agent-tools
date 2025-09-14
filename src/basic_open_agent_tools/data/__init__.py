@@ -8,8 +8,6 @@ This module provides data processing and manipulation tools organized into logic
 - config_processing: Configuration file processing (YAML, TOML, INI)
 """
 
-from typing import List
-
 # Import all functions from submodules
 from .config_processing import (
     merge_config_files,
@@ -44,7 +42,7 @@ from .validation import (
 )
 
 # Re-export all functions at module level for convenience
-__all__: List[str] = [
+__all__: list[str] = [
     # JSON processing
     "safe_json_serialize",
     "safe_json_deserialize",

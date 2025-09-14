@@ -2,13 +2,13 @@
 
 import configparser
 import json
-from typing import List
+from typing import Any, Callable
 
 try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
         return func
 
 
@@ -278,7 +278,7 @@ def validate_config_schema(config_data: dict, schema: dict) -> list:
 
 
 @strands_tool
-def merge_config_files(config_paths: List[str], format_type: str) -> dict:
+def merge_config_files(config_paths: list[str], format_type: str) -> dict:
     """Merge multiple configuration files into a single dictionary.
 
     Args:

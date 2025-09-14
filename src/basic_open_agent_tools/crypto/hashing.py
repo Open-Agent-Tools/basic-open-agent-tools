@@ -2,13 +2,13 @@
 
 import hashlib
 import os
-from typing import Dict, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         """Fallback decorator when strands is not available."""
         return func
 
@@ -17,7 +17,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def hash_md5(data: str) -> Dict[str, str]:
+def hash_md5(data: str) -> dict[str, str]:
     """
     Generate MD5 hash of a string.
 
@@ -50,7 +50,7 @@ def hash_md5(data: str) -> Dict[str, str]:
 
 
 @strands_tool
-def hash_sha256(data: str) -> Dict[str, str]:
+def hash_sha256(data: str) -> dict[str, str]:
     """
     Generate SHA-256 hash of a string.
 
@@ -83,7 +83,7 @@ def hash_sha256(data: str) -> Dict[str, str]:
 
 
 @strands_tool
-def hash_sha512(data: str) -> Dict[str, str]:
+def hash_sha512(data: str) -> dict[str, str]:
     """
     Generate SHA-512 hash of a string.
 
@@ -116,7 +116,7 @@ def hash_sha512(data: str) -> Dict[str, str]:
 
 
 @strands_tool
-def hash_file(file_path: str, algorithm: str = "sha256") -> Dict[str, Union[str, int]]:
+def hash_file(file_path: str, algorithm: str = "sha256") -> dict[str, Union[str, int]]:
     """
     Generate hash of a file's contents.
 
@@ -190,7 +190,7 @@ def hash_file(file_path: str, algorithm: str = "sha256") -> Dict[str, Union[str,
 @strands_tool
 def verify_checksum(
     data: str, expected_hash: str, algorithm: str = "sha256"
-) -> Dict[str, Union[str, bool]]:
+) -> dict[str, Union[str, bool]]:
     """
     Verify data against an expected hash.
 

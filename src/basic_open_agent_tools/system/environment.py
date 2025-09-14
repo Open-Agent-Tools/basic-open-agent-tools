@@ -1,13 +1,13 @@
 """Environment variable operations."""
 
 import os
-from typing import Dict, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         """Fallback decorator when strands is not available."""
         return func
 
@@ -16,7 +16,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def get_env_var(variable_name: str) -> Dict[str, Union[str, bool]]:
+def get_env_var(variable_name: str) -> dict[str, Union[str, bool]]:
     """
     Get the value of an environment variable.
 
@@ -51,7 +51,7 @@ def get_env_var(variable_name: str) -> Dict[str, Union[str, bool]]:
 
 
 @strands_tool
-def set_env_var(variable_name: str, value: str) -> Dict[str, Union[str, bool]]:
+def set_env_var(variable_name: str, value: str) -> dict[str, Union[str, bool]]:
     """
     Set an environment variable (for current process only).
 
@@ -98,7 +98,7 @@ def set_env_var(variable_name: str, value: str) -> Dict[str, Union[str, bool]]:
 @strands_tool
 def list_env_vars(
     filter_pattern: Optional[str] = None, limit: int = 50
-) -> Dict[str, Union[int, Dict[str, str]]]:
+) -> dict[str, Union[int, dict[str, str], str, Optional[str]]]:
     """
     List environment variables, optionally filtered by name pattern.
 

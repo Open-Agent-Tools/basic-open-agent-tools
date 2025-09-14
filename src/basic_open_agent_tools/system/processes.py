@@ -1,9 +1,9 @@
 """Process management and information tools."""
 
-from typing import Dict, List, Union
+from typing import Any, Callable, Union
 
 try:
-    import psutil
+    import psutil  # type: ignore[import-untyped]
 
     HAS_PSUTIL = True
 except ImportError:
@@ -13,7 +13,7 @@ try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         """Fallback decorator when strands is not available."""
         return func
 
@@ -22,7 +22,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def get_current_process_info() -> Dict[str, Union[str, int, float]]:
+def get_current_process_info() -> dict[str, Union[str, int, float, Any]]:
     """
     Get information about the current process.
 
@@ -62,7 +62,7 @@ def get_current_process_info() -> Dict[str, Union[str, int, float]]:
 
 
 @strands_tool
-def list_running_processes(limit: int = 20) -> List[Dict[str, Union[str, int, float]]]:
+def list_running_processes(limit: int = 20) -> list[dict[str, Union[str, int, float]]]:
     """
     List basic information about running processes.
 
@@ -118,7 +118,7 @@ def list_running_processes(limit: int = 20) -> List[Dict[str, Union[str, int, fl
 
 
 @strands_tool
-def get_process_info(process_id: int) -> Dict[str, Union[str, int, float]]:
+def get_process_info(process_id: int) -> dict[str, Union[str, int, float, None]]:
     """
     Get information about a specific process by PID.
 
@@ -171,7 +171,9 @@ def get_process_info(process_id: int) -> Dict[str, Union[str, int, float]]:
 
 
 @strands_tool
-def is_process_running(process_name: str) -> Dict[str, Union[bool, int, List[int]]]:
+def is_process_running(
+    process_name: str,
+) -> dict[str, Union[bool, int, list[int], str]]:
     """
     Check if a process with the given name is running.
 

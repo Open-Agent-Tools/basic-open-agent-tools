@@ -1,13 +1,13 @@
 """Directory tree listing functionality."""
 
 from pathlib import Path
-from typing import List
+from typing import Any, Callable
 
 try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
         return func
 
 
@@ -39,7 +39,7 @@ def list_all_directory_contents(directory_path: str) -> str:
 
     def _generate_tree(
         current_path: Path, prefix: str = "", is_last: bool = True
-    ) -> List[str]:
+    ) -> list[str]:
         """Recursively generate tree representation."""
         tree_lines = []
 
@@ -107,9 +107,9 @@ def generate_directory_tree(
 
     def _generate_tree(
         current_path: Path, prefix: str = "", depth: int = 0, is_last: bool = True
-    ) -> List[str]:
+    ) -> list[str]:
         """Recursively generate tree representation with depth control."""
-        tree_lines: List[str] = []
+        tree_lines: list[str] = []
 
         # Check depth limit
         if depth > max_depth:

@@ -3,13 +3,13 @@
 import secrets
 import string
 import uuid
-from typing import Dict, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         """Fallback decorator when strands is not available."""
         return func
 
@@ -18,7 +18,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def generate_uuid(version: int = 4) -> Dict[str, str]:
+def generate_uuid(version: int = 4) -> dict[str, str]:
     """
     Generate a UUID (Universally Unique Identifier).
 
@@ -63,7 +63,7 @@ def generate_uuid(version: int = 4) -> Dict[str, str]:
 @strands_tool
 def generate_random_string(
     length: int = 16, character_set: str = "alphanumeric"
-) -> Dict[str, Union[str, int]]:
+) -> dict[str, Union[str, int]]:
     """
     Generate a cryptographically secure random string.
 
@@ -119,7 +119,7 @@ def generate_random_string(
 @strands_tool
 def generate_random_bytes(
     length: int = 16, encoding: str = "hex"
-) -> Dict[str, Union[str, int]]:
+) -> dict[str, Union[str, int]]:
     """
     Generate cryptographically secure random bytes.
 

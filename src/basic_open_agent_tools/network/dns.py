@@ -1,13 +1,13 @@
 """DNS resolution and network utilities."""
 
 import socket
-from typing import Dict, List, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         """Fallback decorator when strands is not available."""
         return func
 
@@ -16,7 +16,9 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def resolve_hostname(hostname: str) -> Dict[str, Union[str, List[str]]]:
+def resolve_hostname(
+    hostname: str,
+) -> dict[str, Union[str, int, list[str], list[Union[str, int]]]]:
     """
     Resolve a hostname to IP addresses.
 
@@ -68,7 +70,7 @@ def resolve_hostname(hostname: str) -> Dict[str, Union[str, List[str]]]:
 
 
 @strands_tool
-def reverse_dns_lookup(ip_address: str) -> Dict[str, Union[str, bool]]:
+def reverse_dns_lookup(ip_address: str) -> dict[str, Union[str, bool]]:
     """
     Perform reverse DNS lookup for an IP address.
 
@@ -124,7 +126,7 @@ def reverse_dns_lookup(ip_address: str) -> Dict[str, Union[str, bool]]:
 @strands_tool
 def check_port_open(
     host: str, port: int, timeout: int = 5
-) -> Dict[str, Union[str, int, bool, float]]:
+) -> dict[str, Union[str, int, bool, float]]:
     """
     Check if a port is open on a host.
 

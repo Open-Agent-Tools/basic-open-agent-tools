@@ -30,7 +30,8 @@ def can_create_symlinks() -> bool:
 
 
 skip_if_no_symlinks = pytest.mark.skipif(
-    not can_create_symlinks(), reason="Symlinks not supported or insufficient privileges"
+    not can_create_symlinks(),
+    reason="Symlinks not supported or insufficient privileges",
 )
 
 

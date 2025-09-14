@@ -1,15 +1,15 @@
 """Tests for hashing utilities."""
 
-import pytest
-import tempfile
 import os
-from unittest.mock import patch, mock_open
+import tempfile
+
+import pytest
 
 from basic_open_agent_tools.crypto.hashing import (
+    hash_file,
     hash_md5,
     hash_sha256,
     hash_sha512,
-    hash_file,
     verify_checksum,
 )
 from basic_open_agent_tools.exceptions import BasicAgentToolsError
@@ -70,7 +70,10 @@ class TestHashSha256:
         assert result["algorithm"] == "sha256"
         assert result["input_data"] == "hello world"
         assert result["input_length"] == 11
-        assert result["hash_hex"] == "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
+        assert (
+            result["hash_hex"]
+            == "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
+        )
         assert result["hash_length"] == 64
 
     def test_empty_string_hash(self):
@@ -78,7 +81,10 @@ class TestHashSha256:
         result = hash_sha256("")
 
         assert result["algorithm"] == "sha256"
-        assert result["hash_hex"] == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        assert (
+            result["hash_hex"]
+            == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        )
 
 
 class TestHashSha512:
@@ -106,13 +112,19 @@ class TestHashFile:
 
     def test_invalid_file_path_type(self):
         """Test error handling for invalid file path types."""
-        with pytest.raises(BasicAgentToolsError, match="File path must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="File path must be a non-empty string"
+        ):
             hash_file("")
 
-        with pytest.raises(BasicAgentToolsError, match="File path must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="File path must be a non-empty string"
+        ):
             hash_file(None)
 
-        with pytest.raises(BasicAgentToolsError, match="File path must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="File path must be a non-empty string"
+        ):
             hash_file("   ")
 
     def test_invalid_algorithm(self):
@@ -132,8 +144,8 @@ class TestHashFile:
         """Test successful file hashing with SHA-256."""
         test_content = "hello world\n"
 
-        with tempfile.NamedTemporaryFile(mode='wb', delete=False) as f:
-            f.write(test_content.encode('utf-8'))
+        with tempfile.NamedTemporaryFile(mode="wb", delete=False) as f:
+            f.write(test_content.encode("utf-8"))
             temp_file_path = f.name
 
         try:
@@ -141,7 +153,7 @@ class TestHashFile:
 
             assert result["algorithm"] == "sha256"
             assert result["file_path"] == temp_file_path
-            assert result["file_size_bytes"] == len(test_content.encode('utf-8'))
+            assert result["file_size_bytes"] == len(test_content.encode("utf-8"))
             assert len(result["hash_hex"]) == 64
             assert result["hash_length"] == 64
 
@@ -152,7 +164,7 @@ class TestHashFile:
         """Test successful file hashing with MD5."""
         test_content = "test content"
 
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
             f.write(test_content)
             temp_file_path = f.name
 
@@ -176,14 +188,14 @@ class TestHashFile:
         # Create a file larger than typical chunk size
         large_content = "x" * (100 * 1024)  # 100KB
 
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
             f.write(large_content)
             temp_file_path = f.name
 
         try:
             result = hash_file(temp_file_path, algorithm="sha256")
 
-            assert result["file_size_bytes"] == len(large_content.encode('utf-8'))
+            assert result["file_size_bytes"] == len(large_content.encode("utf-8"))
             assert len(result["hash_hex"]) == 64
 
         finally:
@@ -200,10 +212,14 @@ class TestVerifyChecksum:
 
     def test_invalid_expected_hash_type(self):
         """Test error handling for invalid expected hash types."""
-        with pytest.raises(BasicAgentToolsError, match="Expected hash must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Expected hash must be a non-empty string"
+        ):
             verify_checksum("test", "")
 
-        with pytest.raises(BasicAgentToolsError, match="Expected hash must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Expected hash must be a non-empty string"
+        ):
             verify_checksum("test", None)
 
     def test_invalid_algorithm(self):
@@ -213,10 +229,16 @@ class TestVerifyChecksum:
 
     def test_invalid_hex_format(self):
         """Test error handling for invalid hex format in expected hash."""
-        with pytest.raises(BasicAgentToolsError, match="Expected hash must be a valid hexadecimal string"):
+        with pytest.raises(
+            BasicAgentToolsError,
+            match="Expected hash must be a valid hexadecimal string",
+        ):
             verify_checksum("test", "not_hex_format")
 
-        with pytest.raises(BasicAgentToolsError, match="Expected hash must be a valid hexadecimal string"):
+        with pytest.raises(
+            BasicAgentToolsError,
+            match="Expected hash must be a valid hexadecimal string",
+        ):
             verify_checksum("test", "gggggg")
 
     def test_successful_checksum_verification_valid(self):
@@ -257,7 +279,9 @@ class TestVerifyChecksum:
     def test_sha256_verification(self):
         """Test checksum verification with SHA-256."""
         data = "test"
-        expected_hash = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+        expected_hash = (
+            "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+        )
 
         result = verify_checksum(data, expected_hash, algorithm="sha256")
 

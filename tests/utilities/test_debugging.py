@@ -1,17 +1,17 @@
 """Tests for debugging utilities."""
 
 import sys
-import inspect
-from unittest.mock import patch, MagicMock
+
 import pytest
-from basic_open_agent_tools.utilities.debugging import (
-    inspect_function_signature,
-    get_call_stack_info,
-    format_exception_details,
-    validate_function_call,
-    trace_variable_changes
-)
+
 from basic_open_agent_tools.exceptions import BasicAgentToolsError
+from basic_open_agent_tools.utilities.debugging import (
+    format_exception_details,
+    get_call_stack_info,
+    inspect_function_signature,
+    trace_variable_changes,
+    validate_function_call,
+)
 
 
 class TestInspectFunctionSignature:
@@ -53,6 +53,7 @@ class TestInspectFunctionSignature:
 
     def test_custom_function_inspection(self):
         """Test inspecting a custom function."""
+
         def test_func(arg1: str, arg2: int = 10) -> str:
             """Test function docstring."""
             return f"{arg1}_{arg2}"
@@ -85,6 +86,7 @@ class TestGetCallStackInfo:
 
     def test_call_stack_structure(self):
         """Test call stack information structure."""
+
         def inner_function():
             return get_call_stack_info()
 
@@ -112,7 +114,14 @@ class TestGetCallStackInfo:
         assert len(result["call_stack"]) > 0
         frame = result["call_stack"][0]
 
-        required_keys = ["level", "filename", "function_name", "line_number", "code_context", "is_current_function"]
+        required_keys = [
+            "level",
+            "filename",
+            "function_name",
+            "line_number",
+            "code_context",
+            "is_current_function",
+        ]
         for key in required_keys:
             assert key in frame
 
@@ -125,7 +134,7 @@ class TestFormatExceptionDetails:
     def test_no_exception_available(self):
         """Test when no exception information is available."""
         # Clear any existing exception
-        sys.exc_clear() if hasattr(sys, 'exc_clear') else None
+        sys.exc_clear() if hasattr(sys, "exc_clear") else None
 
         with pytest.raises(BasicAgentToolsError) as exc_info:
             format_exception_details()
@@ -243,7 +252,7 @@ class TestTraceVariableChanges:
         operations = [
             "counter = counter + 1",
             "counter = counter * 2",
-            "counter = counter - 5"
+            "counter = counter - 5",
         ]
 
         result = trace_variable_changes("counter", 0, operations)
@@ -276,7 +285,7 @@ class TestTraceVariableChanges:
         operations = [
             "counter = counter + 1",
             "counter = counter +",  # Syntax error
-            "counter = counter * 2"
+            "counter = counter * 2",
         ]
 
         result = trace_variable_changes("counter", 0, operations)

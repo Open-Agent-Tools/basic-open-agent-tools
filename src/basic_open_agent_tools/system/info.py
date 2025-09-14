@@ -2,10 +2,10 @@
 
 import platform
 import time
-from typing import Dict, Union
+from typing import Any, Callable, Union
 
 try:
-    import psutil
+    import psutil  # type: ignore[import-untyped]
 
     HAS_PSUTIL = True
 except ImportError:
@@ -15,7 +15,7 @@ try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         """Fallback decorator when strands is not available."""
         return func
 
@@ -24,7 +24,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def get_system_info() -> Dict[str, str]:
+def get_system_info() -> dict[str, str]:
     """
     Get basic system information.
 
@@ -51,7 +51,7 @@ def get_system_info() -> Dict[str, str]:
 
 
 @strands_tool
-def get_cpu_info() -> Dict[str, Union[str, int, float]]:
+def get_cpu_info() -> dict[str, Union[str, int, float]]:
     """
     Get CPU information and usage statistics.
 
@@ -94,7 +94,7 @@ def get_cpu_info() -> Dict[str, Union[str, int, float]]:
 
 
 @strands_tool
-def get_memory_info() -> Dict[str, Union[int, float]]:
+def get_memory_info() -> dict[str, Union[int, float]]:
     """
     Get memory usage statistics.
 
@@ -129,7 +129,7 @@ def get_memory_info() -> Dict[str, Union[int, float]]:
 
 
 @strands_tool
-def get_disk_usage(path: str = "/") -> Dict[str, Union[int, float]]:
+def get_disk_usage(path: str = "/") -> dict[str, Union[int, float, str]]:
     """
     Get disk usage statistics for a given path.
 
@@ -173,7 +173,7 @@ def get_disk_usage(path: str = "/") -> Dict[str, Union[int, float]]:
 
 
 @strands_tool
-def get_uptime() -> Dict[str, Union[int, float]]:
+def get_uptime() -> dict[str, Union[int, float, str]]:
     """
     Get system uptime information.
 

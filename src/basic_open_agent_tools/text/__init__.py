@@ -5,8 +5,6 @@ This module provides text processing and manipulation tools organized into logic
 - processing: Core text cleaning, normalization, and formatting
 """
 
-from typing import List
-
 # Import all functions from submodules
 from .processing import (
     clean_whitespace,
@@ -22,7 +20,7 @@ from .processing import (
 )
 
 # Re-export all functions at module level for convenience
-__all__: List[str] = [
+__all__: list[str] = [
     # Text cleaning and normalization
     "clean_whitespace",
     "normalize_line_endings",

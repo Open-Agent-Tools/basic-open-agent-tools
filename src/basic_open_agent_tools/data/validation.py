@@ -1,12 +1,12 @@
 """Data validation utilities for AI agents."""
 
-from typing import Dict, List
+from typing import Any, Callable
 
 try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
         return func
 
 
@@ -73,7 +73,7 @@ def _validate_against_schema(data: dict, schema: dict) -> None:
 
 
 @strands_tool
-def check_required_fields(data: dict, required: List[str]) -> bool:
+def check_required_fields(data: dict, required: list[str]) -> bool:
     """Check if all required fields are present in data.
 
     Args:
@@ -108,7 +108,7 @@ def check_required_fields(data: dict, required: List[str]) -> bool:
 
 
 @strands_tool
-def validate_data_types_simple(data: dict, type_map: Dict[str, str]) -> bool:
+def validate_data_types_simple(data: dict, type_map: dict[str, str]) -> bool:
     """Check that field types match expectations.
 
     Args:
@@ -290,7 +290,7 @@ def create_validation_report(data: dict, rules: dict) -> dict:
 
 
 @strands_tool
-def check_required_fields_simple(data: dict, required: List[str]) -> bool:
+def check_required_fields_simple(data: dict, required: list[str]) -> bool:
     """Check if all required fields are present in data.
 
     This is an alias for check_required_fields for LLM agent compatibility.

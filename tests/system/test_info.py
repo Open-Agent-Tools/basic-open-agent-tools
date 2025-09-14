@@ -1,16 +1,17 @@
 """Tests for system information tools."""
 
-import pytest
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
+import pytest
+
+from basic_open_agent_tools.exceptions import BasicAgentToolsError
 from basic_open_agent_tools.system.info import (
-    get_system_info,
     get_cpu_info,
-    get_memory_info,
     get_disk_usage,
+    get_memory_info,
+    get_system_info,
     get_uptime,
 )
-from basic_open_agent_tools.exceptions import BasicAgentToolsError
 
 
 class TestGetSystemInfo:
@@ -22,8 +23,15 @@ class TestGetSystemInfo:
 
         # Check that all expected keys are present
         expected_keys = [
-            "system", "release", "version", "machine", "processor",
-            "architecture", "platform", "node", "python_version"
+            "system",
+            "release",
+            "version",
+            "machine",
+            "processor",
+            "architecture",
+            "platform",
+            "node",
+            "python_version",
         ]
 
         for key in expected_keys:
@@ -42,12 +50,12 @@ class TestGetCpuInfo:
 
     def test_psutil_not_available_error(self):
         """Test error when psutil is not available."""
-        with patch('basic_open_agent_tools.system.info.HAS_PSUTIL', False):
+        with patch("basic_open_agent_tools.system.info.HAS_PSUTIL", False):
             with pytest.raises(BasicAgentToolsError, match="psutil package required"):
                 get_cpu_info()
 
-    @patch('basic_open_agent_tools.system.info.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.system.info.psutil')
+    @patch("basic_open_agent_tools.system.info.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.system.info.psutil")
     def test_successful_cpu_info_retrieval(self, mock_psutil):
         """Test successful CPU information retrieval."""
         # Mock psutil functions
@@ -62,8 +70,13 @@ class TestGetCpuInfo:
         result = get_cpu_info()
 
         expected_keys = [
-            "usage_percent", "physical_cores", "logical_cores",
-            "processor", "current_frequency_mhz", "min_frequency_mhz", "max_frequency_mhz"
+            "usage_percent",
+            "physical_cores",
+            "logical_cores",
+            "processor",
+            "current_frequency_mhz",
+            "min_frequency_mhz",
+            "max_frequency_mhz",
         ]
 
         for key in expected_keys:
@@ -73,8 +86,8 @@ class TestGetCpuInfo:
         assert result["physical_cores"] == 4
         assert result["current_frequency_mhz"] == 2400.0
 
-    @patch('basic_open_agent_tools.system.info.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.system.info.psutil')
+    @patch("basic_open_agent_tools.system.info.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.system.info.psutil")
     def test_cpu_info_without_frequency(self, mock_psutil):
         """Test CPU info retrieval when frequency info is not available."""
         mock_psutil.cpu_percent.return_value = 25.5
@@ -93,12 +106,12 @@ class TestGetMemoryInfo:
 
     def test_psutil_not_available_error(self):
         """Test error when psutil is not available."""
-        with patch('basic_open_agent_tools.system.info.HAS_PSUTIL', False):
+        with patch("basic_open_agent_tools.system.info.HAS_PSUTIL", False):
             with pytest.raises(BasicAgentToolsError, match="psutil package required"):
                 get_memory_info()
 
-    @patch('basic_open_agent_tools.system.info.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.system.info.psutil')
+    @patch("basic_open_agent_tools.system.info.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.system.info.psutil")
     def test_successful_memory_info_retrieval(self, mock_psutil):
         """Test successful memory information retrieval."""
         # Mock virtual memory
@@ -121,9 +134,15 @@ class TestGetMemoryInfo:
         result = get_memory_info()
 
         expected_keys = [
-            "total_bytes", "available_bytes", "used_bytes", "free_bytes",
-            "usage_percent", "swap_total_bytes", "swap_used_bytes",
-            "swap_free_bytes", "swap_usage_percent"
+            "total_bytes",
+            "available_bytes",
+            "used_bytes",
+            "free_bytes",
+            "usage_percent",
+            "swap_total_bytes",
+            "swap_used_bytes",
+            "swap_free_bytes",
+            "swap_usage_percent",
         ]
 
         for key in expected_keys:
@@ -140,20 +159,24 @@ class TestGetDiskUsage:
 
     def test_invalid_path_type(self):
         """Test error handling for invalid path types."""
-        with pytest.raises(BasicAgentToolsError, match="Path must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Path must be a non-empty string"
+        ):
             get_disk_usage("")
 
-        with pytest.raises(BasicAgentToolsError, match="Path must be a non-empty string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Path must be a non-empty string"
+        ):
             get_disk_usage(None)
 
     def test_psutil_not_available_error(self):
         """Test error when psutil is not available."""
-        with patch('basic_open_agent_tools.system.info.HAS_PSUTIL', False):
+        with patch("basic_open_agent_tools.system.info.HAS_PSUTIL", False):
             with pytest.raises(BasicAgentToolsError, match="psutil package required"):
                 get_disk_usage("/")
 
-    @patch('basic_open_agent_tools.system.info.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.system.info.psutil')
+    @patch("basic_open_agent_tools.system.info.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.system.info.psutil")
     def test_successful_disk_usage_retrieval(self, mock_psutil):
         """Test successful disk usage retrieval."""
         mock_usage = Mock()
@@ -164,7 +187,13 @@ class TestGetDiskUsage:
 
         result = get_disk_usage("/tmp")
 
-        expected_keys = ["path", "total_bytes", "used_bytes", "free_bytes", "usage_percent"]
+        expected_keys = [
+            "path",
+            "total_bytes",
+            "used_bytes",
+            "free_bytes",
+            "usage_percent",
+        ]
 
         for key in expected_keys:
             assert key in result
@@ -175,8 +204,8 @@ class TestGetDiskUsage:
         assert result["free_bytes"] == 400000000
         assert result["usage_percent"] == 60.0
 
-    @patch('basic_open_agent_tools.system.info.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.system.info.psutil')
+    @patch("basic_open_agent_tools.system.info.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.system.info.psutil")
     def test_windows_default_path_conversion(self, mock_psutil):
         """Test Windows default path conversion."""
         mock_usage = Mock()
@@ -185,14 +214,14 @@ class TestGetDiskUsage:
         mock_usage.free = 400000000
         mock_psutil.disk_usage.return_value = mock_usage
 
-        with patch('platform.system', return_value='Windows'):
-            result = get_disk_usage("/")  # Default path
+        with patch("platform.system", return_value="Windows"):
+            get_disk_usage("/")  # Default path
 
             # Should be converted to C:\\ on Windows
             mock_psutil.disk_usage.assert_called_with("C:\\")
 
-    @patch('basic_open_agent_tools.system.info.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.system.info.psutil')
+    @patch("basic_open_agent_tools.system.info.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.system.info.psutil")
     def test_file_not_found_error(self, mock_psutil):
         """Test handling of FileNotFoundError."""
         mock_psutil.disk_usage.side_effect = FileNotFoundError()
@@ -206,13 +235,13 @@ class TestGetUptime:
 
     def test_psutil_not_available_error(self):
         """Test error when psutil is not available."""
-        with patch('basic_open_agent_tools.system.info.HAS_PSUTIL', False):
+        with patch("basic_open_agent_tools.system.info.HAS_PSUTIL", False):
             with pytest.raises(BasicAgentToolsError, match="psutil package required"):
                 get_uptime()
 
-    @patch('basic_open_agent_tools.system.info.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.system.info.psutil')
-    @patch('basic_open_agent_tools.system.info.time')
+    @patch("basic_open_agent_tools.system.info.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.system.info.psutil")
+    @patch("basic_open_agent_tools.system.info.time")
     def test_successful_uptime_retrieval(self, mock_time, mock_psutil):
         """Test successful uptime retrieval."""
         # Mock boot time (1 day, 2 hours, 30 minutes, 45 seconds ago)
@@ -227,9 +256,14 @@ class TestGetUptime:
         result = get_uptime()
 
         expected_keys = [
-            "uptime_seconds", "boot_time_timestamp", "boot_time_iso",
-            "uptime_days", "uptime_hours", "uptime_minutes",
-            "uptime_seconds_remainder", "uptime_human"
+            "uptime_seconds",
+            "boot_time_timestamp",
+            "boot_time_iso",
+            "uptime_days",
+            "uptime_hours",
+            "uptime_minutes",
+            "uptime_seconds_remainder",
+            "uptime_human",
         ]
 
         for key in expected_keys:

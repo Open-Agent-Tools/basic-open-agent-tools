@@ -1,13 +1,12 @@
 """Tests for new module helper functions."""
 
-import pytest
 from basic_open_agent_tools.helpers import (
     load_all_network_tools,
     load_all_utilities_tools,
     merge_tool_lists,
 )
-from basic_open_agent_tools.network.http_client import http_request, http_get, http_post
-from basic_open_agent_tools.utilities.timing import sleep_seconds, sleep_milliseconds, precise_sleep
+from basic_open_agent_tools.network.http_client import http_request
+from basic_open_agent_tools.utilities.timing import sleep_seconds
 
 
 class TestNetworkToolsLoader:
@@ -36,12 +35,12 @@ class TestNetworkToolsLoader:
         # Find http_request function
         http_request_func = None
         for tool in tools:
-            if tool.__name__ == 'http_request':
+            if tool.__name__ == "http_request":
                 http_request_func = tool
                 break
 
         assert http_request_func is not None
-        assert http_request_func.__name__ == 'http_request'
+        assert http_request_func.__name__ == "http_request"
 
 
 class TestUtilitiesToolsLoader:
@@ -70,12 +69,12 @@ class TestUtilitiesToolsLoader:
         # Find sleep_seconds function
         sleep_seconds_func = None
         for tool in tools:
-            if tool.__name__ == 'sleep_seconds':
+            if tool.__name__ == "sleep_seconds":
                 sleep_seconds_func = tool
                 break
 
         assert sleep_seconds_func is not None
-        assert sleep_seconds_func.__name__ == 'sleep_seconds'
+        assert sleep_seconds_func.__name__ == "sleep_seconds"
 
 
 class TestToolMerging:

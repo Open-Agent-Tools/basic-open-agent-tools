@@ -23,7 +23,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -89,7 +88,7 @@ Issues = "https://github.com/open-agent-tools/basic-open-agent-tools/issues"
 where = ["src"]
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py39"
 line-length = 88
 
 [tool.ruff.lint]
@@ -113,7 +112,7 @@ ignore = [
 "__init__.py" = ["F401"]
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

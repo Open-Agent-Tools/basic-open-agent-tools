@@ -8,13 +8,13 @@ import json
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Dict, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         return func
 
 
@@ -25,12 +25,12 @@ from ..exceptions import BasicAgentToolsError
 def http_request(
     method: str,
     url: str,
-    headers: Optional[Dict[str, str]] = None,
+    headers: Optional[dict[str, str]] = None,
     body: Optional[str] = None,
     timeout: int = 30,
     follow_redirects: bool = True,
     verify_ssl: bool = True,
-) -> Dict[str, Union[str, int]]:
+) -> dict[str, Union[str, int]]:
     """Make an HTTP request with simplified parameters.
 
     Args:
@@ -114,7 +114,15 @@ def http_request(
         if not follow_redirects:
 
             class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
-                def redirect_request(self, req, fp, code, msg, headers, newurl):
+                def redirect_request(
+                    self,
+                    req: Any,
+                    fp: Any,
+                    code: Any,
+                    msg: Any,
+                    headers: Any,
+                    newurl: Any,
+                ) -> None:
                     return None
 
             opener = urllib.request.build_opener(NoRedirectHandler)
@@ -178,8 +186,8 @@ def http_request(
 
 @strands_tool
 def http_get(
-    url: str, headers: Optional[Dict[str, str]] = None, timeout: int = 30
-) -> Dict[str, Union[str, int]]:
+    url: str, headers: Optional[dict[str, str]] = None, timeout: int = 30
+) -> dict[str, Union[str, int]]:
     """Convenience function for HTTP GET requests.
 
     Args:
@@ -195,16 +203,16 @@ def http_get(
         >>> print(response["status_code"])
         200
     """
-    return http_request("GET", url, headers=headers, timeout=timeout)
+    return http_request("GET", url, headers=headers, timeout=timeout)  # type: ignore[no-any-return]
 
 
 @strands_tool
 def http_post(
     url: str,
     body: Optional[str] = None,
-    headers: Optional[Dict[str, str]] = None,
+    headers: Optional[dict[str, str]] = None,
     timeout: int = 30,
-) -> Dict[str, Union[str, int]]:
+) -> dict[str, Union[str, int]]:
     """Convenience function for HTTP POST requests.
 
     Args:
@@ -222,4 +230,4 @@ def http_post(
         >>> print(response["status_code"])
         201
     """
-    return http_request("POST", url, headers=headers, body=body, timeout=timeout)
+    return http_request("POST", url, headers=headers, body=body, timeout=timeout)  # type: ignore[no-any-return]

@@ -2,13 +2,13 @@
 
 import os
 import tarfile
-from typing import Dict, List, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         return func
 
 
@@ -17,8 +17,8 @@ from ..exceptions import BasicAgentToolsError
 
 @strands_tool
 def create_tar(
-    source_paths: List[str], output_path: str, compression: str = "gzip"
-) -> Dict[str, Union[str, int]]:
+    source_paths: list[str], output_path: str, compression: str = "gzip"
+) -> dict[str, Union[str, int]]:
     """Create a TAR archive from files and directories."""
     if not isinstance(source_paths, list) or not source_paths:
         raise BasicAgentToolsError("Source paths must be a non-empty list")
@@ -45,7 +45,7 @@ def create_tar(
 
 
 @strands_tool
-def extract_tar(tar_path: str, extract_to: str) -> Dict[str, Union[str, int]]:
+def extract_tar(tar_path: str, extract_to: str) -> dict[str, Union[str, int]]:
     """Extract a TAR archive to a directory."""
     if not os.path.exists(tar_path):
         raise BasicAgentToolsError(f"TAR file not found: {tar_path}")

@@ -3,13 +3,13 @@
 import glob
 import logging.handlers
 import os
-from typing import Dict, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         return func
 
 
@@ -22,7 +22,7 @@ def setup_rotating_log(
     log_file: str,
     max_bytes: int = 10485760,  # 10MB
     backup_count: int = 5,
-) -> Dict[str, Union[str, int]]:
+) -> dict[str, Union[str, int]]:
     """Set up a rotating file handler for a logger."""
     try:
         logger = logging.getLogger(logger_name)
@@ -49,7 +49,7 @@ def setup_rotating_log(
 @strands_tool
 def cleanup_old_logs(
     log_pattern: str, keep_count: int = 5
-) -> Dict[str, Union[str, int]]:
+) -> dict[str, Union[str, int]]:
     """Clean up old log files matching a pattern."""
     try:
         log_files = sorted(glob.glob(log_pattern), key=os.path.getmtime, reverse=True)

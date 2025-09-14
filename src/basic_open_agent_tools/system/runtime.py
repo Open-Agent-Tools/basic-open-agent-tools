@@ -5,13 +5,13 @@ import platform
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         """Fallback decorator when strands is not available."""
         return func
 
@@ -20,7 +20,9 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def inspect_runtime_environment() -> Dict[str, Union[str, int, float, List[str]]]:
+def inspect_runtime_environment() -> dict[
+    str, Union[str, int, float, list[str], dict, Any]
+]:
     """
     Get comprehensive runtime environment information for the current agent.
 
@@ -129,7 +131,7 @@ def inspect_runtime_environment() -> Dict[str, Union[str, int, float, List[str]]
 
 
 @strands_tool
-def get_python_module_info() -> Dict[str, Union[str, List[str]]]:
+def get_python_module_info() -> dict[str, Union[str, int, bool, list[str]]]:
     """
     Get information about loaded Python modules and packages.
 
@@ -177,7 +179,7 @@ def get_python_module_info() -> Dict[str, Union[str, List[str]]]:
 
 
 @strands_tool
-def get_file_system_context() -> Dict[str, Union[str, List[str], bool]]:
+def get_file_system_context() -> dict[str, Union[str, list[str], bool, int]]:
     """
     Get file system context information for the current runtime.
 
@@ -274,7 +276,7 @@ def get_file_system_context() -> Dict[str, Union[str, List[str], bool]]:
 
 
 @strands_tool
-def get_network_environment() -> Dict[str, Union[str, List[str], bool]]:
+def get_network_environment() -> dict[str, Union[str, list[str], bool, int, dict]]:
     """
     Get basic network environment information (without external dependencies).
 

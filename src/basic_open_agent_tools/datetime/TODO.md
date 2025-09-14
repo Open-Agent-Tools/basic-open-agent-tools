@@ -1,6 +1,6 @@
 # DateTime Tools TODO
 
-## Current Status (v0.8.2)
+## Current Status (v0.9.1)
 
 ### 🎆 **COMPREHENSIVE DATETIME TOOLKIT COMPLETED**
 
@@ -181,4 +181,4 @@ all_tools = boat.merge_tool_lists(
 
 ---
 
-**Last Updated**: v0.8.2 (2025-07-08) - Phases 1 & 2 completed, comprehensive datetime toolkit implemented
+**Last Updated**: v0.9.1 (2025-09-14) - Phases 1 & 2 completed, comprehensive datetime toolkit implemented

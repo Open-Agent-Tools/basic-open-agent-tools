@@ -2,13 +2,13 @@
 
 import os
 import time
-from typing import Dict, List, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         return func
 
 
@@ -18,7 +18,7 @@ from ..exceptions import BasicAgentToolsError
 @strands_tool
 def watch_file_changes(
     file_path: str, check_interval: int = 1
-) -> Dict[str, Union[str, float, bool]]:
+) -> dict[str, Union[str, float, bool]]:
     """Watch a file for changes."""
     if not isinstance(file_path, str) or not file_path.strip():
         raise BasicAgentToolsError("File path must be a non-empty string")
@@ -53,7 +53,9 @@ def watch_file_changes(
 
 
 @strands_tool
-def monitor_directory(directory_path: str) -> Dict[str, Union[str, int, List[str]]]:
+def monitor_directory(
+    directory_path: str,
+) -> dict[str, Union[str, int, float, list[str], list[dict[str, object]]]]:
     """Monitor a directory for files and changes."""
     if not isinstance(directory_path, str) or not directory_path.strip():
         raise BasicAgentToolsError("Directory path must be a non-empty string")

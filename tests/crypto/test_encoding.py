@@ -1,15 +1,16 @@
 """Tests for encoding utilities."""
 
-import pytest
 import base64
 
+import pytest
+
 from basic_open_agent_tools.crypto.encoding import (
-    base64_encode,
     base64_decode,
-    url_encode,
-    url_decode,
-    hex_encode,
+    base64_encode,
     hex_decode,
+    hex_encode,
+    url_decode,
+    url_encode,
 )
 from basic_open_agent_tools.exceptions import BasicAgentToolsError
 
@@ -53,7 +54,7 @@ class TestBase64Encode:
         assert len(result["encoded_data"]) > 0
 
         # Verify it can be decoded back
-        decoded = base64.b64decode(result["encoded_data"]).decode('utf-8')
+        decoded = base64.b64decode(result["encoded_data"]).decode("utf-8")
         assert decoded == unicode_string
 
     def test_special_characters_encoding(self):
@@ -224,7 +225,7 @@ class TestHexEncode:
         result = hex_encode(special_string)
 
         assert result["original_data"] == special_string
-        assert len(result["encoded_data"]) == len(special_string.encode('utf-8')) * 2
+        assert len(result["encoded_data"]) == len(special_string.encode("utf-8")) * 2
 
 
 class TestHexDecode:
@@ -255,7 +256,9 @@ class TestHexDecode:
 
     def test_odd_length_hex_string(self):
         """Test error handling for hex string with odd number of characters."""
-        with pytest.raises(BasicAgentToolsError, match="Hex string must have even number of characters"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Hex string must have even number of characters"
+        ):
             hex_decode("68656c6c6")  # Missing last character
 
     def test_invalid_hex_characters(self):
@@ -266,7 +269,10 @@ class TestHexDecode:
     def test_invalid_utf8_sequence(self):
         """Test error handling for hex that doesn't decode to valid UTF-8."""
         # This hex sequence represents invalid UTF-8
-        with pytest.raises(BasicAgentToolsError, match="Decoded bytes do not represent valid UTF-8 text"):
+        with pytest.raises(
+            BasicAgentToolsError,
+            match="Decoded bytes do not represent valid UTF-8 text",
+        ):
             hex_decode("ff")  # 0xFF is not valid UTF-8
 
     def test_roundtrip_hex_encoding_decoding(self):

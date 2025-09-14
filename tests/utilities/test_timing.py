@@ -1,15 +1,16 @@
 """Tests for timing utilities."""
 
 import time
-import pytest
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
-from basic_open_agent_tools.utilities.timing import (
-    sleep_seconds,
-    sleep_milliseconds,
-    precise_sleep,
-)
+import pytest
+
 from basic_open_agent_tools.exceptions import BasicAgentToolsError
+from basic_open_agent_tools.utilities.timing import (
+    precise_sleep,
+    sleep_milliseconds,
+    sleep_seconds,
+)
 
 
 class TestSleepSeconds:
@@ -30,7 +31,9 @@ class TestSleepSeconds:
 
     def test_too_large_seconds(self):
         """Test error handling for seconds greater than 1 hour."""
-        with pytest.raises(BasicAgentToolsError, match="Maximum sleep duration is 3600 seconds"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Maximum sleep duration is 3600 seconds"
+        ):
             sleep_seconds(3601)
 
     def test_successful_sleep(self):
@@ -61,7 +64,7 @@ class TestSleepSeconds:
         assert result["requested_seconds"] == 0.05
         assert 0.04 <= result["actual_seconds"] <= 0.1
 
-    @patch('time.sleep')
+    @patch("time.sleep")
     def test_keyboard_interrupt_handling(self, mock_sleep):
         """Test handling of KeyboardInterrupt during sleep."""
         mock_sleep.side_effect = KeyboardInterrupt()
@@ -73,7 +76,7 @@ class TestSleepSeconds:
         assert result["actual_seconds"] < 1.0
         assert "Sleep interrupted" in result["message"]
 
-    @patch('signal.signal')
+    @patch("signal.signal")
     def test_signal_handler_setup_failure(self, mock_signal):
         """Test graceful handling when signal setup fails."""
         mock_signal.side_effect = ValueError("Signal not available")
@@ -94,7 +97,9 @@ class TestSleepMilliseconds:
 
     def test_negative_milliseconds(self):
         """Test error handling for negative milliseconds."""
-        with pytest.raises(BasicAgentToolsError, match="Milliseconds cannot be negative"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Milliseconds cannot be negative"
+        ):
             sleep_milliseconds(-1)
 
     def test_successful_sleep_milliseconds(self):
@@ -138,7 +143,9 @@ class TestPreciseSleep:
 
     def test_too_large_seconds(self):
         """Test error handling for seconds greater than 60."""
-        with pytest.raises(BasicAgentToolsError, match="Maximum precise sleep duration is 60 seconds"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Maximum precise sleep duration is 60 seconds"
+        ):
             precise_sleep(61)
 
     def test_short_precise_sleep(self):
@@ -150,7 +157,9 @@ class TestPreciseSleep:
         assert result["status"] == "completed"
         assert result["requested_seconds"] == 0.001
         assert result["precision"] == "high"
-        assert 0.0005 <= result["actual_seconds"] <= 0.005  # Allow some variance for precision
+        assert (
+            0.0005 <= result["actual_seconds"] <= 0.005
+        )  # Allow some variance for precision
         assert 0.0005 <= (end_time - start_time) <= 0.005
 
     def test_longer_precise_sleep(self):
@@ -165,8 +174,8 @@ class TestPreciseSleep:
         assert 0.045 <= result["actual_seconds"] <= 0.065
         assert 0.045 <= (end_time - start_time) <= 0.065
 
-    @patch('time.sleep')
-    @patch('time.time')
+    @patch("time.sleep")
+    @patch("time.time")
     def test_precise_sleep_logic(self, mock_time, mock_sleep):
         """Test the logic of combining sleep and busy-wait."""
         # Mock time progression with enough values for all calls

@@ -5,6 +5,7 @@ strings and standard timezone names.
 """
 
 from datetime import datetime
+from typing import Any, Callable
 
 try:
     import zoneinfo
@@ -15,7 +16,7 @@ try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
         return func
 
 

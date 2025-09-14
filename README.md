@@ -160,14 +160,18 @@ Utilities Tools:
 
 ## Documentation
 
-- **[Getting Started](docs/getting-started.md)** - Installation and quick start guide
-- **[Examples](docs/examples.md)** - Detailed usage examples and patterns
-- **[Contributing](docs/contributing.md)** - Development setup and guidelines
+- **[Getting Started](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/docs/getting-started.md)** - Installation and quick start guide
+- **[API Reference](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/docs/api-reference.md)** - Complete function reference and lookup
+- **[Examples](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/docs/examples.md)** - Detailed usage examples and patterns
+- **[FAQ](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/docs/faq.md)** - Frequently asked questions and troubleshooting
+- **[Glossary](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/docs/glossary.md)** - Agent framework terminology reference
+- **[Contributing](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/docs/contributing.md)** - Development setup and guidelines
+- **[Changelog](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/CHANGELOG.md)** - Version history and migration notes
 
 ## Current Features
 
 ### File System Tools ✅ (18 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/file_system/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/file_system/README.md)**
 
 - File operations (read, write, append, delete, copy, move)
 - Directory operations (create, list, delete, tree visualization)
@@ -175,7 +179,7 @@ Utilities Tools:
 - Path validation and security features
 
 ### Text Processing Tools ✅ (10 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/text/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/text/README.md)**
 
 - Text cleaning and whitespace normalization
 - Case conversion utilities (snake_case, camelCase, Title Case)
@@ -183,7 +187,7 @@ Utilities Tools:
 - HTML tag removal and Unicode normalization
 
 ### Data Processing Tools ✅ (23 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/data/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/data/README.md)**
 
 - **JSON Processing**: Safe serialization, validation, compression
 - **CSV Operations**: Reading, writing, cleaning, validation
@@ -192,7 +196,7 @@ Utilities Tools:
 - **Agent-Friendly Signatures**: All functions use basic Python types for maximum AI framework compatibility
 
 ### DateTime Tools ✅ (40 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/datetime/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/datetime/README.md)**
 
 - **Current Date/Time**: Timezone-aware current date/time operations
 - **Date Arithmetic**: Add/subtract days, hours, minutes with proper handling
@@ -202,7 +206,7 @@ Utilities Tools:
 - **Information Extraction**: Weekday names, month names, leap years
 
 ### Network Tools ✅ (4 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/network/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/network/README.md)**
 
 - **HTTP Client**: Make API calls and fetch web data with comprehensive error handling
 - **DNS Resolution**: Resolve hostnames to IP addresses and reverse DNS lookups
@@ -212,7 +216,7 @@ Utilities Tools:
 - **Security**: SSL verification, timeout controls, proper error handling
 
 ### Utilities Tools ✅ (8 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/utilities/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/utilities/README.md)**
 
 - **Timing Controls**: Pause execution with interrupt handling and precision sleep
 - **Debugging Tools**: Function signature inspection, call stack analysis, exception formatting
@@ -222,7 +226,7 @@ Utilities Tools:
 - **Agent-Friendly**: Structured responses with detailed debugging information
 
 ### System Tools ✅ (19 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/system/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/system/README.md)**
 
 - **Cross-Platform Shell**: Execute shell commands on Windows, macOS, and Linux
 - **Process Management**: Get process info, list running processes, check if processes are running
@@ -231,7 +235,7 @@ Utilities Tools:
 - **Runtime Inspection**: Inspect Python environment, modules, and system context
 
 ### Crypto Tools ✅ (14 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/crypto/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/crypto/README.md)**
 
 - **Hashing**: MD5, SHA-256, SHA-512 hashing for strings and files
 - **Encoding**: Base64, URL, and hex encoding/decoding
@@ -239,7 +243,7 @@ Utilities Tools:
 - **Verification**: Checksum verification and hash validation
 
 ### PDF Tools ✅ (8 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/pdf/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/pdf/README.md)**
 
 - **PDF Reading**: Extract text from PDFs with page range support
 - **PDF Creation**: Convert text to PDF with customizable formatting and merging
@@ -248,7 +252,7 @@ Utilities Tools:
 - **Advanced Features**: Page-specific operations and document transformation
 
 ### Archive Tools ✅ (9 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/archive/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/archive/README.md)**
 
 - **ZIP Operations**: Create and extract ZIP archives
 - **TAR Operations**: Create and extract TAR archives
@@ -257,14 +261,14 @@ Utilities Tools:
 - **Multiple Formats**: Support for all major compression formats with statistics
 
 ### Logging Tools ✅ (5 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/logging/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/logging/README.md)**
 
 - **Structured Logging**: JSON-formatted logging with configurable fields
 - **Log Rotation**: Automatic log file rotation and cleanup
 - **Multiple Handlers**: File, console, and rotating file handlers
 
 ### Monitoring Tools ✅ (8 functions)
-📖 **[Complete Documentation](src/basic_open_agent_tools/monitoring/README.md)**
+📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/monitoring/README.md)**
 
 - **File Watching**: Monitor files and directories for changes
 - **Health Checks**: URL health monitoring and service status checks
@@ -315,7 +319,7 @@ custom_tools = boat.merge_tool_lists(
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](docs/contributing.md) for development setup, coding standards, and pull request process.
+We welcome contributions! Please see our [Contributing Guide](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/docs/contributing.md) for development setup, coding standards, and pull request process.
 
 
 

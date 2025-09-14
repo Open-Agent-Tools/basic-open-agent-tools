@@ -2,15 +2,17 @@
 
 import os
 import tempfile
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pytest
-from basic_open_agent_tools.monitoring.performance import (
-    monitor_function_performance,
-    get_system_load_average,
-    profile_code_execution,
-    benchmark_disk_io
-)
+
 from basic_open_agent_tools.exceptions import BasicAgentToolsError
+from basic_open_agent_tools.monitoring.performance import (
+    benchmark_disk_io,
+    get_system_load_average,
+    monitor_function_performance,
+    profile_code_execution,
+)
 
 
 class TestMonitorFunctionPerformance:
@@ -18,7 +20,7 @@ class TestMonitorFunctionPerformance:
 
     def test_missing_psutil_dependency(self):
         """Test error when psutil is not available."""
-        with patch('basic_open_agent_tools.monitoring.performance.HAS_PSUTIL', False):
+        with patch("basic_open_agent_tools.monitoring.performance.HAS_PSUTIL", False):
             with pytest.raises(BasicAgentToolsError) as exc_info:
                 monitor_function_performance(5)
             assert "psutil package required" in str(exc_info.value)
@@ -33,20 +35,29 @@ class TestMonitorFunctionPerformance:
         """Test with duration out of valid range."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
             monitor_function_performance(0)
-        assert "Duration must be an integer between 1 and 3600 seconds" in str(exc_info.value)
+        assert "Duration must be an integer between 1 and 3600 seconds" in str(
+            exc_info.value
+        )
 
         with pytest.raises(BasicAgentToolsError) as exc_info:
             monitor_function_performance(3601)
-        assert "Duration must be an integer between 1 and 3600 seconds" in str(exc_info.value)
+        assert "Duration must be an integer between 1 and 3600 seconds" in str(
+            exc_info.value
+        )
 
-    @patch('basic_open_agent_tools.monitoring.performance.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.monitoring.performance.psutil')
-    @patch('time.sleep')
-    @patch('time.time')
+    @patch("basic_open_agent_tools.monitoring.performance.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.monitoring.performance.psutil")
+    @patch("time.sleep")
+    @patch("time.time")
     def test_successful_monitoring(self, mock_time, mock_sleep, mock_psutil):
         """Test successful performance monitoring."""
         # Mock time progression
-        mock_time.side_effect = [0, 2, 4, 6]  # Start, then 3 samples at 2-second intervals
+        mock_time.side_effect = [
+            0,
+            2,
+            4,
+            6,
+        ]  # Start, then 3 samples at 2-second intervals
 
         # Mock psutil functions
         mock_psutil.cpu_percent.side_effect = [25.0, 30.0, 35.0]
@@ -56,7 +67,7 @@ class TestMonitorFunctionPerformance:
         mock_psutil.virtual_memory.side_effect = [
             MagicMock(percent=50.0),
             MagicMock(percent=55.0),
-            MagicMock(percent=60.0)
+            MagicMock(percent=60.0),
         ]
 
         mock_disk = MagicMock()
@@ -64,7 +75,7 @@ class TestMonitorFunctionPerformance:
         mock_psutil.disk_usage.side_effect = [
             MagicMock(percent=70.0),
             MagicMock(percent=72.0),
-            MagicMock(percent=75.0)
+            MagicMock(percent=75.0),
         ]
 
         result = monitor_function_performance(5)
@@ -90,10 +101,10 @@ class TestMonitorFunctionPerformance:
         assert result["disk_usage_min"] == 70.0
         assert result["disk_usage_max"] == 75.0
 
-    @patch('basic_open_agent_tools.monitoring.performance.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.monitoring.performance.psutil')
-    @patch('time.sleep')
-    @patch('time.time')
+    @patch("basic_open_agent_tools.monitoring.performance.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.monitoring.performance.psutil")
+    @patch("time.sleep")
+    @patch("time.time")
     def test_monitoring_with_exception(self, mock_time, mock_sleep, mock_psutil):
         """Test monitoring when psutil raises an exception."""
         mock_time.side_effect = [0, 2]
@@ -109,13 +120,13 @@ class TestGetSystemLoadAverage:
 
     def test_missing_psutil_dependency(self):
         """Test error when psutil is not available."""
-        with patch('basic_open_agent_tools.monitoring.performance.HAS_PSUTIL', False):
+        with patch("basic_open_agent_tools.monitoring.performance.HAS_PSUTIL", False):
             with pytest.raises(BasicAgentToolsError) as exc_info:
                 get_system_load_average()
             assert "psutil package required" in str(exc_info.value)
 
-    @patch('basic_open_agent_tools.monitoring.performance.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.monitoring.performance.psutil')
+    @patch("basic_open_agent_tools.monitoring.performance.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.monitoring.performance.psutil")
     def test_successful_load_average_unix(self, mock_psutil):
         """Test successful load average retrieval on Unix systems."""
         # Mock Unix system with load average support
@@ -130,12 +141,14 @@ class TestGetSystemLoadAverage:
         assert result["load_average_available"] is True
         assert result["retrieval_status"] == "success"
 
-    @patch('basic_open_agent_tools.monitoring.performance.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.monitoring.performance.psutil')
+    @patch("basic_open_agent_tools.monitoring.performance.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.monitoring.performance.psutil")
     def test_load_average_not_available(self, mock_psutil):
         """Test when load average is not available (e.g., Windows)."""
         # Mock Windows system where getloadavg raises AttributeError
-        mock_psutil.getloadavg.side_effect = AttributeError("Load average not available")
+        mock_psutil.getloadavg.side_effect = AttributeError(
+            "Load average not available"
+        )
 
         result = get_system_load_average()
 
@@ -146,8 +159,8 @@ class TestGetSystemLoadAverage:
         assert result["load_average_available"] is False
         assert result["retrieval_status"] == "not_available"
 
-    @patch('basic_open_agent_tools.monitoring.performance.HAS_PSUTIL', True)
-    @patch('basic_open_agent_tools.monitoring.performance.psutil')
+    @patch("basic_open_agent_tools.monitoring.performance.HAS_PSUTIL", True)
+    @patch("basic_open_agent_tools.monitoring.performance.psutil")
     def test_load_average_with_exception(self, mock_psutil):
         """Test when psutil raises an unexpected exception."""
         mock_psutil.getloadavg.side_effect = OSError("Permission denied")
@@ -176,17 +189,23 @@ class TestProfileCodeExecution:
         """Test with invalid iterations type."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
             profile_code_execution("x = 1", "invalid")
-        assert "Iterations must be an integer between 1 and 10000" in str(exc_info.value)
+        assert "Iterations must be an integer between 1 and 10000" in str(
+            exc_info.value
+        )
 
     def test_invalid_iterations_value(self):
         """Test with invalid iterations value."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
             profile_code_execution("x = 1", 0)
-        assert "Iterations must be an integer between 1 and 10000" in str(exc_info.value)
+        assert "Iterations must be an integer between 1 and 10000" in str(
+            exc_info.value
+        )
 
         with pytest.raises(BasicAgentToolsError) as exc_info:
             profile_code_execution("x = 1", 10001)
-        assert "Iterations must be an integer between 1 and 10000" in str(exc_info.value)
+        assert "Iterations must be an integer between 1 and 10000" in str(
+            exc_info.value
+        )
 
     def test_successful_code_profiling(self):
         """Test successful code profiling."""
@@ -206,7 +225,9 @@ class TestProfileCodeExecution:
         assert result["total_execution_time_seconds"] > 0
         assert result["avg_execution_time_seconds"] > 0
         assert result["min_execution_time_seconds"] >= 0
-        assert result["max_execution_time_seconds"] >= result["min_execution_time_seconds"]
+        assert (
+            result["max_execution_time_seconds"] >= result["min_execution_time_seconds"]
+        )
 
     def test_code_with_syntax_error(self):
         """Test profiling code with syntax error."""
@@ -227,7 +248,7 @@ class TestProfileCodeExecution:
             "exec('print(1)')",
             "eval('1+1')",
             "__import__('os')",
-            "open('/etc/passwd')"
+            "open('/etc/passwd')",
         ]
 
         for dangerous_code in dangerous_codes:
@@ -255,20 +276,26 @@ class TestBenchmarkDiskIo:
         """Test with invalid data size type."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
             benchmark_disk_io("test.dat", "invalid")
-        assert "Data size must be an integer between 1 and 10240 KB" in str(exc_info.value)
+        assert "Data size must be an integer between 1 and 10240 KB" in str(
+            exc_info.value
+        )
 
     def test_invalid_data_size_value(self):
         """Test with invalid data size value."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
             benchmark_disk_io("test.dat", 0)
-        assert "Data size must be an integer between 1 and 10240 KB" in str(exc_info.value)
+        assert "Data size must be an integer between 1 and 10240 KB" in str(
+            exc_info.value
+        )
 
         with pytest.raises(BasicAgentToolsError) as exc_info:
             benchmark_disk_io("test.dat", 10241)  # > 10240 KB
-        assert "Data size must be an integer between 1 and 10240 KB" in str(exc_info.value)
+        assert "Data size must be an integer between 1 and 10240 KB" in str(
+            exc_info.value
+        )
 
-    @patch('os.path.dirname')
-    @patch('os.access')
+    @patch("os.path.dirname")
+    @patch("os.access")
     def test_directory_not_writable(self, mock_access, mock_dirname):
         """Test when directory is not writable."""
         mock_dirname.return_value = "/readonly"
@@ -310,7 +337,7 @@ class TestBenchmarkDiskIo:
             # Cleanup should have occurred
             assert not os.path.exists(test_file)
 
-    @patch('builtins.open')
+    @patch("builtins.open")
     def test_write_permission_error(self, mock_open):
         """Test when write operation fails due to permissions."""
         mock_open.side_effect = PermissionError("Permission denied")

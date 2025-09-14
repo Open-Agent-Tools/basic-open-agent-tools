@@ -1,20 +1,20 @@
 """Performance monitoring and profiling utilities."""
 
 import time
-from typing import Dict, List, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         """Fallback decorator when strands is not available."""
         return func
 
 
 # Try to import system monitoring library
 try:
-    import psutil
+    import psutil  # type: ignore[import-untyped]
 
     HAS_PSUTIL = True
 except ImportError:
@@ -26,7 +26,7 @@ from ..exceptions import BasicAgentToolsError
 @strands_tool
 def monitor_function_performance(
     duration_seconds: int = 60,
-) -> Dict[str, Union[int, float, List]]:
+) -> dict[str, Union[int, float, str, list[Any], dict[str, float]]]:
     """
     Monitor system performance metrics over a specified duration.
 
@@ -94,7 +94,7 @@ def monitor_function_performance(
             time.sleep(sample_interval)
 
         # Calculate statistics
-        def calc_stats(samples):
+        def calc_stats(samples: list[float]) -> dict[str, float]:
             if not samples:
                 return {"min": 0, "max": 0, "avg": 0}
             return {
@@ -120,7 +120,7 @@ def monitor_function_performance(
 
 
 @strands_tool
-def get_system_load_average() -> Dict[str, Union[float, str, bool]]:
+def get_system_load_average() -> dict[str, Union[float, str, bool, int]]:
     """
     Get system load average information.
 
@@ -182,7 +182,7 @@ def get_system_load_average() -> Dict[str, Union[float, str, bool]]:
 @strands_tool
 def profile_code_execution(
     code_snippet: str, iterations: int = 1
-) -> Dict[str, Union[float, str, int, bool]]:
+) -> dict[str, Union[float, str, int, bool]]:
     """
     Profile execution time of a code snippet.
 
@@ -230,7 +230,9 @@ def profile_code_execution(
             start_time = time.perf_counter()
 
             # Execute in a restricted namespace
-            namespace = {"__builtins__": {}}  # Minimal namespace for security
+            namespace: dict[str, Any] = {
+                "__builtins__": {}
+            }  # Minimal namespace for security
             exec(compiled_code, namespace)
 
             end_time = time.perf_counter()
@@ -269,7 +271,7 @@ def profile_code_execution(
 @strands_tool
 def benchmark_disk_io(
     file_path: str, data_size_kb: int = 1024
-) -> Dict[str, Union[str, int, float]]:
+) -> dict[str, Union[str, int, float]]:
     """
     Benchmark disk I/O performance by writing and reading test data.
 

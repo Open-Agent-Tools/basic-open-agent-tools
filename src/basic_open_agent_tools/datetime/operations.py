@@ -5,12 +5,13 @@ All functions are designed to be agent-friendly with clear error handling.
 """
 
 from datetime import date, datetime, time, timedelta
+from typing import Any, Callable
 
 try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
         return func
 
 

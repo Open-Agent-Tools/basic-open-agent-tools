@@ -6,9 +6,9 @@ The following versions of basic-open-agent-tools are currently supported with se
 
 | Version | Supported          | Notes |
 | ------- | ------------------ | ----- |
-| 0.8.x   | :white_check_mark: | Current stable release |
-| 0.7.x   | :white_check_mark: | Previous stable release |
-| < 0.7   | :x:                | Legacy versions, please upgrade |
+| 0.9.x   | :white_check_mark: | Current stable release |
+| 0.8.x   | :white_check_mark: | Previous stable release |
+| < 0.8   | :x:                | Legacy versions, please upgrade |
 
 ## Security Considerations for AI Agent Tools
 
@@ -68,7 +68,7 @@ We take security seriously. If you discover a security vulnerability, please fol
 5. **Disclosure**: We publicly disclose details after users can update
 
 ### Security Updates
-Security fixes are released as patch versions (e.g., 0.8.1 → 0.8.2) and are immediately available via:
+Security fixes are released as patch versions (e.g., 0.9.1 → 0.9.2) and are immediately available via:
 - PyPI package updates
 - GitHub releases with security tags
 - Security advisories on GitHub

@@ -1,13 +1,13 @@
 """Core file and directory operations."""
 
 import shutil
-from typing import List
+from typing import Any, Callable
 
 try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
         return func
 
 
@@ -91,7 +91,7 @@ def append_to_file(file_path: str, content: str) -> bool:
 
 
 @strands_tool
-def list_directory_contents(directory_path: str, include_hidden: bool) -> List[str]:
+def list_directory_contents(directory_path: str, include_hidden: bool) -> list[str]:
     """List contents of a directory.
 
     Args:

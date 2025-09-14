@@ -3,13 +3,13 @@
 import json
 import logging
 import time
-from typing import Dict, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         return func
 
 
@@ -19,7 +19,7 @@ from ..exceptions import BasicAgentToolsError
 @strands_tool
 def log_info(
     message: str, logger_name: str = "agent", **kwargs
-) -> Dict[str, Union[str, float]]:
+) -> dict[str, Union[str, float]]:
     """Log an info message with structured data."""
     if not isinstance(message, str):
         raise BasicAgentToolsError("Message must be a string")
@@ -51,7 +51,7 @@ def log_info(
 @strands_tool
 def log_error(
     message: str, logger_name: str = "agent", **kwargs
-) -> Dict[str, Union[str, float]]:
+) -> dict[str, Union[str, float]]:
     """Log an error message with structured data."""
     if not isinstance(message, str):
         raise BasicAgentToolsError("Message must be a string")
@@ -83,7 +83,7 @@ def log_error(
 @strands_tool
 def configure_logger(
     logger_name: str, log_file: str, level: str = "INFO"
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """Configure a logger with file output."""
     if level not in ["DEBUG", "INFO", "WARNING", "ERROR"]:
         raise BasicAgentToolsError("Level must be DEBUG, INFO, WARNING, or ERROR")

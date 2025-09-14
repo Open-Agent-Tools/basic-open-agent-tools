@@ -4,8 +4,6 @@ An open foundational toolkit providing essential components for building AI agen
 with minimal dependencies for local (non-HTTP/API) actions.
 """
 
-from typing import List
-
 __version__ = "0.9.1"
 
 # Modular structure
@@ -18,7 +16,6 @@ from . import (
     file_system,
     monitoring,
     network,
-    pdf,
     system,
     text,
     types,
@@ -40,7 +37,6 @@ from .helpers import (
     load_all_logging_tools,
     load_all_monitoring_tools,
     load_all_network_tools,
-    load_all_pdf_tools,
     load_all_system_tools,
     load_all_text_tools,
     load_all_tools,
@@ -52,7 +48,7 @@ from .helpers import (
     merge_tool_lists,
 )
 
-__all__: List[str] = [
+__all__: list[str] = [
     # All implemented modules
     "archive",
     "crypto",
@@ -62,7 +58,6 @@ __all__: List[str] = [
     "log_module",
     "monitoring",
     "network",
-    "pdf",
     "system",
     "text",
     "utilities",
@@ -78,7 +73,6 @@ __all__: List[str] = [
     "load_all_logging_tools",
     "load_all_monitoring_tools",
     "load_all_network_tools",
-    "load_all_pdf_tools",
     "load_all_system_tools",
     "load_all_text_tools",
     "load_all_tools",

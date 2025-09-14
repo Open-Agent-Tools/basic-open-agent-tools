@@ -5,13 +5,13 @@ Provides timing utilities and execution control functions with agent-friendly si
 
 import signal
 import time
-from typing import Dict, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
         return func
 
 
@@ -19,7 +19,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def sleep_seconds(seconds: Union[int, float]) -> Dict[str, Union[str, float]]:
+def sleep_seconds(seconds: Union[int, float]) -> dict[str, Union[str, float]]:
     """Pause execution for the specified number of seconds.
 
     This function provides a controlled sleep mechanism that can be interrupted
@@ -57,7 +57,7 @@ def sleep_seconds(seconds: Union[int, float]) -> Dict[str, Union[str, float]]:
     start_time = time.time()
     interrupted = False
 
-    def signal_handler(signum, frame):
+    def signal_handler(signum: int, frame: Any) -> None:
         nonlocal interrupted
         interrupted = True
 
@@ -101,7 +101,7 @@ def sleep_seconds(seconds: Union[int, float]) -> Dict[str, Union[str, float]]:
 
 
 @strands_tool
-def sleep_milliseconds(milliseconds: Union[int, float]) -> Dict[str, Union[str, float]]:
+def sleep_milliseconds(milliseconds: Union[int, float]) -> dict[str, Union[str, float]]:
     """Pause execution for the specified number of milliseconds.
 
     Convenience function for shorter sleep durations.
@@ -127,17 +127,17 @@ def sleep_milliseconds(milliseconds: Union[int, float]) -> Dict[str, Union[str, 
         raise BasicAgentToolsError("Milliseconds cannot be negative")
 
     seconds = milliseconds / 1000.0
-    result = sleep_seconds(seconds)
+    result: dict[str, Union[str, float]] = sleep_seconds(seconds)
 
     # Update the result to reflect milliseconds
     result["requested_milliseconds"] = float(milliseconds)
-    result["actual_milliseconds"] = round(result["actual_seconds"] * 1000, 1)
+    result["actual_milliseconds"] = round(float(result["actual_seconds"]) * 1000, 1)
 
     return result
 
 
 @strands_tool
-def precise_sleep(seconds: Union[int, float]) -> Dict[str, Union[str, float]]:
+def precise_sleep(seconds: Union[int, float]) -> dict[str, Union[str, float]]:
     """Perform a high-precision sleep using busy-waiting for the final portion.
 
     This function combines time.sleep() with busy-waiting to achieve more precise

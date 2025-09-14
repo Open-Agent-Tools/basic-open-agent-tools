@@ -2,13 +2,13 @@
 
 import socket
 import time
-from typing import Dict, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         return func
 
 
@@ -26,7 +26,7 @@ from ..exceptions import BasicAgentToolsError
 @strands_tool
 def check_url_status(
     url: str, timeout: int = 10
-) -> Dict[str, Union[str, int, float, bool]]:
+) -> dict[str, Union[str, int, float, bool]]:
     """Check the status of a URL."""
     if not HAS_HTTP_CLIENT:
         raise BasicAgentToolsError("HTTP client not available for URL status checks")
@@ -65,7 +65,7 @@ def check_url_status(
 @strands_tool
 def ping_host(
     hostname: str, port: int = 80, timeout: int = 5
-) -> Dict[str, Union[str, int, float, bool]]:
+) -> dict[str, Union[str, int, float, bool]]:
     """Ping a host to check connectivity."""
     if not isinstance(hostname, str) or not hostname.strip():
         raise BasicAgentToolsError("Hostname must be a non-empty string")

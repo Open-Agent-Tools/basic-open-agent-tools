@@ -1,13 +1,14 @@
 """Tests for generation utilities."""
 
-import pytest
-import uuid
 import re
+import uuid
+
+import pytest
 
 from basic_open_agent_tools.crypto.generation import (
-    generate_uuid,
-    generate_random_string,
     generate_random_bytes,
+    generate_random_string,
+    generate_uuid,
 )
 from basic_open_agent_tools.exceptions import BasicAgentToolsError
 
@@ -38,12 +39,14 @@ class TestGenerateUuid:
         assert result["uuid_string_length"] == 36  # Standard UUID string length
 
         # Verify UUID format
-        uuid_pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+        uuid_pattern = (
+            r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        )
         assert re.match(uuid_pattern, result["uuid_string"])
 
         # Verify hex format (no dashes)
         assert len(result["uuid_hex"]) == 32
-        assert re.match(r'^[0-9a-f]{32}$', result["uuid_hex"])
+        assert re.match(r"^[0-9a-f]{32}$", result["uuid_hex"])
 
     def test_successful_uuid1_generation(self):
         """Test successful UUID1 generation."""
@@ -55,7 +58,9 @@ class TestGenerateUuid:
         assert result["uuid_string_length"] == 36
 
         # Verify UUID format (UUID1 has version 1 in the version field)
-        uuid_pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-1[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+        uuid_pattern = (
+            r"^[0-9a-f]{8}-[0-9a-f]{4}-1[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        )
         assert re.match(uuid_pattern, result["uuid_string"])
 
     def test_default_version(self):
@@ -88,21 +93,31 @@ class TestGenerateRandomString:
 
     def test_invalid_length(self):
         """Test error handling for invalid length values."""
-        with pytest.raises(BasicAgentToolsError, match="Length must be an integer between 1 and 1000"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
+        ):
             generate_random_string(length=0)
 
-        with pytest.raises(BasicAgentToolsError, match="Length must be an integer between 1 and 1000"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
+        ):
             generate_random_string(length=-1)
 
-        with pytest.raises(BasicAgentToolsError, match="Length must be an integer between 1 and 1000"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
+        ):
             generate_random_string(length=1001)
 
-        with pytest.raises(BasicAgentToolsError, match="Length must be an integer between 1 and 1000"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
+        ):
             generate_random_string(length="16")
 
     def test_invalid_character_set(self):
         """Test error handling for invalid character set."""
-        with pytest.raises(BasicAgentToolsError, match="Character set must be a string"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Character set must be a string"
+        ):
             generate_random_string(character_set=123)
 
         with pytest.raises(BasicAgentToolsError, match="Character set must be one of"):
@@ -118,7 +133,7 @@ class TestGenerateRandomString:
         assert len(result["random_string"]) == 20
 
         # Verify only alphanumeric characters
-        assert re.match(r'^[a-zA-Z0-9]+$', result["random_string"])
+        assert re.match(r"^[a-zA-Z0-9]+$", result["random_string"])
 
     def test_successful_letters_generation(self):
         """Test successful letters-only random string generation."""
@@ -128,7 +143,7 @@ class TestGenerateRandomString:
         assert len(result["random_string"]) == 15
 
         # Verify only letters
-        assert re.match(r'^[a-zA-Z]+$', result["random_string"])
+        assert re.match(r"^[a-zA-Z]+$", result["random_string"])
 
     def test_successful_digits_generation(self):
         """Test successful digits-only random string generation."""
@@ -138,7 +153,7 @@ class TestGenerateRandomString:
         assert len(result["random_string"]) == 10
 
         # Verify only digits
-        assert re.match(r'^[0-9]+$', result["random_string"])
+        assert re.match(r"^[0-9]+$", result["random_string"])
 
     def test_successful_ascii_generation(self):
         """Test successful ASCII random string generation."""
@@ -192,13 +207,19 @@ class TestGenerateRandomBytes:
 
     def test_invalid_length(self):
         """Test error handling for invalid length values."""
-        with pytest.raises(BasicAgentToolsError, match="Length must be an integer between 1 and 1000"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
+        ):
             generate_random_bytes(length=0)
 
-        with pytest.raises(BasicAgentToolsError, match="Length must be an integer between 1 and 1000"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
+        ):
             generate_random_bytes(length=-1)
 
-        with pytest.raises(BasicAgentToolsError, match="Length must be an integer between 1 and 1000"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
+        ):
             generate_random_bytes(length=1001)
 
     def test_invalid_encoding(self):
@@ -206,7 +227,9 @@ class TestGenerateRandomBytes:
         with pytest.raises(BasicAgentToolsError, match="Encoding must be a string"):
             generate_random_bytes(encoding=123)
 
-        with pytest.raises(BasicAgentToolsError, match="Encoding must be 'hex' or 'base64'"):
+        with pytest.raises(
+            BasicAgentToolsError, match="Encoding must be 'hex' or 'base64'"
+        ):
             generate_random_bytes(encoding="invalid")
 
     def test_successful_hex_encoding(self):
@@ -219,7 +242,7 @@ class TestGenerateRandomBytes:
         assert result["entropy_bits"] == 128  # 16 * 8
 
         # Verify hex format
-        assert re.match(r'^[0-9a-f]+$', result["encoded_data"])
+        assert re.match(r"^[0-9a-f]+$", result["encoded_data"])
 
     def test_successful_base64_encoding(self):
         """Test successful random bytes generation with base64 encoding."""
@@ -231,6 +254,7 @@ class TestGenerateRandomBytes:
 
         # Base64 encoding should produce valid base64
         import base64
+
         try:
             base64.b64decode(result["encoded_data"])
         except Exception:
@@ -256,7 +280,7 @@ class TestGenerateRandomBytes:
         result16 = generate_random_bytes(length=16)
         result32 = generate_random_bytes(length=32)
 
-        assert result8["entropy_bits"] == 64   # 8 * 8
+        assert result8["entropy_bits"] == 64  # 8 * 8
         assert result16["entropy_bits"] == 128  # 16 * 8
         assert result32["entropy_bits"] == 256  # 32 * 8
 

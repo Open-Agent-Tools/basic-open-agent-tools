@@ -7,7 +7,7 @@ Hashing, encoding, and basic cryptographic utilities for AI agents (no encryptio
 
 ## Agent Compatibility Requirements
 
-When implementing this module, all functions MUST follow the agent-friendly design principles established in v0.8.1:
+When implementing this module, all functions MUST follow the agent-friendly design principles established in v0.9.1:
 - ✅ **Simple Type Signatures**: Use only basic Python types (str, bytes, dict, list, bool)
 - ✅ **No Complex Types**: Avoid Union types, Optional complex types, or custom type aliases
 - ✅ **Individual Import Ready**: Functions must work when imported individually

@@ -2,13 +2,13 @@
 
 import platform
 import subprocess
-from typing import Dict, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 try:
     from strands import tool as strands_tool
 except ImportError:
 
-    def strands_tool(func):
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
         """Fallback decorator when strands is not available."""
         return func
 
@@ -22,7 +22,7 @@ def execute_shell_command(
     timeout: int = 30,
     capture_output: bool = True,
     working_directory: Optional[str] = None,
-) -> Dict[str, Union[str, int, bool]]:
+) -> dict[str, Union[str, int, bool]]:
     """
     Execute a shell command cross-platform (Windows cmd, Unix bash/sh).
 
@@ -107,7 +107,7 @@ def run_bash(
     timeout: int = 30,
     capture_output: bool = True,
     working_directory: Optional[str] = None,
-) -> Dict[str, Union[str, int, bool]]:
+) -> dict[str, Union[str, int, bool]]:
     """
     Execute a bash command (Unix/Linux/macOS only).
 
@@ -171,7 +171,7 @@ def run_powershell(
     timeout: int = 30,
     capture_output: bool = True,
     working_directory: Optional[str] = None,
-) -> Dict[str, Union[str, int, bool]]:
+) -> dict[str, Union[str, int, bool]]:
     """
     Execute a PowerShell command (Windows only).
 

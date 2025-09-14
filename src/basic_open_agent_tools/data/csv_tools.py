@@ -2,13 +2,13 @@
 
 import csv
 import io
-from typing import Dict, List
+from typing import Any, Callable
 
 try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
         return func
 
 
@@ -18,7 +18,7 @@ from ..exceptions import DataError
 @strands_tool
 def read_csv_simple(
     file_path: str, delimiter: str, headers: bool
-) -> List[Dict[str, str]]:
+) -> list[dict[str, str]]:
     """Read CSV file and return as list of dictionaries.
 
     Args:
@@ -77,7 +77,7 @@ def read_csv_simple(
 
 @strands_tool
 def write_csv_simple(
-    data: List[Dict[str, str]], file_path: str, delimiter: str, headers: bool
+    data: list[dict[str, str]], file_path: str, delimiter: str, headers: bool
 ) -> None:
     """Write list of dictionaries to CSV file.
 
@@ -139,7 +139,7 @@ def write_csv_simple(
 
 
 @strands_tool
-def csv_to_dict_list(csv_data: str, delimiter: str) -> List[Dict[str, str]]:
+def csv_to_dict_list(csv_data: str, delimiter: str) -> list[dict[str, str]]:
     """Convert CSV string to list of dictionaries.
 
     Args:
@@ -175,7 +175,7 @@ def csv_to_dict_list(csv_data: str, delimiter: str) -> List[Dict[str, str]]:
 
 
 @strands_tool
-def dict_list_to_csv(data: List[Dict[str, str]], delimiter: str) -> str:
+def dict_list_to_csv(data: list[dict[str, str]], delimiter: str) -> str:
     """Convert list of dictionaries to CSV string.
 
     Args:
@@ -268,7 +268,7 @@ def detect_csv_delimiter(file_path: str, sample_size: int) -> str:
 
 
 @strands_tool
-def validate_csv_structure(file_path: str, expected_columns: List[str]) -> bool:
+def validate_csv_structure(file_path: str, expected_columns: list[str]) -> bool:
     """Validate CSV file structure and column headers.
 
     Args:
@@ -332,8 +332,8 @@ def validate_csv_structure(file_path: str, expected_columns: List[str]) -> bool:
 
 @strands_tool
 def clean_csv_data(
-    data: List[Dict[str, str]], rules: Dict[str, str]
-) -> List[Dict[str, str]]:
+    data: list[dict[str, str]], rules: dict[str, str]
+) -> list[dict[str, str]]:
     """Clean CSV data according to specified rules.
 
     Args:

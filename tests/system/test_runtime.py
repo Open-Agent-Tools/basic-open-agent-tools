@@ -1,18 +1,15 @@
 """Tests for runtime inspection tools."""
 
-import pytest
 import os
 import sys
-import time
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 from basic_open_agent_tools.system.runtime import (
-    inspect_runtime_environment,
-    get_python_module_info,
     get_file_system_context,
     get_network_environment,
+    get_python_module_info,
+    inspect_runtime_environment,
 )
-from basic_open_agent_tools.exceptions import BasicAgentToolsError
 
 
 class TestInspectRuntimeEnvironment:
@@ -24,10 +21,18 @@ class TestInspectRuntimeEnvironment:
 
         # Check that all expected keys are present
         expected_keys = [
-            "process_id", "username", "current_working_directory", "script_path",
-            "python_executable", "python_version", "python_paths",
-            "operating_system", "hostname", "important_environment_variables",
-            "timestamp", "timestamp_iso"
+            "process_id",
+            "username",
+            "current_working_directory",
+            "script_path",
+            "python_executable",
+            "python_version",
+            "python_paths",
+            "operating_system",
+            "hostname",
+            "important_environment_variables",
+            "timestamp",
+            "timestamp_iso",
         ]
 
         for key in expected_keys:
@@ -67,7 +72,7 @@ class TestInspectRuntimeEnvironment:
         finally:
             sys.argv = original_argv
 
-    @patch('os.getlogin')
+    @patch("os.getlogin")
     def test_username_fallback(self, mock_getlogin):
         """Test username extraction with fallback methods."""
         mock_getlogin.side_effect = OSError("No login")
@@ -86,10 +91,13 @@ class TestGetPythonModuleInfo:
 
         # Check expected keys
         expected_keys = [
-            "loaded_modules_count", "loaded_modules",
-            "builtin_modules_count", "builtin_modules",
-            "installed_packages_count", "installed_packages",
-            "pkg_resources_available"
+            "loaded_modules_count",
+            "loaded_modules",
+            "builtin_modules_count",
+            "builtin_modules",
+            "installed_packages_count",
+            "installed_packages",
+            "pkg_resources_available",
         ]
 
         for key in expected_keys:
@@ -129,10 +137,15 @@ class TestGetFileSystemContext:
 
         # Check expected keys
         expected_keys = [
-            "current_directory", "current_directory_contents",
-            "current_directory_item_count", "common_project_files_present",
-            "common_directories_present", "parent_directories",
-            "is_git_repository", "is_python_project", "has_virtual_environment"
+            "current_directory",
+            "current_directory_contents",
+            "current_directory_item_count",
+            "common_project_files_present",
+            "common_directories_present",
+            "parent_directories",
+            "is_git_repository",
+            "is_python_project",
+            "has_virtual_environment",
         ]
 
         for key in expected_keys:
@@ -150,9 +163,11 @@ class TestGetFileSystemContext:
         assert isinstance(result["has_virtual_environment"], bool)
 
         # Item count should match list length
-        assert result["current_directory_item_count"] == len(result["current_directory_contents"])
+        assert result["current_directory_item_count"] == len(
+            result["current_directory_contents"]
+        )
 
-    @patch('pathlib.Path.iterdir')
+    @patch("pathlib.Path.iterdir")
     def test_permission_denied_handling(self, mock_iterdir):
         """Test handling of permission denied errors."""
         mock_iterdir.side_effect = PermissionError("Access denied")
@@ -172,9 +187,12 @@ class TestGetNetworkEnvironment:
 
         # Check expected keys
         expected_keys = [
-            "hostname", "fqdn", "local_ip_address",
-            "has_proxy_configuration", "proxy_environment_variables",
-            "socket_family_support"
+            "hostname",
+            "fqdn",
+            "local_ip_address",
+            "has_proxy_configuration",
+            "proxy_environment_variables",
+            "socket_family_support",
         ]
 
         for key in expected_keys:
@@ -198,7 +216,7 @@ class TestGetNetworkEnvironment:
         """Test proxy environment variable detection."""
         proxy_vars = {
             "HTTP_PROXY": "http://proxy.example.com:8080",
-            "HTTPS_PROXY": "https://proxy.example.com:8080"
+            "HTTPS_PROXY": "https://proxy.example.com:8080",
         }
 
         with patch.dict(os.environ, proxy_vars, clear=False):
@@ -206,9 +224,12 @@ class TestGetNetworkEnvironment:
 
             assert result["has_proxy_configuration"] is True
             assert "HTTP_PROXY" in result["proxy_environment_variables"]
-            assert result["proxy_environment_variables"]["HTTP_PROXY"] == "http://proxy.example.com:8080"
+            assert (
+                result["proxy_environment_variables"]["HTTP_PROXY"]
+                == "http://proxy.example.com:8080"
+            )
 
-    @patch('socket.socket')
+    @patch("socket.socket")
     def test_local_ip_detection_failure(self, mock_socket):
         """Test handling when local IP detection fails."""
         mock_socket.side_effect = Exception("Network error")
@@ -217,13 +238,13 @@ class TestGetNetworkEnvironment:
 
         assert result["local_ip_address"] == "unknown"
 
-    @patch('socket.getfqdn')
+    @patch("socket.getfqdn")
     def test_fqdn_fallback(self, mock_getfqdn):
         """Test FQDN fallback to hostname."""
         mock_getfqdn.side_effect = Exception("DNS error")
 
-        with patch('socket.gethostname', return_value='test-host'):
+        with patch("socket.gethostname", return_value="test-host"):
             result = get_network_environment()
 
-            assert result["hostname"] == 'test-host'
-            assert result["fqdn"] == 'test-host'  # Should fallback to hostname
+            assert result["hostname"] == "test-host"
+            assert result["fqdn"] == "test-host"  # Should fallback to hostname

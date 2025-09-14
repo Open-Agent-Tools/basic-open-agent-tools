@@ -1,6 +1,6 @@
 # Testing Status - Basic Open Agent Tools
 
-This document provides an overview of the current testing state for the basic-open-agent-tools project (v0.8.1).
+This document provides an overview of the current testing state for the basic-open-agent-tools project (v0.9.1).
 
 ## 📊 Current Status Overview
 
@@ -93,4 +93,4 @@ python3 -m pytest
 ---
 
 **Status**: ✅ **COMPLETE** - Production-ready testing infrastructure  
-**Last Updated**: v0.8.1 (2025-07-08) - Comprehensive testing framework established
+**Last Updated**: v0.9.1 (2025-09-14) - Comprehensive testing framework established

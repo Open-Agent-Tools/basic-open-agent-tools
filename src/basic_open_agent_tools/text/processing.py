@@ -3,13 +3,14 @@
 import re
 import textwrap
 import unicodedata
-from typing import List, Match
+from re import Match
+from typing import Any, Callable
 
 try:
     from strands import tool as strands_tool
 except ImportError:
     # Create a no-op decorator if strands is not installed
-    def strands_tool(func):  # type: ignore
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
         return func
 
 
@@ -228,7 +229,7 @@ def to_title_case(text: str) -> str:
 
 
 @strands_tool
-def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> List[str]:
+def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> list[str]:
     """Split text into lines with maximum length.
 
     Args:
@@ -272,7 +273,7 @@ def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> List[
 
 
 @strands_tool
-def extract_sentences(text: str) -> List[str]:
+def extract_sentences(text: str) -> list[str]:
     """Extract sentences from text using simple rules.
 
     Args:
@@ -310,7 +311,7 @@ def extract_sentences(text: str) -> List[str]:
 
 
 @strands_tool
-def join_with_oxford_comma(items: List[str], conjunction: str) -> str:
+def join_with_oxford_comma(items: list[str], conjunction: str) -> str:
     """Join a list of items with Oxford comma.
 
     Args:
