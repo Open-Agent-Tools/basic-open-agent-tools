@@ -26,7 +26,7 @@ load_dotenv(project_root / ".env")  # From project root
 
 root_agent = Agent(
     name="info_agent",
-    model=os.environ.get("GOOGLE_MODEL_NAME"),
+    model=os.environ.get("GOOGLE_MODEL_NAME", "gemini-1.5-flash"),
     description="Agent that can retrieve file and directory information using the basic_open_agent_tools file system utilities.",
     instruction="""You are a helpful agent that can retrieve file and directory information.
 

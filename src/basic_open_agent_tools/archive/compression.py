@@ -1,7 +1,11 @@
-"""ZIP compression utilities."""
+"""Advanced compression utilities for ZIP, GZIP, BZIP2, and XZ formats."""
 
 import os
 import zipfile
+import gzip
+import bz2
+import lzma
+import shutil
 from typing import Dict, List, Union
 
 try:
@@ -75,3 +79,236 @@ def extract_zip(zip_path: str, extract_to: str) -> Dict[str, Union[str, int]]:
 def compress_files(file_paths: List[str], output_path: str) -> Dict[str, Union[str, int]]:
     """Compress multiple files into a ZIP archive."""
     return create_zip(file_paths, output_path)
+
+
+@strands_tool
+def compress_file_gzip(input_path: str, output_path: str = None) -> Dict[str, Union[str, int, float]]:
+    """
+    Compress a file using gzip compression.
+
+    Args:
+        input_path: Path to input file
+        output_path: Path for compressed file (defaults to input_path.gz)
+
+    Returns:
+        Dictionary with compression results
+
+    Raises:
+        BasicAgentToolsError: If compression fails
+    """
+    if not isinstance(input_path, str) or not input_path.strip():
+        raise BasicAgentToolsError("Input path must be a non-empty string")
+
+    input_path = input_path.strip()
+
+    if not os.path.exists(input_path):
+        raise BasicAgentToolsError(f"Input file not found: {input_path}")
+
+    if not os.path.isfile(input_path):
+        raise BasicAgentToolsError(f"Input path is not a file: {input_path}")
+
+    if output_path is None:
+        output_path = f"{input_path}.gz"
+    elif not isinstance(output_path, str) or not output_path.strip():
+        raise BasicAgentToolsError("Output path must be a non-empty string")
+    else:
+        output_path = output_path.strip()
+
+    try:
+        input_size = os.path.getsize(input_path)
+
+        with open(input_path, 'rb') as f_in:
+            with gzip.open(output_path, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+
+        output_size = os.path.getsize(output_path)
+        compression_ratio = output_size / input_size if input_size > 0 else 0
+
+        return {
+            "input_path": input_path,
+            "output_path": output_path,
+            "input_size_bytes": input_size,
+            "output_size_bytes": output_size,
+            "compression_ratio": round(compression_ratio, 3),
+            "space_saved_bytes": input_size - output_size,
+            "compression_percent": round((1 - compression_ratio) * 100, 1),
+            "compression_type": "gzip",
+            "compression_status": "success"
+        }
+
+    except Exception as e:
+        raise BasicAgentToolsError(f"Failed to compress file with gzip: {str(e)}")
+
+
+@strands_tool
+def decompress_file_gzip(input_path: str, output_path: str = None) -> Dict[str, Union[str, int]]:
+    """
+    Decompress a gzip compressed file.
+
+    Args:
+        input_path: Path to gzip file
+        output_path: Path for decompressed file (defaults to input without .gz)
+
+    Returns:
+        Dictionary with decompression results
+
+    Raises:
+        BasicAgentToolsError: If decompression fails
+    """
+    if not isinstance(input_path, str) or not input_path.strip():
+        raise BasicAgentToolsError("Input path must be a non-empty string")
+
+    input_path = input_path.strip()
+
+    if not os.path.exists(input_path):
+        raise BasicAgentToolsError(f"Input file not found: {input_path}")
+
+    if output_path is None:
+        if input_path.endswith('.gz'):
+            output_path = input_path[:-3]
+        else:
+            output_path = f"{input_path}.decompressed"
+    elif not isinstance(output_path, str) or not output_path.strip():
+        raise BasicAgentToolsError("Output path must be a non-empty string")
+    else:
+        output_path = output_path.strip()
+
+    try:
+        input_size = os.path.getsize(input_path)
+
+        with gzip.open(input_path, 'rb') as f_in:
+            with open(output_path, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+
+        output_size = os.path.getsize(output_path)
+
+        return {
+            "input_path": input_path,
+            "output_path": output_path,
+            "compressed_size_bytes": input_size,
+            "decompressed_size_bytes": output_size,
+            "expansion_ratio": round(output_size / input_size, 2) if input_size > 0 else 0,
+            "decompression_type": "gzip",
+            "decompression_status": "success"
+        }
+
+    except Exception as e:
+        raise BasicAgentToolsError(f"Failed to decompress gzip file: {str(e)}")
+
+
+@strands_tool
+def compress_file_bzip2(input_path: str, output_path: str = None) -> Dict[str, Union[str, int, float]]:
+    """
+    Compress a file using bzip2 compression.
+
+    Args:
+        input_path: Path to input file
+        output_path: Path for compressed file (defaults to input_path.bz2)
+
+    Returns:
+        Dictionary with compression results
+
+    Raises:
+        BasicAgentToolsError: If compression fails
+    """
+    if not isinstance(input_path, str) or not input_path.strip():
+        raise BasicAgentToolsError("Input path must be a non-empty string")
+
+    input_path = input_path.strip()
+
+    if not os.path.exists(input_path):
+        raise BasicAgentToolsError(f"Input file not found: {input_path}")
+
+    if not os.path.isfile(input_path):
+        raise BasicAgentToolsError(f"Input path is not a file: {input_path}")
+
+    if output_path is None:
+        output_path = f"{input_path}.bz2"
+    elif not isinstance(output_path, str) or not output_path.strip():
+        raise BasicAgentToolsError("Output path must be a non-empty string")
+    else:
+        output_path = output_path.strip()
+
+    try:
+        input_size = os.path.getsize(input_path)
+
+        with open(input_path, 'rb') as f_in:
+            with bz2.BZ2File(output_path, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+
+        output_size = os.path.getsize(output_path)
+        compression_ratio = output_size / input_size if input_size > 0 else 0
+
+        return {
+            "input_path": input_path,
+            "output_path": output_path,
+            "input_size_bytes": input_size,
+            "output_size_bytes": output_size,
+            "compression_ratio": round(compression_ratio, 3),
+            "space_saved_bytes": input_size - output_size,
+            "compression_percent": round((1 - compression_ratio) * 100, 1),
+            "compression_type": "bzip2",
+            "compression_status": "success"
+        }
+
+    except Exception as e:
+        raise BasicAgentToolsError(f"Failed to compress file with bzip2: {str(e)}")
+
+
+@strands_tool
+def compress_file_xz(input_path: str, output_path: str = None) -> Dict[str, Union[str, int, float]]:
+    """
+    Compress a file using XZ/LZMA compression.
+
+    Args:
+        input_path: Path to input file
+        output_path: Path for compressed file (defaults to input_path.xz)
+
+    Returns:
+        Dictionary with compression results
+
+    Raises:
+        BasicAgentToolsError: If compression fails
+    """
+    if not isinstance(input_path, str) or not input_path.strip():
+        raise BasicAgentToolsError("Input path must be a non-empty string")
+
+    input_path = input_path.strip()
+
+    if not os.path.exists(input_path):
+        raise BasicAgentToolsError(f"Input file not found: {input_path}")
+
+    if not os.path.isfile(input_path):
+        raise BasicAgentToolsError(f"Input path is not a file: {input_path}")
+
+    if output_path is None:
+        output_path = f"{input_path}.xz"
+    elif not isinstance(output_path, str) or not output_path.strip():
+        raise BasicAgentToolsError("Output path must be a non-empty string")
+    else:
+        output_path = output_path.strip()
+
+    try:
+        input_size = os.path.getsize(input_path)
+
+        with open(input_path, 'rb') as f_in:
+            with lzma.LZMAFile(output_path, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+
+        output_size = os.path.getsize(output_path)
+        compression_ratio = output_size / input_size if input_size > 0 else 0
+
+        return {
+            "input_path": input_path,
+            "output_path": output_path,
+            "input_size_bytes": input_size,
+            "output_size_bytes": output_size,
+            "compression_ratio": round(compression_ratio, 3),
+            "space_saved_bytes": input_size - output_size,
+            "compression_percent": round((1 - compression_ratio) * 100, 1),
+            "compression_type": "xz/lzma",
+            "compression_status": "success"
+        }
+
+    except Exception as e:
+        raise BasicAgentToolsError(f"Failed to compress file with XZ: {str(e)}")

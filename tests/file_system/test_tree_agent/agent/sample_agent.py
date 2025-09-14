@@ -23,7 +23,7 @@ load_dotenv(project_root / ".env")  # From project root
 
 root_agent = Agent(
     name="tree_agent",
-    model=os.environ.get("GOOGLE_MODEL_NAME"),
+    model=os.environ.get("GOOGLE_MODEL_NAME", "gemini-1.5-flash"),
     description="Agent that can generate directory trees and list directory contents using the basic_open_agent_tools filesystem utilities.",
     instruction="""You are a helpful agent it directory skills.""",
     tools=[generate_directory_tree, list_all_directory_contents],

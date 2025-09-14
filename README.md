@@ -68,21 +68,21 @@ from google.adk.models.lite_llm import LiteLlm
 import basic_open_agent_tools as boat
 
 # Option 1: Load all tools at once (recommended)
-agent_tools = boat.load_all_tools()  # All 150+ functions from all modules
+agent_tools = boat.load_all_tools()  # All 166 functions from all modules
 
 # Option 2: Load tools by category
 fs_tools = boat.load_all_filesystem_tools()      # 18 functions
 text_tools = boat.load_all_text_tools()         # 10 functions
 data_tools = boat.load_all_data_tools()         # 23 functions
 datetime_tools = boat.load_all_datetime_tools() # 40 functions
-network_tools = boat.load_all_network_tools()   # 1 function
-utilities_tools = boat.load_all_utilities_tools() # 3 functions
-system_tools = boat.load_all_system_tools()     # 20 functions
-crypto_tools = boat.load_all_crypto_tools()     # 13 functions
-pdf_tools = boat.load_all_pdf_tools()           # 4 functions
-archive_tools = boat.load_all_archive_tools()   # 5 functions
+network_tools = boat.load_all_network_tools()   # 4 functions (NEW: DNS, port checking)
+utilities_tools = boat.load_all_utilities_tools() # 8 functions (NEW: debugging tools)
+system_tools = boat.load_all_system_tools()     # 19 functions
+crypto_tools = boat.load_all_crypto_tools()     # 14 functions
+pdf_tools = boat.load_all_pdf_tools()           # 8 functions (NEW: advanced manipulation)
+archive_tools = boat.load_all_archive_tools()   # 9 functions (NEW: GZIP, BZIP2, XZ)
 logging_tools = boat.load_all_logging_tools()   # 5 functions
-monitoring_tools = boat.load_all_monitoring_tools() # 4 functions
+monitoring_tools = boat.load_all_monitoring_tools() # 8 functions (NEW: performance profiling)
 
 # Merge selected categories (automatically deduplicates)
 agent_tools = boat.merge_tool_lists(fs_tools, text_tools, network_tools, utilities_tools)
@@ -201,23 +201,27 @@ Utilities Tools:
 - **Business Logic**: Business day calculations, timezone conversions
 - **Information Extraction**: Weekday names, month names, leap years
 
-### Network Tools ✅ (1 function)
+### Network Tools ✅ (4 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/network/README.md)**
 
 - **HTTP Client**: Make API calls and fetch web data with comprehensive error handling
+- **DNS Resolution**: Resolve hostnames to IP addresses and reverse DNS lookups
+- **Port Checking**: Check if ports are open on remote hosts with timeout controls
 - **Agent-Friendly**: Simplified type signatures and structured responses
 - **Strands Compatible**: Native `@strands_tool` decorator support
 - **Security**: SSL verification, timeout controls, proper error handling
 
-### Utilities Tools ✅ (3 functions)
+### Utilities Tools ✅ (8 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/utilities/README.md)**
 
-- **Timing Controls**: Pause execution with interrupt handling
-- **Precision Sleep**: High-precision timing for timing-critical operations
+- **Timing Controls**: Pause execution with interrupt handling and precision sleep
+- **Debugging Tools**: Function signature inspection, call stack analysis, exception formatting
+- **Code Validation**: Validate function calls before execution
+- **Variable Tracing**: Track how variables change through operations
 - **Strands Compatible**: Native `@strands_tool` decorator support
-- **Agent-Friendly**: Structured responses with detailed timing information
+- **Agent-Friendly**: Structured responses with detailed debugging information
 
-### System Tools ✅ (20 functions)
+### System Tools ✅ (19 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/system/README.md)**
 
 - **Cross-Platform Shell**: Execute shell commands on Windows, macOS, and Linux
@@ -226,7 +230,7 @@ Utilities Tools:
 - **Environment Variables**: Get, set, and list environment variables
 - **Runtime Inspection**: Inspect Python environment, modules, and system context
 
-### Crypto Tools ✅ (13 functions)
+### Crypto Tools ✅ (14 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/crypto/README.md)**
 
 - **Hashing**: MD5, SHA-256, SHA-512 hashing for strings and files
@@ -234,20 +238,23 @@ Utilities Tools:
 - **Generation**: UUIDs, random strings, and random bytes with configurable entropy
 - **Verification**: Checksum verification and hash validation
 
-### PDF Tools ✅ (4 functions)
+### PDF Tools ✅ (8 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/pdf/README.md)**
 
 - **PDF Reading**: Extract text from PDFs with page range support
-- **PDF Creation**: Convert text to PDF with customizable formatting
+- **PDF Creation**: Convert text to PDF with customizable formatting and merging
 - **PDF Information**: Get metadata and document information
-- **PDF Merging**: Combine multiple PDFs into single documents
+- **PDF Manipulation**: Split PDFs, extract pages, rotate pages, add watermarks
+- **Advanced Features**: Page-specific operations and document transformation
 
-### Archive Tools ✅ (5 functions)
+### Archive Tools ✅ (9 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/archive/README.md)**
 
 - **ZIP Operations**: Create and extract ZIP archives
 - **TAR Operations**: Create and extract TAR archives
-- **Compression**: File and directory compression with multiple formats
+- **Advanced Compression**: GZIP, BZIP2, and XZ/LZMA single-file compression
+- **Compression Analysis**: Detailed compression ratios and space savings metrics
+- **Multiple Formats**: Support for all major compression formats with statistics
 
 ### Logging Tools ✅ (5 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/logging/README.md)**
@@ -256,14 +263,16 @@ Utilities Tools:
 - **Log Rotation**: Automatic log file rotation and cleanup
 - **Multiple Handlers**: File, console, and rotating file handlers
 
-### Monitoring Tools ✅ (4 functions)
+### Monitoring Tools ✅ (8 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/monitoring/README.md)**
 
 - **File Watching**: Monitor files and directories for changes
 - **Health Checks**: URL health monitoring and service status checks
-- **Real-time Monitoring**: Event-driven file system monitoring
+- **Performance Profiling**: System performance monitoring and code execution profiling
+- **Benchmarking**: Disk I/O benchmarking and system load analysis
+- **Real-time Monitoring**: Event-driven file system and performance monitoring
 
-**Total: 150+ implemented functions** across 12 categories, designed specifically for building AI agents with comprehensive local operations and HTTP requests.
+**Total: 166 implemented functions** across 12 categories, designed specifically for building AI agents with comprehensive local operations, network utilities, advanced file processing, and development debugging tools.
 
 ## Helper Functions
 
@@ -271,7 +280,7 @@ Utilities Tools:
 ```python
 import basic_open_agent_tools as boat
 
-# Get all 93 functions from all modules
+# Get all 166 functions from all modules
 all_tools = boat.load_all_tools()
 
 # Use with any agent framework

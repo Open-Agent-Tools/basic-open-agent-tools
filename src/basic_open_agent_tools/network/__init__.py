@@ -6,5 +6,6 @@ and basic connectivity operations. All functions use simplified type signatures 
 """
 
 from .http_client import http_request
+from .dns import resolve_hostname, reverse_dns_lookup, check_port_open
 
-__all__ = ["http_request"]
+__all__ = ["http_request", "resolve_hostname", "reverse_dns_lookup", "check_port_open"]

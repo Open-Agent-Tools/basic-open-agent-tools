@@ -30,7 +30,7 @@ agent_tools = merge_tool_lists(
 
 root_agent = Agent(
     name="helpers_agent",
-    model=os.environ.get("GOOGLE_MODEL_NAME"),
+    model=os.environ.get("GOOGLE_MODEL_NAME", "gemini-1.5-flash"),
     description="Agent that can discover and manage available tools using the basic_open_agent_tools helper utilities.",
     instruction="""You are a helpful agent that can discover and work with tools.
 

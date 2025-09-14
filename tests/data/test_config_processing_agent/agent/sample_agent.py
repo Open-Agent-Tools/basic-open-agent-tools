@@ -28,7 +28,7 @@ load_dotenv(project_root / ".env")  # From project root
 
 root_agent = Agent(
     name="config_processing_agent",
-    model=os.environ.get("GOOGLE_MODEL_NAME"),
+    model=os.environ.get("GOOGLE_MODEL_NAME", "gemini-1.5-flash"),
     description="Agent that can process configuration files using the basic_open_agent_tools config utilities.",
     instruction="""You are a helpful agent that can work with configuration files.
 
