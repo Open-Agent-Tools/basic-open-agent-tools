@@ -1,9 +1,8 @@
 """Cross-platform shell execution tools."""
 
-import subprocess
 import platform
-import shlex
-from typing import Dict, Union, Optional
+import subprocess
+from typing import Dict, Optional, Union
 
 try:
     from strands import tool as strands_tool

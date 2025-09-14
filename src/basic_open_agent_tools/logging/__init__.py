@@ -1,7 +1,7 @@
 """Logging utilities for agents."""
 
-from .structured import log_info, log_error, configure_logger
-from .rotation import setup_rotating_log, cleanup_old_logs
+from .rotation import cleanup_old_logs, setup_rotating_log
+from .structured import configure_logger, log_error, log_info
 
 __all__ = [
     "log_info",

@@ -169,14 +169,19 @@ class TestPreciseSleep:
     @patch('time.time')
     def test_precise_sleep_logic(self, mock_time, mock_sleep):
         """Test the logic of combining sleep and busy-wait."""
-        # Mock time progression
-        times = [0.0, 0.04, 0.049, 0.0499, 0.05]  # Simulate time progression
-        mock_time.side_effect = times
+        # Mock time progression with enough values for all calls
+        # Start time, after regular sleep, then busy-wait progression, final time
+        time_values = [0.0, 0.04, 0.049, 0.0499, 0.05, 0.051]
+        mock_time.side_effect = time_values
 
         result = precise_sleep(0.05)
 
         # Should call regular sleep for most of the duration
         mock_sleep.assert_called_once_with(0.04)  # 0.05 - 0.01
+
+        # Verify result structure
+        assert result["status"] == "completed"
+        assert result["requested_seconds"] == 0.05
 
     def test_very_short_precise_sleep(self):
         """Test precise sleep for durations shorter than 10ms threshold."""

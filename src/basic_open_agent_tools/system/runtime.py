@@ -1,11 +1,11 @@
 """Runtime inspection tools for agents to understand their environment."""
 
 import os
-import sys
 import platform
+import sys
 import time
 from pathlib import Path
-from typing import Dict, Union, List
+from typing import Dict, List, Union
 
 try:
     from strands import tool as strands_tool

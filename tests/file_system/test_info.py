@@ -1,5 +1,6 @@
 """Tests for basic_open_agent_tools.file_system.info module."""
 
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,25 @@ from basic_open_agent_tools.file_system.info import (
     get_file_info,
     get_file_size,
     is_empty_directory,
+)
+
+
+def can_create_symlinks() -> bool:
+    """Check if we can create symbolic links on this system."""
+    try:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            target = temp_path / "target"
+            target.touch()
+            link = temp_path / "link"
+            link.symlink_to(target)
+            return True
+    except (OSError, NotImplementedError):
+        return False
+
+
+skip_if_no_symlinks = pytest.mark.skipif(
+    not can_create_symlinks(), reason="Symlinks not supported or insufficient privileges"
 )
 
 
@@ -101,6 +121,7 @@ class TestGetFileInfo:
         with pytest.raises(FileSystemError):
             get_file_info("")
 
+    @skip_if_no_symlinks
     def test_get_file_info_symlink(self, tmp_path: Path) -> None:
         """Test getting info for symbolic link (follows symlink to target)."""
         # Create target file
@@ -157,6 +178,7 @@ class TestFileExists:
         """Test file_exists returns False for empty path."""
         assert file_exists("") is False
 
+    @skip_if_no_symlinks
     def test_file_exists_symlink_to_file(self, tmp_path: Path) -> None:
         """Test file_exists returns True for symlink to file."""
         target_file = tmp_path / "target.txt"
@@ -167,6 +189,7 @@ class TestFileExists:
 
         assert file_exists(str(symlink_file)) is True
 
+    @skip_if_no_symlinks
     def test_file_exists_broken_symlink(self, tmp_path: Path) -> None:
         """Test file_exists returns False for broken symlink."""
         nonexistent_target = tmp_path / "nonexistent.txt"
@@ -210,6 +233,7 @@ class TestDirectoryExists:
         """Test directory_exists returns True for parent directory."""
         assert directory_exists("..") is True
 
+    @skip_if_no_symlinks
     def test_directory_exists_symlink_to_directory(self, tmp_path: Path) -> None:
         """Test directory_exists returns True for symlink to directory."""
         target_dir = tmp_path / "target_dir"
@@ -409,6 +433,7 @@ class TestInfoIntegration:
         with pytest.raises(FileSystemError):
             is_empty_directory(nonexistent)
 
+    @skip_if_no_symlinks
     def test_symlink_consistency(self, tmp_path: Path) -> None:
         """Test all functions handle symlinks consistently."""
         # Create target file

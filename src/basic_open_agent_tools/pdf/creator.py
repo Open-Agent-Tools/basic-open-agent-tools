@@ -1,7 +1,7 @@
 """PDF creation and manipulation tools."""
 
 import os
-from typing import Dict, Union, List
+from typing import Dict, List, Union
 
 try:
     from strands import tool as strands_tool
@@ -12,9 +12,9 @@ except ImportError:
 
 # Try to import PDF processing libraries
 try:
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.lib.pagesizes import A4, letter
     from reportlab.lib.units import inch
+    from reportlab.pdfgen import canvas
     HAS_REPORTLAB = True
 except ImportError:
     HAS_REPORTLAB = False

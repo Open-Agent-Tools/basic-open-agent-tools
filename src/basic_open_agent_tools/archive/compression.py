@@ -1,8 +1,8 @@
 """ZIP compression utilities."""
 
-import zipfile
 import os
-from typing import Dict, Union, List
+import zipfile
+from typing import Dict, List, Union
 
 try:
     from strands import tool as strands_tool

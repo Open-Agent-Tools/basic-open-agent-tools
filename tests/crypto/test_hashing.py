@@ -33,7 +33,7 @@ class TestHashMd5:
         assert result["algorithm"] == "md5"
         assert result["input_data"] == "hello world"
         assert result["input_length"] == 11
-        assert result["hash_hex"] == "5d41402abc4b2a76b9719d911017c592"
+        assert result["hash_hex"] == "5eb63bbbe01eeed093cb22bb8f5acdc3"
         assert result["hash_length"] == 32
 
     def test_empty_string_hash(self):
@@ -132,8 +132,8 @@ class TestHashFile:
         """Test successful file hashing with SHA-256."""
         test_content = "hello world\n"
 
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
-            f.write(test_content)
+        with tempfile.NamedTemporaryFile(mode='wb', delete=False) as f:
+            f.write(test_content.encode('utf-8'))
             temp_file_path = f.name
 
         try:
@@ -222,7 +222,7 @@ class TestVerifyChecksum:
     def test_successful_checksum_verification_valid(self):
         """Test successful checksum verification with valid hash."""
         data = "hello world"
-        expected_hash = "5d41402abc4b2a76b9719d911017c592"  # MD5 of "hello world"
+        expected_hash = "5eb63bbbe01eeed093cb22bb8f5acdc3"  # MD5 of "hello world"
 
         result = verify_checksum(data, expected_hash, algorithm="md5")
 
@@ -247,7 +247,7 @@ class TestVerifyChecksum:
     def test_case_insensitive_hash_comparison(self):
         """Test that hash comparison is case-insensitive."""
         data = "hello world"
-        uppercase_hash = "5D41402ABC4B2A76B9719D911017C592"  # MD5 in uppercase
+        uppercase_hash = "5EB63BBBE01EEED093CB22BB8F5ACDC3"  # MD5 in uppercase
 
         result = verify_checksum(data, uppercase_hash, algorithm="md5")
 

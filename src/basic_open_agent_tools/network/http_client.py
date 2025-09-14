@@ -5,9 +5,9 @@ and comprehensive error handling.
 """
 
 import json
-import urllib.request
-import urllib.parse
 import urllib.error
+import urllib.parse
+import urllib.request
 from typing import Dict, Optional, Union
 
 try:

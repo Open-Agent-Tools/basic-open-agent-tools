@@ -1,7 +1,7 @@
 """Tests for process management tools."""
 
 import pytest
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, PropertyMock
 
 from basic_open_agent_tools.system.processes import (
     get_current_process_info,
@@ -121,7 +121,12 @@ class TestListRunningProcesses:
     @patch('basic_open_agent_tools.system.processes.psutil')
     def test_process_access_denied_handling(self, mock_psutil):
         """Test handling of access denied errors."""
-        import psutil
+        # Create mock exceptions
+        mock_access_denied = Exception("Access denied")
+        mock_no_such_process = Exception("No such process")
+
+        mock_psutil.AccessDenied = type('AccessDenied', (Exception,), {})
+        mock_psutil.NoSuchProcess = type('NoSuchProcess', (Exception,), {})
 
         mock_processes = []
 
@@ -138,11 +143,11 @@ class TestListRunningProcesses:
 
         # Second process - access denied
         mock_proc2 = Mock()
-        mock_proc2.info = Mock(side_effect=psutil.AccessDenied())
+        # Make accessing .info raise an exception immediately
+        type(mock_proc2).info = PropertyMock(side_effect=mock_psutil.AccessDenied())
         mock_processes.append(mock_proc2)
 
         mock_psutil.process_iter.return_value = mock_processes
-        mock_psutil.AccessDenied = psutil.AccessDenied
 
         result = list_running_processes(limit=10)
 

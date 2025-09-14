@@ -1,8 +1,8 @@
 """TAR archive format utilities."""
 
-import tarfile
 import os
-from typing import Dict, Union, List
+import tarfile
+from typing import Dict, List, Union
 
 try:
     from strands import tool as strands_tool

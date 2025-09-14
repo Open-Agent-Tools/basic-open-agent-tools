@@ -1,6 +1,6 @@
 """Archive and compression tools."""
 
-from .compression import create_zip, extract_zip, compress_files
+from .compression import compress_files, create_zip, extract_zip
 from .formats import create_tar, extract_tar
 
 __all__ = [

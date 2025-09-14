@@ -1,7 +1,7 @@
 """PDF reading and extraction tools."""
 
 import os
-from typing import Dict, Union, List
+from typing import Dict, List, Union
 
 try:
     from strands import tool as strands_tool

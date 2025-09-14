@@ -3,9 +3,8 @@
 Provides timing utilities and execution control functions with agent-friendly signatures.
 """
 
-import time
 import signal
-import sys
+import time
 from typing import Dict, Union
 
 try:

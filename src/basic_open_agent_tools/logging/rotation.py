@@ -1,8 +1,8 @@
 """Log rotation utilities."""
 
+import glob
 import logging.handlers
 import os
-import glob
 from typing import Dict, Union
 
 try:

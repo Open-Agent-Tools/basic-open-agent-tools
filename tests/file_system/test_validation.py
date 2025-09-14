@@ -1,5 +1,6 @@
 """Tests for basic_open_agent_tools.file_system.validation module."""
 
+import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -9,6 +10,25 @@ from basic_open_agent_tools.exceptions import FileSystemError
 from basic_open_agent_tools.file_system.validation import (
     validate_file_content,
     validate_path,
+)
+
+
+def can_create_symlinks() -> bool:
+    """Check if we can create symbolic links on this system."""
+    try:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            target = temp_path / "target"
+            target.touch()
+            link = temp_path / "link"
+            link.symlink_to(target)
+            return True
+    except (OSError, NotImplementedError):
+        return False
+
+
+skip_if_no_symlinks = pytest.mark.skipif(
+    not can_create_symlinks(), reason="Symlinks not supported or insufficient privileges"
 )
 
 
@@ -140,6 +160,7 @@ class TestValidatePath:
         with pytest.raises(FileSystemError, match="Invalid path for custom operation"):
             validate_path("", "custom operation")
 
+    @skip_if_no_symlinks
     def test_validate_path_symlink_resolution(self, tmp_path: Path) -> None:
         """Test that symlinks are resolved correctly."""
         # Create a file and a symlink to it

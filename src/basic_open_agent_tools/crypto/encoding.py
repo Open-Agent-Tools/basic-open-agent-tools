@@ -2,7 +2,7 @@
 
 import base64
 import urllib.parse
-from typing import Dict, Union
+from typing import Dict
 
 try:
     from strands import tool as strands_tool
@@ -224,12 +224,12 @@ def hex_decode(encoded_data: str) -> Dict[str, str]:
             "decoded_length": len(decoded_string)
         }
 
+    except UnicodeDecodeError:
+        raise BasicAgentToolsError("Decoded bytes do not represent valid UTF-8 text")
     except ValueError as e:
         if "non-hexadecimal" in str(e).lower() or "invalid" in str(e).lower():
             raise BasicAgentToolsError("Invalid hexadecimal string")
         else:
             raise BasicAgentToolsError(f"Failed to decode hex data: {str(e)}")
-    except UnicodeDecodeError:
-        raise BasicAgentToolsError("Decoded bytes do not represent valid UTF-8 text")
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to decode hex data: {str(e)}")

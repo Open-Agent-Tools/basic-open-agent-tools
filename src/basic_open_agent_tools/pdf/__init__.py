@@ -1,7 +1,7 @@
 """PDF processing tools."""
 
+from .creator import merge_pdfs, text_to_pdf
 from .reader import extract_text_from_pdf, get_pdf_info
-from .creator import text_to_pdf, merge_pdfs
 
 __all__ = [
     # PDF reading

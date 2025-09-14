@@ -1,9 +1,9 @@
 """Structured logging utilities."""
 
-import logging
 import json
+import logging
 import time
-from typing import Dict, Union, Any
+from typing import Dict, Union
 
 try:
     from strands import tool as strands_tool

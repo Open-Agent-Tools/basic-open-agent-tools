@@ -1,7 +1,6 @@
 """Process management and information tools."""
 
-import os
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Union
 
 try:
     import psutil

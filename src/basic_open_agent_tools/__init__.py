@@ -16,7 +16,6 @@ from . import (
     datetime,
     exceptions,
     file_system,
-    logging as log_module,
     monitoring,
     network,
     pdf,
@@ -24,6 +23,9 @@ from . import (
     text,
     types,
     utilities,
+)
+from . import (
+    logging as log_module,
 )
 
 # Helper functions for tool management
