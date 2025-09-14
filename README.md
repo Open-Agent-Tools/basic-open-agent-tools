@@ -4,6 +4,7 @@ An open foundational toolkit providing essential components for building AI agen
 
 ## Installation
 
+### Basic Installation
 ```bash
 pip install basic-open-agent-tools
 ```
@@ -12,6 +13,38 @@ Or with UV:
 ```bash
 uv add basic-open-agent-tools
 ```
+
+### Optional Dependency Groups
+Install only the features you need:
+
+```bash
+# System tools (process management, system info, shell commands)
+pip install basic-open-agent-tools[system]
+
+# PDF tools (reading and creating PDFs)
+pip install basic-open-agent-tools[pdf]
+
+# All optional features
+pip install basic-open-agent-tools[all]
+
+# Development dependencies (testing, linting, type checking)
+pip install basic-open-agent-tools[dev]
+
+# Testing only
+pip install basic-open-agent-tools[test]
+```
+
+**💡 Tip**: Use `[all]` to get all optional features, or combine specific groups as needed.
+
+### Dependency Groups Explained
+
+| Group | Dependencies | Use Case |
+|-------|-------------|----------|
+| **`[system]`** | `psutil>=5.9.0` | Process management, system monitoring, resource usage |
+| **`[pdf]`** | `PyPDF2>=3.0.0`, `reportlab>=4.0.0` | PDF reading, creation, and manipulation |
+| **`[all]`** | All optional dependencies | Complete feature set with all capabilities |
+| **`[dev]`** | All above + testing/linting tools | Development, testing, and code quality |
+| **`[test]`** | All above + testing tools only | CI/CD and automated testing |
 
 ## Key Features
 
@@ -35,7 +68,7 @@ from google.adk.models.lite_llm import LiteLlm
 import basic_open_agent_tools as boat
 
 # Option 1: Load all tools at once (recommended)
-agent_tools = boat.load_all_tools()  # All 93 functions from all modules
+agent_tools = boat.load_all_tools()  # All 150+ functions from all modules
 
 # Option 2: Load tools by category
 fs_tools = boat.load_all_filesystem_tools()      # 18 functions
@@ -43,7 +76,13 @@ text_tools = boat.load_all_text_tools()         # 10 functions
 data_tools = boat.load_all_data_tools()         # 23 functions
 datetime_tools = boat.load_all_datetime_tools() # 40 functions
 network_tools = boat.load_all_network_tools()   # 1 function
-utilities_tools = boat.load_all_utilities_tools() # 1 function
+utilities_tools = boat.load_all_utilities_tools() # 3 functions
+system_tools = boat.load_all_system_tools()     # 20 functions
+crypto_tools = boat.load_all_crypto_tools()     # 13 functions
+pdf_tools = boat.load_all_pdf_tools()           # 4 functions
+archive_tools = boat.load_all_archive_tools()   # 5 functions
+logging_tools = boat.load_all_logging_tools()   # 5 functions
+monitoring_tools = boat.load_all_monitoring_tools() # 4 functions
 
 # Merge selected categories (automatically deduplicates)
 agent_tools = boat.merge_tool_lists(fs_tools, text_tools, network_tools, utilities_tools)
@@ -170,7 +209,7 @@ Utilities Tools:
 - **Strands Compatible**: Native `@strands_tool` decorator support
 - **Security**: SSL verification, timeout controls, proper error handling
 
-### Utilities Tools ✅ (1 function)
+### Utilities Tools ✅ (3 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/utilities/README.md)**
 
 - **Timing Controls**: Pause execution with interrupt handling
@@ -178,7 +217,53 @@ Utilities Tools:
 - **Strands Compatible**: Native `@strands_tool` decorator support
 - **Agent-Friendly**: Structured responses with detailed timing information
 
-**Total: 93 implemented functions** across 6 categories, designed specifically for building AI agents with local operations and HTTP requests.
+### System Tools ✅ (20 functions)
+📖 **[Complete Documentation](src/basic_open_agent_tools/system/README.md)**
+
+- **Cross-Platform Shell**: Execute shell commands on Windows, macOS, and Linux
+- **Process Management**: Get process info, list running processes, check if processes are running
+- **System Information**: CPU usage, memory usage, disk usage, system uptime
+- **Environment Variables**: Get, set, and list environment variables
+- **Runtime Inspection**: Inspect Python environment, modules, and system context
+
+### Crypto Tools ✅ (13 functions)
+📖 **[Complete Documentation](src/basic_open_agent_tools/crypto/README.md)**
+
+- **Hashing**: MD5, SHA-256, SHA-512 hashing for strings and files
+- **Encoding**: Base64, URL, and hex encoding/decoding
+- **Generation**: UUIDs, random strings, and random bytes with configurable entropy
+- **Verification**: Checksum verification and hash validation
+
+### PDF Tools ✅ (4 functions)
+📖 **[Complete Documentation](src/basic_open_agent_tools/pdf/README.md)**
+
+- **PDF Reading**: Extract text from PDFs with page range support
+- **PDF Creation**: Convert text to PDF with customizable formatting
+- **PDF Information**: Get metadata and document information
+- **PDF Merging**: Combine multiple PDFs into single documents
+
+### Archive Tools ✅ (5 functions)
+📖 **[Complete Documentation](src/basic_open_agent_tools/archive/README.md)**
+
+- **ZIP Operations**: Create and extract ZIP archives
+- **TAR Operations**: Create and extract TAR archives
+- **Compression**: File and directory compression with multiple formats
+
+### Logging Tools ✅ (5 functions)
+📖 **[Complete Documentation](src/basic_open_agent_tools/logging/README.md)**
+
+- **Structured Logging**: JSON-formatted logging with configurable fields
+- **Log Rotation**: Automatic log file rotation and cleanup
+- **Multiple Handlers**: File, console, and rotating file handlers
+
+### Monitoring Tools ✅ (4 functions)
+📖 **[Complete Documentation](src/basic_open_agent_tools/monitoring/README.md)**
+
+- **File Watching**: Monitor files and directories for changes
+- **Health Checks**: URL health monitoring and service status checks
+- **Real-time Monitoring**: Event-driven file system monitoring
+
+**Total: 150+ implemented functions** across 12 categories, designed specifically for building AI agents with comprehensive local operations and HTTP requests.
 
 ## Helper Functions
 
@@ -196,22 +281,28 @@ agent = Agent(tools=all_tools)
 ### Selective Loading 🎯
 ```python
 # Load specific categories
-network_tools = boat.load_all_network_tools()        # HTTP client
-utilities_tools = boat.load_all_utilities_tools()    # Sleep functions
 fs_tools = boat.load_all_filesystem_tools()          # File operations
+text_tools = boat.load_all_text_tools()             # Text processing
+data_tools = boat.load_all_data_tools()             # JSON, CSV, config files
+datetime_tools = boat.load_all_datetime_tools()     # Date/time operations
+network_tools = boat.load_all_network_tools()       # HTTP client
+utilities_tools = boat.load_all_utilities_tools()   # Timing functions
+system_tools = boat.load_all_system_tools()         # Shell, processes, system info
+crypto_tools = boat.load_all_crypto_tools()         # Hashing, encoding, generation
+pdf_tools = boat.load_all_pdf_tools()               # PDF reading and creation
+archive_tools = boat.load_all_archive_tools()       # ZIP and TAR operations
+logging_tools = boat.load_all_logging_tools()       # Structured logging
+monitoring_tools = boat.load_all_monitoring_tools() # File watching, health checks
 
-# Merge selected tools
-custom_tools = boat.merge_tool_lists(network_tools, fs_tools)
+# Merge selected tools (automatically deduplicates)
+custom_tools = boat.merge_tool_lists(
+    fs_tools,
+    network_tools,
+    system_tools,
+    crypto_tools
+)
 ```
 
-### Future Modules 🚧
-
-- **System Tools** 📖 **[Planned Features](src/basic_open_agent_tools/system/README.md)** - Cross-platform shell (`execute_shell_command`, `run_powershell`, `run_bash`), process management (`run_command`, `kill_process`, `list_processes`), system info (`get_cpu_usage`, `get_memory_usage`, `get_disk_space`), environment variables (`set_env_var`, `get_env_var`, `list_env_vars`)
-- **Crypto Tools** 📖 **[Planned Features](src/basic_open_agent_tools/crypto/README.md)** - Hashing (`hash_md5`, `hash_sha256`, `verify_hash`), encoding (`base64_encode`, `base64_decode`, `url_encode`), basic crypto (`generate_uuid`, `generate_random_string`)
-- **PDF Tools** 📋 **Planned** - Reading (`extract_text_from_pdf`, `get_pdf_info`), creation (`text_to_pdf`, `merge_pdfs`)
-- **Archive Tools** 📋 **Planned** - Compression (`create_zip`, `extract_zip`, `compress_files`), formats (`create_tar`, `extract_tar`)
-- **Logging Tools** 📋 **Planned** - Structured logging (`log_info`, `log_error`, `configure_logger`), file rotation (`setup_rotating_log`, `cleanup_old_logs`)
-- **Monitoring Tools** 📋 **Planned** - File watching (`watch_file_changes`, `monitor_directory`), health checks (`check_url_status`, `ping_host`)
 
 ## Contributing
 
