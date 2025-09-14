@@ -9,7 +9,7 @@ from typing import List
 __version__ = "0.9.1"
 
 # Modular structure
-from . import data, datetime, exceptions, file_system, text, types
+from . import data, datetime, exceptions, file_system, network, text, types, utilities
 
 # Helper functions for tool management
 from .helpers import (
@@ -18,7 +18,10 @@ from .helpers import (
     load_all_data_tools,
     load_all_datetime_tools,
     load_all_filesystem_tools,
+    load_all_network_tools,
     load_all_text_tools,
+    load_all_tools,
+    load_all_utilities_tools,
     load_data_config_tools,
     load_data_csv_tools,
     load_data_json_tools,
@@ -28,10 +31,7 @@ from .helpers import (
 
 # Future modules (placeholder imports for when modules are implemented)
 # from . import system
-# from . import network
-# from . import data
 # from . import crypto
-# from . import utilities
 
 __all__: List[str] = [
     # Implemented modules
@@ -39,11 +39,11 @@ __all__: List[str] = [
     "text",
     "data",
     "datetime",
+    "network",
+    "utilities",
     # Future modules (uncomment when implemented)
     # "system",
-    # "network",
     # "crypto",
-    # "utilities",
     # Common infrastructure
     "exceptions",
     "types",
@@ -52,6 +52,9 @@ __all__: List[str] = [
     "load_all_text_tools",
     "load_all_data_tools",
     "load_all_datetime_tools",
+    "load_all_network_tools",
+    "load_all_utilities_tools",
+    "load_all_tools",
     "load_data_json_tools",
     "load_data_csv_tools",
     "load_data_validation_tools",

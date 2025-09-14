@@ -1,21 +1,51 @@
 # Utilities Tools Status
 
 ## Overview
-Development utilities, logging, caching, and helper functions for AI agents.
+Timing controls, sleep functions, and utility tools for AI agents.
 
 ## Current Status
-**📋 PLANNED MODULE** - Not yet implemented
+**✅ IMPLEMENTED MODULE** - Timing utilities available
 
-This module is planned for future development to provide essential development and operational utilities for AI agents.
+This module provides essential timing and execution control utilities for AI agents with agent-friendly signatures.
+
+## Current Features
+- ✅ **sleep_seconds**: Pause execution with interrupt handling
+- ✅ **sleep_milliseconds**: Sleep for millisecond durations
+- ✅ **precise_sleep**: High-precision sleep using busy-waiting
+
+## Timing Functions
+
+### sleep_seconds
+```python
+def sleep_seconds(seconds: Union[int, float]) -> Dict[str, Union[str, float]]
+```
+- Pause execution for specified seconds (max 3600)
+- Interruptible with Ctrl+C
+- Returns structured response with timing details
+
+### sleep_milliseconds
+```python
+def sleep_milliseconds(milliseconds: Union[int, float]) -> Dict[str, Union[str, float]]
+```
+- Convenience function for millisecond sleep durations
+- Converts to seconds internally and calls sleep_seconds
+
+### precise_sleep
+```python
+def precise_sleep(seconds: Union[int, float]) -> Dict[str, Union[str, float]]
+```
+- High-precision sleep using combination of sleep() and busy-waiting
+- Best for timing-critical applications (max 60 seconds)
+- Uses busy-waiting for final 10ms for accuracy
 
 ## Planned Features
-- ✅ **Planned**: Simple logging utilities
-- ✅ **Planned**: Basic caching mechanisms
-- ✅ **Planned**: Retry and backoff utilities
-- ✅ **Planned**: Rate limiting helpers
-- ✅ **Planned**: Simple debugging tools
-- ✅ **Planned**: Performance timing utilities
-- ✅ **Planned**: Data structure helpers
+- 🚧 **Planned**: Simple logging utilities
+- 🚧 **Planned**: Basic caching mechanisms
+- 🚧 **Planned**: Retry and backoff utilities
+- 🚧 **Planned**: Rate limiting helpers
+- 🚧 **Planned**: Simple debugging tools
+- 🚧 **Planned**: Performance timing utilities
+- 🚧 **Planned**: Data structure helpers
 
 ## Design Considerations for Agent Tools
 - Simple, lightweight utility functions
@@ -86,11 +116,13 @@ This module is planned for future development to provide essential development a
 - Thread-safe implementations where needed
 
 ## Agent Integration
-When implemented, will be compatible with:
+Compatible with multiple agent frameworks:
 - **Google ADK**: Direct function imports as tools
 - **LangChain**: Wrappable with StructuredTool
-- **Strands Agents**: Native @strands_tool decorator support
+- **Strands Agents**: Native @strands_tool decorator support ✅
 - **Custom Agents**: Simple function-based API
+
+All functions include the `@strands_tool` decorator for native Strands Agents compatibility.
 
 ## Common Use Cases
 - **Development**: Simple logging and debugging during agent development

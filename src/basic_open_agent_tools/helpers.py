@@ -3,7 +3,7 @@
 import inspect
 from typing import Any, Callable, Dict, List, Union
 
-from . import data, datetime, file_system, text
+from . import data, datetime, file_system, network, text, utilities
 
 
 def load_all_filesystem_tools() -> List[Callable[..., Any]]:
@@ -92,6 +92,76 @@ def load_all_datetime_tools() -> List[Callable[..., Any]]:
             tools.append(func)
 
     return tools
+
+
+def load_all_network_tools() -> List[Callable[..., Any]]:
+    """Load all network tools as a list of callable functions.
+
+    Returns:
+        List of all network tool functions
+
+    Example:
+        >>> network_tools = load_all_network_tools()
+        >>> len(network_tools) > 0
+        True
+    """
+    tools = []
+
+    # Get all functions from network module
+    for name in network.__all__:
+        func = getattr(network, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
+def load_all_utilities_tools() -> List[Callable[..., Any]]:
+    """Load all utilities tools as a list of callable functions.
+
+    Returns:
+        List of all utilities tool functions
+
+    Example:
+        >>> utilities_tools = load_all_utilities_tools()
+        >>> len(utilities_tools) > 0
+        True
+    """
+    tools = []
+
+    # Get all functions from utilities module
+    for name in utilities.__all__:
+        func = getattr(utilities, name)
+        if callable(func):
+            tools.append(func)
+
+    return tools
+
+
+def load_all_tools() -> List[Callable[..., Any]]:
+    """Load all tools from all modules as a single list of callable functions.
+
+    This is a convenience function that loads and combines tools from all
+    implemented modules: file_system, text, data, datetime, network, and utilities.
+
+    Returns:
+        List of all tool functions from all modules (automatically deduplicated)
+
+    Example:
+        >>> all_tools = load_all_tools()
+        >>> len(all_tools) >= 93  # Current total: 93 functions
+        True
+        >>> # Use with agent frameworks
+        >>> agent = Agent(tools=load_all_tools())
+    """
+    return merge_tool_lists(
+        load_all_filesystem_tools(),    # 18 functions
+        load_all_text_tools(),          # 10 functions
+        load_all_data_tools(),          # 23 functions
+        load_all_datetime_tools(),      # 40 functions
+        load_all_network_tools(),       # 1 function
+        load_all_utilities_tools(),     # 1 function
+    )
 
 
 def load_data_json_tools() -> List[Callable[..., Any]]:

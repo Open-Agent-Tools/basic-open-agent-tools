@@ -19,9 +19,9 @@ uv add basic-open-agent-tools
 
 🚀 **Minimal Dependencies**: Pure Python implementation with no external dependencies for core functionality
 
-🔧 **Modular Architecture**: Load only the tools you need with category-specific helpers
+🔧 **Modular Architecture**: Load only the tools you need with category-specific helpers, or use `load_all_tools()` for everything
 
-🤝 **Multi-Framework Compatibility**: Native support for Google ADK, LangChain, Strands Agents, and custom agent frameworks
+🤝 **Multi-Framework Compatibility**: Native support for Google ADK, LangChain, Strands Agents, and custom agent frameworks with `@strands_tool` decorators
 
 ## Quick Start
 
@@ -34,12 +34,19 @@ from google.adk.models.lite_llm import LiteLlm
 
 import basic_open_agent_tools as boat
 
-# Load tools by category
-fs_tools = boat.load_all_filesystem_tools()    # 18 functions
-text_tools = boat.load_all_text_tools()       # 10 functions
+# Option 1: Load all tools at once (recommended)
+agent_tools = boat.load_all_tools()  # All 93 functions from all modules
 
-# Merge for agent use (automatically deduplicates)
-agent_tools = boat.merge_tool_lists(fs_tools, text_tools)
+# Option 2: Load tools by category
+fs_tools = boat.load_all_filesystem_tools()      # 18 functions
+text_tools = boat.load_all_text_tools()         # 10 functions
+data_tools = boat.load_all_data_tools()         # 23 functions
+datetime_tools = boat.load_all_datetime_tools() # 40 functions
+network_tools = boat.load_all_network_tools()   # 1 function
+utilities_tools = boat.load_all_utilities_tools() # 1 function
+
+# Merge selected categories (automatically deduplicates)
+agent_tools = boat.merge_tool_lists(fs_tools, text_tools, network_tools, utilities_tools)
 
 
 load_dotenv()
@@ -102,6 +109,12 @@ Text Processing Tools:
     extract_sentences
     join_with_oxford_comma
 
+Network Tools:
+    http_request
+
+Utilities Tools:
+    sleep_seconds
+
 """
 
 ```
@@ -130,7 +143,7 @@ Text Processing Tools:
 - Smart text splitting and sentence extraction
 - HTML tag removal and Unicode normalization
 
-### Data Processing Tools ✅ (27 functions)
+### Data Processing Tools ✅ (23 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/data/README.md)**
 
 - **JSON Processing**: Safe serialization, validation, compression
@@ -139,7 +152,7 @@ Text Processing Tools:
 - **Data Validation**: Schema checking, type validation, field validation
 - **Agent-Friendly Signatures**: All functions use basic Python types for maximum AI framework compatibility
 
-### DateTime Tools ✅ (42 functions)
+### DateTime Tools ✅ (40 functions)
 📖 **[Complete Documentation](src/basic_open_agent_tools/datetime/README.md)**
 
 - **Current Date/Time**: Timezone-aware current date/time operations
@@ -149,12 +162,52 @@ Text Processing Tools:
 - **Business Logic**: Business day calculations, timezone conversions
 - **Information Extraction**: Weekday names, month names, leap years
 
+### Network Tools ✅ (1 function)
+📖 **[Complete Documentation](src/basic_open_agent_tools/network/README.md)**
+
+- **HTTP Client**: Make API calls and fetch web data with comprehensive error handling
+- **Agent-Friendly**: Simplified type signatures and structured responses
+- **Strands Compatible**: Native `@strands_tool` decorator support
+- **Security**: SSL verification, timeout controls, proper error handling
+
+### Utilities Tools ✅ (1 function)
+📖 **[Complete Documentation](src/basic_open_agent_tools/utilities/README.md)**
+
+- **Timing Controls**: Pause execution with interrupt handling
+- **Precision Sleep**: High-precision timing for timing-critical operations
+- **Strands Compatible**: Native `@strands_tool` decorator support
+- **Agent-Friendly**: Structured responses with detailed timing information
+
+**Total: 93 implemented functions** across 6 categories, designed specifically for building AI agents with local operations and HTTP requests.
+
+## Helper Functions
+
+### Load All Tools at Once ⚡
+```python
+import basic_open_agent_tools as boat
+
+# Get all 93 functions from all modules
+all_tools = boat.load_all_tools()
+
+# Use with any agent framework
+agent = Agent(tools=all_tools)
+```
+
+### Selective Loading 🎯
+```python
+# Load specific categories
+network_tools = boat.load_all_network_tools()        # HTTP client
+utilities_tools = boat.load_all_utilities_tools()    # Sleep functions
+fs_tools = boat.load_all_filesystem_tools()          # File operations
+
+# Merge selected tools
+custom_tools = boat.merge_tool_lists(network_tools, fs_tools)
+```
+
 ### Future Modules 🚧
 
-- **Network Tools** 📖 **[Planned Features](src/basic_open_agent_tools/network/README.md)** - Local network utilities, connectivity validation
-- **System Tools** 📖 **[Planned Features](src/basic_open_agent_tools/system/README.md)** - Process management, system information  
+- **System Tools** 📖 **[Planned Features](src/basic_open_agent_tools/system/README.md)** - Process management, system information
 - **Crypto Tools** 📖 **[Planned Features](src/basic_open_agent_tools/crypto/README.md)** - Hashing, encoding, basic cryptographic utilities
-- **Utilities** 📖 **[Planned Features](src/basic_open_agent_tools/utilities/README.md)** - Development and debugging helpers
 
 ## Contributing
 

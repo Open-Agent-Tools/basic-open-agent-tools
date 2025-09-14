@@ -1,23 +1,70 @@
 # Network Tools Status
 
 ## Overview
-Local network utilities, validation, and connectivity tools for AI agents.
+HTTP client and network utilities for AI agents with simplified type signatures.
 
 ## Current Status
-**📋 PLANNED MODULE** - Not yet implemented
+**✅ IMPLEMENTED MODULE** - HTTP client tools available
 
-This module is planned for future development to provide essential local networking capabilities for AI agents.
+This module provides essential HTTP client functionality for AI agents with agent-friendly signatures.
+
+## Current Features
+- ✅ **http_request**: Make HTTP requests with comprehensive error handling
+- ✅ **http_get**: Convenience function for GET requests
+- ✅ **http_post**: Convenience function for POST requests
 
 ## Planned Features
-- ✅ **Planned**: Network connectivity validation
-- ✅ **Planned**: Local network interface information
-- ✅ **Planned**: Port availability checking
-- ✅ **Planned**: Basic network configuration validation
-- ✅ **Planned**: Local DNS resolution utilities
-- ✅ **Planned**: Network latency and performance checks
+- 🚧 **Planned**: Network connectivity validation
+- 🚧 **Planned**: Local network interface information
+- 🚧 **Planned**: Port availability checking
+- 🚧 **Planned**: Basic network configuration validation
+- 🚧 **Planned**: Local DNS resolution utilities
+- 🚧 **Planned**: Network latency and performance checks
+
+## HTTP Client Features
+- **Agent-Friendly Signatures**: Simplified parameters using basic Python types
+- **Comprehensive Error Handling**: Structured error responses with details
+- **Flexible Authentication**: Support for various auth types (planned)
+- **Security Controls**: SSL verification, timeout management
+- **Binary Content Support**: Handles both text and binary responses
+- **Structured Responses**: Consistent return format with status, headers, body, URL
+
+## Function Signatures
+
+### http_request
+```python
+def http_request(
+    method: str,
+    url: str,
+    headers: Optional[Dict[str, str]] = None,
+    body: Optional[str] = None,
+    timeout: int = 30,
+    follow_redirects: bool = True,
+    verify_ssl: bool = True
+) -> Dict[str, Union[str, int]]
+```
+
+### http_get
+```python
+def http_get(
+    url: str,
+    headers: Optional[Dict[str, str]] = None,
+    timeout: int = 30
+) -> Dict[str, Union[str, int]]
+```
+
+### http_post
+```python
+def http_post(
+    url: str,
+    body: Optional[str] = None,
+    headers: Optional[Dict[str, str]] = None,
+    timeout: int = 30
+) -> Dict[str, Union[str, int]]
+```
 
 ## Design Considerations for Agent Tools
-- **Local network operations only** (no remote network calls or API requests)
+- HTTP client operations for web API interactions
 - Functions designed as individual agent tools
 - Cross-platform compatibility (Windows, macOS, Linux)
 - Security-conscious network operations
@@ -66,11 +113,13 @@ This module is planned for future development to provide essential local network
 - Safe error handling without information disclosure
 
 ## Agent Integration
-When implemented, will be compatible with:
+Compatible with multiple agent frameworks:
 - **Google ADK**: Direct function imports as tools
 - **LangChain**: Wrappable with StructuredTool
-- **Strands Agents**: Native @strands_tool decorator support
+- **Strands Agents**: Native @strands_tool decorator support ✅
 - **Custom Agents**: Simple function-based API
+
+All functions include the `@strands_tool` decorator for native Strands Agents compatibility.
 
 ## Implementation Priority
 This module is planned for implementation after the core modules (file_system, text, data, datetime) are stable and tested.
