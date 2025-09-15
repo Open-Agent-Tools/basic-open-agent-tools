@@ -5,7 +5,15 @@ their own workflow during a session.
 """
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
+        return func
+
 
 from ..exceptions import BasicAgentToolsError
 from .validation import (
@@ -33,6 +41,7 @@ def _get_current_timestamp() -> str:
     return datetime.now().isoformat()
 
 
+@strands_tool
 def add_task(
     title: str,
     priority: str,
@@ -117,6 +126,7 @@ def add_task(
         raise BasicAgentToolsError(f"Failed to create task: {e}") from e
 
 
+@strands_tool
 def list_tasks(status: str, tag: str) -> dict[str, Any]:
     """List all tasks or filter by status and/or tag.
 
@@ -175,6 +185,7 @@ def list_tasks(status: str, tag: str) -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to list tasks: {e}") from e
 
 
+@strands_tool
 def get_task(task_id: int) -> dict[str, Any]:
     """Retrieve a single task by ID.
 
@@ -211,6 +222,7 @@ def get_task(task_id: int) -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to get task: {e}") from e
 
 
+@strands_tool
 def update_task(
     task_id: int,
     title: str,
@@ -296,6 +308,7 @@ def update_task(
         raise BasicAgentToolsError(f"Failed to update task: {e}") from e
 
 
+@strands_tool
 def delete_task(task_id: int) -> dict[str, Any]:
     """Remove a task from memory.
 
@@ -334,6 +347,7 @@ def delete_task(task_id: int) -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to delete task: {e}") from e
 
 
+@strands_tool
 def complete_task(task_id: int) -> dict[str, Any]:
     """Mark a task as completed.
 
@@ -375,6 +389,7 @@ def complete_task(task_id: int) -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to complete task: {e}") from e
 
 
+@strands_tool
 def get_task_stats() -> dict[str, Any]:
     """Get summary statistics about all tasks.
 
@@ -434,6 +449,7 @@ def get_task_stats() -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to get task statistics: {e}") from e
 
 
+@strands_tool
 def clear_all_tasks() -> dict[str, Any]:
     """Clear all tasks from memory (for testing/reset).
 
