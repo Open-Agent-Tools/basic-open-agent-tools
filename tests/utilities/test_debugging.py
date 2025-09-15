@@ -143,7 +143,7 @@ class TestFormatExceptionDetails:
     def test_format_current_exception(self):
         """Test formatting current exception."""
         try:
-            1 / 0
+            _ = 1 / 0  # Intentional division by zero for test
         except ZeroDivisionError:
             result = format_exception_details()
 

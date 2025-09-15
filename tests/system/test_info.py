@@ -38,7 +38,7 @@ class TestGetSystemInfo:
             assert key in result
 
         # Check that values are strings
-        for key, value in result.items():
+        for _key, value in result.items():
             assert isinstance(value, str)
 
         # Basic validation - system should not be empty
