@@ -79,6 +79,7 @@ class TestDecompressFileGzip:
                 except BasicAgentToolsError as e:
                     # Should have tried to create "test.txt" as output
                     assert "not found" in str(e)
+                    raise  # Re-raise so pytest.raises can catch it
 
     @patch("os.path.exists")
     @patch("os.path.getsize")

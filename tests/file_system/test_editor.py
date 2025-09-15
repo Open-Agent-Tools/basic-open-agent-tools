@@ -1,11 +1,11 @@
 """Tests for the file editor tool."""
 
-import pytest
-import tempfile
 from pathlib import Path
 
-from basic_open_agent_tools.file_system.editor import file_editor
+import pytest
+
 from basic_open_agent_tools.exceptions import FileSystemError
+from basic_open_agent_tools.file_system.editor import file_editor
 
 
 class TestFileEditor:
@@ -81,8 +81,9 @@ class TestFileEditor:
         test_content = "Hello world\nHello universe\n"
         test_file.write_text(test_content)
 
-        result = file_editor("str_replace", str(test_file), False,
-                           old_str="Hello", new_str="Hi")
+        result = file_editor(
+            "str_replace", str(test_file), False, old_str="Hello", new_str="Hi"
+        )
         assert "Replaced 2 occurrence(s)" in result
 
         updated_content = test_file.read_text()
@@ -95,8 +96,9 @@ class TestFileEditor:
         test_content = "Hello world\n"
         test_file.write_text(test_content)
 
-        result = file_editor("str_replace", str(test_file), False,
-                           old_str="goodbye", new_str="farewell")
+        result = file_editor(
+            "str_replace", str(test_file), False, old_str="goodbye", new_str="farewell"
+        )
         assert "No occurrences" in result
 
     def test_insert_at_line(self, tmp_path: Path) -> None:
@@ -105,8 +107,9 @@ class TestFileEditor:
         test_content = "line 1\nline 2\nline 3\n"
         test_file.write_text(test_content)
 
-        result = file_editor("insert", str(test_file), False,
-                           line_number=2, content="inserted line")
+        result = file_editor(
+            "insert", str(test_file), False, line_number=2, content="inserted line"
+        )
         assert "Inserted content at line 2" in result
 
         updated_content = test_file.read_text()
@@ -120,8 +123,9 @@ class TestFileEditor:
         test_content = "line 1\nline 2\n"
         test_file.write_text(test_content)
 
-        result = file_editor("insert", str(test_file), False,
-                           line_number=10, content="appended line")
+        result = file_editor(
+            "insert", str(test_file), False, line_number=10, content="appended line"
+        )
         assert "end" in result
 
         updated_content = test_file.read_text()
@@ -144,8 +148,9 @@ class TestFileEditor:
         test_content = "apple123\nbanana\napple456\ncherry\n"
         test_file.write_text(test_content)
 
-        result = file_editor("find", str(test_file), False,
-                           pattern=r"apple\d+", use_regex=True)
+        result = file_editor(
+            "find", str(test_file), False, pattern=r"apple\d+", use_regex=True
+        )
         assert "Found 2 match(es)" in result
         assert "apple123" in result
         assert "apple456" in result
@@ -192,8 +197,13 @@ class TestFileEditor:
             file_editor("view", str(nonexistent_file), False)
 
         with pytest.raises(FileSystemError, match="File not found"):
-            file_editor("str_replace", str(nonexistent_file), False,
-                       old_str="old", new_str="new")
+            file_editor(
+                "str_replace",
+                str(nonexistent_file),
+                False,
+                old_str="old",
+                new_str="new",
+            )
 
     def test_invalid_line_range(self, tmp_path: Path) -> None:
         """Test invalid line range formats."""
@@ -215,8 +225,9 @@ class TestFileEditor:
         test_file.write_text("content")
 
         with pytest.raises(ValueError, match="old_str cannot be empty"):
-            file_editor("str_replace", str(test_file), False,
-                       old_str="", new_str="replacement")
+            file_editor(
+                "str_replace", str(test_file), False, old_str="", new_str="replacement"
+            )
 
     def test_invalid_regex_pattern(self, tmp_path: Path) -> None:
         """Test invalid regex pattern raises error."""
@@ -224,5 +235,4 @@ class TestFileEditor:
         test_file.write_text("content")
 
         with pytest.raises(ValueError, match="Invalid regex pattern"):
-            file_editor("find", str(test_file), False,
-                       pattern="[", use_regex=True)
+            file_editor("find", str(test_file), False, pattern="[", use_regex=True)

@@ -27,7 +27,9 @@ from .validation import validate_path
 
 
 @strands_tool
-def file_editor(command: str, path: str, force: bool, **kwargs: Union[str, int, bool]) -> str:
+def file_editor(
+    command: str, path: str, force: bool, **kwargs: Union[str, int, bool]
+) -> str:
     """Comprehensive file editor with multiple operations.
 
     This tool provides a unified interface for file editing operations including
@@ -54,7 +56,9 @@ def file_editor(command: str, path: str, force: bool, **kwargs: Union[str, int, 
     """
     valid_commands = ["view", "create", "str_replace", "insert", "find"]
     if command not in valid_commands:
-        raise ValueError(f"Invalid command '{command}'. Must be one of: {valid_commands}")
+        raise ValueError(
+            f"Invalid command '{command}'. Must be one of: {valid_commands}"
+        )
 
     file_path = validate_path(path, command)
 
@@ -106,7 +110,7 @@ def _view_file(file_path: Path, view_range: Union[str, None]) -> str:
 
         if view_range:
             start_line, end_line = _parse_line_range(view_range, len(lines))
-            lines = lines[start_line-1:end_line]
+            lines = lines[start_line - 1 : end_line]
             line_numbers = range(start_line, start_line + len(lines))
         else:
             line_numbers = range(1, len(lines) + 1)
@@ -132,7 +136,9 @@ def _create_file(file_path: Path, content: str, force: bool) -> str:
     file_existed = file_path.exists()
 
     if file_existed and not force:
-        raise FileSystemError(f"File already exists: {file_path}. Use force=True to overwrite.")
+        raise FileSystemError(
+            f"File already exists: {file_path}. Use force=True to overwrite."
+        )
 
     try:
         write_file_from_string(str(file_path), content)
@@ -222,7 +228,9 @@ def _find_in_file(file_path: Path, pattern: str, use_regex: bool) -> str:
 
         if not matches:
             search_type = "regex" if use_regex else "text"
-            return f"No matches found for {search_type} pattern '{pattern}' in {file_path}"
+            return (
+                f"No matches found for {search_type} pattern '{pattern}' in {file_path}"
+            )
 
         result = f"Found {len(matches)} match(es) for '{pattern}' in {file_path}:\n"
         result += "\n".join(matches)

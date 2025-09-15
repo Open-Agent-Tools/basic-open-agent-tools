@@ -1,0 +1,468 @@
+"""Core TODO list operations for AI agents.
+
+Provides in-memory task management capabilities for agents to track
+their own workflow during a session.
+"""
+
+from datetime import datetime
+from typing import Any
+
+from ..exceptions import BasicAgentToolsError
+from .validation import (
+    validate_dependencies,
+    validate_estimated_duration,
+    validate_notes,
+    validate_priority,
+    validate_status,
+    validate_tags,
+    validate_task_count,
+    validate_task_exists,
+    validate_title,
+)
+
+# Global in-memory storage
+_task_storage: dict[str, Any] = {
+    "tasks": {},  # Dict[int, Dict] - task_id -> task_data
+    "next_id": 1,  # Auto-incrementing counter
+    "total_count": 0,  # Total tasks created (for stats)
+}
+
+
+def _get_current_timestamp() -> str:
+    """Get current ISO timestamp."""
+    return datetime.now().isoformat()
+
+
+def add_task(
+    title: str,
+    priority: str,
+    notes: str,
+    tags: list[str],
+    estimated_duration: str,
+    dependencies: list[int],
+) -> dict[str, Any]:
+    """Create a new task with auto-incrementing ID.
+
+    Creates a new task and adds it to the in-memory storage. The task
+    starts with 'open' status and gets a unique auto-incrementing ID.
+
+    Args:
+        title: Task description or title
+        priority: Priority level ('low', 'medium', 'high', 'urgent')
+        notes: Additional task details or notes
+        tags: List of tags for categorization
+        estimated_duration: Optional time estimate as string
+        dependencies: List of task IDs this task depends on
+
+    Returns:
+        Dictionary containing:
+        - success: True if task created successfully
+        - task: The created task dictionary
+        - message: Success message with task ID
+
+    Raises:
+        BasicAgentToolsError: If validation fails or task limit exceeded
+
+    Example:
+        >>> result = add_task(
+        ...     title="Implement user auth",
+        ...     priority="high",
+        ...     notes="Use OAuth2",
+        ...     tags=["security", "backend"],
+        ...     estimated_duration="2 hours",
+        ...     dependencies=[]
+        ... )
+        >>> result["success"]
+        True
+    """
+    try:
+        # Validate inputs
+        validate_title(title)
+        validate_priority(priority)
+        validate_notes(notes)
+        validate_tags(tags)
+        validate_estimated_duration(estimated_duration)
+        validate_task_count(len(_task_storage["tasks"]))
+        validate_dependencies(dependencies, _task_storage["tasks"])
+
+        # Create new task
+        task_id = _task_storage["next_id"]
+        timestamp = _get_current_timestamp()
+
+        task = {
+            "id": task_id,
+            "title": title,
+            "status": "open",
+            "priority": priority,
+            "created_at": timestamp,
+            "updated_at": timestamp,
+            "notes": notes,
+            "tags": tags,
+            "estimated_duration": estimated_duration,
+            "dependencies": dependencies,
+        }
+
+        # Store task
+        _task_storage["tasks"][task_id] = task
+        _task_storage["next_id"] += 1
+        _task_storage["total_count"] += 1
+
+        return {
+            "success": True,
+            "task": task,
+            "message": f"Task created with ID {task_id}",
+        }
+
+    except (ValueError, TypeError) as e:
+        raise BasicAgentToolsError(f"Failed to create task: {e}") from e
+
+
+def list_tasks(status: str, tag: str) -> dict[str, Any]:
+    """List all tasks or filter by status and/or tag.
+
+    Returns all tasks or filters them based on status and tag criteria.
+    If no filters are provided, returns all tasks.
+
+    Args:
+        status: Filter by task status (empty string for no filter)
+        tag: Filter by tag (empty string for no filter)
+
+    Returns:
+        Dictionary containing:
+        - success: True if operation successful
+        - tasks: List of task dictionaries matching criteria
+        - count: Number of tasks returned
+        - filters_applied: Dictionary of applied filters
+
+    Raises:
+        BasicAgentToolsError: If status validation fails
+
+    Example:
+        >>> result = list_tasks(status="in_progress", tag="")
+        >>> len(result["tasks"])
+        2
+    """
+    try:
+        # Validate status filter if provided
+        if status:
+            validate_status(status)
+
+        tasks = list(_task_storage["tasks"].values())
+        original_count = len(tasks)
+
+        # Apply filters
+        if status:
+            tasks = [task for task in tasks if task["status"] == status]
+
+        if tag:
+            tasks = [task for task in tasks if tag in task["tags"]]
+
+        # Sort by ID for consistent ordering
+        tasks.sort(key=lambda x: x["id"])
+
+        return {
+            "success": True,
+            "tasks": tasks,
+            "count": len(tasks),
+            "total_tasks": original_count,
+            "filters_applied": {
+                "status": status if status else None,
+                "tag": tag if tag else None,
+            },
+        }
+
+    except ValueError as e:
+        raise BasicAgentToolsError(f"Failed to list tasks: {e}") from e
+
+
+def get_task(task_id: int) -> dict[str, Any]:
+    """Retrieve a single task by ID.
+
+    Gets the complete task data for the specified task ID.
+
+    Args:
+        task_id: The unique task identifier
+
+    Returns:
+        Dictionary containing:
+        - success: True if task found
+        - task: The task dictionary
+        - message: Success message
+
+    Raises:
+        BasicAgentToolsError: If task not found
+
+    Example:
+        >>> result = get_task(1)
+        >>> result["task"]["title"]
+        "Implement user auth"
+    """
+    try:
+        validate_task_exists(task_id, _task_storage["tasks"])
+
+        task = _task_storage["tasks"][task_id]
+        return {
+            "success": True,
+            "task": task,
+            "message": f"Task {task_id} retrieved successfully",
+        }
+
+    except (ValueError, TypeError) as e:
+        raise BasicAgentToolsError(f"Failed to get task: {e}") from e
+
+
+def update_task(
+    task_id: int,
+    title: str,
+    status: str,
+    priority: str,
+    notes: str,
+    tags: list[str],
+    estimated_duration: str,
+    dependencies: list[int],
+) -> dict[str, Any]:
+    """Update any field of an existing task.
+
+    Updates the specified task with new values and refreshes the
+    updated_at timestamp.
+
+    Args:
+        task_id: The unique task identifier
+        title: New task title
+        status: New task status
+        priority: New priority level
+        notes: New notes
+        tags: New tags list
+        estimated_duration: New time estimate
+        dependencies: New dependencies list
+
+    Returns:
+        Dictionary containing:
+        - success: True if task updated
+        - task: The updated task dictionary
+        - message: Success message
+
+    Raises:
+        BasicAgentToolsError: If task not found or validation fails
+
+    Example:
+        >>> result = update_task(
+        ...     task_id=1,
+        ...     title="Updated title",
+        ...     status="in_progress",
+        ...     priority="urgent",
+        ...     notes="Updated notes",
+        ...     tags=["new_tag"],
+        ...     estimated_duration="3 hours",
+        ...     dependencies=[]
+        ... )
+        >>> result["task"]["status"]
+        "in_progress"
+    """
+    try:
+        validate_task_exists(task_id, _task_storage["tasks"])
+        validate_title(title)
+        validate_status(status)
+        validate_priority(priority)
+        validate_notes(notes)
+        validate_tags(tags)
+        validate_estimated_duration(estimated_duration)
+        validate_dependencies(
+            dependencies, _task_storage["tasks"], exclude_task_id=task_id
+        )
+
+        # Update task
+        task = _task_storage["tasks"][task_id]
+        task.update(
+            {
+                "title": title,
+                "status": status,
+                "priority": priority,
+                "notes": notes,
+                "tags": tags,
+                "estimated_duration": estimated_duration,
+                "dependencies": dependencies,
+                "updated_at": _get_current_timestamp(),
+            }
+        )
+
+        return {
+            "success": True,
+            "task": task,
+            "message": f"Task {task_id} updated successfully",
+        }
+
+    except ValueError as e:
+        raise BasicAgentToolsError(f"Failed to update task: {e}") from e
+
+
+def delete_task(task_id: int) -> dict[str, Any]:
+    """Remove a task from memory.
+
+    Permanently deletes the specified task from storage.
+
+    Args:
+        task_id: The unique task identifier
+
+    Returns:
+        Dictionary containing:
+        - success: True if task deleted
+        - message: Confirmation message
+        - deleted_task_id: The ID of the deleted task
+
+    Raises:
+        BasicAgentToolsError: If task not found
+
+    Example:
+        >>> result = delete_task(1)
+        >>> result["success"]
+        True
+    """
+    try:
+        validate_task_exists(task_id, _task_storage["tasks"])
+
+        # Remove task
+        del _task_storage["tasks"][task_id]
+
+        return {
+            "success": True,
+            "message": f"Task {task_id} deleted successfully",
+            "deleted_task_id": task_id,
+        }
+
+    except ValueError as e:
+        raise BasicAgentToolsError(f"Failed to delete task: {e}") from e
+
+
+def complete_task(task_id: int) -> dict[str, Any]:
+    """Mark a task as completed.
+
+    Convenience method to set task status to 'completed' and update
+    the timestamp.
+
+    Args:
+        task_id: The unique task identifier
+
+    Returns:
+        Dictionary containing:
+        - success: True if task completed
+        - task: The updated task dictionary
+        - message: Success message
+
+    Raises:
+        BasicAgentToolsError: If task not found
+
+    Example:
+        >>> result = complete_task(1)
+        >>> result["task"]["status"]
+        "completed"
+    """
+    try:
+        validate_task_exists(task_id, _task_storage["tasks"])
+
+        # Update status and timestamp
+        task = _task_storage["tasks"][task_id]
+        task["status"] = "completed"
+        task["updated_at"] = _get_current_timestamp()
+
+        return {
+            "success": True,
+            "task": task,
+            "message": f"Task {task_id} marked as completed",
+        }
+
+    except ValueError as e:
+        raise BasicAgentToolsError(f"Failed to complete task: {e}") from e
+
+
+def get_task_stats() -> dict[str, Any]:
+    """Get summary statistics about all tasks.
+
+    Returns counts and statistics about the current task list.
+
+    Returns:
+        Dictionary containing:
+        - success: True
+        - total_tasks: Total number of tasks
+        - status_counts: Count by status
+        - priority_counts: Count by priority
+        - tasks_with_dependencies: Number of tasks with dependencies
+        - average_tasks_per_status: Average distribution
+
+    Example:
+        >>> result = get_task_stats()
+        >>> result["status_counts"]["completed"]
+        5
+    """
+    try:
+        tasks = list(_task_storage["tasks"].values())
+        total = len(tasks)
+
+        # Count by status
+        status_counts = {}
+        for status in [
+            "open",
+            "in_progress",
+            "blocked",
+            "deferred",
+            "completed",
+            "cancelled",
+        ]:
+            status_counts[status] = len([t for t in tasks if t["status"] == status])
+
+        # Count by priority
+        priority_counts = {}
+        for priority in ["low", "medium", "high", "urgent"]:
+            priority_counts[priority] = len(
+                [t for t in tasks if t["priority"] == priority]
+            )
+
+        # Other stats
+        tasks_with_dependencies = len([t for t in tasks if t["dependencies"]])
+
+        return {
+            "success": True,
+            "total_tasks": total,
+            "total_created": _task_storage["total_count"],
+            "status_counts": status_counts,
+            "priority_counts": priority_counts,
+            "tasks_with_dependencies": tasks_with_dependencies,
+            "next_id": _task_storage["next_id"],
+        }
+
+    except Exception as e:
+        raise BasicAgentToolsError(f"Failed to get task statistics: {e}") from e
+
+
+def clear_all_tasks() -> dict[str, Any]:
+    """Clear all tasks from memory (for testing/reset).
+
+    WARNING: This permanently deletes all tasks. Use with caution.
+
+    Returns:
+        Dictionary containing:
+        - success: True
+        - message: Confirmation message
+        - cleared_count: Number of tasks that were cleared
+
+    Example:
+        >>> result = clear_all_tasks()
+        >>> result["cleared_count"]
+        10
+    """
+    try:
+        cleared_count = len(_task_storage["tasks"])
+
+        # Reset storage
+        _task_storage["tasks"] = {}
+        _task_storage["next_id"] = 1
+        _task_storage["total_count"] = 0
+
+        return {
+            "success": True,
+            "message": f"Cleared {cleared_count} tasks from memory",
+            "cleared_count": cleared_count,
+        }
+
+    except Exception as e:
+        raise BasicAgentToolsError(f"Failed to clear tasks: {e}") from e

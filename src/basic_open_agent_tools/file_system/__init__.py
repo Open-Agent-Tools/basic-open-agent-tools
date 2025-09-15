@@ -11,6 +11,7 @@ All functions are also available directly from this module for convenience.
 """
 
 # Import all functions from submodules
+from .editor import file_editor
 from .info import (
     directory_exists,
     file_exists,
@@ -31,7 +32,6 @@ from .operations import (
     replace_in_file,
     write_file_from_string,
 )
-from .editor import file_editor
 from .tree import (
     generate_directory_tree,
     list_all_directory_contents,

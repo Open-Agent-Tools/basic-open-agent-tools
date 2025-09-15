@@ -9,10 +9,10 @@ from . import (
     data,
     datetime,
     file_system,
-    monitoring,
     network,
     system,
     text,
+    todo,
     utilities,
 )
 from . import logging as log_module
@@ -190,11 +190,11 @@ def load_all_logging_tools() -> list[Callable[..., Any]]:
     return tools
 
 
-def load_all_monitoring_tools() -> list[Callable[..., Any]]:
-    """Load all monitoring tools as a list of callable functions."""
+def load_all_todo_tools() -> list[Callable[..., Any]]:
+    """Load all todo tools as a list of callable functions."""
     tools = []
-    for name in monitoring.__all__:
-        func = getattr(monitoring, name)
+    for name in todo.__all__:
+        func = getattr(todo, name)
         if callable(func):
             tools.append(func)
     return tools
@@ -227,7 +227,7 @@ def load_all_tools() -> list[Callable[..., Any]]:
         load_all_crypto_tools(),  # ~13 functions
         load_all_archive_tools(),  # 5 functions
         load_all_logging_tools(),  # 5 functions
-        load_all_monitoring_tools(),  # 4 functions
+        load_all_todo_tools(),  # 8 functions
     )
 
 
