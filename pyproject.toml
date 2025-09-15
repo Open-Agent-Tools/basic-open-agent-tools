@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [project]
 name = "basic-open-agent-tools"
-version = "0.10.0"  # Enhanced toolkit with comprehensive module documentation and improved quality standards
+version = "0.10.1"  # Add Strands compatibility decorators to todo tools
 description = "An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -48,6 +48,12 @@ all = [
     "PyPDF2>=3.0.0",
     "reportlab>=4.0.0",
 ]
+# Strands integration testing
+strands = [
+    "strands>=0.1.0",
+    "anthropic>=0.25.0",
+    "python-dotenv>=1.0.0",
+]
 # Development dependencies
 dev = [
     "pytest>=7.0.0",
@@ -63,6 +69,10 @@ dev = [
     "psutil>=5.9.0",
     "PyPDF2>=3.0.0",
     "reportlab>=4.0.0",
+    # Strands testing dependencies
+    "strands>=0.1.0",
+    "anthropic>=0.25.0",
+    "python-dotenv>=1.0.0",
 ]
 test = [
     "pytest>=7.0.0",
@@ -142,6 +152,8 @@ addopts = [
 markers = [
     "agent_evaluation: marks tests as agent evaluation tests (may be slow due to API calls)",
     "slow: marks tests as slow running",
+    "strands_integration: marks tests as requiring Strands framework integration",
+    "strands_agent: marks tests that create and run actual Strands agents (requires API keys)",
 ]
 # Additional options for agent evaluation tests
 filterwarnings = [
