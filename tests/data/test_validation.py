@@ -83,10 +83,10 @@ class TestValidateSchemaSimple:
 
     def test_invalid_schema_type_error(self) -> None:
         """Test error handling for invalid schema type."""
-        with pytest.raises(TypeError, match="schema must be a dictionary"):
+        with pytest.raises(TypeError, match="schema_definition must be a dictionary"):
             validate_schema_simple({"data": "value"}, "invalid_schema")  # type: ignore[arg-type]
 
-        with pytest.raises(TypeError, match="schema must be a dictionary"):
+        with pytest.raises(TypeError, match="schema_definition must be a dictionary"):
             validate_schema_simple({"data": "value"}, ["not", "dict"])  # type: ignore[arg-type]
 
     def test_data_type_mismatch(self) -> None:

@@ -221,12 +221,12 @@ def write_ini_file(data: dict, file_path: str) -> None:
 
 
 @strands_tool
-def validate_config_schema(config_data: dict, schema: dict) -> list:
+def validate_config_schema(config_data: dict, schema_definition: dict) -> list:
     """Validate configuration data against a schema.
 
     Args:
         config_data: Configuration data to validate
-        schema: Schema definition with field specifications
+        schema_definition: Schema definition with field specifications
 
     Returns:
         List of validation errors (empty if valid)
@@ -243,7 +243,7 @@ def validate_config_schema(config_data: dict, schema: dict) -> list:
     errors = []
 
     # Check each field in the schema
-    for field_name, field_spec in schema.items():
+    for field_name, field_spec in schema_definition.items():
         # Check if required field is present
         if field_spec.get("required", False) and field_name not in config_data:
             errors.append(f"Required field '{field_name}' is missing")
@@ -271,7 +271,7 @@ def validate_config_schema(config_data: dict, schema: dict) -> list:
 
     # Check for unknown fields
     for field_name in config_data:
-        if field_name not in schema:
+        if field_name not in schema_definition:
             errors.append(f"Unknown field '{field_name}' in configuration")
 
     return errors

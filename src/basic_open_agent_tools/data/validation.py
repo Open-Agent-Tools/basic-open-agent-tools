@@ -14,30 +14,30 @@ from ..exceptions import ValidationError
 
 
 @strands_tool
-def validate_schema_simple(data: dict, schema: dict) -> bool:
+def validate_schema_simple(data: dict, schema_definition: dict) -> bool:
     """Validate data against a JSON Schema-style schema.
 
     Args:
         data: Data to validate
-        schema: Schema definition dictionary
+        schema_definition: Schema definition dictionary
 
     Returns:
         True if data matches schema
 
     Raises:
         ValidationError: If data doesn't match schema
-        TypeError: If schema is not a dictionary
+        TypeError: If schema_definition is not a dictionary
 
     Example:
         >>> schema = {"type": "object", "properties": {"name": {"type": "string"}}}
         >>> validate_schema_simple({"name": "Alice"}, schema)
         True
     """
-    if not isinstance(schema, dict):
-        raise TypeError("schema must be a dictionary")
+    if not isinstance(schema_definition, dict):
+        raise TypeError("schema_definition must be a dictionary")
 
     try:
-        _validate_against_schema(data, schema)
+        _validate_against_schema(data, schema_definition)
         return True
     except ValidationError:
         raise

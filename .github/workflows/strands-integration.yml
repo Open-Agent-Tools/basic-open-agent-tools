@@ -1,0 +1,227 @@
+name: Strands Integration Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'tests/strands/**'
+      - 'examples/strands_agent_example.py'
+      - 'pyproject.toml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'tests/strands/**'
+      - 'examples/strands_agent_example.py'
+      - 'pyproject.toml'
+  workflow_dispatch:
+    inputs:
+      run_full_tests:
+        description: 'Run full Strands integration tests with API calls'
+        required: false
+        default: false
+        type: boolean
+      anthropic_test:
+        description: 'Run tests requiring Anthropic API key'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  strands-compatibility:
+    name: Strands Compatibility Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev,strands]"
+
+    - name: Run basic Strands compatibility tests
+      run: |
+        python -m pytest tests/strands/test_strands_decorators.py -v
+        python -m pytest tests/strands/test_strands_integration.py::TestStrandsIntegration::test_strands_tool_decorator_available -v
+        python -m pytest tests/strands/test_strands_integration.py::TestStrandsIntegration::test_tool_loading_for_strands -v
+
+    - name: Test decorator functionality
+      run: |
+        python -m pytest tests/strands/test_strands_decorators.py::TestStrandsDecorators -v
+
+    - name: Test A2A compatibility (mock)
+      run: |
+        python -m pytest tests/strands/test_a2a_compatibility.py -k "not test_a2a_executor_mock_integration" -v
+
+    - name: Validate example agent structure
+      run: |
+        python -c "
+        import sys
+        sys.path.insert(0, 'examples')
+        try:
+            import strands_agent_example
+            print('✅ Strands example imports successfully')
+        except ImportError as e:
+            if 'strands' in str(e):
+                print('⚠️  Strands not installed for example validation')
+            else:
+                raise
+        "
+
+  strands-integration:
+    name: Strands Integration Tests
+    runs-on: ubuntu-latest
+    if: github.event.inputs.run_full_tests == 'true' || github.event_name == 'workflow_dispatch'
+    needs: strands-compatibility
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies with Strands
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev,strands]"
+
+    - name: Run Strands integration tests (without API calls)
+      env:
+        STRANDS_INTEGRATION_TEST: "true"
+      run: |
+        python -m pytest tests/strands/test_strands_integration.py -k "not test_strands_agent_creation and not TestStrandsAgentExecution" -v
+
+    - name: Test A2A compatibility
+      env:
+        STRANDS_INTEGRATION_TEST: "true"
+      run: |
+        python -m pytest tests/strands/test_a2a_compatibility.py::TestA2ACompatibility -k "not test_a2a_executor_mock_integration" -v
+
+  strands-agent-tests:
+    name: Strands Agent Tests (API Required)
+    runs-on: ubuntu-latest
+    if: github.event.inputs.anthropic_test == 'true' && github.event_name == 'workflow_dispatch'
+    needs: strands-compatibility
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies with Strands
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev,strands]"
+
+    - name: Run agent creation tests
+      env:
+        STRANDS_INTEGRATION_TEST: "true"
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      run: |
+        python -m pytest tests/strands/test_strands_integration.py::TestStrandsIntegration::test_strands_agent_creation -v
+
+    - name: Run agent execution tests (limited)
+      env:
+        STRANDS_INTEGRATION_TEST: "true"
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      run: |
+        python -m pytest tests/strands/test_strands_integration.py::TestStrandsAgentExecution -v --maxfail=3 -x
+
+    - name: Test full agent example
+      env:
+        STRANDS_INTEGRATION_TEST: "true"
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      run: |
+        python -m pytest tests/strands/test_strands_agent_example.py::TestStrandsAgentExample::test_create_complete_strands_agent -v
+
+  documentation-check:
+    name: Strands Documentation Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+
+    - name: Check Strands example syntax
+      run: |
+        python -m py_compile examples/strands_agent_example.py
+
+    - name: Validate README references to Strands
+      run: |
+        if grep -q "strands" README.md; then
+          echo "✅ README contains Strands references"
+        else
+          echo "⚠️  No Strands references found in README"
+        fi
+
+    - name: Check for Strands integration documentation
+      run: |
+        echo "Checking for Strands integration documentation..."
+        ls -la examples/
+        if [ -f "examples/strands_agent_example.py" ]; then
+          echo "✅ Strands example file exists"
+          head -10 examples/strands_agent_example.py
+        fi
+
+  report:
+    name: Strands Integration Report
+    runs-on: ubuntu-latest
+    needs: [strands-compatibility, documentation-check]
+    if: always()
+
+    steps:
+    - name: Report Results
+      run: |
+        echo "## Strands Integration Test Results"
+        echo ""
+        echo "- **Compatibility Tests**: ${{ needs.strands-compatibility.result }}"
+        echo "- **Documentation Check**: ${{ needs.documentation-check.result }}"
+
+        if [[ "${{ needs.strands-compatibility.result }}" == "success" ]]; then
+          echo ""
+          echo "✅ **Strands Compatibility**: All compatibility tests passed"
+          echo "   - @strands_tool decorators work correctly"
+          echo "   - Tool loading compatible with Strands"
+          echo "   - Function signatures meet requirements"
+        else
+          echo ""
+          echo "❌ **Strands Compatibility**: Tests failed - check logs"
+        fi
+
+        echo ""
+        echo "### Next Steps for Strands Integration:"
+        echo "- Install Strands: \`pip install basic-open-agent-tools[strands]\`"
+        echo "- Run example: \`python examples/strands_agent_example.py\`"
+        echo "- Set ANTHROPIC_API_KEY for full testing"
