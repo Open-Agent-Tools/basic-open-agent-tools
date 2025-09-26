@@ -191,31 +191,53 @@ def read_ini_file(file_path: str) -> dict:
 
 
 @strands_tool
-def write_ini_file(data: dict, file_path: str) -> None:
-    """Write dictionary data to an INI file.
+def write_ini_file(data: dict, file_path: str, force: bool) -> str:
+    """Write dictionary data to an INI file with permission checking.
 
     Args:
         data: Dictionary to write (nested dict representing sections)
         file_path: Path where INI file will be created
+        force: If True, overwrite existing files without confirmation
+
+    Returns:
+        String describing the operation result
 
     Raises:
-        DataError: If file cannot be written
+        DataError: If file cannot be written or exists without force
 
     Example:
         >>> data = {"database": {"host": "localhost", "port": "5432"}}
-        >>> write_ini_file(data, "config.ini")
+        >>> write_ini_file(data, "config.ini", force=True)
+        "Created INI file config.ini with 1 sections (87 bytes)"
     """
+    import os
+
+    file_existed = os.path.exists(file_path)
+
+    if file_existed and not force:
+        raise DataError(
+            f"INI file already exists: {file_path}. Use force=True to overwrite."
+        )
+
     try:
         config = configparser.ConfigParser()
+        section_count = 0
 
         for section_name, section_data in data.items():
             config.add_section(section_name)
+            section_count += 1
             if isinstance(section_data, dict):
                 for key, value in section_data.items():
                     config.set(section_name, key, str(value))
 
         with open(file_path, "w", encoding="utf-8") as f:
             config.write(f)
+
+        # Calculate stats for feedback
+        file_size = os.path.getsize(file_path)
+        action = "Overwrote" if file_existed else "Created"
+
+        return f"{action} INI file {file_path} with {section_count} sections ({file_size} bytes)"
     except Exception as e:
         raise DataError(f"Failed to write INI file {file_path}: {e}")
 

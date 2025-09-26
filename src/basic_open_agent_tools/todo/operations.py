@@ -309,39 +309,43 @@ def update_task(
 
 
 @strands_tool
-def delete_task(task_id: int) -> dict[str, Any]:
-    """Remove a task from memory.
+def delete_task(task_id: int, force: bool) -> str:
+    """Remove a task from memory with permission checking.
 
     Permanently deletes the specified task from storage.
 
     Args:
         task_id: The unique task identifier
+        force: If True, proceed with deletion without additional checks
 
     Returns:
-        Dictionary containing:
-        - success: True if task deleted
-        - message: Confirmation message
-        - deleted_task_id: The ID of the deleted task
+        String describing the operation result
 
     Raises:
-        BasicAgentToolsError: If task not found
+        BasicAgentToolsError: If task not found or deletion not allowed without force
 
     Example:
-        >>> result = delete_task(1)
-        >>> result["success"]
-        True
+        >>> result = delete_task(1, force=True)
+        "Deleted task 1: 'Complete project setup' (was 'in_progress')"
     """
     try:
         validate_task_exists(task_id, _task_storage["tasks"])
 
+        # Get task info before deletion for feedback
+        task = _task_storage["tasks"][task_id]
+        task_title = task.get("title", "Untitled")
+        task_status = task.get("status", "unknown")
+
+        # Check if task is important (e.g., in_progress) and require confirmation
+        if task_status == "in_progress" and not force:
+            raise BasicAgentToolsError(
+                f"Task {task_id} is currently in progress: '{task_title}'. Use force=True to delete anyway."
+            )
+
         # Remove task
         del _task_storage["tasks"][task_id]
 
-        return {
-            "success": True,
-            "message": f"Task {task_id} deleted successfully",
-            "deleted_task_id": task_id,
-        }
+        return f"Deleted task {task_id}: '{task_title}' (was '{task_status}')"
 
     except ValueError as e:
         raise BasicAgentToolsError(f"Failed to delete task: {e}") from e

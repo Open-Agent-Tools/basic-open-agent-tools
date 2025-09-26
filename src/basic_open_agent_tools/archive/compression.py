@@ -20,15 +20,24 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def create_zip(
-    source_paths: list[str], output_path: str
-) -> dict[str, Union[str, int, list[str]]]:
-    """Create a ZIP archive from files and directories."""
+def create_zip(source_paths: list[str], output_path: str, force: bool) -> str:
+    """Create a ZIP archive from files and directories with permission checking."""
     if not isinstance(source_paths, list) or not source_paths:
         raise BasicAgentToolsError("Source paths must be a non-empty list")
 
     if not isinstance(output_path, str) or not output_path.strip():
         raise BasicAgentToolsError("Output path must be a non-empty string")
+
+    if not isinstance(force, bool):
+        raise BasicAgentToolsError("force must be a boolean")
+
+    # Check if output file exists
+    file_existed = os.path.exists(output_path)
+
+    if file_existed and not force:
+        raise BasicAgentToolsError(
+            f"ZIP archive already exists: {output_path}. Use force=True to overwrite."
+        )
 
     try:
         files_added = []
@@ -47,46 +56,62 @@ def create_zip(
                             zf.write(file_path, arc_name)
                             files_added.append(file_path)
 
-        return {
-            "output_path": output_path,
-            "files_added": len(files_added),
-            "file_size_bytes": os.path.getsize(output_path),
-            "status": "success",
-        }
+        # Calculate stats for feedback
+        archive_size = os.path.getsize(output_path)
+        file_count = len(files_added)
+        action = "Overwrote" if file_existed else "Created"
+
+        return f"{action} ZIP archive {output_path} with {file_count} files ({archive_size} bytes)"
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to create ZIP archive: {str(e)}")
 
 
 @strands_tool
-def extract_zip(zip_path: str, extract_to: str) -> dict[str, Union[str, int]]:
-    """Extract a ZIP archive to a directory."""
+def extract_zip(zip_path: str, extract_to: str, force: bool) -> str:
+    """Extract a ZIP archive to a directory with permission checking."""
     if not isinstance(zip_path, str) or not zip_path.strip():
         raise BasicAgentToolsError("ZIP path must be a non-empty string")
+
+    if not isinstance(extract_to, str) or not extract_to.strip():
+        raise BasicAgentToolsError("Extract path must be a non-empty string")
+
+    if not isinstance(force, bool):
+        raise BasicAgentToolsError("force must be a boolean")
 
     if not os.path.exists(zip_path):
         raise BasicAgentToolsError(f"ZIP file not found: {zip_path}")
 
+    # Check if extraction directory exists and has contents
+    extract_exists = os.path.exists(extract_to)
+    if extract_exists and not force:
+        try:
+            if os.listdir(extract_to):  # Directory exists and has contents
+                raise BasicAgentToolsError(
+                    f"Extract directory already exists and is not empty: {extract_to}. Use force=True to proceed."
+                )
+        except OSError:
+            pass  # Can't read directory, proceed anyway
+
     try:
+        # Create extraction directory if it doesn't exist
+        os.makedirs(extract_to, exist_ok=True)
+
         with zipfile.ZipFile(zip_path, "r") as zf:
             zf.extractall(extract_to)
             files_extracted = len(zf.namelist())
 
-        return {
-            "zip_path": zip_path,
-            "extract_to": extract_to,
-            "files_extracted": files_extracted,
-            "status": "success",
-        }
+        # Calculate archive size for feedback
+        archive_size = os.path.getsize(zip_path)
+
+        return f"Extracted ZIP archive {zip_path} to {extract_to} ({files_extracted} files, {archive_size} bytes)"
     except Exception as e:
         raise BasicAgentToolsError(f"Failed to extract ZIP archive: {str(e)}")
 
 
 @strands_tool
-def compress_files(
-    file_paths: list[str], output_path: str
-) -> dict[str, Union[str, int]]:
+def compress_files(file_paths: list[str], output_path: str, force: bool) -> str:
     """Compress multiple files into a ZIP archive."""
-    return create_zip(file_paths, output_path)
+    return create_zip(file_paths, output_path, force)
 
 
 @strands_tool
