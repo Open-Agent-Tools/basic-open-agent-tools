@@ -2,6 +2,16 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions. Designed with **agent-friendly type signatures** to eliminate "signature too complex" errors, while offering core utilities that developers can easily integrate into their agents to avoid excess boilerplate.
 
+## 🆕 What's New in v0.11.1
+
+✨ **Enhanced User Feedback Loops**: All file and data manipulation tools now provide detailed feedback messages and permission checking to prevent accidental overwrites
+
+🛡️ **Smart Permission System**: New `force` parameter across all write operations with clear confirmation messages
+
+🔄 **Consistent Response Patterns**: Unified feedback approach across all modules following the file_editor pattern
+
+📝 **Detailed Operation Reports**: Functions now return descriptive strings instead of simple boolean values, perfect for agent understanding
+
 ## Installation
 
 ### Basic Installation
@@ -56,6 +66,8 @@ pip install basic-open-agent-tools[test]
 
 🤝 **Multi-Framework Compatibility**: Native support for Google ADK, LangChain, Strands Agents, and custom agent frameworks with `@strands_tool` decorators
 
+🔍 **Enhanced User Feedback**: Detailed operation confirmations and permission checking across all write operations for better agent decision-making
+
 ## Quick Start
 
 ```python
@@ -69,6 +81,25 @@ import basic_open_agent_tools as boat
 
 # Option 1: Load all tools at once (recommended)
 agent_tools = boat.load_all_tools()  # All 166 functions from all modules
+
+# Enhanced feedback examples (NEW in v0.11.1):
+# All write operations now return detailed feedback strings
+result = boat.file_system.write_file_from_string(
+    file_path="/tmp/example.txt",
+    content="Hello, World!",
+    force=True  # Required to prevent accidental overwrites
+)
+# Returns: "Created file /tmp/example.txt with 1 lines (13 bytes)"
+
+# Data tools also provide enhanced feedback
+csv_result = boat.data.write_csv_simple(
+    data=[{"name": "Alice", "age": 30}],
+    file_path="/tmp/data.csv",
+    delimiter=",",
+    headers=True,
+    force=True
+)
+# Returns: "Created CSV file /tmp/data.csv with 1 rows and 2 columns (17 bytes)"
 
 # Option 2: Load tools by category
 fs_tools = boat.load_all_filesystem_tools()      # 18 functions
@@ -177,6 +208,7 @@ Utilities Tools:
 - Directory operations (create, list, delete, tree visualization)
 - File information and existence checking
 - Path validation and security features
+- **🆕 Enhanced feedback**: All write operations now include `force` parameter and return detailed operation summaries
 
 ### Text Processing Tools ✅ (10 functions)
 📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/text/README.md)**
@@ -194,6 +226,7 @@ Utilities Tools:
 - **Configuration Files**: YAML, TOML, INI processing
 - **Data Validation**: Schema checking, type validation, field validation
 - **Agent-Friendly Signatures**: All functions use basic Python types for maximum AI framework compatibility
+- **🆕 Enhanced feedback**: All write operations include detailed reports with row/column counts and file sizes
 
 ### DateTime Tools ✅ (40 functions)
 📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/datetime/README.md)**
@@ -259,6 +292,7 @@ Utilities Tools:
 - **Advanced Compression**: GZIP, BZIP2, and XZ/LZMA single-file compression
 - **Compression Analysis**: Detailed compression ratios and space savings metrics
 - **Multiple Formats**: Support for all major compression formats with statistics
+- **🆕 Enhanced feedback**: Archive creation returns detailed compression statistics and file counts
 
 ### Logging Tools ✅ (5 functions)
 📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/logging/README.md)**

@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.1] - 2024-09-26
+
+### Added
+- **Enhanced User Feedback Loops**: All file and data manipulation tools now provide detailed feedback messages
+- **Permission System**: Added `force` parameter to prevent accidental overwrites across all write operations
+- **Detailed Operation Reports**: Functions now return descriptive strings instead of simple boolean values
+- **Consistent Response Patterns**: Unified feedback approach across all modules following the file_editor pattern
+
+### Enhanced Functions
+- **File System**: `write_file_from_string`, `copy_file`, `delete_file`, `move_file` now include detailed feedback
+- **Data Tools**: `write_csv_simple`, `write_yaml_to_file`, `write_toml_to_file`, `write_ini_to_file` with operation summaries
+- **Archive Tools**: `create_tar_archive`, `create_zip_archive` with compression statistics
+- **Todo Tools**: `write_todo_to_file` with protection mechanisms and clear confirmations
+
+### Changed
+- **Agent Framework Compatibility**: All functions maintain Google ADK compliance while providing richer feedback
+- **Function Signatures**: Added required `force` parameter to destructive operations for safety
+- **Return Values**: Enhanced from boolean/None returns to detailed string descriptions for better agent understanding
+
+### Fixed
+- **Package Build Process**: Ensured all enhancements are properly included in published packages
+- **Test Agent Compatibility**: Updated test agents to handle new function signatures
+- **Import Errors**: Resolved import issues in evaluation tests
+
 ## [0.9.1] - 2024-09-14
 
 ### Added
