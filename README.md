@@ -2,15 +2,15 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions. Designed with **agent-friendly type signatures** to eliminate "signature too complex" errors, while offering core utilities that developers can easily integrate into their agents to avoid excess boilerplate.
 
-## 🆕 What's New in v0.11.1
+## 🆕 What's New in v0.11.2
 
-✨ **Enhanced User Feedback Loops**: All file and data manipulation tools now provide detailed feedback messages and permission checking to prevent accidental overwrites
+🔍 **Comprehensive Input Logging**: All security-sensitive tools now log input parameters and operations for complete audit trails
 
-🛡️ **Smart Permission System**: New `force` parameter across all write operations with clear confirmation messages
+🛡️ **Security Monitoring**: Added structured logging with `[PREFIX]` format across file operations, shell commands, network requests, and data processing
 
-🔄 **Consistent Response Patterns**: Unified feedback approach across all modules following the file_editor pattern
+📊 **Audit Visibility**: Real-time tracking of agent actions across file system, crypto, network, archive, and text processing modules
 
-📝 **Detailed Operation Reports**: Functions now return descriptive strings instead of simple boolean values, perfect for agent understanding
+🔐 **Enhanced Security**: Input validation and operation logging for improved debugging and security compliance
 
 ## Installation
 
@@ -82,7 +82,7 @@ import basic_open_agent_tools as boat
 # Option 1: Load all tools at once (recommended)
 agent_tools = boat.load_all_tools()  # All 166 functions from all modules
 
-# Enhanced feedback examples (NEW in v0.11.1):
+# Enhanced feedback and logging examples:
 # All write operations now return detailed feedback strings
 result = boat.file_system.write_file_from_string(
     file_path="/tmp/example.txt",

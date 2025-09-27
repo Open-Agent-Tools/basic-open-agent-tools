@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [project]
 name = "basic-open-agent-tools"
-version = "0.11.1"  # Minor bug fixes and improvements
+version = "0.11.2"  # Enhanced input logging for security auditing
 description = "An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -177,4 +177,9 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.12",
 ]
