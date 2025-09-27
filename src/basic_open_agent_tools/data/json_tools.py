@@ -35,14 +35,20 @@ def safe_json_serialize(data: dict, indent: int) -> str:
         >>> safe_json_serialize({"a": 1, "b": 2}, indent=2)
         '{\\n  "a": 1,\\n  "b": 2\\n}'
     """
+    data_type = type(data).__name__
+    print(f"[DATA] Serializing {data_type} to JSON (indent={indent})")
+
     if not isinstance(indent, int):
         raise TypeError("indent must be an integer")
 
     try:
         # Use None for compact format when indent is 0
         actual_indent = None if indent == 0 else indent
-        return json.dumps(data, indent=actual_indent, ensure_ascii=False)
+        result = json.dumps(data, indent=actual_indent, ensure_ascii=False)
+        print(f"[DATA] JSON serialized: {len(result)} characters")
+        return result
     except (TypeError, ValueError) as e:
+        print(f"[DATA] JSON serialization error: {e}")
         raise SerializationError(f"Failed to serialize data to JSON: {e}")
 
 
@@ -66,6 +72,8 @@ def safe_json_deserialize(json_str: str) -> dict:
         >>> safe_json_deserialize('[1, 2, 3]')
         [1, 2, 3]
     """
+    print(f"[DATA] Deserializing JSON string ({len(json_str)} characters)")
+
     if not isinstance(json_str, str):
         raise TypeError("Input must be a string")
 
@@ -73,11 +81,15 @@ def safe_json_deserialize(json_str: str) -> dict:
         result = json.loads(json_str)
         # Always return dict for agent compatibility
         if isinstance(result, dict):
-            return result
+            final_result = result
         else:
             # Wrap non-dict results in a dict for consistency
-            return {"result": result}
+            final_result = {"result": result}
+
+        print(f"[DATA] JSON deserialized: {type(final_result).__name__} with {len(final_result)} keys")
+        return final_result
     except (json.JSONDecodeError, ValueError) as e:
+        print(f"[DATA] JSON deserialization error: {e}")
         raise SerializationError(f"Failed to deserialize JSON string: {e}")
 
 
@@ -97,11 +109,16 @@ def validate_json_string(json_str: str) -> bool:
         >>> validate_json_string('{"invalid": }')
         False
     """
+    print(f"[DATA] Validating JSON string ({len(json_str)} characters)")
+
     if not isinstance(json_str, str):
+        print("[DATA] JSON validation failed: not a string")
         return False  # type: ignore[unreachable]
 
     try:
         json.loads(json_str)
+        print("[DATA] JSON validation: valid")
         return True
-    except (json.JSONDecodeError, ValueError):
+    except (json.JSONDecodeError, ValueError) as e:
+        print(f"[DATA] JSON validation failed: {e}")
         return False

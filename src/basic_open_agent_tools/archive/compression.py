@@ -22,6 +22,8 @@ from ..exceptions import BasicAgentToolsError
 @strands_tool
 def create_zip(source_paths: list[str], output_path: str, force: bool) -> str:
     """Create a ZIP archive from files and directories with permission checking."""
+    print(f"[ARCHIVE] Creating ZIP: {output_path} from {len(source_paths)} sources (force={force})")
+
     if not isinstance(source_paths, list) or not source_paths:
         raise BasicAgentToolsError("Source paths must be a non-empty list")
 
@@ -35,6 +37,7 @@ def create_zip(source_paths: list[str], output_path: str, force: bool) -> str:
     file_existed = os.path.exists(output_path)
 
     if file_existed and not force:
+        print(f"[ARCHIVE] ZIP creation blocked - file exists and force=False: {output_path}")
         raise BasicAgentToolsError(
             f"ZIP archive already exists: {output_path}. Use force=True to overwrite."
         )
@@ -61,14 +64,19 @@ def create_zip(source_paths: list[str], output_path: str, force: bool) -> str:
         file_count = len(files_added)
         action = "Overwrote" if file_existed else "Created"
 
-        return f"{action} ZIP archive {output_path} with {file_count} files ({archive_size} bytes)"
+        result = f"{action} ZIP archive {output_path} with {file_count} files ({archive_size} bytes)"
+        print(f"[ARCHIVE] {result}")
+        return result
     except Exception as e:
+        print(f"[ARCHIVE] ZIP creation failed: {e}")
         raise BasicAgentToolsError(f"Failed to create ZIP archive: {str(e)}")
 
 
 @strands_tool
 def extract_zip(zip_path: str, extract_to: str, force: bool) -> str:
     """Extract a ZIP archive to a directory with permission checking."""
+    print(f"[ARCHIVE] Extracting ZIP: {zip_path} to {extract_to} (force={force})")
+
     if not isinstance(zip_path, str) or not zip_path.strip():
         raise BasicAgentToolsError("ZIP path must be a non-empty string")
 
@@ -79,6 +87,7 @@ def extract_zip(zip_path: str, extract_to: str, force: bool) -> str:
         raise BasicAgentToolsError("force must be a boolean")
 
     if not os.path.exists(zip_path):
+        print(f"[ARCHIVE] ZIP file not found: {zip_path}")
         raise BasicAgentToolsError(f"ZIP file not found: {zip_path}")
 
     # Check if extraction directory exists and has contents
@@ -103,14 +112,18 @@ def extract_zip(zip_path: str, extract_to: str, force: bool) -> str:
         # Calculate archive size for feedback
         archive_size = os.path.getsize(zip_path)
 
-        return f"Extracted ZIP archive {zip_path} to {extract_to} ({files_extracted} files, {archive_size} bytes)"
+        result = f"Extracted ZIP archive {zip_path} to {extract_to} ({files_extracted} files, {archive_size} bytes)"
+        print(f"[ARCHIVE] {result}")
+        return result
     except Exception as e:
+        print(f"[ARCHIVE] ZIP extraction failed: {e}")
         raise BasicAgentToolsError(f"Failed to extract ZIP archive: {str(e)}")
 
 
 @strands_tool
 def compress_files(file_paths: list[str], output_path: str, force: bool) -> str:
     """Compress multiple files into a ZIP archive."""
+    print(f"[ARCHIVE] Compressing {len(file_paths)} files to: {output_path}")
     return create_zip(file_paths, output_path, force)
 
 

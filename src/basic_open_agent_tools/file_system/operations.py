@@ -28,14 +28,19 @@ def read_file_to_string(file_path: str) -> str:
     Raises:
         FileSystemError: If file doesn't exist or can't be read
     """
+    print(f"[FILE] Reading: {file_path}")
+
     path = validate_path(file_path, "read")
 
     if not path.is_file():
         raise FileSystemError(f"File not found: {path}")
 
     try:
-        return path.read_text(encoding="utf-8").strip()
+        content = path.read_text(encoding="utf-8").strip()
+        print(f"[FILE] Read {len(content)} characters from {path}")
+        return content
     except (OSError, UnicodeDecodeError) as e:
+        print(f"[FILE] Failed to read {path}: {e}")
         raise FileSystemError(f"Failed to read file {path}: {e}")
 
 
@@ -54,12 +59,15 @@ def write_file_from_string(file_path: str, content: str, force: bool) -> str:
     Raises:
         FileSystemError: If write operation fails or file exists without force
     """
+    print(f"[FILE] Writing to: {file_path} ({len(content)} chars, force={force})")
+
     validate_file_content(content, "write")
     path = validate_path(file_path, "write")
 
     file_existed = path.exists()
 
     if file_existed and not force:
+        print(f"[FILE] Write blocked - file exists and force=False: {path}")
         raise FileSystemError(
             f"File already exists: {path}. Use force=True to overwrite."
         )
@@ -70,8 +78,11 @@ def write_file_from_string(file_path: str, content: str, force: bool) -> str:
 
         line_count = len(content.splitlines()) if content else 0
         action = "Overwrote" if file_existed else "Created"
-        return f"{action} file {path} with {line_count} lines"
+        result = f"{action} file {path} with {line_count} lines"
+        print(f"[FILE] {result}")
+        return result
     except OSError as e:
+        print(f"[FILE] Failed to write {path}: {e}")
         raise FileSystemError(f"Failed to write file {path}: {e}")
 
 
@@ -126,6 +137,8 @@ def list_directory_contents(directory_path: str, include_hidden: bool) -> list[s
     Raises:
         FileSystemError: If directory doesn't exist or can't be read
     """
+    print(f"[FILE] Listing directory: {directory_path} (include_hidden={include_hidden})")
+
     path = validate_path(directory_path, "list directory")
 
     if not path.is_dir():
@@ -135,8 +148,11 @@ def list_directory_contents(directory_path: str, include_hidden: bool) -> list[s
         contents = [item.name for item in path.iterdir()]
         if not include_hidden:
             contents = [name for name in contents if not name.startswith(".")]
-        return sorted(contents)
+        sorted_contents = sorted(contents)
+        print(f"[FILE] Found {len(sorted_contents)} items in {path}")
+        return sorted_contents
     except OSError as e:
+        print(f"[FILE] Failed to list directory {path}: {e}")
         raise FileSystemError(f"Failed to list directory {path}: {e}")
 
 
@@ -188,6 +204,8 @@ def delete_file(file_path: str, force: bool) -> str:
     Raises:
         FileSystemError: If deletion fails or file doesn't exist without force
     """
+    print(f"[FILE] Deleting file: {file_path} (force={force})")
+
     path = validate_path(file_path, "delete file")
 
     if not path.exists():
@@ -205,8 +223,11 @@ def delete_file(file_path: str, force: bool) -> str:
 
     try:
         path.unlink()
-        return f"Deleted file {path} ({file_size} bytes)"
+        result = f"Deleted file {path} ({file_size} bytes)"
+        print(f"[FILE] {result}")
+        return result
     except OSError as e:
+        print(f"[FILE] Failed to delete {path}: {e}")
         raise FileSystemError(f"Failed to delete file {path}: {e}")
 
 
@@ -278,6 +299,8 @@ def move_file(source_path: str, destination_path: str, force: bool) -> str:
     Raises:
         FileSystemError: If move operation fails or destination exists without force
     """
+    print(f"[FILE] Moving: {source_path} -> {destination_path} (force={force})")
+
     src_path = validate_path(source_path, "move source")
     dst_path = validate_path(destination_path, "move destination")
 
@@ -306,8 +329,11 @@ def move_file(source_path: str, destination_path: str, force: bool) -> str:
         shutil.move(str(src_path), str(dst_path))
 
         action = "Moved and overwrote" if destination_existed else "Moved"
-        return f"{action} {item_type} from {src_path} to {dst_path}{size_info}"
+        result = f"{action} {item_type} from {src_path} to {dst_path}{size_info}"
+        print(f"[FILE] {result}")
+        return result
     except OSError as e:
+        print(f"[FILE] Failed to move {src_path} to {dst_path}: {e}")
         raise FileSystemError(f"Failed to move {src_path} to {dst_path}: {e}")
 
 

@@ -49,18 +49,25 @@ def read_yaml_file(file_path: str) -> dict:
         >>> read_yaml_file("config.yaml")
         {"database": {"host": "localhost", "port": 5432}}
     """
+    print(f"[DATA] Reading YAML file: {file_path}")
+
     if not HAS_YAML:
         raise DataError("YAML support not available. Install PyYAML to use YAML files.")
 
     try:
         with open(file_path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
-            return data if data is not None else {}
+            result = data if data is not None else {}
+            print(f"[DATA] YAML loaded: {len(result)} top-level keys")
+            return result
     except FileNotFoundError:
+        print(f"[DATA] YAML file not found: {file_path}")
         raise FileNotFoundError(f"YAML file not found: {file_path}")
     except yaml.YAMLError as e:
+        print(f"[DATA] YAML parse error: {e}")
         raise ValueError(f"Failed to parse YAML file {file_path}: {e}")
     except Exception as e:
+        print(f"[DATA] YAML read error: {e}")
         raise DataError(f"Failed to read YAML file {file_path}: {e}")
 
 
@@ -79,12 +86,15 @@ def write_yaml_file(data: dict, file_path: str) -> None:
         >>> data = {"database": {"host": "localhost", "port": 5432}}
         >>> write_yaml_file(data, "config.yaml")
     """
+    print(f"[DATA] Writing YAML file: {file_path} ({len(data)} top-level keys)")
+
     if not HAS_YAML:
         raise DataError("YAML support not available. Install PyYAML to use YAML files.")
 
     try:
         with open(file_path, "w", encoding="utf-8") as f:
             yaml.safe_dump(data, f, default_flow_style=False, allow_unicode=True)
+        print(f"[DATA] YAML file written successfully: {file_path}")
     except Exception as e:
         raise DataError(f"Failed to write YAML file {file_path}: {e}")
 
@@ -106,6 +116,8 @@ def read_toml_file(file_path: str) -> dict:
         >>> read_toml_file("config.toml")
         {"database": {"host": "localhost", "port": 5432}}
     """
+    print(f"[DATA] Reading TOML file: {file_path}")
+
     if not HAS_TOML:
         raise DataError(
             "TOML support not available. Install tomli and tomli-w to use TOML files."
@@ -114,12 +126,16 @@ def read_toml_file(file_path: str) -> dict:
     try:
         with open(file_path, "rb") as f:
             result: dict = tomli.load(f)
+            print(f"[DATA] TOML loaded: {len(result)} top-level keys")
             return result
     except FileNotFoundError:
+        print(f"[DATA] TOML file not found: {file_path}")
         raise FileNotFoundError(f"TOML file not found: {file_path}")
     except tomli.TOMLDecodeError as e:
+        print(f"[DATA] TOML parse error: {e}")
         raise ValueError(f"Failed to parse TOML file {file_path}: {e}")
     except Exception as e:
+        print(f"[DATA] TOML read error: {e}")
         raise DataError(f"Failed to read TOML file {file_path}: {e}")
 
 
@@ -138,6 +154,8 @@ def write_toml_file(data: dict, file_path: str) -> None:
         >>> data = {"database": {"host": "localhost", "port": 5432}}
         >>> write_toml_file(data, "config.toml")
     """
+    print(f"[DATA] Writing TOML file: {file_path} ({len(data)} top-level keys)")
+
     if not HAS_TOML:
         raise DataError(
             "TOML support not available. Install tomli and tomli-w to use TOML files."
@@ -146,7 +164,9 @@ def write_toml_file(data: dict, file_path: str) -> None:
     try:
         with open(file_path, "wb") as f:
             tomli_w.dump(data, f)
+        print(f"[DATA] TOML file written successfully: {file_path}")
     except Exception as e:
+        print(f"[DATA] TOML write error: {e}")
         raise DataError(f"Failed to write TOML file {file_path}: {e}")
 
 
@@ -167,10 +187,13 @@ def read_ini_file(file_path: str) -> dict:
         >>> read_ini_file("config.ini")
         {"database": {"host": "localhost", "port": "5432"}}
     """
+    print(f"[DATA] Reading INI file: {file_path}")
+
     # Check if file exists first (ConfigParser.read doesn't raise FileNotFoundError)
     import os
 
     if not os.path.isfile(file_path):
+        print(f"[DATA] INI file not found: {file_path}")
         raise FileNotFoundError(f"INI file not found: {file_path}")
 
     try:
@@ -181,12 +204,15 @@ def read_ini_file(file_path: str) -> dict:
         for section_name in config.sections():
             result[section_name] = dict(config[section_name])
 
+        print(f"[DATA] INI loaded: {len(result)} sections")
         return result
     except FileNotFoundError:
         raise DataError(f"INI file not found: {file_path}")
     except configparser.Error as e:
+        print(f"[DATA] INI parse error: {e}")
         raise DataError(f"Failed to parse INI file {file_path}: {e}")
     except Exception as e:
+        print(f"[DATA] INI read error: {e}")
         raise DataError(f"Failed to read INI file {file_path}: {e}")
 
 
@@ -210,11 +236,14 @@ def write_ini_file(data: dict, file_path: str, force: bool) -> str:
         >>> write_ini_file(data, "config.ini", force=True)
         "Created INI file config.ini with 1 sections (87 bytes)"
     """
+    print(f"[DATA] Writing INI file: {file_path} ({len(data)} sections, force={force})")
+
     import os
 
     file_existed = os.path.exists(file_path)
 
     if file_existed and not force:
+        print(f"[DATA] INI write blocked - file exists and force=False: {file_path}")
         raise DataError(
             f"INI file already exists: {file_path}. Use force=True to overwrite."
         )
@@ -237,8 +266,11 @@ def write_ini_file(data: dict, file_path: str, force: bool) -> str:
         file_size = os.path.getsize(file_path)
         action = "Overwrote" if file_existed else "Created"
 
-        return f"{action} INI file {file_path} with {section_count} sections ({file_size} bytes)"
+        result = f"{action} INI file {file_path} with {section_count} sections ({file_size} bytes)"
+        print(f"[DATA] {result}")
+        return result
     except Exception as e:
+        print(f"[DATA] INI write error: {e}")
         raise DataError(f"Failed to write INI file {file_path}: {e}")
 
 

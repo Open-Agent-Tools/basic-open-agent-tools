@@ -39,6 +39,8 @@ def read_csv_simple(
         >>> data
         [{'name': 'Alice', 'age': '25'}, {'name': 'Bob', 'age': '30'}]
     """
+    print(f"[DATA] Reading CSV file: {file_path} (delimiter='{delimiter}', headers={headers})")
+
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
@@ -54,24 +56,29 @@ def read_csv_simple(
         with open(file_path_str, encoding="utf-8", newline="") as csvfile:
             if headers:
                 dict_reader = csv.DictReader(csvfile, delimiter=delimiter)
-                return [dict(row) for row in dict_reader]
+                result = [dict(row) for row in dict_reader]
             else:
                 # If no headers, use col_N as keys
                 csv_reader = csv.reader(csvfile, delimiter=delimiter)
                 data = list(csv_reader)
                 if not data:
-                    return []
+                    result = []
+                else:
+                    result = []
+                    for row in data:
+                        row_dict = {f"col_{i}": value for i, value in enumerate(row)}
+                        result.append(row_dict)
 
-                result = []
-                for row in data:
-                    row_dict = {f"col_{i}": value for i, value in enumerate(row)}
-                    result.append(row_dict)
-                return result
+            print(f"[DATA] CSV loaded: {len(result)} rows")
+            return result
     except FileNotFoundError:
+        print(f"[DATA] CSV file not found: {file_path_str}")
         raise DataError(f"CSV file not found: {file_path_str}")
     except UnicodeDecodeError as e:
+        print(f"[DATA] CSV encoding error: {e}")
         raise DataError(f"Failed to decode CSV file {file_path_str}: {e}")
     except csv.Error as e:
+        print(f"[DATA] CSV parse error: {e}")
         raise DataError(f"Failed to parse CSV file {file_path_str}: {e}")
 
 
@@ -104,6 +111,8 @@ def write_csv_simple(
         >>> write_csv_simple(data, "output.csv", ",", True, force=True)
         "Created CSV file output.csv with 2 rows and 2 columns"
     """
+    print(f"[DATA] Writing CSV file: {file_path} ({len(data)} rows, delimiter='{delimiter}', headers={headers}, force={force})")
+
     # Check if data is a list
     if not isinstance(data, list):
         raise TypeError("data must be a list")
@@ -169,8 +178,11 @@ def write_csv_simple(
         # Get file size
         file_size = os.path.getsize(file_path_str)
 
-        return f"{action} CSV file {file_path_str} with {row_count} rows and {col_count} columns ({file_size} bytes)"
+        result = f"{action} CSV file {file_path_str} with {row_count} rows and {col_count} columns ({file_size} bytes)"
+        print(f"[DATA] {result}")
+        return result
     except OSError as e:
+        print(f"[DATA] CSV write error: {e}")
         raise DataError(f"Failed to write CSV file {file_path_str}: {e}")
 
 

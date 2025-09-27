@@ -30,6 +30,8 @@ def hash_md5(data: str) -> dict[str, str]:
     Raises:
         BasicAgentToolsError: If data is invalid
     """
+    print(f"[CRYPTO] Hashing {len(data)} chars with MD5")
+
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
 
@@ -37,7 +39,7 @@ def hash_md5(data: str) -> dict[str, str]:
         hash_obj = hashlib.md5(data.encode("utf-8"))
         hex_hash = hash_obj.hexdigest()
 
-        return {
+        result = {
             "algorithm": "md5",
             "input_data": data,
             "input_length": len(data),
@@ -45,7 +47,11 @@ def hash_md5(data: str) -> dict[str, str]:
             "hash_length": len(hex_hash),
         }
 
+        print(f"[CRYPTO] MD5 hash generated: {hex_hash[:16]}...")
+        return result
+
     except Exception as e:
+        print(f"[CRYPTO] MD5 hash failed: {e}")
         raise BasicAgentToolsError(f"Failed to generate MD5 hash: {str(e)}")
 
 
@@ -63,6 +69,8 @@ def hash_sha256(data: str) -> dict[str, str]:
     Raises:
         BasicAgentToolsError: If data is invalid
     """
+    print(f"[CRYPTO] Hashing {len(data)} chars with SHA-256")
+
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
 
@@ -70,7 +78,7 @@ def hash_sha256(data: str) -> dict[str, str]:
         hash_obj = hashlib.sha256(data.encode("utf-8"))
         hex_hash = hash_obj.hexdigest()
 
-        return {
+        result = {
             "algorithm": "sha256",
             "input_data": data,
             "input_length": len(data),
@@ -78,7 +86,11 @@ def hash_sha256(data: str) -> dict[str, str]:
             "hash_length": len(hex_hash),
         }
 
+        print(f"[CRYPTO] SHA-256 hash generated: {hex_hash[:16]}...")
+        return result
+
     except Exception as e:
+        print(f"[CRYPTO] SHA-256 hash failed: {e}")
         raise BasicAgentToolsError(f"Failed to generate SHA-256 hash: {str(e)}")
 
 
@@ -130,6 +142,8 @@ def hash_file(file_path: str, algorithm: str = "sha256") -> dict[str, Union[str,
     Raises:
         BasicAgentToolsError: If file path is invalid or algorithm is unsupported
     """
+    print(f"[CRYPTO] Hashing file: {file_path} with {algorithm}")
+
     if not isinstance(file_path, str) or not file_path.strip():
         raise BasicAgentToolsError("File path must be a non-empty string")
 
@@ -171,13 +185,16 @@ def hash_file(file_path: str, algorithm: str = "sha256") -> dict[str, Union[str,
 
         hex_hash = hash_obj.hexdigest()
 
-        return {
+        result = {
             "algorithm": algorithm,
             "file_path": file_path,
             "file_size_bytes": file_size,
             "hash_hex": hex_hash,
             "hash_length": len(hex_hash),
         }
+
+        print(f"[CRYPTO] File hash ({file_size} bytes): {hex_hash[:16]}...")
+        return result
 
     except FileNotFoundError:
         raise BasicAgentToolsError(f"File not found: {file_path}")

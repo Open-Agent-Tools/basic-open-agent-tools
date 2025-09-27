@@ -57,6 +57,11 @@ def http_request(
         >>> print(response["status_code"])
         200
     """
+    # Log the HTTP request details for security auditing
+    body_info = f" with {len(body)} char body" if body else ""
+    headers_info = f" with {len(headers)} headers" if headers else ""
+    print(f"[HTTP] {method} {url}{body_info}{headers_info} (timeout={timeout}s)")
+
     if not method or not isinstance(method, str):
         raise BasicAgentToolsError("Method must be a non-empty string")
 
@@ -155,12 +160,18 @@ def http_request(
 
             decoded_body = f"[Binary content - base64]: {base64.b64encode(response_body).decode('ascii')}"
 
-        return {
+        result = {
             "status_code": response.getcode(),
             "headers": json.dumps(response_headers, indent=2),
             "body": decoded_body,
             "url": response.geturl(),
         }
+
+        # Log response details
+        body_size = len(decoded_body) if decoded_body else 0
+        print(f"[HTTP] Response: {result['status_code']} ({body_size} chars)")
+
+        return result
 
     except urllib.error.HTTPError as e:
         # Handle HTTP errors (4xx, 5xx)

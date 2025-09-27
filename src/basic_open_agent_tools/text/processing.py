@@ -28,13 +28,18 @@ def clean_whitespace(text: str) -> str:
         >>> clean_whitespace("  hello    world  \\n\\t  ")
         "hello world"
     """
+    print(f"[TEXT] Cleaning whitespace in {len(text)} character text")
+
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
 
     # Replace all whitespace sequences with single spaces
     cleaned = re.sub(r"\s+", " ", text)
     # Strip leading and trailing whitespace
-    return cleaned.strip()
+    result = cleaned.strip()
+
+    print(f"[TEXT] Whitespace cleaned: {len(result)} characters")
+    return result
 
 
 @strands_tool
@@ -55,6 +60,8 @@ def normalize_line_endings(text: str, style: str) -> str:
         >>> normalize_line_endings("line1\\r\\nline2\\rline3\\n", "unix")
         "line1\\nline2\\nline3\\n"
     """
+    print(f"[TEXT] Normalizing line endings: {len(text)} chars to {style} style")
+
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
 
@@ -70,6 +77,7 @@ def normalize_line_endings(text: str, style: str) -> str:
     if style != "unix":
         normalized = normalized.replace("\n", line_endings[style])
 
+    print(f"[TEXT] Line endings normalized: {len(normalized)} characters")
     return normalized
 
 
@@ -87,6 +95,8 @@ def strip_html_tags(text: str) -> str:
         >>> strip_html_tags("<p>Hello <strong>world</strong>!</p>")
         "Hello world!"
     """
+    print(f"[TEXT] Stripping HTML tags from {len(text)} character text")
+
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
 
@@ -97,6 +107,8 @@ def strip_html_tags(text: str) -> str:
     cleaned = re.sub(r"<[^>]+>", " ", cleaned)
     # Clean up extra whitespace that might result from tag removal
     result: str = clean_whitespace(cleaned)
+
+    print(f"[TEXT] HTML tags stripped: {len(result)} characters")
     return result
 
 
