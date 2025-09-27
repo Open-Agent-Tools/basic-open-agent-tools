@@ -137,7 +137,9 @@ def list_directory_contents(directory_path: str, include_hidden: bool) -> list[s
     Raises:
         FileSystemError: If directory doesn't exist or can't be read
     """
-    print(f"[FILE] Listing directory: {directory_path} (include_hidden={include_hidden})")
+    print(
+        f"[FILE] Listing directory: {directory_path} (include_hidden={include_hidden})"
+    )
 
     path = validate_path(directory_path, "list directory")
 
@@ -419,6 +421,9 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
     if not old_text:
         raise ValueError("old_text cannot be empty")
 
+    # Enhanced input logging for security auditing
+    print(f"[FILE] replace_in_file: file_path='{file_path}', old_text='{old_text[:100]}{'...' if len(old_text) > 100 else ''}', new_text='{new_text[:100]}{'...' if len(new_text) > 100 else ''}', count={count}")
+
     validate_file_content(new_text, "replace")
     path = validate_path(file_path, "replace")
 
@@ -474,6 +479,9 @@ def insert_at_line(file_path: str, line_number: int, content: str) -> str:
     """
     if line_number < 1:
         raise ValueError("line_number must be 1 or greater")
+
+    # Enhanced input logging for security auditing
+    print(f"[FILE] insert_at_line: file_path='{file_path}', line_number={line_number}, content='{content[:100]}{'...' if len(content) > 100 else ''}')")
 
     validate_file_content(content, "insert")
     path = validate_path(file_path, "insert")
