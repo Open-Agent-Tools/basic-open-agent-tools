@@ -2,15 +2,15 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions. Designed with **agent-friendly type signatures** to eliminate "signature too complex" errors, while offering core utilities that developers can easily integrate into their agents to avoid excess boilerplate.
 
-## 🆕 What's New in v0.11.2
+## 🆕 What's New in v0.11.3
 
-🔍 **Comprehensive Input Logging**: All security-sensitive tools now log input parameters and operations for complete audit trails
+🔧 **File Operation Logging**: Enhanced input logging for `replace_in_file()` and `insert_at_line()` functions with detailed parameter tracking
 
-🛡️ **Security Monitoring**: Added structured logging with `[PREFIX]` format across file operations, shell commands, network requests, and data processing
+🛡️ **Security Auditing**: Added comprehensive logging for file modification operations with truncated parameter display for security monitoring
 
-📊 **Audit Visibility**: Real-time tracking of agent actions across file system, crypto, network, archive, and text processing modules
+📝 **Operation Visibility**: Real-time tracking of file content changes and line insertions with `[FILE]` prefix logging
 
-🔐 **Enhanced Security**: Input validation and operation logging for improved debugging and security compliance
+🔐 **Enhanced Monitoring**: Complete audit trail for file modification operations ensuring security compliance and debugging capability
 
 ## Installation
 
