@@ -28,7 +28,7 @@ from .validation import validate_path
 
 @strands_tool
 def file_editor(
-    command: str, path: str, force: bool, **kwargs: Union[str, int, bool]
+    command: str, path: str, skip_confirm: bool, **kwargs: Union[str, int, bool]
 ) -> str:
     """Comprehensive file editor with multiple operations.
 
@@ -39,7 +39,7 @@ def file_editor(
     Args:
         command: The operation to perform
         path: Path to the file or directory
-        force: If True, bypasses confirmations and safety checks (yes-to-all mode)
+        skip_confirm: If True, skip confirmation and bypass safety checks. IMPORTANT: Agents should default to skip_confirm=False for safety.
         **kwargs: Additional parameters based on command:
             - view: view_range (str, optional) - line range like "1-10" or "5"
             - create: content (str, optional) - initial file content
@@ -65,7 +65,7 @@ def file_editor(
     if command == "view":
         return _view_file(file_path, kwargs.get("view_range"))
     elif command == "create":
-        return _create_file(file_path, kwargs.get("content", ""), force)
+        return _create_file(file_path, kwargs.get("content", ""), skip_confirm)
     elif command == "str_replace":
         old_str = kwargs.get("old_str")
         new_str = kwargs.get("new_str")
@@ -131,13 +131,13 @@ def _view_file(file_path: Path, view_range: Union[str, None]) -> str:
         raise FileSystemError(f"Failed to read file {file_path}: {e}")
 
 
-def _create_file(file_path: Path, content: str, force: bool) -> str:
+def _create_file(file_path: Path, content: str, skip_confirm: bool) -> str:
     """Create a new file with optional content."""
     file_existed = file_path.exists()
 
-    if file_existed and not force:
+    if file_existed and not skip_confirm:
         raise FileSystemError(
-            f"File already exists: {file_path}. Use force=True to overwrite."
+            f"File already exists: {file_path}. Use skip_confirm=True to overwrite."
         )
 
     try:

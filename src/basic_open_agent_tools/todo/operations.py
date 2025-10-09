@@ -309,25 +309,27 @@ def update_task(
 
 
 @strands_tool
-def delete_task(task_id: int, force: bool) -> str:
+def delete_task(task_id: int, skip_confirm: bool) -> str:
     """Remove a task from memory with permission checking.
 
     Permanently deletes the specified task from storage.
 
     Args:
         task_id: The unique task identifier
-        force: If True, proceed with deletion without additional checks
+        skip_confirm: If True, skip confirmation and proceed with deletion. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
 
     Raises:
-        BasicAgentToolsError: If task not found or deletion not allowed without force
+        BasicAgentToolsError: If task not found or deletion not allowed without skip_confirm
 
     Example:
-        >>> result = delete_task(1, force=True)
+        >>> result = delete_task(1, skip_confirm=True)
         "Deleted task 1: 'Complete project setup' (was 'in_progress')"
     """
+    print(f"[TODO] Deleting task {task_id} (skip_confirm={skip_confirm})")
+
     try:
         validate_task_exists(task_id, _task_storage["tasks"])
 
@@ -337,17 +339,23 @@ def delete_task(task_id: int, force: bool) -> str:
         task_status = task.get("status", "unknown")
 
         # Check if task is important (e.g., in_progress) and require confirmation
-        if task_status == "in_progress" and not force:
+        if task_status == "in_progress" and not skip_confirm:
+            print(
+                f"[TODO] Delete blocked - task {task_id} is in_progress and skip_confirm=False"
+            )
             raise BasicAgentToolsError(
-                f"Task {task_id} is currently in progress: '{task_title}'. Use force=True to delete anyway."
+                f"Task {task_id} is currently in progress: '{task_title}'. Use skip_confirm=True to delete anyway."
             )
 
         # Remove task
         del _task_storage["tasks"][task_id]
 
+        print(f"[TODO] Task {task_id} deleted: '{task_title}' (was '{task_status}')")
+
         return f"Deleted task {task_id}: '{task_title}' (was '{task_status}')"
 
     except ValueError as e:
+        print(f"[TODO] Delete failed: {e}")
         raise BasicAgentToolsError(f"Failed to delete task: {e}") from e
 
 
@@ -470,13 +478,19 @@ def clear_all_tasks() -> dict[str, Any]:
         >>> result["cleared_count"]
         10
     """
+    print("[TODO] Clearing all tasks from memory")
+
     try:
         cleared_count = len(_task_storage["tasks"])
+
+        print(f"[TODO] Clearing {cleared_count} tasks")
 
         # Reset storage
         _task_storage["tasks"] = {}
         _task_storage["next_id"] = 1
         _task_storage["total_count"] = 0
+
+        print(f"[TODO] All tasks cleared: {cleared_count} tasks removed")
 
         return {
             "success": True,

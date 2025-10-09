@@ -30,6 +30,8 @@ def base64_encode(data: str) -> dict[str, str]:
     Raises:
         BasicAgentToolsError: If data is invalid
     """
+    print(f"[CRYPTO] Encoding {len(data)} chars to Base64")
+
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
 
@@ -38,6 +40,10 @@ def base64_encode(data: str) -> dict[str, str]:
         data_bytes = data.encode("utf-8")
         encoded_bytes = base64.b64encode(data_bytes)
         encoded_string = encoded_bytes.decode("ascii")
+
+        print(
+            f"[CRYPTO] Base64 encoding complete: {len(data)} chars -> {len(encoded_string)} chars"
+        )
 
         return {
             "encoding": "base64",
@@ -48,6 +54,7 @@ def base64_encode(data: str) -> dict[str, str]:
         }
 
     except Exception as e:
+        print(f"[CRYPTO] Base64 encoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to encode data to Base64: {str(e)}")
 
 
@@ -65,6 +72,8 @@ def base64_decode(encoded_data: str) -> dict[str, str]:
     Raises:
         BasicAgentToolsError: If encoded data is invalid
     """
+    print(f"[CRYPTO] Decoding {len(encoded_data)} chars from Base64")
+
     if not isinstance(encoded_data, str):
         raise BasicAgentToolsError("Encoded data must be a string")
 
@@ -77,6 +86,10 @@ def base64_decode(encoded_data: str) -> dict[str, str]:
         decoded_bytes = base64.b64decode(encoded_bytes)
         decoded_string = decoded_bytes.decode("utf-8")
 
+        print(
+            f"[CRYPTO] Base64 decoding complete: {len(encoded_data)} chars -> {len(decoded_string)} chars"
+        )
+
         return {
             "encoding": "base64",
             "encoded_data": encoded_data,
@@ -86,6 +99,7 @@ def base64_decode(encoded_data: str) -> dict[str, str]:
         }
 
     except Exception as e:
+        print(f"[CRYPTO] Base64 decoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to decode Base64 data: {str(e)}")
 
 
@@ -103,11 +117,17 @@ def url_encode(data: str) -> dict[str, str]:
     Raises:
         BasicAgentToolsError: If data is invalid
     """
+    print(f"[CRYPTO] URL encoding {len(data)} chars")
+
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
 
     try:
         encoded_string = urllib.parse.quote(data, safe="")
+
+        print(
+            f"[CRYPTO] URL encoding complete: {len(data)} chars -> {len(encoded_string)} chars"
+        )
 
         return {
             "encoding": "url",
@@ -118,6 +138,7 @@ def url_encode(data: str) -> dict[str, str]:
         }
 
     except Exception as e:
+        print(f"[CRYPTO] URL encoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to URL encode data: {str(e)}")
 
 
@@ -135,11 +156,17 @@ def url_decode(encoded_data: str) -> dict[str, str]:
     Raises:
         BasicAgentToolsError: If encoded data is invalid
     """
+    print(f"[CRYPTO] URL decoding {len(encoded_data)} chars")
+
     if not isinstance(encoded_data, str):
         raise BasicAgentToolsError("Encoded data must be a string")
 
     try:
         decoded_string = urllib.parse.unquote(encoded_data)
+
+        print(
+            f"[CRYPTO] URL decoding complete: {len(encoded_data)} chars -> {len(decoded_string)} chars"
+        )
 
         return {
             "encoding": "url",
@@ -150,6 +177,7 @@ def url_decode(encoded_data: str) -> dict[str, str]:
         }
 
     except Exception as e:
+        print(f"[CRYPTO] URL decoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to URL decode data: {str(e)}")
 
 
@@ -167,6 +195,8 @@ def hex_encode(data: str) -> dict[str, str]:
     Raises:
         BasicAgentToolsError: If data is invalid
     """
+    print(f"[CRYPTO] Hex encoding {len(data)} chars")
+
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
 
@@ -174,6 +204,10 @@ def hex_encode(data: str) -> dict[str, str]:
         # Encode string to bytes, then to hex
         data_bytes = data.encode("utf-8")
         hex_string = data_bytes.hex()
+
+        print(
+            f"[CRYPTO] Hex encoding complete: {len(data)} chars -> {len(hex_string)} chars"
+        )
 
         return {
             "encoding": "hex",
@@ -184,6 +218,7 @@ def hex_encode(data: str) -> dict[str, str]:
         }
 
     except Exception as e:
+        print(f"[CRYPTO] Hex encoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to encode data to hex: {str(e)}")
 
 
@@ -201,6 +236,8 @@ def hex_decode(encoded_data: str) -> dict[str, str]:
     Raises:
         BasicAgentToolsError: If encoded data is invalid
     """
+    print(f"[CRYPTO] Hex decoding {len(encoded_data)} chars")
+
     if not isinstance(encoded_data, str):
         raise BasicAgentToolsError("Encoded data must be a string")
 
@@ -218,6 +255,10 @@ def hex_decode(encoded_data: str) -> dict[str, str]:
         decoded_bytes = bytes.fromhex(encoded_data)
         decoded_string = decoded_bytes.decode("utf-8")
 
+        print(
+            f"[CRYPTO] Hex decoding complete: {len(encoded_data)} chars -> {len(decoded_string)} chars"
+        )
+
         return {
             "encoding": "hex",
             "encoded_data": encoded_data,
@@ -227,11 +268,14 @@ def hex_decode(encoded_data: str) -> dict[str, str]:
         }
 
     except UnicodeDecodeError:
+        print("[CRYPTO] Hex decoding failed: Invalid UTF-8")
         raise BasicAgentToolsError("Decoded bytes do not represent valid UTF-8 text")
     except ValueError as e:
+        print(f"[CRYPTO] Hex decoding failed: {e}")
         if "non-hexadecimal" in str(e).lower() or "invalid" in str(e).lower():
             raise BasicAgentToolsError("Invalid hexadecimal string")
         else:
             raise BasicAgentToolsError(f"Failed to decode hex data: {str(e)}")
     except Exception as e:
+        print(f"[CRYPTO] Hex decoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to decode hex data: {str(e)}")

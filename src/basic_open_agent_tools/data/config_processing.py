@@ -72,30 +72,58 @@ def read_yaml_file(file_path: str) -> dict:
 
 
 @strands_tool
-def write_yaml_file(data: dict, file_path: str) -> None:
-    """Write dictionary data to a YAML file.
+def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
+    """Write dictionary data to a YAML file with permission checking.
 
     Args:
         data: Dictionary to write
         file_path: Path where YAML file will be created
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
+
+    Returns:
+        String describing the operation result
 
     Raises:
-        DataError: If file cannot be written
+        DataError: If file cannot be written or exists without skip_confirm
 
     Example:
         >>> data = {"database": {"host": "localhost", "port": 5432}}
-        >>> write_yaml_file(data, "config.yaml")
+        >>> write_yaml_file(data, "config.yaml", skip_confirm=True)
+        "Created YAML file config.yaml with 1 top-level keys (87 bytes)"
     """
-    print(f"[DATA] Writing YAML file: {file_path} ({len(data)} top-level keys)")
+    print(
+        f"[DATA] Writing YAML file: {file_path} ({len(data)} top-level keys, skip_confirm={skip_confirm})"
+    )
 
     if not HAS_YAML:
         raise DataError("YAML support not available. Install PyYAML to use YAML files.")
 
+    import os
+
+    file_existed = os.path.exists(file_path)
+
+    if file_existed and not skip_confirm:
+        print(
+            f"[DATA] YAML write blocked - file exists and skip_confirm=False: {file_path}"
+        )
+        raise DataError(
+            f"YAML file already exists: {file_path}. Use skip_confirm=True to overwrite."
+        )
+
     try:
         with open(file_path, "w", encoding="utf-8") as f:
             yaml.safe_dump(data, f, default_flow_style=False, allow_unicode=True)
-        print(f"[DATA] YAML file written successfully: {file_path}")
+
+        # Calculate stats for feedback
+        file_size = os.path.getsize(file_path)
+        key_count = len(data)
+        action = "Overwrote" if file_existed else "Created"
+
+        result = f"{action} YAML file {file_path} with {key_count} top-level keys ({file_size} bytes)"
+        print(f"[DATA] {result}")
+        return result
     except Exception as e:
+        print(f"[DATA] YAML write error: {e}")
         raise DataError(f"Failed to write YAML file {file_path}: {e}")
 
 
@@ -140,31 +168,58 @@ def read_toml_file(file_path: str) -> dict:
 
 
 @strands_tool
-def write_toml_file(data: dict, file_path: str) -> None:
-    """Write dictionary data to a TOML file.
+def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
+    """Write dictionary data to a TOML file with permission checking.
 
     Args:
         data: Dictionary to write
         file_path: Path where TOML file will be created
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
+
+    Returns:
+        String describing the operation result
 
     Raises:
-        DataError: If file cannot be written
+        DataError: If file cannot be written or exists without skip_confirm
 
     Example:
         >>> data = {"database": {"host": "localhost", "port": 5432}}
-        >>> write_toml_file(data, "config.toml")
+        >>> write_toml_file(data, "config.toml", skip_confirm=True)
+        "Created TOML file config.toml with 1 top-level keys (87 bytes)"
     """
-    print(f"[DATA] Writing TOML file: {file_path} ({len(data)} top-level keys)")
+    print(
+        f"[DATA] Writing TOML file: {file_path} ({len(data)} top-level keys, skip_confirm={skip_confirm})"
+    )
 
     if not HAS_TOML:
         raise DataError(
             "TOML support not available. Install tomli and tomli-w to use TOML files."
         )
 
+    import os
+
+    file_existed = os.path.exists(file_path)
+
+    if file_existed and not skip_confirm:
+        print(
+            f"[DATA] TOML write blocked - file exists and skip_confirm=False: {file_path}"
+        )
+        raise DataError(
+            f"TOML file already exists: {file_path}. Use skip_confirm=True to overwrite."
+        )
+
     try:
         with open(file_path, "wb") as f:
             tomli_w.dump(data, f)
-        print(f"[DATA] TOML file written successfully: {file_path}")
+
+        # Calculate stats for feedback
+        file_size = os.path.getsize(file_path)
+        key_count = len(data)
+        action = "Overwrote" if file_existed else "Created"
+
+        result = f"{action} TOML file {file_path} with {key_count} top-level keys ({file_size} bytes)"
+        print(f"[DATA] {result}")
+        return result
     except Exception as e:
         print(f"[DATA] TOML write error: {e}")
         raise DataError(f"Failed to write TOML file {file_path}: {e}")
@@ -217,35 +272,39 @@ def read_ini_file(file_path: str) -> dict:
 
 
 @strands_tool
-def write_ini_file(data: dict, file_path: str, force: bool) -> str:
+def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     """Write dictionary data to an INI file with permission checking.
 
     Args:
         data: Dictionary to write (nested dict representing sections)
         file_path: Path where INI file will be created
-        force: If True, overwrite existing files without confirmation
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
 
     Raises:
-        DataError: If file cannot be written or exists without force
+        DataError: If file cannot be written or exists without skip_confirm
 
     Example:
         >>> data = {"database": {"host": "localhost", "port": "5432"}}
-        >>> write_ini_file(data, "config.ini", force=True)
+        >>> write_ini_file(data, "config.ini", skip_confirm=True)
         "Created INI file config.ini with 1 sections (87 bytes)"
     """
-    print(f"[DATA] Writing INI file: {file_path} ({len(data)} sections, force={force})")
+    print(
+        f"[DATA] Writing INI file: {file_path} ({len(data)} sections, skip_confirm={skip_confirm})"
+    )
 
     import os
 
     file_existed = os.path.exists(file_path)
 
-    if file_existed and not force:
-        print(f"[DATA] INI write blocked - file exists and force=False: {file_path}")
+    if file_existed and not skip_confirm:
+        print(
+            f"[DATA] INI write blocked - file exists and skip_confirm=False: {file_path}"
+        )
         raise DataError(
-            f"INI file already exists: {file_path}. Use force=True to overwrite."
+            f"INI file already exists: {file_path}. Use skip_confirm=True to overwrite."
         )
 
     try:

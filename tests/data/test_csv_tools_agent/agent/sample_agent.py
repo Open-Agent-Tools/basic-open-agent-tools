@@ -33,10 +33,10 @@ root_agent = Agent(
 
 You have access to tools for reading, writing, parsing, validating, and cleaning CSV files. You can detect delimiters, convert between formats, and process CSV data structures.
 
-IMPORTANT: The write_csv_simple function now requires a 'force' parameter:
-- write_csv_simple: requires force=True to overwrite existing files
+IMPORTANT: The write_csv_simple function now requires a 'skip_confirm' parameter:
+- write_csv_simple: requires skip_confirm=True to overwrite existing files
 
-Always use force=True when writing CSV files to avoid permission errors.
+Always use skip_confirm=True when writing CSV files to avoid permission errors.
 The tool now returns detailed feedback strings describing the file created (rows, columns, file size).
 
 Always provide clear output showing the CSV processing results.""",

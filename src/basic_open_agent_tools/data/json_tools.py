@@ -86,7 +86,9 @@ def safe_json_deserialize(json_str: str) -> dict:
             # Wrap non-dict results in a dict for consistency
             final_result = {"result": result}
 
-        print(f"[DATA] JSON deserialized: {type(final_result).__name__} with {len(final_result)} keys")
+        print(
+            f"[DATA] JSON deserialized: {type(final_result).__name__} with {len(final_result)} keys"
+        )
         return final_result
     except (json.JSONDecodeError, ValueError) as e:
         print(f"[DATA] JSON deserialization error: {e}")

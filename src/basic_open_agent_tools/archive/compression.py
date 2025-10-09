@@ -20,9 +20,23 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def create_zip(source_paths: list[str], output_path: str, force: bool) -> str:
-    """Create a ZIP archive from files and directories with permission checking."""
-    print(f"[ARCHIVE] Creating ZIP: {output_path} from {len(source_paths)} sources (force={force})")
+def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) -> str:
+    """Create a ZIP archive from files and directories with permission checking.
+
+    Args:
+        source_paths: List of file/directory paths to include in archive
+        output_path: Path for the output ZIP file
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
+
+    Returns:
+        String describing the operation result
+
+    Raises:
+        BasicAgentToolsError: If archive creation fails or file exists without skip_confirm
+    """
+    print(
+        f"[ARCHIVE] Creating ZIP: {output_path} from {len(source_paths)} sources (skip_confirm={skip_confirm})"
+    )
 
     if not isinstance(source_paths, list) or not source_paths:
         raise BasicAgentToolsError("Source paths must be a non-empty list")
@@ -30,16 +44,18 @@ def create_zip(source_paths: list[str], output_path: str, force: bool) -> str:
     if not isinstance(output_path, str) or not output_path.strip():
         raise BasicAgentToolsError("Output path must be a non-empty string")
 
-    if not isinstance(force, bool):
-        raise BasicAgentToolsError("force must be a boolean")
+    if not isinstance(skip_confirm, bool):
+        raise BasicAgentToolsError("skip_confirm must be a boolean")
 
     # Check if output file exists
     file_existed = os.path.exists(output_path)
 
-    if file_existed and not force:
-        print(f"[ARCHIVE] ZIP creation blocked - file exists and force=False: {output_path}")
+    if file_existed and not skip_confirm:
+        print(
+            f"[ARCHIVE] ZIP creation blocked - file exists and skip_confirm=False: {output_path}"
+        )
         raise BasicAgentToolsError(
-            f"ZIP archive already exists: {output_path}. Use force=True to overwrite."
+            f"ZIP archive already exists: {output_path}. Use skip_confirm=True to overwrite."
         )
 
     try:
@@ -73,9 +89,23 @@ def create_zip(source_paths: list[str], output_path: str, force: bool) -> str:
 
 
 @strands_tool
-def extract_zip(zip_path: str, extract_to: str, force: bool) -> str:
-    """Extract a ZIP archive to a directory with permission checking."""
-    print(f"[ARCHIVE] Extracting ZIP: {zip_path} to {extract_to} (force={force})")
+def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
+    """Extract a ZIP archive to a directory with permission checking.
+
+    Args:
+        zip_path: Path to the ZIP archive
+        extract_to: Directory to extract files to
+        skip_confirm: If True, skip confirmation and extract even if directory is not empty. IMPORTANT: Agents should default to skip_confirm=False for safety.
+
+    Returns:
+        String describing the operation result
+
+    Raises:
+        BasicAgentToolsError: If extraction fails or directory is not empty without skip_confirm
+    """
+    print(
+        f"[ARCHIVE] Extracting ZIP: {zip_path} to {extract_to} (skip_confirm={skip_confirm})"
+    )
 
     if not isinstance(zip_path, str) or not zip_path.strip():
         raise BasicAgentToolsError("ZIP path must be a non-empty string")
@@ -83,8 +113,8 @@ def extract_zip(zip_path: str, extract_to: str, force: bool) -> str:
     if not isinstance(extract_to, str) or not extract_to.strip():
         raise BasicAgentToolsError("Extract path must be a non-empty string")
 
-    if not isinstance(force, bool):
-        raise BasicAgentToolsError("force must be a boolean")
+    if not isinstance(skip_confirm, bool):
+        raise BasicAgentToolsError("skip_confirm must be a boolean")
 
     if not os.path.exists(zip_path):
         print(f"[ARCHIVE] ZIP file not found: {zip_path}")
@@ -92,11 +122,11 @@ def extract_zip(zip_path: str, extract_to: str, force: bool) -> str:
 
     # Check if extraction directory exists and has contents
     extract_exists = os.path.exists(extract_to)
-    if extract_exists and not force:
+    if extract_exists and not skip_confirm:
         try:
             if os.listdir(extract_to):  # Directory exists and has contents
                 raise BasicAgentToolsError(
-                    f"Extract directory already exists and is not empty: {extract_to}. Use force=True to proceed."
+                    f"Extract directory already exists and is not empty: {extract_to}. Use skip_confirm=True to proceed."
                 )
         except OSError:
             pass  # Can't read directory, proceed anyway
@@ -121,28 +151,36 @@ def extract_zip(zip_path: str, extract_to: str, force: bool) -> str:
 
 
 @strands_tool
-def compress_files(file_paths: list[str], output_path: str, force: bool) -> str:
-    """Compress multiple files into a ZIP archive."""
+def compress_files(file_paths: list[str], output_path: str, skip_confirm: bool) -> str:
+    """Compress multiple files into a ZIP archive.
+
+    Args:
+        file_paths: List of file paths to compress
+        output_path: Path for the output ZIP file
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
+
+    Returns:
+        String describing the operation result
+    """
     print(f"[ARCHIVE] Compressing {len(file_paths)} files to: {output_path}")
-    return create_zip(file_paths, output_path, force)
+    return create_zip(file_paths, output_path, skip_confirm)
 
 
 @strands_tool
-def compress_file_gzip(
-    input_path: str, output_path: Optional[str] = None
-) -> dict[str, Union[str, int, float]]:
+def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) -> str:
     """
-    Compress a file using gzip compression.
+    Compress a file using gzip compression with permission checking.
 
     Args:
         input_path: Path to input file
-        output_path: Path for compressed file (defaults to input_path.gz)
+        output_path: Path for compressed file (e.g., 'file.txt.gz')
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
-        Dictionary with compression results
+        String describing the operation result
 
     Raises:
-        BasicAgentToolsError: If compression fails
+        BasicAgentToolsError: If compression fails or output exists without skip_confirm
     """
     if not isinstance(input_path, str) or not input_path.strip():
         raise BasicAgentToolsError("Input path must be a non-empty string")
@@ -155,12 +193,24 @@ def compress_file_gzip(
     if not os.path.isfile(input_path):
         raise BasicAgentToolsError(f"Input path is not a file: {input_path}")
 
-    if output_path is None:
-        output_path = f"{input_path}.gz"
-    elif not isinstance(output_path, str) or not output_path.strip():
+    if not isinstance(output_path, str) or not output_path.strip():
         raise BasicAgentToolsError("Output path must be a non-empty string")
-    else:
-        output_path = output_path.strip()
+
+    output_path = output_path.strip()
+
+    if not isinstance(skip_confirm, bool):
+        raise BasicAgentToolsError("skip_confirm must be a boolean")
+
+    # Check if output file exists
+    file_existed = os.path.exists(output_path)
+
+    if file_existed and not skip_confirm:
+        print(
+            f"[ARCHIVE] GZIP compression blocked - file exists and skip_confirm=False: {output_path}"
+        )
+        raise BasicAgentToolsError(
+            f"Output file already exists: {output_path}. Use skip_confirm=True to overwrite."
+        )
 
     try:
         input_size = os.path.getsize(input_path)
@@ -171,20 +221,15 @@ def compress_file_gzip(
 
         output_size = os.path.getsize(output_path)
         compression_ratio = output_size / input_size if input_size > 0 else 0
+        compression_percent = round((1 - compression_ratio) * 100, 1)
 
-        return {
-            "input_path": input_path,
-            "output_path": output_path,
-            "input_size_bytes": input_size,
-            "output_size_bytes": output_size,
-            "compression_ratio": round(compression_ratio, 3),
-            "space_saved_bytes": input_size - output_size,
-            "compression_percent": round((1 - compression_ratio) * 100, 1),
-            "compression_type": "gzip",
-            "compression_status": "success",
-        }
+        action = "Overwrote" if file_existed else "Created"
+        result = f"{action} GZIP compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
+        print(f"[ARCHIVE] {result}")
+        return result
 
     except Exception as e:
+        print(f"[ARCHIVE] GZIP compression failed: {e}")
         raise BasicAgentToolsError(f"Failed to compress file with gzip: {str(e)}")
 
 
@@ -249,21 +294,20 @@ def decompress_file_gzip(
 
 
 @strands_tool
-def compress_file_bzip2(
-    input_path: str, output_path: Optional[str] = None
-) -> dict[str, Union[str, int, float]]:
+def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -> str:
     """
-    Compress a file using bzip2 compression.
+    Compress a file using bzip2 compression with permission checking.
 
     Args:
         input_path: Path to input file
-        output_path: Path for compressed file (defaults to input_path.bz2)
+        output_path: Path for compressed file (e.g., 'file.txt.bz2')
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
-        Dictionary with compression results
+        String describing the operation result
 
     Raises:
-        BasicAgentToolsError: If compression fails
+        BasicAgentToolsError: If compression fails or output exists without skip_confirm
     """
     if not isinstance(input_path, str) or not input_path.strip():
         raise BasicAgentToolsError("Input path must be a non-empty string")
@@ -276,12 +320,24 @@ def compress_file_bzip2(
     if not os.path.isfile(input_path):
         raise BasicAgentToolsError(f"Input path is not a file: {input_path}")
 
-    if output_path is None:
-        output_path = f"{input_path}.bz2"
-    elif not isinstance(output_path, str) or not output_path.strip():
+    if not isinstance(output_path, str) or not output_path.strip():
         raise BasicAgentToolsError("Output path must be a non-empty string")
-    else:
-        output_path = output_path.strip()
+
+    output_path = output_path.strip()
+
+    if not isinstance(skip_confirm, bool):
+        raise BasicAgentToolsError("skip_confirm must be a boolean")
+
+    # Check if output file exists
+    file_existed = os.path.exists(output_path)
+
+    if file_existed and not skip_confirm:
+        print(
+            f"[ARCHIVE] BZIP2 compression blocked - file exists and skip_confirm=False: {output_path}"
+        )
+        raise BasicAgentToolsError(
+            f"Output file already exists: {output_path}. Use skip_confirm=True to overwrite."
+        )
 
     try:
         input_size = os.path.getsize(input_path)
@@ -292,39 +348,33 @@ def compress_file_bzip2(
 
         output_size = os.path.getsize(output_path)
         compression_ratio = output_size / input_size if input_size > 0 else 0
+        compression_percent = round((1 - compression_ratio) * 100, 1)
 
-        return {
-            "input_path": input_path,
-            "output_path": output_path,
-            "input_size_bytes": input_size,
-            "output_size_bytes": output_size,
-            "compression_ratio": round(compression_ratio, 3),
-            "space_saved_bytes": input_size - output_size,
-            "compression_percent": round((1 - compression_ratio) * 100, 1),
-            "compression_type": "bzip2",
-            "compression_status": "success",
-        }
+        action = "Overwrote" if file_existed else "Created"
+        result = f"{action} BZIP2 compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
+        print(f"[ARCHIVE] {result}")
+        return result
 
     except Exception as e:
+        print(f"[ARCHIVE] BZIP2 compression failed: {e}")
         raise BasicAgentToolsError(f"Failed to compress file with bzip2: {str(e)}")
 
 
 @strands_tool
-def compress_file_xz(
-    input_path: str, output_path: Optional[str] = None
-) -> dict[str, Union[str, int, float]]:
+def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> str:
     """
-    Compress a file using XZ/LZMA compression.
+    Compress a file using XZ/LZMA compression with permission checking.
 
     Args:
         input_path: Path to input file
-        output_path: Path for compressed file (defaults to input_path.xz)
+        output_path: Path for compressed file (e.g., 'file.txt.xz')
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
-        Dictionary with compression results
+        String describing the operation result
 
     Raises:
-        BasicAgentToolsError: If compression fails
+        BasicAgentToolsError: If compression fails or output exists without skip_confirm
     """
     if not isinstance(input_path, str) or not input_path.strip():
         raise BasicAgentToolsError("Input path must be a non-empty string")
@@ -337,12 +387,24 @@ def compress_file_xz(
     if not os.path.isfile(input_path):
         raise BasicAgentToolsError(f"Input path is not a file: {input_path}")
 
-    if output_path is None:
-        output_path = f"{input_path}.xz"
-    elif not isinstance(output_path, str) or not output_path.strip():
+    if not isinstance(output_path, str) or not output_path.strip():
         raise BasicAgentToolsError("Output path must be a non-empty string")
-    else:
-        output_path = output_path.strip()
+
+    output_path = output_path.strip()
+
+    if not isinstance(skip_confirm, bool):
+        raise BasicAgentToolsError("skip_confirm must be a boolean")
+
+    # Check if output file exists
+    file_existed = os.path.exists(output_path)
+
+    if file_existed and not skip_confirm:
+        print(
+            f"[ARCHIVE] XZ compression blocked - file exists and skip_confirm=False: {output_path}"
+        )
+        raise BasicAgentToolsError(
+            f"Output file already exists: {output_path}. Use skip_confirm=True to overwrite."
+        )
 
     try:
         input_size = os.path.getsize(input_path)
@@ -353,18 +415,13 @@ def compress_file_xz(
 
         output_size = os.path.getsize(output_path)
         compression_ratio = output_size / input_size if input_size > 0 else 0
+        compression_percent = round((1 - compression_ratio) * 100, 1)
 
-        return {
-            "input_path": input_path,
-            "output_path": output_path,
-            "input_size_bytes": input_size,
-            "output_size_bytes": output_size,
-            "compression_ratio": round(compression_ratio, 3),
-            "space_saved_bytes": input_size - output_size,
-            "compression_percent": round((1 - compression_ratio) * 100, 1),
-            "compression_type": "xz/lzma",
-            "compression_status": "success",
-        }
+        action = "Overwrote" if file_existed else "Created"
+        result = f"{action} XZ compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
+        print(f"[ARCHIVE] {result}")
+        return result
 
     except Exception as e:
+        print(f"[ARCHIVE] XZ compression failed: {e}")
         raise BasicAgentToolsError(f"Failed to compress file with XZ: {str(e)}")

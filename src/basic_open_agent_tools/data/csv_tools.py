@@ -39,7 +39,9 @@ def read_csv_simple(
         >>> data
         [{'name': 'Alice', 'age': '25'}, {'name': 'Bob', 'age': '30'}]
     """
-    print(f"[DATA] Reading CSV file: {file_path} (delimiter='{delimiter}', headers={headers})")
+    print(
+        f"[DATA] Reading CSV file: {file_path} (delimiter='{delimiter}', headers={headers})"
+    )
 
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
@@ -88,7 +90,7 @@ def write_csv_simple(
     file_path: str,
     delimiter: str,
     headers: bool,
-    force: bool,
+    skip_confirm: bool,
 ) -> str:
     """Write list of dictionaries to CSV file with permission checking.
 
@@ -97,21 +99,23 @@ def write_csv_simple(
         file_path: Path where CSV file will be created as a string
         delimiter: CSV delimiter character
         headers: Whether to write headers
-        force: If True, overwrite existing files without confirmation
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
 
     Raises:
         TypeError: If data is not a list, contains non-dictionary items, or file_path is not a string
-        DataError: If file cannot be written or exists without force
+        DataError: If file cannot be written or exists without skip_confirm
 
     Example:
         >>> data = [{'name': 'Alice', 'age': '25'}, {'name': 'Bob', 'age': '30'}]
-        >>> write_csv_simple(data, "output.csv", ",", True, force=True)
+        >>> write_csv_simple(data, "output.csv", ",", True, skip_confirm=True)
         "Created CSV file output.csv with 2 rows and 2 columns"
     """
-    print(f"[DATA] Writing CSV file: {file_path} ({len(data)} rows, delimiter='{delimiter}', headers={headers}, force={force})")
+    print(
+        f"[DATA] Writing CSV file: {file_path} ({len(data)} rows, delimiter='{delimiter}', headers={headers}, skip_confirm={skip_confirm})"
+    )
 
     # Check if data is a list
     if not isinstance(data, list):
@@ -128,17 +132,17 @@ def write_csv_simple(
     if not isinstance(headers, bool):
         raise TypeError("headers must be a boolean")
 
-    if not isinstance(force, bool):
-        raise TypeError("force must be a boolean")
+    if not isinstance(skip_confirm, bool):
+        raise TypeError("skip_confirm must be a boolean")
 
     # Check if file exists
     import os
 
     file_existed = os.path.exists(file_path_str)
 
-    if file_existed and not force:
+    if file_existed and not skip_confirm:
         raise DataError(
-            f"CSV file already exists: {file_path_str}. Use force=True to overwrite."
+            f"CSV file already exists: {file_path_str}. Use skip_confirm=True to overwrite."
         )
 
     if not data:

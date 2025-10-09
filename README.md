@@ -87,7 +87,7 @@ agent_tools = boat.load_all_tools()  # All 166 functions from all modules
 result = boat.file_system.write_file_from_string(
     file_path="/tmp/example.txt",
     content="Hello, World!",
-    force=True  # Required to prevent accidental overwrites
+    skip_confirm=False  # Safe default - prevents accidental overwrites
 )
 # Returns: "Created file /tmp/example.txt with 1 lines (13 bytes)"
 
@@ -97,7 +97,7 @@ csv_result = boat.data.write_csv_simple(
     file_path="/tmp/data.csv",
     delimiter=",",
     headers=True,
-    force=True
+    skip_confirm=False  # Safe default - prevents accidental overwrites
 )
 # Returns: "Created CSV file /tmp/data.csv with 1 rows and 2 columns (17 bytes)"
 
@@ -208,7 +208,7 @@ Utilities Tools:
 - Directory operations (create, list, delete, tree visualization)
 - File information and existence checking
 - Path validation and security features
-- **🆕 Enhanced feedback**: All write operations now include `force` parameter and return detailed operation summaries
+- **🆕 Enhanced feedback**: All write operations now include `skip_confirm` parameter and return detailed operation summaries
 
 ### Text Processing Tools ✅ (10 functions)
 📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/text/README.md)**
@@ -292,7 +292,7 @@ Utilities Tools:
 - **Advanced Compression**: GZIP, BZIP2, and XZ/LZMA single-file compression
 - **Compression Analysis**: Detailed compression ratios and space savings metrics
 - **Multiple Formats**: Support for all major compression formats with statistics
-- **🆕 Enhanced feedback**: Archive creation returns detailed compression statistics and file counts
+- **🆕 Enhanced feedback**: Archive creation includes `skip_confirm` parameter and returns detailed compression statistics and file counts
 
 ### Logging Tools ✅ (5 functions)
 📖 **[Complete Documentation](https://github.com/open-agent-tools/basic-open-agent-tools/blob/main/src/basic_open_agent_tools/logging/README.md)**

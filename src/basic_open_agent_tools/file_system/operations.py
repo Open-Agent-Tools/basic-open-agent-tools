@@ -45,31 +45,33 @@ def read_file_to_string(file_path: str) -> str:
 
 
 @strands_tool
-def write_file_from_string(file_path: str, content: str, force: bool) -> str:
+def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> str:
     """Write string content to a text file with permission checking.
 
     Args:
         file_path: Path to the output file
         content: String content to write
-        force: If True, overwrite existing files without confirmation
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
 
     Raises:
-        FileSystemError: If write operation fails or file exists without force
+        FileSystemError: If write operation fails or file exists without skip_confirm
     """
-    print(f"[FILE] Writing to: {file_path} ({len(content)} chars, force={force})")
+    print(
+        f"[FILE] Writing to: {file_path} ({len(content)} chars, skip_confirm={skip_confirm})"
+    )
 
     validate_file_content(content, "write")
     path = validate_path(file_path, "write")
 
     file_existed = path.exists()
 
-    if file_existed and not force:
-        print(f"[FILE] Write blocked - file exists and force=False: {path}")
+    if file_existed and not skip_confirm:
+        print(f"[FILE] Write blocked - file exists and skip_confirm=False: {path}")
         raise FileSystemError(
-            f"File already exists: {path}. Use force=True to overwrite."
+            f"File already exists: {path}. Use skip_confirm=True to overwrite."
         )
 
     try:
@@ -159,26 +161,26 @@ def list_directory_contents(directory_path: str, include_hidden: bool) -> list[s
 
 
 @strands_tool
-def create_directory(directory_path: str, force: bool) -> str:
+def create_directory(directory_path: str, skip_confirm: bool) -> str:
     """Create a directory and any necessary parent directories.
 
     Args:
         directory_path: Path to the directory to create
-        force: If True, proceed even if directory already exists
+        skip_confirm: If True, skip confirmation and proceed even if directory already exists. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
 
     Raises:
-        FileSystemError: If directory creation fails or exists without force
+        FileSystemError: If directory creation fails or exists without skip_confirm
     """
     path = validate_path(directory_path, "create directory")
 
     already_existed = path.exists()
 
-    if already_existed and not force:
+    if already_existed and not skip_confirm:
         raise FileSystemError(
-            f"Directory already exists: {path}. Use force=True to proceed."
+            f"Directory already exists: {path}. Use skip_confirm=True to proceed."
         )
 
     try:
@@ -193,27 +195,27 @@ def create_directory(directory_path: str, force: bool) -> str:
 
 
 @strands_tool
-def delete_file(file_path: str, force: bool) -> str:
+def delete_file(file_path: str, skip_confirm: bool) -> str:
     """Delete a file with permission checking.
 
     Args:
         file_path: Path to the file to delete
-        force: If True, proceed with deletion without additional checks
+        skip_confirm: If True, skip confirmation and proceed with deletion. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
 
     Raises:
-        FileSystemError: If deletion fails or file doesn't exist without force
+        FileSystemError: If deletion fails or file doesn't exist without skip_confirm
     """
-    print(f"[FILE] Deleting file: {file_path} (force={force})")
+    print(f"[FILE] Deleting file: {file_path} (skip_confirm={skip_confirm})")
 
     path = validate_path(file_path, "delete file")
 
     if not path.exists():
-        if not force:
+        if not skip_confirm:
             raise FileSystemError(
-                f"File not found: {path}. Use force=True to suppress this error."
+                f"File not found: {path}. Use skip_confirm=True to suppress this error."
             )
         return f"File not found (already deleted): {path}"
 
@@ -234,26 +236,26 @@ def delete_file(file_path: str, force: bool) -> str:
 
 
 @strands_tool
-def delete_directory(directory_path: str, recursive: bool, force: bool) -> str:
+def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -> str:
     """Delete a directory with permission checking.
 
     Args:
         directory_path: Path to the directory to delete
         recursive: If True, delete directory and all contents recursively
-        force: If True, proceed with deletion without additional checks
+        skip_confirm: If True, skip confirmation and proceed with deletion. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
 
     Raises:
-        FileSystemError: If deletion fails or directory doesn't exist without force
+        FileSystemError: If deletion fails or directory doesn't exist without skip_confirm
     """
     path = validate_path(directory_path, "delete directory")
 
     if not path.exists():
-        if not force:
+        if not skip_confirm:
             raise FileSystemError(
-                f"Directory not found: {path}. Use force=True to suppress this error."
+                f"Directory not found: {path}. Use skip_confirm=True to suppress this error."
             )
         return f"Directory not found (already deleted): {path}"
 
@@ -287,21 +289,23 @@ def delete_directory(directory_path: str, recursive: bool, force: bool) -> str:
 
 
 @strands_tool
-def move_file(source_path: str, destination_path: str, force: bool) -> str:
+def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> str:
     """Move or rename a file or directory with permission checking.
 
     Args:
         source_path: Current path of the file/directory
         destination_path: New path for the file/directory
-        force: If True, overwrite destination if it exists
+        skip_confirm: If True, skip confirmation and overwrite destination if it exists. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
 
     Raises:
-        FileSystemError: If move operation fails or destination exists without force
+        FileSystemError: If move operation fails or destination exists without skip_confirm
     """
-    print(f"[FILE] Moving: {source_path} -> {destination_path} (force={force})")
+    print(
+        f"[FILE] Moving: {source_path} -> {destination_path} (skip_confirm={skip_confirm})"
+    )
 
     src_path = validate_path(source_path, "move source")
     dst_path = validate_path(destination_path, "move destination")
@@ -311,9 +315,9 @@ def move_file(source_path: str, destination_path: str, force: bool) -> str:
 
     destination_existed = dst_path.exists()
 
-    if destination_existed and not force:
+    if destination_existed and not skip_confirm:
         raise FileSystemError(
-            f"Destination already exists: {dst_path}. Use force=True to overwrite."
+            f"Destination already exists: {dst_path}. Use skip_confirm=True to overwrite."
         )
 
     # Get source info before move
@@ -340,19 +344,19 @@ def move_file(source_path: str, destination_path: str, force: bool) -> str:
 
 
 @strands_tool
-def copy_file(source_path: str, destination_path: str, force: bool) -> str:
+def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> str:
     """Copy a file or directory with permission checking.
 
     Args:
         source_path: Path of the source file/directory
         destination_path: Path for the copied file/directory
-        force: If True, overwrite destination if it exists
+        skip_confirm: If True, skip confirmation and overwrite destination if it exists. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
 
     Raises:
-        FileSystemError: If copy operation fails or destination exists without force
+        FileSystemError: If copy operation fails or destination exists without skip_confirm
     """
     src_path = validate_path(source_path, "copy source")
     dst_path = validate_path(destination_path, "copy destination")
@@ -362,9 +366,9 @@ def copy_file(source_path: str, destination_path: str, force: bool) -> str:
 
     destination_existed = dst_path.exists()
 
-    if destination_existed and not force:
+    if destination_existed and not skip_confirm:
         raise FileSystemError(
-            f"Destination already exists: {dst_path}. Use force=True to overwrite."
+            f"Destination already exists: {dst_path}. Use skip_confirm=True to overwrite."
         )
 
     # Get source info
@@ -422,7 +426,9 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
         raise ValueError("old_text cannot be empty")
 
     # Enhanced input logging for security auditing
-    print(f"[FILE] replace_in_file: file_path='{file_path}', old_text='{old_text[:100]}{'...' if len(old_text) > 100 else ''}', new_text='{new_text[:100]}{'...' if len(new_text) > 100 else ''}', count={count}")
+    print(
+        f"[FILE] replace_in_file: file_path='{file_path}', old_text='{old_text[:100]}{'...' if len(old_text) > 100 else ''}', new_text='{new_text[:100]}{'...' if len(new_text) > 100 else ''}', count={count}"
+    )
 
     validate_file_content(new_text, "replace")
     path = validate_path(file_path, "replace")
@@ -481,7 +487,9 @@ def insert_at_line(file_path: str, line_number: int, content: str) -> str:
         raise ValueError("line_number must be 1 or greater")
 
     # Enhanced input logging for security auditing
-    print(f"[FILE] insert_at_line: file_path='{file_path}', line_number={line_number}, content='{content[:100]}{'...' if len(content) > 100 else ''}')")
+    print(
+        f"[FILE] insert_at_line: file_path='{file_path}', line_number={line_number}, content='{content[:100]}{'...' if len(content) > 100 else ''}')"
+    )
 
     validate_file_content(content, "insert")
     path = validate_path(file_path, "insert")

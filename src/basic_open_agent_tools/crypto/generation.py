@@ -31,6 +31,8 @@ def generate_uuid(version: int = 4) -> dict[str, str]:
     Raises:
         BasicAgentToolsError: If version is invalid
     """
+    print(f"[CRYPTO] Generating UUID version {version}")
+
     if not isinstance(version, int) or version not in [1, 4]:
         raise BasicAgentToolsError("Version must be 1 or 4")
 
@@ -47,6 +49,8 @@ def generate_uuid(version: int = 4) -> dict[str, str]:
         uuid_string = str(generated_uuid)
         uuid_hex = generated_uuid.hex
 
+        print(f"[CRYPTO] UUID generated: {uuid_string}")
+
         return {
             "uuid_version": version,
             "uuid_type": uuid_type,
@@ -57,6 +61,7 @@ def generate_uuid(version: int = 4) -> dict[str, str]:
         }
 
     except Exception as e:
+        print(f"[CRYPTO] UUID generation failed: {e}")
         raise BasicAgentToolsError(f"Failed to generate UUID: {str(e)}")
 
 
@@ -77,6 +82,10 @@ def generate_random_string(
     Raises:
         BasicAgentToolsError: If parameters are invalid
     """
+    print(
+        f"[CRYPTO] Generating random string: length={length}, charset={character_set}"
+    )
+
     if not isinstance(length, int) or length < 1 or length > 1000:
         raise BasicAgentToolsError("Length must be an integer between 1 and 1000")
 
@@ -103,6 +112,10 @@ def generate_random_string(
         # Generate random string
         random_string = "".join(secrets.choice(chars) for _ in range(length))
 
+        print(
+            f"[CRYPTO] Random string generated: {length} chars, {length * len(chars).bit_length()} bits entropy"
+        )
+
         return {
             "random_string": random_string,
             "requested_length": length,
@@ -113,6 +126,7 @@ def generate_random_string(
         }
 
     except Exception as e:
+        print(f"[CRYPTO] Random string generation failed: {e}")
         raise BasicAgentToolsError(f"Failed to generate random string: {str(e)}")
 
 
@@ -133,6 +147,8 @@ def generate_random_bytes(
     Raises:
         BasicAgentToolsError: If parameters are invalid
     """
+    print(f"[CRYPTO] Generating random bytes: length={length}, encoding={encoding}")
+
     if not isinstance(length, int) or length < 1 or length > 1000:
         raise BasicAgentToolsError("Length must be an integer between 1 and 1000")
 
@@ -156,6 +172,10 @@ def generate_random_bytes(
 
             encoded_data = base64.b64encode(random_bytes).decode("ascii")
 
+        print(
+            f"[CRYPTO] Random bytes generated: {length} bytes, {length * 8} bits entropy, encoded as {encoding}"
+        )
+
         return {
             "random_bytes_length": length,
             "encoding": encoding,
@@ -165,4 +185,5 @@ def generate_random_bytes(
         }
 
     except Exception as e:
+        print(f"[CRYPTO] Random bytes generation failed: {e}")
         raise BasicAgentToolsError(f"Failed to generate random bytes: {str(e)}")

@@ -156,6 +156,16 @@ def run_bash(
         )
 
     try:
+        # Print command info to stdout
+        print(f"[SHELL] Executing (bash): {command}")
+        print(f"[SHELL] Platform: {system}")
+        print(f"[SHELL] Working directory: {working_directory or 'current'}")
+        print(f"[SHELL] Timeout: {timeout}s")
+        print("-" * 50)
+
+        # Execute the command
+        start_time = time.time()
+
         # Use bash explicitly
         result = subprocess.run(
             ["/bin/bash", "-c", command],
@@ -164,6 +174,21 @@ def run_bash(
             timeout=timeout,
             cwd=working_directory,
         )
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+
+        # Print execution results to stdout
+        print(f"[SHELL] Command completed in {execution_time:.3f}s")
+        print(f"[SHELL] Return code: {result.returncode}")
+
+        if capture_output and result.stdout:
+            print(f"[SHELL] STDOUT:\n{result.stdout}")
+
+        if capture_output and result.stderr:
+            print(f"[SHELL] STDERR:\n{result.stderr}")
+
+        print("-" * 50)
 
         return {
             "status": "success" if result.returncode == 0 else "error",
@@ -175,6 +200,7 @@ def run_bash(
             "platform": system,
             "working_directory": working_directory or "current",
             "timeout_seconds": timeout,
+            "execution_time_seconds": round(execution_time, 3),
         }
 
     except subprocess.TimeoutExpired:
@@ -220,6 +246,16 @@ def run_powershell(
         )
 
     try:
+        # Print command info to stdout
+        print(f"[SHELL] Executing (powershell): {command}")
+        print(f"[SHELL] Platform: {system}")
+        print(f"[SHELL] Working directory: {working_directory or 'current'}")
+        print(f"[SHELL] Timeout: {timeout}s")
+        print("-" * 50)
+
+        # Execute the command
+        start_time = time.time()
+
         # Use PowerShell with execution policy bypass for basic commands
         result = subprocess.run(
             ["powershell.exe", "-ExecutionPolicy", "Bypass", "-Command", command],
@@ -228,6 +264,21 @@ def run_powershell(
             timeout=timeout,
             cwd=working_directory,
         )
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+
+        # Print execution results to stdout
+        print(f"[SHELL] Command completed in {execution_time:.3f}s")
+        print(f"[SHELL] Return code: {result.returncode}")
+
+        if capture_output and result.stdout:
+            print(f"[SHELL] STDOUT:\n{result.stdout}")
+
+        if capture_output and result.stderr:
+            print(f"[SHELL] STDERR:\n{result.stderr}")
+
+        print("-" * 50)
 
         return {
             "status": "success" if result.returncode == 0 else "error",
@@ -239,6 +290,7 @@ def run_powershell(
             "platform": system,
             "working_directory": working_directory or "current",
             "timeout_seconds": timeout,
+            "execution_time_seconds": round(execution_time, 3),
         }
 
     except subprocess.TimeoutExpired:
