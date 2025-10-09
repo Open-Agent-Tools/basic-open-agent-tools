@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/Open-Agent-Tools/basic-open-agent-tools/discussions
+    about: Ask questions, share ideas, or discuss the project with the community
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/Open-Agent-Tools/basic-open-agent-tools/security/advisories/new
+    about: Report a security vulnerability privately (please do not open a public issue)
+  - name: 📚 Documentation
+    url: https://github.com/Open-Agent-Tools/basic-open-agent-tools#readme
+    about: Read the documentation and usage guides
+  - name: 📦 PyPI Package
+    url: https://pypi.org/project/basic-open-agent-tools/
+    about: View the package on PyPI

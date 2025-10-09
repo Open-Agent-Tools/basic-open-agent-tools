@@ -1,0 +1,30 @@
+{
+  "recommendations": [
+    // Python language support
+    "ms-python.python",
+
+    // Ruff linter and formatter
+    "charliermarsh.ruff",
+
+    // Test runner integration
+    "ms-python.vscode-pylance",
+
+    // EditorConfig support
+    "editorconfig.editorconfig",
+
+    // GitHub integration
+    "github.vscode-pull-request-github",
+
+    // YAML support
+    "redhat.vscode-yaml",
+
+    // TOML support
+    "tamasfe.even-better-toml",
+
+    // Markdown preview
+    "yzhang.markdown-all-in-one",
+
+    // Git integration
+    "eamodio.gitlens"
+  ]
+}

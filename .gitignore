@@ -187,7 +187,8 @@ cython_debug/
 .abstra/
 
 # IDEs and editors
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo

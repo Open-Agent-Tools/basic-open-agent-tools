@@ -1,0 +1,107 @@
+# Release Drafter configuration
+# https://github.com/release-drafter/release-drafter
+
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+
+categories:
+  - title: "🚀 Features"
+    labels:
+      - "type: enhancement"
+      - "type: feature"
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "type: bug"
+  - title: "🔒 Security"
+    labels:
+      - "type: security"
+      - "area: security"
+  - title: "⚠️ Breaking Changes"
+    labels:
+      - "type: breaking-change"
+  - title: "📚 Documentation"
+    labels:
+      - "area: documentation"
+  - title: "🧪 Tests"
+    labels:
+      - "area: tests"
+  - title: "🔧 Maintenance"
+    labels:
+      - "area: ci"
+      - "type: dependencies"
+  - title: "🎨 Style & Refactoring"
+    labels:
+      - "type: refactor"
+      - "type: style"
+
+change-template: "- $TITLE (#$NUMBER) @$AUTHOR"
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels:
+      - "type: breaking-change"
+      - "version: major"
+  minor:
+    labels:
+      - "type: enhancement"
+      - "type: feature"
+      - "version: minor"
+  patch:
+    labels:
+      - "type: bug"
+      - "type: security"
+      - "type: dependencies"
+      - "version: patch"
+  default: patch
+
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  ## Contributors
+
+  Thank you to all contributors who made this release possible!
+
+  $CONTRIBUTORS
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
+autolabeler:
+  - label: "area: documentation"
+    files:
+      - "*.md"
+      - "docs/**/*"
+  - label: "area: tests"
+    files:
+      - "tests/**/*"
+      - "**/test_*.py"
+  - label: "area: ci"
+    files:
+      - ".github/**/*"
+  - label: "type: dependencies"
+    files:
+      - "pyproject.toml"
+      - "requirements*.txt"
+      - "uv.lock"
+  - label: "area: core"
+    files:
+      - "src/basic_open_agent_tools/**/*.py"
+
+exclude-labels:
+  - "skip-changelog"
+  - "status: duplicate"
+  - "status: invalid"
+  - "status: wontfix"
+
+replacers:
+  # Replace "Fix #123" with a link
+  - search: '/\bFix #(\d+)\b/g'
+    replace: "Fix [#$1](https://github.com/$OWNER/$REPOSITORY/issues/$1)"
+  # Replace "Close #123" with a link
+  - search: '/\bClose #(\d+)\b/g'
+    replace: "Close [#$1](https://github.com/$OWNER/$REPOSITORY/issues/$1)"
+  # Replace "Resolve #123" with a link
+  - search: '/\bResolve #(\d+)\b/g'
+    replace: "Resolve [#$1](https://github.com/$OWNER/$REPOSITORY/issues/$1)"

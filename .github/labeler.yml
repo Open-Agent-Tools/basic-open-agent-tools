@@ -1,0 +1,46 @@
+# Auto-labeling rules for PRs based on changed files
+# https://github.com/actions/labeler
+
+# Documentation changes
+"area: documentation":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - "docs/**/*"
+
+# Tests
+"area: tests":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tests/**/*"
+          - "**/test_*.py"
+          - "**/*_test.py"
+
+# CI/CD and workflows
+"area: ci":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**/*"
+          - ".gitignore"
+          - ".pre-commit-config.yaml"
+
+# Dependencies
+"type: dependencies":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "pyproject.toml"
+          - "requirements*.txt"
+          - "uv.lock"
+
+# Core functionality
+"area: core":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/basic_open_agent_tools/**/*.py"
+
+# Security
+"area: security":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "SECURITY.md"
+          - "**/security*.py"

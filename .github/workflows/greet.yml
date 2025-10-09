@@ -1,0 +1,52 @@
+# Greet first-time contributors
+# https://github.com/actions/first-interaction
+name: "Greet First-Time Contributors"
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Greet first-time contributor
+        uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Message for first issue
+          issue-message: |
+            👋 Welcome to **Basic Open Agent Tools**!
+
+            Thank you for opening your first issue! We appreciate you taking the time to contribute to the project.
+
+            A maintainer will review your issue soon. In the meantime:
+            - Make sure you've provided all the details requested in the issue template
+            - Check if there are any related discussions or issues
+            - Feel free to ask questions in [GitHub Discussions](https://github.com/Open-Agent-Tools/basic-open-agent-tools/discussions)
+
+            We're excited to have you as part of our community! 🎉
+
+          # Message for first PR
+          pr-message: |
+            🎉 Thank you for your first pull request to **Basic Open Agent Tools**!
+
+            We're thrilled to see your contribution. Here's what happens next:
+            - Our CI will run tests on your changes
+            - A maintainer will review your PR as soon as possible
+            - We may suggest some changes or improvements
+            - Once approved, we'll merge your changes
+
+            While you wait:
+            - Ensure all CI checks pass
+            - Address any review comments
+            - Check out our [CONTRIBUTING.md](CONTRIBUTING.md) for guidance
+
+            Thank you for helping make this project better! 🚀
