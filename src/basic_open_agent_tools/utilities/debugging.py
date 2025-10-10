@@ -264,9 +264,9 @@ def format_exception_details(
                         "local_variables_count": len(frame.f_locals),
                     }
                 )
-                tb = tb.tb_next
+                tb = tb.tb_next  # type: ignore[assignment]
 
-            exception_details["frames"] = frames
+            exception_details["frames"] = frames  # type: ignore[unreachable]  # False positive - this is reachable
             exception_details["frame_count"] = len(frames)
         else:
             exception_details.update(
@@ -468,7 +468,7 @@ def trace_variable_changes(
         # Execute each operation and trace changes
         for i, operation in enumerate(operations):
             if not isinstance(operation, str):
-                trace_steps.append(
+                trace_steps.append(  # type: ignore[unreachable]  # False positive - this is reachable
                     {
                         "step": i + 1,
                         "operation": str(operation),

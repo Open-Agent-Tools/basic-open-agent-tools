@@ -35,3 +35,27 @@ class DateTimeError(BasicAgentToolsError):
     """Exception for date and time operations."""
 
     pass
+
+
+class CodeAnalysisError(BasicAgentToolsError):
+    """Exception for code analysis operations."""
+
+    pass
+
+
+class ProfilingError(BasicAgentToolsError):
+    """Exception for profiling and performance analysis operations."""
+
+    pass
+
+
+class StaticAnalysisError(BasicAgentToolsError):
+    """Exception for static analysis output parsing operations."""
+
+    pass
+
+
+class GitError(BasicAgentToolsError):
+    """Exception for git repository operations."""
+
+    pass

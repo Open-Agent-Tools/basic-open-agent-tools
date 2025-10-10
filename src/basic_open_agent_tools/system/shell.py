@@ -23,7 +23,7 @@ def execute_shell_command(
     timeout: int = 30,
     capture_output: bool = True,
     working_directory: Optional[str] = None,
-) -> dict[str, Union[str, int, bool]]:
+) -> dict[str, Union[str, int, float, bool]]:
     """
     Execute a shell command cross-platform (Windows cmd, Unix bash/sh).
 
@@ -127,7 +127,7 @@ def run_bash(
     timeout: int = 30,
     capture_output: bool = True,
     working_directory: Optional[str] = None,
-) -> dict[str, Union[str, int, bool]]:
+) -> dict[str, Union[str, int, float, bool]]:
     """
     Execute a bash command (Unix/Linux/macOS only).
 
@@ -217,7 +217,7 @@ def run_powershell(
     timeout: int = 30,
     capture_output: bool = True,
     working_directory: Optional[str] = None,
-) -> dict[str, Union[str, int, bool]]:
+) -> dict[str, Union[str, int, float, bool]]:
     """
     Execute a PowerShell command (Windows only).
 

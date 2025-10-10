@@ -114,8 +114,8 @@ def validate_json_string(json_str: str) -> bool:
     print(f"[DATA] Validating JSON string ({len(json_str)} characters)")
 
     if not isinstance(json_str, str):
-        print("[DATA] JSON validation failed: not a string")
-        return False  # type: ignore[unreachable]
+        print("[DATA] JSON validation failed: not a string")  # type: ignore[unreachable]
+        return False  # False positive - mypy thinks isinstance always narrows, but runtime can differ
 
     try:
         json.loads(json_str)

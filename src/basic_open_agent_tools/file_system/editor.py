@@ -88,7 +88,7 @@ def file_editor(
     return f"Unknown command: {command}"
 
 
-def _view_file(file_path: Path, view_range: Union[str, None]) -> str:
+def _view_file(file_path: Path, view_range: Union[str, int, None]) -> str:
     """View file contents with optional line range."""
     if not file_path.exists():
         raise FileSystemError(f"File not found: {file_path}")
@@ -109,7 +109,11 @@ def _view_file(file_path: Path, view_range: Union[str, None]) -> str:
         lines = content.splitlines()
 
         if view_range:
-            start_line, end_line = _parse_line_range(view_range, len(lines))
+            # Convert view_range to string if it's an int
+            view_range_str = (
+                str(view_range) if not isinstance(view_range, str) else view_range
+            )
+            start_line, end_line = _parse_line_range(view_range_str, len(lines))
             lines = lines[start_line - 1 : end_line]
             line_numbers = range(start_line, start_line + len(lines))
         else:
@@ -122,7 +126,7 @@ def _view_file(file_path: Path, view_range: Union[str, None]) -> str:
 
         result = f"File: {file_path}\n"
         if view_range:
-            result += f"Lines {view_range}:\n"
+            result += f"Lines {view_range_str}:\n"
         result += "\n".join(formatted_lines)
 
         return result
@@ -131,7 +135,7 @@ def _view_file(file_path: Path, view_range: Union[str, None]) -> str:
         raise FileSystemError(f"Failed to read file {file_path}: {e}")
 
 
-def _create_file(file_path: Path, content: str, skip_confirm: bool) -> str:
+def _create_file(file_path: Path, content: Union[str, int], skip_confirm: bool) -> str:
     """Create a new file with optional content."""
     file_existed = file_path.exists()
 
@@ -140,9 +144,12 @@ def _create_file(file_path: Path, content: str, skip_confirm: bool) -> str:
             f"File already exists: {file_path}. Use skip_confirm=True to overwrite."
         )
 
+    # Convert content to string if needed
+    content_str = str(content) if not isinstance(content, str) else content
+
     try:
-        write_file_from_string(str(file_path), content)
-        line_count = len(content.splitlines()) if content else 0
+        write_file_from_string(str(file_path), content_str)
+        line_count = len(content_str.splitlines()) if content_str else 0
         action = "Overwrote" if file_existed else "Created"
         return f"{action} file {file_path} with {line_count} lines"
 

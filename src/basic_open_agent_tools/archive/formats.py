@@ -62,7 +62,7 @@ def create_tar(
         mode = mode_map[compression]
 
         files_added = 0
-        with tarfile.open(output_path, mode) as tf:
+        with tarfile.open(output_path, mode) as tf:  # type: ignore[call-overload]
             for source_path in source_paths:
                 tf.add(source_path, arcname=os.path.basename(source_path))
                 files_added += 1
@@ -101,7 +101,7 @@ def extract_tar(tar_path: str, extract_to: str) -> dict[str, Union[str, int]]:
         }
 
         print(f"[ARCHIVE] TAR extracted: {files_extracted} files to {extract_to}")
-        return result
+        return result  # type: ignore[return-value]
     except Exception as e:
         print(f"[ARCHIVE] TAR extraction failed: {e}")
         raise BasicAgentToolsError(f"Failed to extract TAR archive: {str(e)}")

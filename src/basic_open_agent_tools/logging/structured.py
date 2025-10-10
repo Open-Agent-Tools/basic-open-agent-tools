@@ -18,7 +18,7 @@ from ..exceptions import BasicAgentToolsError
 
 @strands_tool
 def log_info(
-    message: str, logger_name: str = "agent", **kwargs
+    message: str, logger_name: str = "agent", **kwargs: Any
 ) -> dict[str, Union[str, float]]:
     """Log an info message with structured data."""
     if not isinstance(message, str):
@@ -50,7 +50,7 @@ def log_info(
 
 @strands_tool
 def log_error(
-    message: str, logger_name: str = "agent", **kwargs
+    message: str, logger_name: str = "agent", **kwargs: Any
 ) -> dict[str, Union[str, float]]:
     """Log an error message with structured data."""
     if not isinstance(message, str):

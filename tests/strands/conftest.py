@@ -33,7 +33,7 @@ def pytest_collection_modifyitems(config, items):
 def strands_available():
     """Check if Strands framework is available."""
     try:
-        import strands
+        import strands  # noqa: F401
 
         return True
     except ImportError:

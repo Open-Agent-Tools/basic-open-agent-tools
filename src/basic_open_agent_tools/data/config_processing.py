@@ -16,7 +16,7 @@ from ..exceptions import DataError
 
 # Simple YAML support using json fallback
 try:
-    import yaml
+    import yaml  # type: ignore[import-untyped]
 
     HAS_YAML = True
 except ImportError:
@@ -24,8 +24,8 @@ except ImportError:
 
 # Simple TOML support
 try:
-    import tomli
-    import tomli_w
+    import tomli  # type: ignore[import-not-found]
+    import tomli_w  # type: ignore[import-not-found]
 
     HAS_TOML = True
 except ImportError:

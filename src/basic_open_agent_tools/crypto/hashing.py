@@ -17,7 +17,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def hash_md5(data: str) -> dict[str, str]:
+def hash_md5(data: str) -> dict[str, Union[str, int]]:
     """
     Generate MD5 hash of a string.
 
@@ -48,7 +48,7 @@ def hash_md5(data: str) -> dict[str, str]:
         }
 
         print(f"[CRYPTO] MD5 hash generated: {hex_hash[:16]}...")
-        return result
+        return result  # type: ignore[return-value]
 
     except Exception as e:
         print(f"[CRYPTO] MD5 hash failed: {e}")
@@ -56,7 +56,7 @@ def hash_md5(data: str) -> dict[str, str]:
 
 
 @strands_tool
-def hash_sha256(data: str) -> dict[str, str]:
+def hash_sha256(data: str) -> dict[str, Union[str, int]]:
     """
     Generate SHA-256 hash of a string.
 
@@ -87,7 +87,7 @@ def hash_sha256(data: str) -> dict[str, str]:
         }
 
         print(f"[CRYPTO] SHA-256 hash generated: {hex_hash[:16]}...")
-        return result
+        return result  # type: ignore[return-value]
 
     except Exception as e:
         print(f"[CRYPTO] SHA-256 hash failed: {e}")
@@ -95,7 +95,7 @@ def hash_sha256(data: str) -> dict[str, str]:
 
 
 @strands_tool
-def hash_sha512(data: str) -> dict[str, str]:
+def hash_sha512(data: str) -> dict[str, Union[str, int]]:
     """
     Generate SHA-512 hash of a string.
 
@@ -194,7 +194,7 @@ def hash_file(file_path: str, algorithm: str = "sha256") -> dict[str, Union[str,
         }
 
         print(f"[CRYPTO] File hash ({file_size} bytes): {hex_hash[:16]}...")
-        return result
+        return result  # type: ignore[return-value]
 
     except FileNotFoundError:
         raise BasicAgentToolsError(f"File not found: {file_path}")
@@ -207,7 +207,7 @@ def hash_file(file_path: str, algorithm: str = "sha256") -> dict[str, Union[str,
 @strands_tool
 def verify_checksum(
     data: str, expected_hash: str, algorithm: str = "sha256"
-) -> dict[str, Union[str, bool]]:
+) -> dict[str, Union[str, int, bool]]:
     """
     Verify data against an expected hash.
 

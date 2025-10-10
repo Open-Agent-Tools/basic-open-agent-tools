@@ -150,8 +150,8 @@ class TestStrandsAgentExample:
     def test_agent_tool_integration_patterns(self):
         """Test different tool integration patterns with Strands."""
         try:
-            from strands import Agent
-            from strands.models.anthropic import AnthropicModel
+            from strands import Agent  # noqa: F401
+            from strands.models.anthropic import AnthropicModel  # noqa: F401
         except ImportError:
             pytest.skip("Strands framework not installed")
 

@@ -163,7 +163,7 @@ def compress_files(file_paths: list[str], output_path: str, skip_confirm: bool) 
         String describing the operation result
     """
     print(f"[ARCHIVE] Compressing {len(file_paths)} files to: {output_path}")
-    return create_zip(file_paths, output_path, skip_confirm)
+    return create_zip(file_paths, output_path, skip_confirm)  # type: ignore[no-any-return]
 
 
 @strands_tool
@@ -236,7 +236,7 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
 @strands_tool
 def decompress_file_gzip(
     input_path: str, output_path: Optional[str] = None
-) -> dict[str, Union[str, int]]:
+) -> dict[str, Union[str, int, float]]:
     """
     Decompress a gzip compressed file.
 

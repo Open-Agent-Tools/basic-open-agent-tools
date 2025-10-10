@@ -5,11 +5,15 @@ from typing import Any, Callable, Union
 
 from . import (
     archive,
+    code_analysis,
     crypto,
     data,
     datetime,
     file_system,
+    git,
     network,
+    profiling,
+    static_analysis,
     system,
     text,
     todo,
@@ -200,6 +204,82 @@ def load_all_todo_tools() -> list[Callable[..., Any]]:
     return tools
 
 
+def load_all_code_analysis_tools() -> list[Callable[..., Any]]:
+    """Load all code analysis tools as a list of callable functions.
+
+    Returns:
+        List of all code analysis tool functions
+
+    Example:
+        >>> code_tools = load_all_code_analysis_tools()
+        >>> len(code_tools) >= 15
+        True
+    """
+    tools = []
+    for name in code_analysis.__all__:
+        func = getattr(code_analysis, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_profiling_tools() -> list[Callable[..., Any]]:
+    """Load all profiling and performance analysis tools as a list of callable functions.
+
+    Returns:
+        List of all profiling tool functions
+
+    Example:
+        >>> profiling_tools = load_all_profiling_tools()
+        >>> len(profiling_tools) >= 8
+        True
+    """
+    tools = []
+    for name in profiling.__all__:
+        func = getattr(profiling, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_static_analysis_tools() -> list[Callable[..., Any]]:
+    """Load all static analysis output parsing tools as a list of callable functions.
+
+    Returns:
+        List of all static analysis tool functions
+
+    Example:
+        >>> static_tools = load_all_static_analysis_tools()
+        >>> len(static_tools) >= 7
+        True
+    """
+    tools = []
+    for name in static_analysis.__all__:
+        func = getattr(static_analysis, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_git_tools() -> list[Callable[..., Any]]:
+    """Load all git repository information tools as a list of callable functions.
+
+    Returns:
+        List of all git tool functions
+
+    Example:
+        >>> git_tools = load_all_git_tools()
+        >>> len(git_tools) >= 9
+        True
+    """
+    tools = []
+    for name in git.__all__:
+        func = getattr(git, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
 def load_all_tools() -> list[Callable[..., Any]]:
     """Load all tools from all modules as a single list of callable functions.
 
@@ -211,7 +291,7 @@ def load_all_tools() -> list[Callable[..., Any]]:
 
     Example:
         >>> all_tools = load_all_tools()
-        >>> len(all_tools) >= 150  # Total with all new modules
+        >>> len(all_tools) >= 170  # Total with all modules including Phase 3
         True
         >>> # Use with agent frameworks
         >>> agent = Agent(tools=load_all_tools())
@@ -228,6 +308,10 @@ def load_all_tools() -> list[Callable[..., Any]]:
         load_all_archive_tools(),  # 5 functions
         load_all_logging_tools(),  # 5 functions
         load_all_todo_tools(),  # 8 functions
+        load_all_code_analysis_tools(),  # 15 functions
+        load_all_profiling_tools(),  # 8 functions
+        load_all_static_analysis_tools(),  # 7 functions
+        load_all_git_tools(),  # 9 functions
     )
 
 

@@ -214,13 +214,15 @@ class TestStrandsIntegrationValidation:
     def test_error_handling_compatibility(self):
         """Test that error handling works well with agent frameworks."""
         from basic_open_agent_tools.data import safe_json_deserialize
-        from basic_open_agent_tools.file_system import read_file_to_string
 
         # Test that functions raise appropriate exceptions (not generic Exception)
-        with pytest.raises(Exception):  # FileSystemError inherits from Exception
+        from basic_open_agent_tools.exceptions import DataError, FileSystemError
+        from basic_open_agent_tools.file_system import read_file_to_string
+
+        with pytest.raises(FileSystemError):
             read_file_to_string("/nonexistent/file/path.txt")
 
-        with pytest.raises(Exception):  # DataError inherits from Exception
+        with pytest.raises(DataError):
             safe_json_deserialize("invalid json")
 
     def test_return_value_compatibility(self):

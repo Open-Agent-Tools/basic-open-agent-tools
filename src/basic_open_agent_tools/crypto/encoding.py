@@ -2,7 +2,7 @@
 
 import base64
 import urllib.parse
-from typing import Any, Callable
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
@@ -17,7 +17,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def base64_encode(data: str) -> dict[str, str]:
+def base64_encode(data: str) -> dict[str, Union[str, int]]:
     """
     Encode a string to Base64.
 
@@ -59,7 +59,7 @@ def base64_encode(data: str) -> dict[str, str]:
 
 
 @strands_tool
-def base64_decode(encoded_data: str) -> dict[str, str]:
+def base64_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     """
     Decode a Base64 encoded string.
 
@@ -104,7 +104,7 @@ def base64_decode(encoded_data: str) -> dict[str, str]:
 
 
 @strands_tool
-def url_encode(data: str) -> dict[str, str]:
+def url_encode(data: str) -> dict[str, Union[str, int]]:
     """
     URL encode a string (percent encoding).
 
@@ -143,7 +143,7 @@ def url_encode(data: str) -> dict[str, str]:
 
 
 @strands_tool
-def url_decode(encoded_data: str) -> dict[str, str]:
+def url_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     """
     URL decode a string (percent decoding).
 
@@ -182,7 +182,7 @@ def url_decode(encoded_data: str) -> dict[str, str]:
 
 
 @strands_tool
-def hex_encode(data: str) -> dict[str, str]:
+def hex_encode(data: str) -> dict[str, Union[str, int]]:
     """
     Encode a string to hexadecimal representation.
 
@@ -223,7 +223,7 @@ def hex_encode(data: str) -> dict[str, str]:
 
 
 @strands_tool
-def hex_decode(encoded_data: str) -> dict[str, str]:
+def hex_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     """
     Decode a hexadecimal encoded string.
 

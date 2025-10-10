@@ -18,7 +18,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def generate_uuid(version: int = 4) -> dict[str, str]:
+def generate_uuid(version: int = 4) -> dict[str, Union[str, int]]:
     """
     Generate a UUID (Universally Unique Identifier).
 
