@@ -178,7 +178,7 @@ class TestWriteYamlFile:
             import yaml
 
             with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
-                write_yaml_file(data, str(yaml_file))
+                write_yaml_file(data, str(yaml_file), skip_confirm=True)
 
         # Verify file was created and contains expected content
         assert yaml_file.exists()
@@ -196,7 +196,7 @@ class TestWriteYamlFile:
             import yaml
 
             with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
-                write_yaml_file(data, str(yaml_file))
+                write_yaml_file(data, str(yaml_file), skip_confirm=True)
 
         assert yaml_file.exists()
         content = yaml_file.read_text(encoding="utf-8")
@@ -221,7 +221,7 @@ class TestWriteYamlFile:
             import yaml
 
             with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
-                write_yaml_file(data, str(yaml_file))
+                write_yaml_file(data, str(yaml_file), skip_confirm=True)
 
         assert yaml_file.exists()
         content = yaml_file.read_text(encoding="utf-8")
@@ -237,7 +237,7 @@ class TestWriteYamlFile:
             import yaml
 
             with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
-                write_yaml_file(data, str(yaml_file))
+                write_yaml_file(data, str(yaml_file), skip_confirm=True)
 
         assert yaml_file.exists()
         content = yaml_file.read_text(encoding="utf-8")

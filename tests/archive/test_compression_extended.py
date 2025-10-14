@@ -38,9 +38,11 @@ class TestCompressFileGzip:
         self, mock_copy, mock_file, mock_gzip, mock_getsize, mock_isfile, mock_exists
     ):
         """Test successful GZIP compression."""
+
         # Input exists, output doesn't exist
         def exists_side_effect(path):
             return path == "input.txt"
+
         mock_exists.side_effect = exists_side_effect
         mock_isfile.return_value = True
         mock_getsize.side_effect = [1000, 300]  # Input: 1000, Output: 300 bytes
@@ -116,9 +118,11 @@ class TestCompressFileBzip2:
         self, mock_copy, mock_file, mock_bz2, mock_getsize, mock_isfile, mock_exists
     ):
         """Test successful BZIP2 compression."""
+
         # Input exists, output doesn't exist
         def exists_side_effect(path):
             return path == "large_file.txt"
+
         mock_exists.side_effect = exists_side_effect
         mock_isfile.return_value = True
         mock_getsize.side_effect = [2000, 400]  # Better compression than gzip
@@ -145,9 +149,11 @@ class TestCompressFileXz:
         self, mock_copy, mock_file, mock_lzma, mock_getsize, mock_isfile, mock_exists
     ):
         """Test successful XZ compression."""
+
         # Input exists, output doesn't exist
         def exists_side_effect(path):
             return path == "huge_file.txt"
+
         mock_exists.side_effect = exists_side_effect
         mock_isfile.return_value = True
         mock_getsize.side_effect = [3000, 450]  # Best compression ratio

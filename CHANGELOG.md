@@ -5,7 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.1] - 2025-10-14
+
+### Removed
+- **Code Analysis Module** - Migrated to [coding-open-agent-tools](https://github.com/open-agent-tools/coding-open-agent-tools) (15 functions)
+- **Git Tools Module** - Migrated to coding-open-agent-tools (9 functions)
+- **Profiling Module** - Migrated to coding-open-agent-tools (8 functions)
+- **Static Analysis Module** - Migrated to coding-open-agent-tools (7 functions)
+
+### Changed
+- **Function Count**: Reduced from 190+ to 151 functions (focused on foundational tools)
+- **Module Count**: Reduced from 15 to 11 modules (removed coding-specific modules)
+- **Package Scope**: Refocused on foundational, non-coding-specific agent tools
+
+### Migration Guide
+The removed modules are now available in the **coding-open-agent-tools** package:
+```bash
+pip install coding-open-agent-tools
+```
+
+These modules were development/coding-specific and better suited for a specialized package. Users who need these capabilities should install coding-open-agent-tools alongside this package.
+
 ## [0.13.0] - 2025-10-14
+
+### Note
+**This version contained modules that were not properly exported in the package API.** Version 0.13.1 removes these modules as they have been migrated to coding-open-agent-tools.
+
+### Added (Not Actually Available)
+- Code Analysis Module (15 functions) - **Migrated to coding-open-agent-tools in v0.13.1**
+- Profiling Module (8 functions) - **Migrated to coding-open-agent-tools in v0.13.1**
+- Static Analysis Module (7 functions) - **Migrated to coding-open-agent-tools in v0.13.1**
+- Git Tools Module (9 functions) - **Migrated to coding-open-agent-tools in v0.13.1**
 
 ### Added
 - **Code Analysis Module** (15 functions): AST parsing, complexity analysis, import management, secret detection

@@ -2,17 +2,15 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions. Designed with **agent-friendly type signatures** to eliminate "signature too complex" errors, while offering core utilities that developers can easily integrate into their agents to avoid excess boilerplate.
 
-## 🆕 What's New in v0.13.0
+## 🆕 What's New in v0.13.1
 
-🔍 **Code Analysis Module**: 15 new functions for AST parsing, complexity analysis, import management, and secret detection
+🔀 **Module Migration**: Code analysis, git tools, profiling, and static analysis modules (39 functions) have been migrated to the new **[coding-open-agent-tools](https://github.com/open-agent-tools/coding-open-agent-tools)** package
 
-⚡ **Profiling Module**: 8 new functions for performance profiling, memory analysis, and benchmarking
+🎯 **Refocused Scope**: This package now focuses on foundational, non-coding-specific agent tools (151 functions across 11 modules)
 
-📊 **Static Analysis Module**: 7 new functions for parsing tool outputs (ruff, mypy, pytest) and issue prioritization
+📦 **New Sibling Package**: For coding-specific tools, install `coding-open-agent-tools` alongside this package
 
-🔀 **Git Tools Module**: 9 new functions for read-only git operations including status, logs, diffs, and branch info
-
-**Total**: 39 new development-focused tools for building sophisticated coding agents
+**Note**: v0.13.0 incorrectly claimed to add modules that weren't properly exported. v0.13.1 corrects this by migrating them to their proper home.
 
 ## Installation
 
@@ -312,7 +310,9 @@ Utilities Tools:
 - **Benchmarking**: Disk I/O benchmarking and system load analysis
 - **Real-time Monitoring**: Event-driven file system and performance monitoring
 
-**Total: 166 implemented functions** across 12 categories, designed specifically for building AI agents with comprehensive local operations, network utilities, advanced file processing, and development debugging tools.
+**Total: 151 implemented functions** across 11 core modules, designed specifically for building AI agents with foundational local operations, network utilities, and advanced file processing.
+
+**For coding-specific tools** (code analysis, git operations, profiling, static analysis), see **[coding-open-agent-tools](https://github.com/open-agent-tools/coding-open-agent-tools)**.
 
 ## Helper Functions
 
@@ -320,7 +320,7 @@ Utilities Tools:
 ```python
 import basic_open_agent_tools as boat
 
-# Get all 166 functions from all modules
+# Get all 151 functions from all modules
 all_tools = boat.load_all_tools()
 
 # Use with any agent framework

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [project]
 name = "basic-open-agent-tools"
-version = "0.13.0"  # Added code_analysis, profiling, static_analysis, and git modules with 39 new functions
+version = "0.13.1"  # Migrated code_analysis, profiling, static_analysis, and git modules to coding-open-agent-tools
 description = "An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions."
 readme = "README.md"
 requires-python = ">=3.9"

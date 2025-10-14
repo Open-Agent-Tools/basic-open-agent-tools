@@ -30,10 +30,10 @@ def hash_md5(data: str) -> dict[str, Union[str, int]]:
     Raises:
         BasicAgentToolsError: If data is invalid
     """
-    print(f"[CRYPTO] Hashing {len(data)} chars with MD5")
-
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
+
+    print(f"[CRYPTO] Hashing {len(data)} chars with MD5")
 
     try:
         hash_obj = hashlib.md5(data.encode("utf-8"))
@@ -69,10 +69,10 @@ def hash_sha256(data: str) -> dict[str, Union[str, int]]:
     Raises:
         BasicAgentToolsError: If data is invalid
     """
-    print(f"[CRYPTO] Hashing {len(data)} chars with SHA-256")
-
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
+
+    print(f"[CRYPTO] Hashing {len(data)} chars with SHA-256")
 
     try:
         hash_obj = hashlib.sha256(data.encode("utf-8"))
