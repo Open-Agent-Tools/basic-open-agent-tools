@@ -12,6 +12,7 @@ except ImportError:
         return func
 
 
+from ..confirmation import check_user_confirmation
 from ..exceptions import DataError
 
 # Simple YAML support using json fallback
@@ -102,13 +103,19 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
 
     file_existed = os.path.exists(file_path)
 
-    if file_existed and not skip_confirm:
-        print(
-            f"[DATA] YAML write blocked - file exists and skip_confirm=False: {file_path}"
+    if file_existed:
+        # Check user confirmation
+        preview = f"{os.path.getsize(file_path)} bytes" if file_existed else None
+        confirmed = check_user_confirmation(
+            operation="overwrite existing YAML file",
+            target=file_path,
+            skip_confirm=skip_confirm,
+            preview_info=preview,
         )
-        raise DataError(
-            f"YAML file already exists: {file_path}. Use skip_confirm=True to overwrite."
-        )
+
+        if not confirmed:
+            print(f"[DATA] YAML write cancelled by user: {file_path}")
+            return f"Operation cancelled by user: {file_path}"
 
     try:
         with open(file_path, "w", encoding="utf-8") as f:
@@ -200,13 +207,19 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
 
     file_existed = os.path.exists(file_path)
 
-    if file_existed and not skip_confirm:
-        print(
-            f"[DATA] TOML write blocked - file exists and skip_confirm=False: {file_path}"
+    if file_existed:
+        # Check user confirmation
+        preview = f"{os.path.getsize(file_path)} bytes" if file_existed else None
+        confirmed = check_user_confirmation(
+            operation="overwrite existing TOML file",
+            target=file_path,
+            skip_confirm=skip_confirm,
+            preview_info=preview,
         )
-        raise DataError(
-            f"TOML file already exists: {file_path}. Use skip_confirm=True to overwrite."
-        )
+
+        if not confirmed:
+            print(f"[DATA] TOML write cancelled by user: {file_path}")
+            return f"Operation cancelled by user: {file_path}"
 
     try:
         with open(file_path, "wb") as f:
@@ -299,13 +312,19 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
 
     file_existed = os.path.exists(file_path)
 
-    if file_existed and not skip_confirm:
-        print(
-            f"[DATA] INI write blocked - file exists and skip_confirm=False: {file_path}"
+    if file_existed:
+        # Check user confirmation
+        preview = f"{os.path.getsize(file_path)} bytes" if file_existed else None
+        confirmed = check_user_confirmation(
+            operation="overwrite existing INI file",
+            target=file_path,
+            skip_confirm=skip_confirm,
+            preview_info=preview,
         )
-        raise DataError(
-            f"INI file already exists: {file_path}. Use skip_confirm=True to overwrite."
-        )
+
+        if not confirmed:
+            print(f"[DATA] INI write cancelled by user: {file_path}")
+            return f"Operation cancelled by user: {file_path}"
 
     try:
         config = configparser.ConfigParser()

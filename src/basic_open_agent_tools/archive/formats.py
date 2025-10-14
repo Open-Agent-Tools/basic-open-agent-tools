@@ -12,6 +12,7 @@ except ImportError:
         return func
 
 
+from ..confirmation import check_user_confirmation
 from ..exceptions import BasicAgentToolsError
 
 
@@ -49,13 +50,19 @@ def create_tar(
     # Check if output file exists
     file_existed = os.path.exists(output_path)
 
-    if file_existed and not skip_confirm:
-        print(
-            f"[ARCHIVE] TAR creation blocked - file exists and skip_confirm=False: {output_path}"
+    if file_existed:
+        # Check user confirmation
+        preview = f"{os.path.getsize(output_path)} bytes" if file_existed else None
+        confirmed = check_user_confirmation(
+            operation="overwrite existing TAR archive",
+            target=output_path,
+            skip_confirm=skip_confirm,
+            preview_info=preview,
         )
-        raise BasicAgentToolsError(
-            f"TAR archive already exists: {output_path}. Use skip_confirm=True to overwrite."
-        )
+
+        if not confirmed:
+            print(f"[ARCHIVE] TAR creation cancelled by user: {output_path}")
+            return f"Operation cancelled by user: {output_path}"
 
     try:
         mode_map = {"none": "w", "gzip": "w:gz", "bzip2": "w:bz2"}

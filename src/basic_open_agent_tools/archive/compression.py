@@ -16,6 +16,7 @@ except ImportError:
         return func
 
 
+from ..confirmation import check_user_confirmation
 from ..exceptions import BasicAgentToolsError
 
 
@@ -50,13 +51,19 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
     # Check if output file exists
     file_existed = os.path.exists(output_path)
 
-    if file_existed and not skip_confirm:
-        print(
-            f"[ARCHIVE] ZIP creation blocked - file exists and skip_confirm=False: {output_path}"
+    if file_existed:
+        # Check user confirmation (interactive prompt, agent error, or bypass)
+        preview = f"{os.path.getsize(output_path)} bytes" if file_existed else None
+        confirmed = check_user_confirmation(
+            operation="overwrite existing ZIP archive",
+            target=output_path,
+            skip_confirm=skip_confirm,
+            preview_info=preview,
         )
-        raise BasicAgentToolsError(
-            f"ZIP archive already exists: {output_path}. Use skip_confirm=True to overwrite."
-        )
+
+        if not confirmed:
+            print(f"[ARCHIVE] ZIP creation cancelled by user: {output_path}")
+            return f"Operation cancelled by user: {output_path}"
 
     try:
         files_added = []
@@ -122,12 +129,21 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
 
     # Check if extraction directory exists and has contents
     extract_exists = os.path.exists(extract_to)
-    if extract_exists and not skip_confirm:
+    if extract_exists:
         try:
-            if os.listdir(extract_to):  # Directory exists and has contents
-                raise BasicAgentToolsError(
-                    f"Extract directory already exists and is not empty: {extract_to}. Use skip_confirm=True to proceed."
+            contents = os.listdir(extract_to) if os.path.exists(extract_to) else []
+            if contents:  # Directory exists and has contents
+                # Check user confirmation
+                confirmed = check_user_confirmation(
+                    operation="extract to non-empty directory",
+                    target=extract_to,
+                    skip_confirm=skip_confirm,
+                    preview_info=f"Directory contains {len(contents)} items",
                 )
+
+                if not confirmed:
+                    print(f"[ARCHIVE] ZIP extraction cancelled by user: {extract_to}")
+                    return f"Operation cancelled by user: {extract_to}"
         except OSError:
             pass  # Can't read directory, proceed anyway
 
@@ -204,13 +220,19 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
     # Check if output file exists
     file_existed = os.path.exists(output_path)
 
-    if file_existed and not skip_confirm:
-        print(
-            f"[ARCHIVE] GZIP compression blocked - file exists and skip_confirm=False: {output_path}"
+    if file_existed:
+        # Check user confirmation
+        preview = f"{os.path.getsize(output_path)} bytes" if file_existed else None
+        confirmed = check_user_confirmation(
+            operation="overwrite existing GZIP file",
+            target=output_path,
+            skip_confirm=skip_confirm,
+            preview_info=preview,
         )
-        raise BasicAgentToolsError(
-            f"Output file already exists: {output_path}. Use skip_confirm=True to overwrite."
-        )
+
+        if not confirmed:
+            print(f"[ARCHIVE] GZIP compression cancelled by user: {output_path}")
+            return f"Operation cancelled by user: {output_path}"
 
     try:
         input_size = os.path.getsize(input_path)
@@ -331,13 +353,19 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
     # Check if output file exists
     file_existed = os.path.exists(output_path)
 
-    if file_existed and not skip_confirm:
-        print(
-            f"[ARCHIVE] BZIP2 compression blocked - file exists and skip_confirm=False: {output_path}"
+    if file_existed:
+        # Check user confirmation
+        preview = f"{os.path.getsize(output_path)} bytes" if file_existed else None
+        confirmed = check_user_confirmation(
+            operation="overwrite existing BZIP2 file",
+            target=output_path,
+            skip_confirm=skip_confirm,
+            preview_info=preview,
         )
-        raise BasicAgentToolsError(
-            f"Output file already exists: {output_path}. Use skip_confirm=True to overwrite."
-        )
+
+        if not confirmed:
+            print(f"[ARCHIVE] BZIP2 compression cancelled by user: {output_path}")
+            return f"Operation cancelled by user: {output_path}"
 
     try:
         input_size = os.path.getsize(input_path)
@@ -398,13 +426,19 @@ def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> s
     # Check if output file exists
     file_existed = os.path.exists(output_path)
 
-    if file_existed and not skip_confirm:
-        print(
-            f"[ARCHIVE] XZ compression blocked - file exists and skip_confirm=False: {output_path}"
+    if file_existed:
+        # Check user confirmation
+        preview = f"{os.path.getsize(output_path)} bytes" if file_existed else None
+        confirmed = check_user_confirmation(
+            operation="overwrite existing XZ file",
+            target=output_path,
+            skip_confirm=skip_confirm,
+            preview_info=preview,
         )
-        raise BasicAgentToolsError(
-            f"Output file already exists: {output_path}. Use skip_confirm=True to overwrite."
-        )
+
+        if not confirmed:
+            print(f"[ARCHIVE] XZ compression cancelled by user: {output_path}")
+            return f"Operation cancelled by user: {output_path}"
 
     try:
         input_size = os.path.getsize(input_path)
