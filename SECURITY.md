@@ -6,9 +6,9 @@ The following versions of basic-open-agent-tools are currently supported with se
 
 | Version | Supported          | Notes |
 | ------- | ------------------ | ----- |
-| 0.9.x   | :white_check_mark: | Current stable release |
-| 0.8.x   | :white_check_mark: | Previous stable release |
-| < 0.8   | :x:                | Legacy versions, please upgrade |
+| 0.13.x  | :white_check_mark: | Current stable release |
+| 0.12.x  | :white_check_mark: | Previous stable release |
+| < 0.12  | :x:                | Legacy versions, please upgrade |
 
 ## Security Considerations for AI Agent Tools
 

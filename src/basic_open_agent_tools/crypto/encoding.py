@@ -30,10 +30,10 @@ def base64_encode(data: str) -> dict[str, Union[str, int]]:
     Raises:
         BasicAgentToolsError: If data is invalid
     """
-    print(f"[CRYPTO] Encoding {len(data)} chars to Base64")
-
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
+
+    print(f"[CRYPTO] Encoding {len(data)} chars to Base64")
 
     try:
         # Encode string to bytes, then to base64
@@ -72,10 +72,10 @@ def base64_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     Raises:
         BasicAgentToolsError: If encoded data is invalid
     """
-    print(f"[CRYPTO] Decoding {len(encoded_data)} chars from Base64")
-
     if not isinstance(encoded_data, str):
         raise BasicAgentToolsError("Encoded data must be a string")
+
+    print(f"[CRYPTO] Decoding {len(encoded_data)} chars from Base64")
 
     if not encoded_data.strip():
         raise BasicAgentToolsError("Encoded data cannot be empty")
@@ -117,10 +117,10 @@ def url_encode(data: str) -> dict[str, Union[str, int]]:
     Raises:
         BasicAgentToolsError: If data is invalid
     """
-    print(f"[CRYPTO] URL encoding {len(data)} chars")
-
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
+
+    print(f"[CRYPTO] URL encoding {len(data)} chars")
 
     try:
         encoded_string = urllib.parse.quote(data, safe="")
@@ -156,10 +156,10 @@ def url_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     Raises:
         BasicAgentToolsError: If encoded data is invalid
     """
-    print(f"[CRYPTO] URL decoding {len(encoded_data)} chars")
-
     if not isinstance(encoded_data, str):
         raise BasicAgentToolsError("Encoded data must be a string")
+
+    print(f"[CRYPTO] URL decoding {len(encoded_data)} chars")
 
     try:
         decoded_string = urllib.parse.unquote(encoded_data)
@@ -195,10 +195,10 @@ def hex_encode(data: str) -> dict[str, Union[str, int]]:
     Raises:
         BasicAgentToolsError: If data is invalid
     """
-    print(f"[CRYPTO] Hex encoding {len(data)} chars")
-
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
+
+    print(f"[CRYPTO] Hex encoding {len(data)} chars")
 
     try:
         # Encode string to bytes, then to hex
@@ -236,10 +236,10 @@ def hex_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     Raises:
         BasicAgentToolsError: If encoded data is invalid
     """
-    print(f"[CRYPTO] Hex decoding {len(encoded_data)} chars")
-
     if not isinstance(encoded_data, str):
         raise BasicAgentToolsError("Encoded data must be a string")
+
+    print(f"[CRYPTO] Hex decoding {len(encoded_data)} chars")
 
     if not encoded_data.strip():
         raise BasicAgentToolsError("Encoded data cannot be empty")

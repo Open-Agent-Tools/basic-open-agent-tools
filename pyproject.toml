@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [project]
 name = "basic-open-agent-tools"
-version = "0.12.5"  # Enhanced mypy compliance and pytest configuration
+version = "0.13.0"  # Added code_analysis, profiling, static_analysis, and git modules with 39 new functions
 description = "An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -48,11 +48,38 @@ pdf = [
     "PyPDF2>=3.0.0",
     "reportlab>=4.0.0",
 ]
+# XML tools - for XML parsing, authoring, and advanced validation
+xml = [
+    "lxml>=4.9.0",
+    "defusedxml>=0.7.1",
+]
+# Word document tools
+word = [
+    "python-docx>=0.8.11",
+]
+# Excel spreadsheet tools
+excel = [
+    "openpyxl>=3.1.0",
+]
+# PowerPoint presentation tools
+powerpoint = [
+    "python-pptx>=0.6.21",
+]
+# Image processing tools
+image = [
+    "Pillow>=10.0.0",
+]
 # All optional features
 all = [
     "psutil>=5.9.0",
     "PyPDF2>=3.0.0",
     "reportlab>=4.0.0",
+    "lxml>=4.9.0",
+    "defusedxml>=0.7.1",
+    "python-docx>=0.8.11",
+    "openpyxl>=3.1.0",
+    "python-pptx>=0.6.21",
+    "Pillow>=10.0.0",
 ]
 # Strands integration testing
 strands = [
@@ -143,7 +170,7 @@ warn_unreachable = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-module = ["strands", "strands.*", "pkg_resources"]
+module = ["strands", "strands.*", "pkg_resources", "PyPDF2", "reportlab", "reportlab.*", "docx", "docx.*", "openpyxl", "openpyxl.*", "pptx", "pptx.*", "PIL", "PIL.*", "defusedxml", "defusedxml.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

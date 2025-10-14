@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2025-10-14
+
+### Added
+- **Code Analysis Module** (15 functions): AST parsing, complexity analysis, import management, secret detection
+  - `parse_python_ast`, `extract_functions`, `extract_classes`, `extract_imports`
+  - `calculate_complexity`, `calculate_function_complexity`, `get_code_metrics`, `identify_complex_functions`
+  - `find_unused_imports`, `organize_imports`, `validate_import_order`
+  - `scan_for_secrets`, `scan_directory_for_secrets`, `validate_secret_patterns`
+- **Profiling Module** (8 functions): Performance and memory profiling, benchmarking
+  - `profile_function`, `profile_script`, `get_hotspots`
+  - `measure_memory_usage`, `detect_memory_leaks`, `get_memory_snapshot`
+  - `benchmark_execution`, `compare_implementations`
+- **Static Analysis Module** (7 functions): Tool output parsing and issue analysis
+  - `parse_ruff_json`, `parse_mypy_json`, `parse_pytest_json`, `summarize_static_analysis`
+  - `filter_issues_by_severity`, `group_issues_by_file`, `prioritize_issues`
+- **Git Tools Module** (9 functions): Read-only git repository operations
+  - `get_git_status`, `get_current_branch`, `get_git_diff`
+  - `get_git_log`, `get_git_blame`, `get_file_history`, `get_file_at_commit`
+  - `list_branches`, `get_branch_info`
+
+### Changed
+- **Test Coverage**: Improved to 87% average across new modules (148 new tests)
+- **Function Count**: Increased from 150+ to 190+ total agent tools
+- **Module Count**: Expanded from 11 to 15 modules
+
+### Fixed
+- **Test Compatibility**: Updated archive compression tests for new skip_confirm parameter behavior
+- **Type Validation**: Fixed encoding functions to validate types before logging operations
+
 ## [0.11.1] - 2024-09-26
 
 ### Added

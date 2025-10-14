@@ -2,15 +2,17 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions. Designed with **agent-friendly type signatures** to eliminate "signature too complex" errors, while offering core utilities that developers can easily integrate into their agents to avoid excess boilerplate.
 
-## 🆕 What's New in v0.11.3
+## 🆕 What's New in v0.13.0
 
-🔧 **File Operation Logging**: Enhanced input logging for `replace_in_file()` and `insert_at_line()` functions with detailed parameter tracking
+🔍 **Code Analysis Module**: 15 new functions for AST parsing, complexity analysis, import management, and secret detection
 
-🛡️ **Security Auditing**: Added comprehensive logging for file modification operations with truncated parameter display for security monitoring
+⚡ **Profiling Module**: 8 new functions for performance profiling, memory analysis, and benchmarking
 
-📝 **Operation Visibility**: Real-time tracking of file content changes and line insertions with `[FILE]` prefix logging
+📊 **Static Analysis Module**: 7 new functions for parsing tool outputs (ruff, mypy, pytest) and issue prioritization
 
-🔐 **Enhanced Monitoring**: Complete audit trail for file modification operations ensuring security compliance and debugging capability
+🔀 **Git Tools Module**: 9 new functions for read-only git operations including status, logs, diffs, and branch info
+
+**Total**: 39 new development-focused tools for building sophisticated coding agents
 
 ## Installation
 

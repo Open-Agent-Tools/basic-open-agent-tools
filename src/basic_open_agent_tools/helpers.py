@@ -9,15 +9,24 @@ from . import (
     crypto,
     data,
     datetime,
+    diagrams,
+    excel,
     file_system,
     git,
+    html,
+    image,
+    markdown,
     network,
+    pdf,
+    powerpoint,
     profiling,
     static_analysis,
     system,
     text,
     todo,
     utilities,
+    word,
+    xml,
 )
 from . import logging as log_module
 
@@ -280,6 +289,177 @@ def load_all_git_tools() -> list[Callable[..., Any]]:
     return tools
 
 
+def load_all_xml_tools() -> list[Callable[..., Any]]:
+    """Load all XML processing tools as a list of callable functions.
+
+    Returns:
+        List of all XML tool functions
+
+    Example:
+        >>> xml_tools = load_all_xml_tools()
+        >>> len(xml_tools) == 24
+        True
+    """
+    tools = []
+    for name in xml.__all__:
+        func = getattr(xml, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_pdf_tools() -> list[Callable[..., Any]]:
+    """Load all PDF processing tools as a list of callable functions.
+
+    Returns:
+        List of all PDF tool functions
+
+    Example:
+        >>> pdf_tools = load_all_pdf_tools()
+        >>> len(pdf_tools) == 20
+        True
+    """
+    tools = []
+    for name in pdf.__all__:
+        func = getattr(pdf, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_word_tools() -> list[Callable[..., Any]]:
+    """Load all Word document processing tools as a list of callable functions.
+
+    Returns:
+        List of all Word tool functions
+
+    Example:
+        >>> word_tools = load_all_word_tools()
+        >>> len(word_tools) == 18
+        True
+    """
+    tools = []
+    for name in word.__all__:
+        func = getattr(word, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_excel_tools() -> list[Callable[..., Any]]:
+    """Load all Excel spreadsheet processing tools as a list of callable functions.
+
+    Returns:
+        List of all Excel tool functions
+
+    Example:
+        >>> excel_tools = load_all_excel_tools()
+        >>> len(excel_tools) == 24
+        True
+    """
+    tools = []
+    for name in excel.__all__:
+        func = getattr(excel, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_markdown_tools() -> list[Callable[..., Any]]:
+    """Load all Markdown processing tools as a list of callable functions.
+
+    Returns:
+        List of all Markdown tool functions
+
+    Example:
+        >>> markdown_tools = load_all_markdown_tools()
+        >>> len(markdown_tools) == 12
+        True
+    """
+    tools = []
+    for name in markdown.__all__:
+        func = getattr(markdown, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_html_tools() -> list[Callable[..., Any]]:
+    """Load all HTML processing tools as a list of callable functions.
+
+    Returns:
+        List of all HTML tool functions
+
+    Example:
+        >>> html_tools = load_all_html_tools()
+        >>> len(html_tools) == 17
+        True
+    """
+    tools = []
+    for name in html.__all__:
+        func = getattr(html, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_powerpoint_tools() -> list[Callable[..., Any]]:
+    """Load all PowerPoint presentation processing tools as a list of callable functions.
+
+    Returns:
+        List of all PowerPoint tool functions
+
+    Example:
+        >>> powerpoint_tools = load_all_powerpoint_tools()
+        >>> len(powerpoint_tools) == 10
+        True
+    """
+    tools = []
+    for name in powerpoint.__all__:
+        func = getattr(powerpoint, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_image_tools() -> list[Callable[..., Any]]:
+    """Load all image processing tools as a list of callable functions.
+
+    Returns:
+        List of all image tool functions
+
+    Example:
+        >>> image_tools = load_all_image_tools()
+        >>> len(image_tools) == 12
+        True
+    """
+    tools = []
+    for name in image.__all__:
+        func = getattr(image, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
+def load_all_diagrams_tools() -> list[Callable[..., Any]]:
+    """Load all diagram generation tools as a list of callable functions.
+
+    Returns:
+        List of all diagram tool functions
+
+    Example:
+        >>> diagram_tools = load_all_diagrams_tools()
+        >>> len(diagram_tools) == 16
+        True
+    """
+    tools = []
+    for name in diagrams.__all__:
+        func = getattr(diagrams, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
 def load_all_tools() -> list[Callable[..., Any]]:
     """Load all tools from all modules as a single list of callable functions.
 
@@ -312,6 +492,15 @@ def load_all_tools() -> list[Callable[..., Any]]:
         load_all_profiling_tools(),  # 8 functions
         load_all_static_analysis_tools(),  # 7 functions
         load_all_git_tools(),  # 9 functions
+        load_all_xml_tools(),  # 24 functions
+        load_all_pdf_tools(),  # 20 functions
+        load_all_word_tools(),  # 18 functions
+        load_all_excel_tools(),  # 24 functions
+        load_all_markdown_tools(),  # 12 functions
+        load_all_html_tools(),  # 17 functions
+        load_all_powerpoint_tools(),  # 10 functions
+        load_all_image_tools(),  # 12 functions
+        load_all_diagrams_tools(),  # 16 functions
     )
 
 
