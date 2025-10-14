@@ -9,6 +9,7 @@ __version__ = "0.13.1"
 # Modular structure
 from . import (
     archive,
+    color,
     crypto,
     data,
     datetime,
@@ -39,6 +40,7 @@ from .helpers import (
     get_tool_info,
     list_all_available_tools,
     load_all_archive_tools,
+    load_all_color_tools,
     load_all_crypto_tools,
     load_all_data_tools,
     load_all_datetime_tools,
@@ -69,6 +71,7 @@ from .helpers import (
 __all__: list[str] = [
     # All implemented modules
     "archive",
+    "color",
     "crypto",
     "data",
     "datetime",
@@ -93,6 +96,7 @@ __all__: list[str] = [
     "types",
     # Helper functions
     "load_all_archive_tools",
+    "load_all_color_tools",
     "load_all_crypto_tools",
     "load_all_data_tools",
     "load_all_datetime_tools",

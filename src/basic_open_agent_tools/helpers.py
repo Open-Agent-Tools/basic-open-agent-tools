@@ -5,6 +5,7 @@ from typing import Any, Callable, Union
 
 from . import (
     archive,
+    color,
     crypto,
     data,
     datetime,
@@ -380,6 +381,25 @@ def load_all_diagrams_tools() -> list[Callable[..., Any]]:
     return tools
 
 
+def load_all_color_tools() -> list[Callable[..., Any]]:
+    """Load all color manipulation tools as a list of callable functions.
+
+    Returns:
+        List of all color tool functions
+
+    Example:
+        >>> color_tools = load_all_color_tools()
+        >>> len(color_tools) == 14
+        True
+    """
+    tools = []
+    for name in color.__all__:
+        func = getattr(color, name)
+        if callable(func):
+            tools.append(func)
+    return tools
+
+
 def load_all_tools() -> list[Callable[..., Any]]:
     """Load all tools from all modules as a single list of callable functions.
 
@@ -417,6 +437,7 @@ def load_all_tools() -> list[Callable[..., Any]]:
         load_all_powerpoint_tools(),  # 10 functions
         load_all_image_tools(),  # 12 functions
         load_all_diagrams_tools(),  # 16 functions
+        load_all_color_tools(),  # 14 functions
     )
 
 
