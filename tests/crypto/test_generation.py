@@ -63,9 +63,9 @@ class TestGenerateUuid:
         )
         assert re.match(uuid_pattern, result["uuid_string"])
 
-    def test_default_version(self):
-        """Test that default version is 4."""
-        result = generate_uuid()  # No version specified
+    def test_version_4_is_random(self):
+        """Test that version 4 produces random UUIDs."""
+        result = generate_uuid(version=4)
 
         assert result["uuid_version"] == 4
         assert result["uuid_type"] == "random"
@@ -96,32 +96,32 @@ class TestGenerateRandomString:
         with pytest.raises(
             BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
         ):
-            generate_random_string(length=0)
+            generate_random_string(length=0, character_set="alphanumeric")
 
         with pytest.raises(
             BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
         ):
-            generate_random_string(length=-1)
+            generate_random_string(length=-1, character_set="alphanumeric")
 
         with pytest.raises(
             BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
         ):
-            generate_random_string(length=1001)
+            generate_random_string(length=1001, character_set="alphanumeric")
 
         with pytest.raises(
             BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
         ):
-            generate_random_string(length="16")
+            generate_random_string(length="16", character_set="alphanumeric")
 
     def test_invalid_character_set(self):
         """Test error handling for invalid character set."""
         with pytest.raises(
             BasicAgentToolsError, match="Character set must be a string"
         ):
-            generate_random_string(character_set=123)
+            generate_random_string(length=10, character_set=123)
 
         with pytest.raises(BasicAgentToolsError, match="Character set must be one of"):
-            generate_random_string(character_set="invalid")
+            generate_random_string(length=10, character_set="invalid")
 
     def test_successful_alphanumeric_generation(self):
         """Test successful alphanumeric random string generation."""
@@ -166,9 +166,9 @@ class TestGenerateRandomString:
         # Just verify it's ASCII printable
         assert all(ord(c) < 128 and ord(c) >= 32 for c in result["random_string"])
 
-    def test_default_parameters(self):
-        """Test default parameters."""
-        result = generate_random_string()  # Should use defaults
+    def test_common_alphanumeric_generation(self):
+        """Test common alphanumeric generation with standard length."""
+        result = generate_random_string(length=16, character_set="alphanumeric")
 
         assert result["requested_length"] == 16
         assert result["actual_length"] == 16
@@ -176,9 +176,9 @@ class TestGenerateRandomString:
 
     def test_character_set_size_calculation(self):
         """Test that character set size is calculated correctly."""
-        result_alpha = generate_random_string(character_set="alphanumeric")
-        result_letters = generate_random_string(character_set="letters")
-        result_digits = generate_random_string(character_set="digits")
+        result_alpha = generate_random_string(length=10, character_set="alphanumeric")
+        result_letters = generate_random_string(length=10, character_set="letters")
+        result_digits = generate_random_string(length=10, character_set="digits")
 
         assert result_alpha["character_set_size"] == 62  # 26+26+10
         assert result_letters["character_set_size"] == 52  # 26+26
@@ -186,16 +186,16 @@ class TestGenerateRandomString:
 
     def test_string_uniqueness(self):
         """Test that generated strings are unique."""
-        result1 = generate_random_string(length=20)
-        result2 = generate_random_string(length=20)
+        result1 = generate_random_string(length=20, character_set="alphanumeric")
+        result2 = generate_random_string(length=20, character_set="alphanumeric")
 
         assert result1["random_string"] != result2["random_string"]
 
     def test_case_insensitive_character_set(self):
         """Test that character set parameter is case-insensitive."""
-        result_lower = generate_random_string(character_set="alphanumeric")
-        result_upper = generate_random_string(character_set="ALPHANUMERIC")
-        result_mixed = generate_random_string(character_set="AlPhAnUmErIc")
+        result_lower = generate_random_string(length=10, character_set="alphanumeric")
+        result_upper = generate_random_string(length=10, character_set="ALPHANUMERIC")
+        result_mixed = generate_random_string(length=10, character_set="AlPhAnUmErIc")
 
         assert result_lower["character_set"] == "alphanumeric"
         assert result_upper["character_set"] == "alphanumeric"
@@ -210,27 +210,27 @@ class TestGenerateRandomBytes:
         with pytest.raises(
             BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
         ):
-            generate_random_bytes(length=0)
+            generate_random_bytes(length=0, encoding="hex")
 
         with pytest.raises(
             BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
         ):
-            generate_random_bytes(length=-1)
+            generate_random_bytes(length=-1, encoding="hex")
 
         with pytest.raises(
             BasicAgentToolsError, match="Length must be an integer between 1 and 1000"
         ):
-            generate_random_bytes(length=1001)
+            generate_random_bytes(length=1001, encoding="hex")
 
     def test_invalid_encoding(self):
         """Test error handling for invalid encoding."""
         with pytest.raises(BasicAgentToolsError, match="Encoding must be a string"):
-            generate_random_bytes(encoding=123)
+            generate_random_bytes(length=16, encoding=123)
 
         with pytest.raises(
             BasicAgentToolsError, match="Encoding must be 'hex' or 'base64'"
         ):
-            generate_random_bytes(encoding="invalid")
+            generate_random_bytes(length=16, encoding="invalid")
 
     def test_successful_hex_encoding(self):
         """Test successful random bytes generation with hex encoding."""
@@ -260,25 +260,25 @@ class TestGenerateRandomBytes:
         except Exception:
             pytest.fail("Generated data is not valid base64")
 
-    def test_default_parameters(self):
-        """Test default parameters."""
-        result = generate_random_bytes()  # Should use defaults
+    def test_common_hex_generation(self):
+        """Test common hex generation with standard length."""
+        result = generate_random_bytes(length=16, encoding="hex")
 
         assert result["random_bytes_length"] == 16
         assert result["encoding"] == "hex"
 
     def test_bytes_uniqueness(self):
         """Test that generated bytes are unique."""
-        result1 = generate_random_bytes(length=32)
-        result2 = generate_random_bytes(length=32)
+        result1 = generate_random_bytes(length=32, encoding="hex")
+        result2 = generate_random_bytes(length=32, encoding="hex")
 
         assert result1["encoded_data"] != result2["encoded_data"]
 
     def test_entropy_calculation(self):
         """Test that entropy is calculated correctly."""
-        result8 = generate_random_bytes(length=8)
-        result16 = generate_random_bytes(length=16)
-        result32 = generate_random_bytes(length=32)
+        result8 = generate_random_bytes(length=8, encoding="hex")
+        result16 = generate_random_bytes(length=16, encoding="hex")
+        result32 = generate_random_bytes(length=32, encoding="hex")
 
         assert result8["entropy_bits"] == 64  # 8 * 8
         assert result16["entropy_bits"] == 128  # 16 * 8
@@ -286,9 +286,9 @@ class TestGenerateRandomBytes:
 
     def test_case_insensitive_encoding(self):
         """Test that encoding parameter is case-insensitive."""
-        result_lower = generate_random_bytes(encoding="hex")
-        result_upper = generate_random_bytes(encoding="HEX")
-        result_mixed = generate_random_bytes(encoding="HeX")
+        result_lower = generate_random_bytes(length=16, encoding="hex")
+        result_upper = generate_random_bytes(length=16, encoding="HEX")
+        result_mixed = generate_random_bytes(length=16, encoding="HeX")
 
         assert result_lower["encoding"] == "hex"
         assert result_upper["encoding"] == "hex"
