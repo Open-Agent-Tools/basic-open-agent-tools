@@ -456,7 +456,9 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
             )
         except OSError:
             size_info = ""
-            preview = "Will overwrite existing directory" if destination_existed else None
+            preview = (
+                "Will overwrite existing directory" if destination_existed else None
+            )
 
     item_type = "directory" if is_directory else "file"
 

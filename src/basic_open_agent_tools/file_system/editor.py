@@ -142,7 +142,9 @@ def _create_file(file_path: Path, content: Union[str, int], skip_confirm: bool) 
 
     try:
         # Pass skip_confirm to write_file_from_string which handles confirmation
-        return cast(str, write_file_from_string(str(file_path), content_str, skip_confirm))
+        return cast(
+            str, write_file_from_string(str(file_path), content_str, skip_confirm)
+        )
 
     except Exception as e:
         raise FileSystemError(f"Failed to create file {file_path}: {e}")
