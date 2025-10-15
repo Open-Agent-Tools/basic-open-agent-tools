@@ -15,6 +15,7 @@ except ImportError:
         return func
 
 
+from ..confirmation import check_user_confirmation
 from ..exceptions import BasicAgentToolsError
 from .validation import (
     validate_dependencies,
@@ -339,13 +340,18 @@ def delete_task(task_id: int, skip_confirm: bool) -> str:
         task_status = task.get("status", "unknown")
 
         # Check if task is important (e.g., in_progress) and require confirmation
-        if task_status == "in_progress" and not skip_confirm:
-            print(
-                f"[TODO] Delete blocked - task {task_id} is in_progress and skip_confirm=False"
+        if task_status == "in_progress":
+            # Check user confirmation
+            confirmed = check_user_confirmation(
+                operation="delete in-progress task",
+                target=f"Task {task_id}: {task_title}",
+                skip_confirm=skip_confirm,
+                preview_info=f"Status: {task_status}",
             )
-            raise BasicAgentToolsError(
-                f"Task {task_id} is currently in progress: '{task_title}'. Use skip_confirm=True to delete anyway."
-            )
+
+            if not confirmed:
+                print(f"[TODO] Task deletion cancelled by user: {task_id}")
+                return f"Operation cancelled by user: Task {task_id}"
 
         # Remove task
         del _task_storage["tasks"][task_id]

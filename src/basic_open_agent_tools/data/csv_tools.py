@@ -12,6 +12,7 @@ except ImportError:
         return func
 
 
+from ..confirmation import check_user_confirmation
 from ..exceptions import DataError
 
 
@@ -140,10 +141,19 @@ def write_csv_simple(
 
     file_existed = os.path.exists(file_path_str)
 
-    if file_existed and not skip_confirm:
-        raise DataError(
-            f"CSV file already exists: {file_path_str}. Use skip_confirm=True to overwrite."
+    if file_existed:
+        # Check user confirmation
+        preview = f"{os.path.getsize(file_path_str)} bytes" if file_existed else None
+        confirmed = check_user_confirmation(
+            operation="overwrite existing CSV file",
+            target=file_path_str,
+            skip_confirm=skip_confirm,
+            preview_info=preview,
         )
+
+        if not confirmed:
+            print(f"[DATA] CSV write cancelled by user: {file_path_str}")
+            return f"Operation cancelled by user: {file_path_str}"
 
     if not data:
         # Write empty file for empty data

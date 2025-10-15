@@ -6,7 +6,7 @@ but designed for cross-platform compatibility and all agent frameworks.
 
 import re
 from pathlib import Path
-from typing import Any, Callable, Union
+from typing import Any, Callable, Union, cast
 
 try:
     from strands import tool as strands_tool
@@ -137,21 +137,12 @@ def _view_file(file_path: Path, view_range: Union[str, int, None]) -> str:
 
 def _create_file(file_path: Path, content: Union[str, int], skip_confirm: bool) -> str:
     """Create a new file with optional content."""
-    file_existed = file_path.exists()
-
-    if file_existed and not skip_confirm:
-        raise FileSystemError(
-            f"File already exists: {file_path}. Use skip_confirm=True to overwrite."
-        )
-
     # Convert content to string if needed
     content_str = str(content) if not isinstance(content, str) else content
 
     try:
-        write_file_from_string(str(file_path), content_str)
-        line_count = len(content_str.splitlines()) if content_str else 0
-        action = "Overwrote" if file_existed else "Created"
-        return f"{action} file {file_path} with {line_count} lines"
+        # Pass skip_confirm to write_file_from_string which handles confirmation
+        return cast(str, write_file_from_string(str(file_path), content_str, skip_confirm))
 
     except Exception as e:
         raise FileSystemError(f"Failed to create file {file_path}: {e}")
