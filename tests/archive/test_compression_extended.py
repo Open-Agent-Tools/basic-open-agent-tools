@@ -71,14 +71,14 @@ class TestDecompressFileGzip:
     """Test cases for decompress_file_gzip function."""
 
     def test_default_output_path_with_gz_extension(self):
-        """Test default output path generation for .gz files."""
+        """Test decompression with explicit output path for .gz files."""
         with patch("os.path.exists", return_value=False):
             with pytest.raises(BasicAgentToolsError):
-                # Will fail at exists check, but we can verify path logic
+                # Will fail at exists check
                 try:
-                    decompress_file_gzip("test.txt.gz")
+                    decompress_file_gzip("test.txt.gz", "test.txt")
                 except BasicAgentToolsError as e:
-                    # Should have tried to create "test.txt" as output
+                    # Should fail because file doesn't exist
                     assert "not found" in str(e)
                     raise  # Re-raise so pytest.raises can catch it
 

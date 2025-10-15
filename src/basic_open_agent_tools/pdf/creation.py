@@ -5,6 +5,15 @@ using the reportlab library.
 """
 
 import os
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from reportlab.lib.pagesizes import (
@@ -27,6 +36,7 @@ except ImportError:
     HAS_REPORTLAB = False
 
 
+@strands_tool
 def create_simple_pdf(file_path: str, content: str, skip_confirm: bool) -> str:
     """Create simple PDF from text content.
 
@@ -107,6 +117,7 @@ def create_simple_pdf(file_path: str, content: str, skip_confirm: bool) -> str:
         raise ValueError(f"Failed to create PDF: {e}")
 
 
+@strands_tool
 def create_pdf_from_text_list(
     file_path: str, paragraphs: list[str], skip_confirm: bool
 ) -> str:
@@ -194,6 +205,7 @@ def create_pdf_from_text_list(
         raise ValueError(f"Failed to create PDF: {e}")
 
 
+@strands_tool
 def create_pdf_with_title(
     file_path: str, title: str, content: str, skip_confirm: bool
 ) -> str:
@@ -285,6 +297,7 @@ def create_pdf_with_title(
         raise ValueError(f"Failed to create PDF: {e}")
 
 
+@strands_tool
 def create_pdf_with_metadata(
     file_path: str, content: str, metadata: dict[str, str], skip_confirm: bool
 ) -> str:
@@ -384,6 +397,7 @@ def create_pdf_with_metadata(
         raise ValueError(f"Failed to create PDF: {e}")
 
 
+@strands_tool
 def create_multi_page_pdf(
     file_path: str, pages: list[dict[str, str]], skip_confirm: bool
 ) -> str:
@@ -492,6 +506,7 @@ def create_multi_page_pdf(
         raise ValueError(f"Failed to create PDF: {e}")
 
 
+@strands_tool
 def text_to_pdf(
     text_content: str, output_path: str, font_size: int, skip_confirm: bool
 ) -> str:

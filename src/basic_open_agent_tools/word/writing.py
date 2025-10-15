@@ -5,6 +5,15 @@ using the python-docx library.
 """
 
 import os
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from docx import Document  # type: ignore[import-untyped, import-not-found]
@@ -14,6 +23,7 @@ except ImportError:
     HAS_PYTHON_DOCX = False
 
 
+@strands_tool
 def create_simple_docx(file_path: str, content: str, skip_confirm: bool) -> str:
     """Create simple Word document from text content.
 
@@ -90,6 +100,7 @@ def create_simple_docx(file_path: str, content: str, skip_confirm: bool) -> str:
         raise ValueError(f"Failed to create Word document: {e}")
 
 
+@strands_tool
 def create_docx_from_paragraphs(
     file_path: str, paragraphs: list[str], skip_confirm: bool
 ) -> str:
@@ -172,6 +183,7 @@ def create_docx_from_paragraphs(
         raise ValueError(f"Failed to create Word document: {e}")
 
 
+@strands_tool
 def create_docx_with_title(
     file_path: str, title: str, content: str, skip_confirm: bool
 ) -> str:
@@ -258,6 +270,7 @@ def create_docx_with_title(
         raise ValueError(f"Failed to create Word document: {e}")
 
 
+@strands_tool
 def add_paragraph_to_docx(file_path: str, paragraph: str, skip_confirm: bool) -> str:
     """Append paragraph to existing Word document.
 
@@ -326,6 +339,7 @@ def add_paragraph_to_docx(file_path: str, paragraph: str, skip_confirm: bool) ->
         raise ValueError(f"Failed to add paragraph: {e}")
 
 
+@strands_tool
 def create_docx_with_headings(
     file_path: str, sections: list[dict[str, str]], skip_confirm: bool
 ) -> str:
@@ -441,6 +455,7 @@ def create_docx_with_headings(
         raise ValueError(f"Failed to create Word document: {e}")
 
 
+@strands_tool
 def add_table_to_docx(
     file_path: str, table_data: list[list[str]], skip_confirm: bool
 ) -> str:
@@ -533,6 +548,7 @@ def add_table_to_docx(
         raise ValueError(f"Failed to add table: {e}")
 
 
+@strands_tool
 def create_docx_from_template(
     template_path: str,
     output_path: str,
@@ -647,6 +663,7 @@ def create_docx_from_template(
         raise ValueError(f"Failed to create document from template: {e}")
 
 
+@strands_tool
 def docx_to_text(file_path: str, output_path: str, skip_confirm: bool) -> str:
     """Convert Word document to plain text file.
 

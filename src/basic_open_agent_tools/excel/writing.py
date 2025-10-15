@@ -5,6 +5,15 @@ This module provides functions for creating and modifying Excel (.xlsx) spreadsh
 
 import csv
 import os
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from openpyxl import (  # type: ignore[import-untyped, import-not-found]
@@ -20,6 +29,7 @@ except ImportError:
 MAX_FILE_SIZE = 100 * 1024 * 1024
 
 
+@strands_tool
 def create_simple_excel(
     file_path: str, data: list[list[str]], skip_confirm: bool
 ) -> str:
@@ -103,6 +113,7 @@ def create_simple_excel(
         raise ValueError(f"Failed to create Excel file: {e}")
 
 
+@strands_tool
 def create_excel_with_headers(
     file_path: str, headers: list[str], data: list[list[str]], skip_confirm: bool
 ) -> str:
@@ -162,6 +173,7 @@ def create_excel_with_headers(
     return create_simple_excel(file_path, combined_data, skip_confirm)
 
 
+@strands_tool
 def create_excel_from_dicts(
     file_path: str, data: list[dict[str, str]], skip_confirm: bool
 ) -> str:
@@ -225,6 +237,7 @@ def create_excel_from_dicts(
     return create_excel_with_headers(file_path, headers, rows, skip_confirm)
 
 
+@strands_tool
 def add_sheet_to_excel(
     file_path: str, sheet_name: str, data: list[list[str]], skip_confirm: bool
 ) -> str:
@@ -312,6 +325,7 @@ def add_sheet_to_excel(
         raise ValueError(f"Failed to add sheet: {e}")
 
 
+@strands_tool
 def append_rows_to_excel(
     file_path: str, sheet_name: str, rows: list[list[str]], skip_confirm: bool
 ) -> str:
@@ -394,6 +408,7 @@ def append_rows_to_excel(
         raise ValueError(f"Failed to append rows: {e}")
 
 
+@strands_tool
 def update_excel_cell(
     file_path: str,
     sheet_name: str,
@@ -476,6 +491,7 @@ def update_excel_cell(
         raise ValueError(f"Failed to update cell: {e}")
 
 
+@strands_tool
 def delete_excel_sheet(file_path: str, sheet_name: str, skip_confirm: bool) -> str:
     """Delete sheet from Excel workbook.
 
@@ -549,6 +565,7 @@ def delete_excel_sheet(file_path: str, sheet_name: str, skip_confirm: bool) -> s
         raise ValueError(f"Failed to delete sheet: {e}")
 
 
+@strands_tool
 def excel_to_csv(
     file_path: str, sheet_name: str, output_path: str, skip_confirm: bool
 ) -> str:

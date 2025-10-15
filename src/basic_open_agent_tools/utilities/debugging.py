@@ -3,7 +3,7 @@
 import inspect
 import sys
 import traceback
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
@@ -19,7 +19,7 @@ from ..exceptions import BasicAgentToolsError
 
 @strands_tool
 def inspect_function_signature(
-    function_name: str, module_name: Optional[str] = None
+    function_name: str, module_name: str
 ) -> dict[str, Union[str, int, list, dict, Any]]:
     """
     Inspect a function's signature, parameters, and documentation.
@@ -197,7 +197,7 @@ def get_call_stack_info() -> dict[str, Union[list, int, str, Any]]:
 
 @strands_tool
 def format_exception_details(
-    exception_info: Optional[str] = None,
+    exception_info: str,
 ) -> dict[str, Union[str, list, bool, Any]]:
     """
     Format detailed exception information from the last exception or provided info.
@@ -288,7 +288,7 @@ def format_exception_details(
 
 @strands_tool
 def validate_function_call(
-    function_name: str, arguments: dict[str, Any], module_name: Optional[str] = None
+    function_name: str, arguments: dict[str, str], module_name: str
 ) -> dict[str, Union[str, bool, list, Any]]:
     """
     Validate if a function call would succeed with given arguments.
@@ -421,7 +421,7 @@ def validate_function_call(
 
 @strands_tool
 def trace_variable_changes(
-    variable_name: str, initial_value: Any, operations: list[str]
+    variable_name: str, initial_value: str, operations: list[str]
 ) -> dict[str, Union[str, Any, list]]:
     """
     Trace how a variable changes through a series of operations.

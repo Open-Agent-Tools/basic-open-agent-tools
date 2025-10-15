@@ -18,7 +18,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def generate_uuid(version: int = 4) -> dict[str, Union[str, int]]:
+def generate_uuid(version: int) -> dict[str, Union[str, int]]:
     """
     Generate a UUID (Universally Unique Identifier).
 
@@ -67,7 +67,7 @@ def generate_uuid(version: int = 4) -> dict[str, Union[str, int]]:
 
 @strands_tool
 def generate_random_string(
-    length: int = 16, character_set: str = "alphanumeric"
+    length: int, character_set: str
 ) -> dict[str, Union[str, int]]:
     """
     Generate a cryptographically secure random string.
@@ -131,9 +131,7 @@ def generate_random_string(
 
 
 @strands_tool
-def generate_random_bytes(
-    length: int = 16, encoding: str = "hex"
-) -> dict[str, Union[str, int]]:
+def generate_random_bytes(length: int, encoding: str) -> dict[str, Union[str, int]]:
     """
     Generate cryptographically secure random bytes.
 

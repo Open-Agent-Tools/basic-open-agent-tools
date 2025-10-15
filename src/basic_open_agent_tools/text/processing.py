@@ -225,6 +225,7 @@ def to_title_case(text: str) -> str:
         raise TypeError("Input must be a string")
 
     # Split on common delimiters but preserve the structure
+    @strands_tool
     def capitalize_word(match: Match[str]) -> str:
         word = match.group(0)
         return word.capitalize()

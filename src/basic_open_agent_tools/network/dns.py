@@ -125,7 +125,7 @@ def reverse_dns_lookup(ip_address: str) -> dict[str, Union[str, bool]]:
 
 @strands_tool
 def check_port_open(
-    host: str, port: int, timeout: int = 5
+    host: str, port: int, timeout: int
 ) -> dict[str, Union[str, int, bool, float]]:
     """
     Check if a port is open on a host.
@@ -133,7 +133,7 @@ def check_port_open(
     Args:
         host: Hostname or IP address
         port: Port number to check
-        timeout: Connection timeout in seconds
+        timeout: Connection timeout in seconds (1-30)
 
     Returns:
         Dictionary with port check results

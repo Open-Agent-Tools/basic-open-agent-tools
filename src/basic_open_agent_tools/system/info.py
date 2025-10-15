@@ -129,7 +129,7 @@ def get_memory_info() -> dict[str, Union[int, float]]:
 
 
 @strands_tool
-def get_disk_usage(path: str = "/") -> dict[str, Union[int, float, str]]:
+def get_disk_usage(path: str) -> dict[str, Union[int, float, str]]:
     """
     Get disk usage statistics for a given path.
 

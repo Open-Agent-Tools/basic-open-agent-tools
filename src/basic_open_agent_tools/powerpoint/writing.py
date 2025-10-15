@@ -1,6 +1,15 @@
 """PowerPoint generation and creation functions for AI agents."""
 
 import os
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from pptx import Presentation
@@ -11,10 +20,12 @@ except ImportError:
     Pt = None  # type: ignore[assignment,misc]
 
 
+@strands_tool
 def create_simple_pptx(
     file_path: str, title: str, subtitle: str, skip_confirm: bool
 ) -> str:
     """Create simple PowerPoint presentation with title slide.
+
 
     Args:
         file_path: Path for new PowerPoint file (.pptx)
@@ -77,6 +88,7 @@ def create_simple_pptx(
         raise ValueError(f"Failed to create PowerPoint presentation: {e}")
 
 
+@strands_tool
 def add_pptx_title_slide(file_path: str, title: str, subtitle: str) -> str:
     """Add title slide to existing PowerPoint presentation.
 
@@ -131,6 +143,7 @@ def add_pptx_title_slide(file_path: str, title: str, subtitle: str) -> str:
         raise ValueError(f"Failed to add title slide: {e}")
 
 
+@strands_tool
 def add_pptx_content_slide(file_path: str, title: str, bullet_points: list[str]) -> str:
     """Add content slide with title and bullet points.
 
@@ -201,6 +214,7 @@ def add_pptx_content_slide(file_path: str, title: str, bullet_points: list[str])
         raise ValueError(f"Failed to add content slide: {e}")
 
 
+@strands_tool
 def add_pptx_blank_slide(file_path: str) -> str:
     """Add blank slide to existing PowerPoint presentation.
 

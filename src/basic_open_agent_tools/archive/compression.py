@@ -6,7 +6,7 @@ import lzma
 import os
 import shutil
 import zipfile
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
@@ -257,7 +257,7 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
 
 @strands_tool
 def decompress_file_gzip(
-    input_path: str, output_path: Optional[str] = None
+    input_path: str, output_path: str
 ) -> dict[str, Union[str, int, float]]:
     """
     Decompress a gzip compressed file.

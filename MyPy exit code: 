@@ -1,0 +1,23 @@
+src/basic_open_agent_tools/markdown/generation.py:129: error: Returning Any from function declared to return "str"  [no-any-return]
+src/basic_open_agent_tools/excel/writing.py:173: error: Returning Any from function declared to return "str"  [no-any-return]
+src/basic_open_agent_tools/excel/writing.py:237: error: Returning Any from function declared to return "str"  [no-any-return]
+src/basic_open_agent_tools/html/parsing.py:217: error: Returning Any from function declared to return "list[dict[str, str]]"  [no-any-return]
+src/basic_open_agent_tools/html/parsing.py:217: note: Error code "no-any-return" not covered by "type: ignore" comment
+src/basic_open_agent_tools/html/parsing.py:241: error: Returning Any from function declared to return "list[dict[str, str]]"  [no-any-return]
+src/basic_open_agent_tools/html/parsing.py:241: note: Error code "no-any-return" not covered by "type: ignore" comment
+src/basic_open_agent_tools/html/parsing.py:265: error: Returning Any from function declared to return "list[list[list[str]]]"  [no-any-return]
+src/basic_open_agent_tools/html/parsing.py:265: note: Error code "no-any-return" not covered by "type: ignore" comment
+src/basic_open_agent_tools/html/parsing.py:289: error: Returning Any from function declared to return "list[dict[str, str]]"  [no-any-return]
+src/basic_open_agent_tools/html/parsing.py:289: note: Error code "no-any-return" not covered by "type: ignore" comment
+src/basic_open_agent_tools/html/parsing.py:313: error: Returning Any from function declared to return "dict[str, str]"  [no-any-return]
+src/basic_open_agent_tools/html/parsing.py:313: note: Error code "no-any-return" not covered by "type: ignore" comment
+src/basic_open_agent_tools/html/generation.py:396: error: Returning Any from function declared to return "str"  [no-any-return]
+src/basic_open_agent_tools/file_system/info.py:65: error: Returning Any from function declared to return "bool"  [no-any-return]
+src/basic_open_agent_tools/file_system/info.py:82: error: Returning Any from function declared to return "bool"  [no-any-return]
+src/basic_open_agent_tools/file_system/info.py:106: error: Returning Any from function declared to return "int"  [no-any-return]
+src/basic_open_agent_tools/xml/authoring.py:409: error: Returning Any from function declared to return "str"  [no-any-return]
+src/basic_open_agent_tools/xml/authoring.py:473: error: Returning Any from function declared to return "str"  [no-any-return]
+src/basic_open_agent_tools/utilities/debugging.py:217: error: Statement is unreachable  [unreachable]
+src/basic_open_agent_tools/utilities/debugging.py:235: error: Statement is unreachable  [unreachable]
+src/basic_open_agent_tools/archive/compression.py:284: error: Statement is unreachable  [unreachable]
+Found 17 errors in 8 files (checked 86 source files)

@@ -5,6 +5,15 @@ Word (.docx) documents.
 """
 
 import os
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from docx import Document  # type: ignore[import-untyped, import-not-found]
@@ -17,6 +26,7 @@ except ImportError:
     HAS_PYTHON_DOCX = False
 
 
+@strands_tool
 def apply_heading_style(
     file_path: str, paragraph_index: int, heading_level: int, skip_confirm: bool
 ) -> str:
@@ -100,6 +110,7 @@ def apply_heading_style(
         raise ValueError(f"Failed to apply heading style: {e}")
 
 
+@strands_tool
 def apply_bold_to_paragraph(
     file_path: str, paragraph_index: int, skip_confirm: bool
 ) -> str:
@@ -176,6 +187,7 @@ def apply_bold_to_paragraph(
         raise ValueError(f"Failed to apply bold formatting: {e}")
 
 
+@strands_tool
 def set_paragraph_alignment(
     file_path: str, paragraph_index: int, alignment: str, skip_confirm: bool
 ) -> str:
@@ -271,6 +283,7 @@ def set_paragraph_alignment(
         raise ValueError(f"Failed to set paragraph alignment: {e}")
 
 
+@strands_tool
 def add_page_break(file_path: str, after_paragraph: int, skip_confirm: bool) -> str:
     """Insert page break after specified paragraph in Word document.
 

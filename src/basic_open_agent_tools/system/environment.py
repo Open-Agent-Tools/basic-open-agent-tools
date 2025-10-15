@@ -97,7 +97,7 @@ def set_env_var(variable_name: str, value: str) -> dict[str, Union[str, bool]]:
 
 @strands_tool
 def list_env_vars(
-    filter_pattern: Optional[str] = None, limit: int = 50
+    filter_pattern: str, limit: int
 ) -> dict[str, Union[int, dict[str, str], str, Optional[str]]]:
     """
     List environment variables, optionally filtered by name pattern.

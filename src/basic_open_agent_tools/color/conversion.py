@@ -177,6 +177,7 @@ def hsl_to_rgb(h: int, s: int, lightness: int) -> dict[str, int]:
     l_norm = lightness / 100.0
 
     # Helper function
+    @strands_tool
     def hue_to_rgb(p: float, q: float, t: float) -> float:
         if t < 0:
             t += 1

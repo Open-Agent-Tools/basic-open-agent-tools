@@ -3,7 +3,7 @@
 import platform
 import subprocess
 import time
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
@@ -20,9 +20,9 @@ from ..exceptions import BasicAgentToolsError
 @strands_tool
 def execute_shell_command(
     command: str,
-    timeout: int = 30,
-    capture_output: bool = True,
-    working_directory: Optional[str] = None,
+    timeout: int,
+    capture_output: bool,
+    working_directory: str,
 ) -> dict[str, Union[str, int, float, bool]]:
     """
     Execute a shell command cross-platform (Windows cmd, Unix bash/sh).
@@ -124,9 +124,9 @@ def execute_shell_command(
 @strands_tool
 def run_bash(
     command: str,
-    timeout: int = 30,
-    capture_output: bool = True,
-    working_directory: Optional[str] = None,
+    timeout: int,
+    capture_output: bool,
+    working_directory: str,
 ) -> dict[str, Union[str, int, float, bool]]:
     """
     Execute a bash command (Unix/Linux/macOS only).
@@ -214,9 +214,9 @@ def run_bash(
 @strands_tool
 def run_powershell(
     command: str,
-    timeout: int = 30,
-    capture_output: bool = True,
-    working_directory: Optional[str] = None,
+    timeout: int,
+    capture_output: bool,
+    working_directory: str,
 ) -> dict[str, Union[str, int, float, bool]]:
     """
     Execute a PowerShell command (Windows only).

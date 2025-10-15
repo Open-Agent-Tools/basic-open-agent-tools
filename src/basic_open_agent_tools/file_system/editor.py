@@ -4,6 +4,7 @@ This module provides a unified file editing interface similar to strands editor
 but designed for cross-platform compatibility and all agent frameworks.
 """
 
+import json
 import re
 from pathlib import Path
 from typing import Any, Callable, Union, cast
@@ -27,9 +28,7 @@ from .validation import validate_path
 
 
 @strands_tool
-def file_editor(
-    command: str, path: str, skip_confirm: bool, **kwargs: Union[str, int, bool]
-) -> str:
+def file_editor(command: str, path: str, skip_confirm: bool, options_json: str) -> str:
     """Comprehensive file editor with multiple operations.
 
     This tool provides a unified interface for file editing operations including
@@ -40,12 +39,12 @@ def file_editor(
         command: The operation to perform
         path: Path to the file or directory
         skip_confirm: If True, skip confirmation and bypass safety checks. IMPORTANT: Agents should default to skip_confirm=False for safety.
-        **kwargs: Additional parameters based on command:
-            - view: view_range (str, optional) - line range like "1-10" or "5"
-            - create: content (str, optional) - initial file content
-            - str_replace: old_str (str), new_str (str) - text to replace
-            - insert: line_number (int), content (str) - where and what to insert
-            - find: pattern (str), use_regex (bool, optional) - search pattern
+        options_json: JSON string with command-specific options:
+            - view: {"view_range": "1-10"} - line range (optional)
+            - create: {"content": "text"} - initial content (optional)
+            - str_replace: {"old_str": "x", "new_str": "y"} - required
+            - insert: {"line_number": 5, "content": "text"} - required
+            - find: {"pattern": "text", "use_regex": false} - pattern required
 
     Returns:
         String result describing the operation outcome or file contents
@@ -54,6 +53,16 @@ def file_editor(
         FileSystemError: If file operations fail
         ValueError: If command or parameters are invalid
     """
+    # Parse options from JSON
+    try:
+        options = (
+            json.loads(options_json) if options_json and options_json != "{}" else {}
+        )
+        if not isinstance(options, dict):
+            raise ValueError("options_json must be a JSON object")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in options_json: {e}")
+
     valid_commands = ["view", "create", "str_replace", "insert", "find"]
     if command not in valid_commands:
         raise ValueError(
@@ -63,26 +72,26 @@ def file_editor(
     file_path = validate_path(path, command)
 
     if command == "view":
-        return _view_file(file_path, kwargs.get("view_range"))
+        return _view_file(file_path, options.get("view_range"))
     elif command == "create":
-        return _create_file(file_path, kwargs.get("content", ""), skip_confirm)
+        return _create_file(file_path, options.get("content", ""), skip_confirm)
     elif command == "str_replace":
-        old_str = kwargs.get("old_str")
-        new_str = kwargs.get("new_str")
+        old_str = options.get("old_str")
+        new_str = options.get("new_str")
         if old_str is None or new_str is None:
             raise ValueError("str_replace requires 'old_str' and 'new_str' parameters")
         return _str_replace(file_path, str(old_str), str(new_str))
     elif command == "insert":
-        line_number = kwargs.get("line_number")
-        content = kwargs.get("content")
+        line_number = options.get("line_number")
+        content = options.get("content")
         if line_number is None or content is None:
             raise ValueError("insert requires 'line_number' and 'content' parameters")
         return _insert_at_line(file_path, int(line_number), str(content))
     elif command == "find":
-        pattern = kwargs.get("pattern")
+        pattern = options.get("pattern")
         if pattern is None:
             raise ValueError("find requires 'pattern' parameter")
-        use_regex = bool(kwargs.get("use_regex", False))
+        use_regex = bool(options.get("use_regex", False))
         return _find_in_file(file_path, str(pattern), use_regex)
 
     return f"Unknown command: {command}"

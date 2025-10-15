@@ -5,6 +5,15 @@ tables, metadata, and searching within documents.
 """
 
 import os
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from docx import Document  # type: ignore[import-untyped, import-not-found]
@@ -18,6 +27,7 @@ except ImportError:
 MAX_DOCX_FILE_SIZE = 50 * 1024 * 1024
 
 
+@strands_tool
 def extract_text_from_docx(file_path: str) -> str:
     """Extract all text content from Word document.
 
@@ -85,6 +95,7 @@ def extract_text_from_docx(file_path: str) -> str:
         raise ValueError(f"Failed to read Word document {file_path}: {e}")
 
 
+@strands_tool
 def get_docx_paragraphs(file_path: str) -> list[str]:
     """Get all paragraphs from Word document as separate strings.
 
@@ -146,6 +157,7 @@ def get_docx_paragraphs(file_path: str) -> list[str]:
         raise ValueError(f"Failed to read Word document {file_path}: {e}")
 
 
+@strands_tool
 def get_docx_tables(file_path: str) -> list[list[list[str]]]:
     """Extract all tables from Word document.
 
@@ -205,6 +217,7 @@ def get_docx_tables(file_path: str) -> list[list[list[str]]]:
         raise ValueError(f"Failed to extract tables from {file_path}: {e}")
 
 
+@strands_tool
 def get_docx_metadata(file_path: str) -> dict[str, str]:
     """Extract metadata from Word document.
 
@@ -269,6 +282,7 @@ def get_docx_metadata(file_path: str) -> dict[str, str]:
         raise ValueError(f"Failed to extract metadata from {file_path}: {e}")
 
 
+@strands_tool
 def search_docx_text(
     file_path: str, search_term: str, case_sensitive: bool
 ) -> list[dict[str, object]]:
@@ -347,6 +361,7 @@ def search_docx_text(
         raise ValueError(f"Failed to search Word document {file_path}: {e}")
 
 
+@strands_tool
 def get_docx_info(file_path: str) -> dict[str, object]:
     """Get comprehensive information about Word document.
 

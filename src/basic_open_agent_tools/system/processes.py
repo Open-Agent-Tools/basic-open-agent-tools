@@ -62,7 +62,7 @@ def get_current_process_info() -> dict[str, Union[str, int, float, Any]]:
 
 
 @strands_tool
-def list_running_processes(limit: int = 20) -> list[dict[str, Union[str, int, float]]]:
+def list_running_processes(limit: int) -> list[dict[str, Union[str, int, float]]]:
     """
     List basic information about running processes.
 

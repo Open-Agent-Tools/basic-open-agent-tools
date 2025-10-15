@@ -1,6 +1,15 @@
 """Image manipulation and transformation functions for AI agents."""
 
 import os
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from PIL import Image
@@ -10,6 +19,7 @@ except ImportError:
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB limit
 
 
+@strands_tool
 def resize_image(
     file_path: str, output_path: str, width: int, height: int, skip_confirm: bool
 ) -> str:
@@ -80,6 +90,7 @@ def resize_image(
         raise ValueError(f"Failed to resize image: {e}")
 
 
+@strands_tool
 def crop_image(
     file_path: str,
     output_path: str,
@@ -162,6 +173,7 @@ def crop_image(
         raise ValueError(f"Failed to crop image: {e}")
 
 
+@strands_tool
 def rotate_image(
     file_path: str, output_path: str, degrees: int, skip_confirm: bool
 ) -> str:
@@ -226,6 +238,7 @@ def rotate_image(
         raise ValueError(f"Failed to rotate image: {e}")
 
 
+@strands_tool
 def convert_image_format(
     file_path: str, output_path: str, output_format: str, skip_confirm: bool
 ) -> str:
@@ -299,6 +312,7 @@ def convert_image_format(
         raise ValueError(f"Failed to convert image format: {e}")
 
 
+@strands_tool
 def create_thumbnail(
     file_path: str, output_path: str, max_size: int, skip_confirm: bool
 ) -> str:
@@ -366,6 +380,7 @@ def create_thumbnail(
         raise ValueError(f"Failed to create thumbnail: {e}")
 
 
+@strands_tool
 def flip_image(
     file_path: str, output_path: str, direction: str, skip_confirm: bool
 ) -> str:

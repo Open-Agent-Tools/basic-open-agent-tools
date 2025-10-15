@@ -7,7 +7,15 @@ using Python standard library only.
 import os
 import re
 from html.parser import HTMLParser
-from typing import Union
+from typing import Any, Callable, Union
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 # Maximum file size: 10MB
 MAX_FILE_SIZE = 10 * 1024 * 1024
@@ -35,6 +43,7 @@ class HTMLStructureParser(HTMLParser):
         self._in_row = False
         self._in_cell = False
 
+    @strands_tool
     def handle_starttag(
         self, tag: str, attrs: list[tuple[str, Union[str, None]]]
     ) -> None:
@@ -68,6 +77,7 @@ class HTMLStructureParser(HTMLParser):
             self._in_cell = True
             self._current_cell = ""
 
+    @strands_tool
     def handle_endtag(self, tag: str) -> None:
         """Handle closing tags."""
         if tag == "title":
@@ -86,6 +96,7 @@ class HTMLStructureParser(HTMLParser):
             self._current_row.append(self._current_cell.strip())
             self._in_cell = False
 
+    @strands_tool
     def handle_data(self, data: str) -> None:
         """Handle text data."""
         text = data.strip()
@@ -105,6 +116,7 @@ class HTMLStructureParser(HTMLParser):
             self.text_parts.append(text)
 
 
+@strands_tool
 def parse_html_to_dict(file_path: str) -> dict[str, object]:
     """Parse HTML file into structured dictionary.
 
@@ -157,6 +169,7 @@ def parse_html_to_dict(file_path: str) -> dict[str, object]:
         raise ValueError(f"Failed to parse HTML file: {e}")
 
 
+@strands_tool
 def extract_html_text(file_path: str) -> str:
     """Extract all text content from HTML file.
 
@@ -180,6 +193,7 @@ def extract_html_text(file_path: str) -> str:
     return str(data["text"])
 
 
+@strands_tool
 def extract_html_links(file_path: str) -> list[dict[str, str]]:
     """Extract all links from HTML file.
 
@@ -203,6 +217,7 @@ def extract_html_links(file_path: str) -> list[dict[str, str]]:
     return data["links"]  # type: ignore[return-value]
 
 
+@strands_tool
 def extract_html_images(file_path: str) -> list[dict[str, str]]:
     """Extract all image sources from HTML file.
 
@@ -226,6 +241,7 @@ def extract_html_images(file_path: str) -> list[dict[str, str]]:
     return data["images"]  # type: ignore[return-value]
 
 
+@strands_tool
 def extract_html_tables(file_path: str) -> list[list[list[str]]]:
     """Extract all tables from HTML file.
 
@@ -249,6 +265,7 @@ def extract_html_tables(file_path: str) -> list[list[list[str]]]:
     return data["tables"]  # type: ignore[return-value]
 
 
+@strands_tool
 def extract_html_headings(file_path: str) -> list[dict[str, str]]:
     """Extract all headings (h1-h6) from HTML file.
 
@@ -272,6 +289,7 @@ def extract_html_headings(file_path: str) -> list[dict[str, str]]:
     return data["headings"]  # type: ignore[return-value]
 
 
+@strands_tool
 def extract_html_metadata(file_path: str) -> dict[str, str]:
     """Extract metadata from HTML meta tags.
 
@@ -295,6 +313,7 @@ def extract_html_metadata(file_path: str) -> dict[str, str]:
     return data["metadata"]  # type: ignore[return-value]
 
 
+@strands_tool
 def html_to_plain_text(file_path: str) -> str:
     """Convert HTML file to plain text by stripping tags.
 

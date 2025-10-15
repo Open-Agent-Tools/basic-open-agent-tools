@@ -6,6 +6,15 @@ Excel (.xlsx) spreadsheets.
 
 import os
 import re
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from openpyxl import load_workbook  # type: ignore[import-untyped, import-not-found]
@@ -20,6 +29,7 @@ except ImportError:
     HAS_OPENPYXL = False
 
 
+@strands_tool
 def apply_excel_bold(
     file_path: str, sheet_name: str, cell_range: str, skip_confirm: bool
 ) -> str:
@@ -96,6 +106,7 @@ def apply_excel_bold(
         raise ValueError(f"Failed to apply bold formatting: {e}")
 
 
+@strands_tool
 def apply_excel_font_size(
     file_path: str,
     sheet_name: str,
@@ -182,6 +193,7 @@ def apply_excel_font_size(
         raise ValueError(f"Failed to set font size: {e}")
 
 
+@strands_tool
 def apply_excel_alignment(
     file_path: str,
     sheet_name: str,
@@ -284,6 +296,7 @@ def apply_excel_alignment(
         raise ValueError(f"Failed to set alignment: {e}")
 
 
+@strands_tool
 def set_excel_column_width(
     file_path: str, sheet_name: str, column_letter: str, width: int, skip_confirm: bool
 ) -> str:
@@ -367,6 +380,7 @@ def set_excel_column_width(
         raise ValueError(f"Failed to set column width: {e}")
 
 
+@strands_tool
 def set_excel_row_height(
     file_path: str, sheet_name: str, row_number: int, height: int, skip_confirm: bool
 ) -> str:
@@ -449,6 +463,7 @@ def set_excel_row_height(
         raise ValueError(f"Failed to set row height: {e}")
 
 
+@strands_tool
 def apply_excel_cell_color(
     file_path: str,
     sheet_name: str,
@@ -542,6 +557,7 @@ def apply_excel_cell_color(
         raise ValueError(f"Failed to apply cell color: {e}")
 
 
+@strands_tool
 def freeze_excel_panes(
     file_path: str, sheet_name: str, cell_reference: str, skip_confirm: bool
 ) -> str:
@@ -616,6 +632,7 @@ def freeze_excel_panes(
         raise ValueError(f"Failed to freeze panes: {e}")
 
 
+@strands_tool
 def add_excel_formula(
     file_path: str,
     sheet_name: str,

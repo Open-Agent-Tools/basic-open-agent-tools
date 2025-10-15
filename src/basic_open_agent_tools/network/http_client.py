@@ -8,7 +8,7 @@ import json
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Union
 
 try:
     from strands import tool as strands_tool
@@ -25,22 +25,22 @@ from ..exceptions import BasicAgentToolsError
 def http_request(
     method: str,
     url: str,
-    headers: Optional[dict[str, str]] = None,
-    body: Optional[str] = None,
-    timeout: int = 30,
-    follow_redirects: bool = True,
-    verify_ssl: bool = True,
+    headers: str,
+    body: str,
+    timeout: int,
+    follow_redirects: bool,
+    verify_ssl: bool,
 ) -> dict[str, Union[str, int]]:
     """Make an HTTP request with simplified parameters.
 
     Args:
         method: HTTP method (GET, POST, PUT, DELETE, etc.)
         url: Target URL for the request
-        headers: Optional HTTP headers as key-value pairs
-        body: Optional request body (for POST, PUT, etc.)
-        timeout: Request timeout in seconds (default: 30)
-        follow_redirects: Whether to follow HTTP redirects (default: True)
-        verify_ssl: Whether to verify SSL certificates (default: True)
+        headers: HTTP headers as JSON string (use "{}" for no headers)
+        body: Request body content (use "" for no body)
+        timeout: Request timeout in seconds
+        follow_redirects: Whether to follow HTTP redirects
+        verify_ssl: Whether to verify SSL certificates
 
     Returns:
         Dictionary containing:
@@ -53,13 +53,24 @@ def http_request(
         BasicAgentToolsError: If request fails or invalid parameters
 
     Example:
-        >>> response = http_request("GET", "https://api.github.com/user")
+        >>> response = http_request("GET", "https://api.github.com/user", "{}", "", 30, True, True)
         >>> print(response["status_code"])
         200
     """
+    # Parse headers from JSON string
+    if not isinstance(headers, str):
+        raise BasicAgentToolsError("headers must be a JSON string")
+
+    try:
+        headers_dict = json.loads(headers) if headers and headers != "{}" else {}
+        if not isinstance(headers_dict, dict):
+            raise BasicAgentToolsError("headers must be a JSON object")
+    except json.JSONDecodeError as e:
+        raise BasicAgentToolsError(f"Invalid JSON in headers: {e}")
+
     # Log the HTTP request details for security auditing
     body_info = f" with {len(body)} char body" if body else ""
-    headers_info = f" with {len(headers)} headers" if headers else ""
+    headers_info = f" with {len(headers_dict)} headers" if headers_dict else ""
     print(f"[HTTP] {method} {url}{body_info}{headers_info} (timeout={timeout}s)")
 
     if not method or not isinstance(method, str):
@@ -74,11 +85,7 @@ def http_request(
     method = method.upper()
 
     # Prepare headers
-    request_headers = {}
-    if headers:
-        if not isinstance(headers, dict):
-            raise BasicAgentToolsError("Headers must be a dictionary")
-        request_headers.update(headers)
+    request_headers = dict(headers_dict)
 
     # Set default User-Agent if not provided
     if "User-Agent" not in request_headers:
@@ -119,6 +126,7 @@ def http_request(
         if not follow_redirects:
 
             class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+                @strands_tool
                 def redirect_request(
                     self,
                     req: Any,
@@ -193,52 +201,3 @@ def http_request(
 
     except Exception as e:
         raise BasicAgentToolsError(f"Request failed: {str(e)}")
-
-
-@strands_tool
-def http_get(
-    url: str, headers: Optional[dict[str, str]] = None, timeout: int = 30
-) -> dict[str, Union[str, int]]:
-    """Convenience function for HTTP GET requests.
-
-    Args:
-        url: Target URL for the request
-        headers: Optional HTTP headers
-        timeout: Request timeout in seconds
-
-    Returns:
-        Dictionary with response data (same as http_request)
-
-    Example:
-        >>> response = http_get("https://api.github.com/user")
-        >>> print(response["status_code"])
-        200
-    """
-    return http_request("GET", url, headers=headers, timeout=timeout)  # type: ignore[no-any-return]
-
-
-@strands_tool
-def http_post(
-    url: str,
-    body: Optional[str] = None,
-    headers: Optional[dict[str, str]] = None,
-    timeout: int = 30,
-) -> dict[str, Union[str, int]]:
-    """Convenience function for HTTP POST requests.
-
-    Args:
-        url: Target URL for the request
-        body: Request body content
-        headers: Optional HTTP headers
-        timeout: Request timeout in seconds
-
-    Returns:
-        Dictionary with response data (same as http_request)
-
-    Example:
-        >>> data = '{"name": "test"}'
-        >>> response = http_post("https://api.example.com/users", body=data)
-        >>> print(response["status_code"])
-        201
-    """
-    return http_request("POST", url, headers=headers, body=body, timeout=timeout)  # type: ignore[no-any-return]

@@ -1,6 +1,15 @@
 """PowerPoint reading and extraction functions for AI agents."""
 
 import os
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from pptx import Presentation
@@ -10,8 +19,10 @@ except ImportError:
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB limit
 
 
+@strands_tool
 def get_pptx_metadata(file_path: str) -> dict[str, str]:
     """Extract metadata from PowerPoint presentation.
+
 
     Args:
         file_path: Path to PowerPoint file (.pptx)
@@ -66,6 +77,7 @@ def get_pptx_metadata(file_path: str) -> dict[str, str]:
         raise ValueError(f"Failed to read PowerPoint metadata: {e}")
 
 
+@strands_tool
 def get_pptx_slide_count(file_path: str) -> int:
     """Get number of slides in PowerPoint presentation.
 
@@ -112,6 +124,7 @@ def get_pptx_slide_count(file_path: str) -> int:
         raise ValueError(f"Failed to read PowerPoint slide count: {e}")
 
 
+@strands_tool
 def extract_pptx_text(file_path: str) -> str:
     """Extract all text content from PowerPoint presentation.
 
@@ -165,6 +178,7 @@ def extract_pptx_text(file_path: str) -> str:
         raise ValueError(f"Failed to extract PowerPoint text: {e}")
 
 
+@strands_tool
 def get_pptx_slide_text(file_path: str, slide_index: int) -> str:
     """Get text content from specific slide (0-indexed).
 
@@ -229,6 +243,7 @@ def get_pptx_slide_text(file_path: str, slide_index: int) -> str:
         raise ValueError(f"Failed to read PowerPoint slide text: {e}")
 
 
+@strands_tool
 def get_pptx_slide_titles(file_path: str) -> list[str]:
     """Get titles of all slides in presentation.
 
@@ -283,6 +298,7 @@ def get_pptx_slide_titles(file_path: str) -> list[str]:
         raise ValueError(f"Failed to read PowerPoint slide titles: {e}")
 
 
+@strands_tool
 def extract_pptx_notes(file_path: str) -> list[str]:
     """Extract speaker notes from all slides.
 

@@ -18,13 +18,28 @@ from ..exceptions import BasicAgentToolsError
 
 @strands_tool
 def log_info(
-    message: str, logger_name: str = "agent", **kwargs: Any
+    message: str, logger_name: str, extra_data_json: str
 ) -> dict[str, Union[str, float]]:
-    """Log an info message with structured data."""
+    """Log an info message with structured data.
+
+    Args:
+        message: Log message
+        logger_name: Name of logger to use
+        extra_data_json: JSON string with extra data (use "{}" for none)
+    """
     if not isinstance(message, str):
         raise BasicAgentToolsError("Message must be a string")
 
     try:
+        # Parse extra data from JSON
+        extra_data = (
+            json.loads(extra_data_json)
+            if extra_data_json and extra_data_json != "{}"
+            else {}
+        )
+        if not isinstance(extra_data, dict):
+            raise ValueError("extra_data_json must be a JSON object")
+
         logger = logging.getLogger(logger_name)
         timestamp = time.time()
 
@@ -32,7 +47,7 @@ def log_info(
             "timestamp": timestamp,
             "level": "INFO",
             "message": message,
-            **kwargs,
+            **extra_data,
         }
 
         logger.info(json.dumps(log_entry))
@@ -50,13 +65,28 @@ def log_info(
 
 @strands_tool
 def log_error(
-    message: str, logger_name: str = "agent", **kwargs: Any
+    message: str, logger_name: str, extra_data_json: str
 ) -> dict[str, Union[str, float]]:
-    """Log an error message with structured data."""
+    """Log an error message with structured data.
+
+    Args:
+        message: Log message
+        logger_name: Name of logger to use
+        extra_data_json: JSON string with extra data (use "{}" for none)
+    """
     if not isinstance(message, str):
         raise BasicAgentToolsError("Message must be a string")
 
     try:
+        # Parse extra data from JSON
+        extra_data = (
+            json.loads(extra_data_json)
+            if extra_data_json and extra_data_json != "{}"
+            else {}
+        )
+        if not isinstance(extra_data, dict):
+            raise ValueError("extra_data_json must be a JSON object")
+
         logger = logging.getLogger(logger_name)
         timestamp = time.time()
 
@@ -64,7 +94,7 @@ def log_error(
             "timestamp": timestamp,
             "level": "ERROR",
             "message": message,
-            **kwargs,
+            **extra_data,
         }
 
         logger.error(json.dumps(log_entry))
@@ -81,9 +111,7 @@ def log_error(
 
 
 @strands_tool
-def configure_logger(
-    logger_name: str, log_file: str, level: str = "INFO"
-) -> dict[str, str]:
+def configure_logger(logger_name: str, log_file: str, level: str) -> dict[str, str]:
     """Configure a logger with file output."""
     if level not in ["DEBUG", "INFO", "WARNING", "ERROR"]:
         raise BasicAgentToolsError("Level must be DEBUG, INFO, WARNING, or ERROR")

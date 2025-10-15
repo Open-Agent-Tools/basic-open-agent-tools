@@ -128,7 +128,7 @@ def hash_sha512(data: str) -> dict[str, Union[str, int]]:
 
 
 @strands_tool
-def hash_file(file_path: str, algorithm: str = "sha256") -> dict[str, Union[str, int]]:
+def hash_file(file_path: str, algorithm: str) -> dict[str, Union[str, int]]:
     """
     Generate hash of a file's contents.
 
@@ -206,7 +206,7 @@ def hash_file(file_path: str, algorithm: str = "sha256") -> dict[str, Union[str,
 
 @strands_tool
 def verify_checksum(
-    data: str, expected_hash: str, algorithm: str = "sha256"
+    data: str, expected_hash: str, algorithm: str
 ) -> dict[str, Union[str, int, bool]]:
     """
     Verify data against an expected hash.

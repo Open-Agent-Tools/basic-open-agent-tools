@@ -45,6 +45,7 @@ def calculate_luminance(r: int, g: int, b: int) -> float:
     b_norm = b / 255.0
 
     # Apply gamma correction
+    @strands_tool
     def adjust_gamma(channel: float) -> float:
         if channel <= 0.03928:
             return channel / 12.92

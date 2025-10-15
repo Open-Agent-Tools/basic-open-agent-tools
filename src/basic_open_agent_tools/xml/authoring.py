@@ -6,7 +6,14 @@ from simple dictionary structures.
 
 import os
 import xml.etree.ElementTree as ET
-from typing import Optional
+from typing import Any, Callable, Optional
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
 
 
 def _dict_to_element(data: dict, parent: Optional[ET.Element] = None) -> ET.Element:
@@ -36,6 +43,7 @@ def _dict_to_element(data: dict, parent: Optional[ET.Element] = None) -> ET.Elem
     return element
 
 
+@strands_tool
 def create_xml_from_dict(data: dict, root_tag: str, encoding: str, indent: bool) -> str:
     """Create XML string from nested dictionary structure.
 
@@ -114,6 +122,7 @@ def create_xml_from_dict(data: dict, root_tag: str, encoding: str, indent: bool)
     return decoded_str
 
 
+@strands_tool
 def write_xml_file(
     data: dict, file_path: str, root_tag: str, encoding: str, skip_confirm: bool
 ) -> str:
@@ -188,6 +197,7 @@ def write_xml_file(
     return f"Created XML file {file_path} ({file_size} bytes)"
 
 
+@strands_tool
 def create_xml_element(tag: str, text: str, attributes: dict[str, str]) -> dict:
     """Create a single XML element as dict structure.
 
@@ -244,6 +254,7 @@ def create_xml_element(tag: str, text: str, attributes: dict[str, str]) -> dict:
     }
 
 
+@strands_tool
 def add_xml_child_element(parent: dict, child: dict) -> dict:
     """Add child element to parent element structure.
 
@@ -291,6 +302,7 @@ def add_xml_child_element(parent: dict, child: dict) -> dict:
     return parent
 
 
+@strands_tool
 def set_xml_element_attribute(
     element: dict, attribute_name: str, attribute_value: str
 ) -> dict:
@@ -342,6 +354,7 @@ def set_xml_element_attribute(
     return element
 
 
+@strands_tool
 def build_simple_xml(root_tag: str, elements: list[dict]) -> str:
     """Build simple flat XML document from list of elements.
 
@@ -396,6 +409,7 @@ def build_simple_xml(root_tag: str, elements: list[dict]) -> str:
     return create_xml_from_dict(root_data, root_tag, "UTF-8", indent=True)
 
 
+@strands_tool
 def xml_from_csv(csv_data: list[dict], root_tag: str, row_tag: str) -> str:
     """Convert CSV data (list of dicts) to XML format.
 

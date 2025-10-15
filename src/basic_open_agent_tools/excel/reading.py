@@ -5,6 +5,15 @@ Excel (.xlsx) spreadsheets.
 """
 
 import os
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from openpyxl import load_workbook  # type: ignore[import-untyped, import-not-found]
@@ -17,6 +26,7 @@ except ImportError:
 MAX_FILE_SIZE = 100 * 1024 * 1024
 
 
+@strands_tool
 def read_excel_sheet(file_path: str, sheet_name: str) -> list[list[str]]:
     """Read Excel sheet as 2D list of strings.
 
@@ -91,6 +101,7 @@ def read_excel_sheet(file_path: str, sheet_name: str) -> list[list[str]]:
         raise ValueError(f"Failed to read Excel sheet: {e}")
 
 
+@strands_tool
 def get_excel_sheet_names(file_path: str) -> list[str]:
     """Get list of all sheet names in Excel workbook.
 
@@ -141,6 +152,7 @@ def get_excel_sheet_names(file_path: str) -> list[str]:
         raise ValueError(f"Failed to get sheet names: {e}")
 
 
+@strands_tool
 def read_excel_as_dicts(
     file_path: str, sheet_name: str, header_row: int
 ) -> list[dict[str, str]]:
@@ -218,6 +230,7 @@ def read_excel_as_dicts(
     return result
 
 
+@strands_tool
 def get_excel_cell_value(file_path: str, sheet_name: str, cell_reference: str) -> str:
     """Get value from single cell using A1 notation.
 
@@ -287,6 +300,7 @@ def get_excel_cell_value(file_path: str, sheet_name: str, cell_reference: str) -
         raise ValueError(f"Failed to get cell value: {e}")
 
 
+@strands_tool
 def get_excel_cell_range(
     file_path: str, sheet_name: str, start_cell: str, end_cell: str
 ) -> list[list[str]]:
@@ -369,6 +383,7 @@ def get_excel_cell_range(
         raise ValueError(f"Failed to get cell range: {e}")
 
 
+@strands_tool
 def search_excel_text(
     file_path: str, search_term: str, case_sensitive: bool
 ) -> list[dict[str, object]]:
@@ -456,6 +471,7 @@ def search_excel_text(
         raise ValueError(f"Failed to search Excel file: {e}")
 
 
+@strands_tool
 def get_excel_metadata(file_path: str) -> dict[str, str]:
     """Get Excel workbook metadata and properties.
 
@@ -521,6 +537,7 @@ def get_excel_metadata(file_path: str) -> dict[str, str]:
         raise ValueError(f"Failed to get Excel metadata: {e}")
 
 
+@strands_tool
 def get_excel_info(file_path: str) -> dict[str, object]:
     """Get comprehensive information about Excel workbook.
 

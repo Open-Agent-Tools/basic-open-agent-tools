@@ -6,6 +6,15 @@ formatting XML, and transforming XML documents.
 
 import json
 import xml.etree.ElementTree as ET
+from typing import Any, Callable
+
+try:
+    from strands import tool as strands_tool
+except ImportError:
+    # Create a no-op decorator if strands is not installed
+    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
+        return func
+
 
 try:
     from defusedxml.ElementTree import (
@@ -64,6 +73,7 @@ def _element_to_json_dict(element: ET.Element) -> dict:
     return result
 
 
+@strands_tool
 def xml_to_json(xml_content: str) -> str:
     """Convert XML to JSON format preserving structure.
 
@@ -110,6 +120,7 @@ def xml_to_json(xml_content: str) -> str:
         raise ValueError(f"Invalid XML content: {e}")
 
 
+@strands_tool
 def json_to_xml(json_content: str, root_tag: str) -> str:
     """Convert JSON to XML format.
 
@@ -157,6 +168,7 @@ def json_to_xml(json_content: str, root_tag: str) -> str:
         root = ET.Element(root_tag)
 
         # Convert dict to XML elements
+        @strands_tool
         def dict_to_element(parent: ET.Element, data: dict) -> None:
             """Recursively convert dict to XML elements."""
             for key, value in data.items():
@@ -209,6 +221,7 @@ def json_to_xml(json_content: str, root_tag: str) -> str:
         raise ValueError(f"Invalid JSON content: {e}")
 
 
+@strands_tool
 def format_xml(xml_content: str, indent_size: int) -> str:
     """Format XML with proper indentation and line breaks.
 
@@ -265,6 +278,7 @@ def format_xml(xml_content: str, indent_size: int) -> str:
         raise ValueError(f"Invalid XML content: {e}")
 
 
+@strands_tool
 def strip_xml_namespaces(xml_content: str) -> str:
     """Remove namespace declarations and prefixes from XML.
 
@@ -302,6 +316,7 @@ def strip_xml_namespaces(xml_content: str) -> str:
             root = ET.fromstring(xml_content)
 
         # Strip namespaces from all elements
+        @strands_tool
         def strip_ns(element: ET.Element) -> None:
             """Remove namespace from element and descendants."""
             # Remove namespace from tag
@@ -334,6 +349,7 @@ def strip_xml_namespaces(xml_content: str) -> str:
         raise ValueError(f"Invalid XML content: {e}")
 
 
+@strands_tool
 def transform_xml_with_xslt(xml_content: str, xslt_path: str) -> str:
     """Apply XSLT transformation to XML.
 
@@ -403,6 +419,7 @@ def transform_xml_with_xslt(xml_content: str, xslt_path: str) -> str:
         raise ValueError(f"Invalid XML syntax: {e}")
 
 
+@strands_tool
 def extract_xml_to_csv(xml_content: str, element_tag: str) -> list[dict]:
     """Extract repeating elements to CSV-style list of dicts.
 

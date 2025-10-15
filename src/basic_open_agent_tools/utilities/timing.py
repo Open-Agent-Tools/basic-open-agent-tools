@@ -19,7 +19,7 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
-def sleep_seconds(seconds: Union[int, float]) -> dict[str, Union[str, float]]:
+def sleep_seconds(seconds: float) -> dict[str, Union[str, float]]:
     """Pause execution for the specified number of seconds.
 
     This function provides a controlled sleep mechanism that can be interrupted
@@ -57,6 +57,7 @@ def sleep_seconds(seconds: Union[int, float]) -> dict[str, Union[str, float]]:
     start_time = time.time()
     interrupted = False
 
+    @strands_tool
     def signal_handler(signum: int, frame: Any) -> None:
         nonlocal interrupted
         interrupted = True
@@ -101,7 +102,7 @@ def sleep_seconds(seconds: Union[int, float]) -> dict[str, Union[str, float]]:
 
 
 @strands_tool
-def sleep_milliseconds(milliseconds: Union[int, float]) -> dict[str, Union[str, float]]:
+def sleep_milliseconds(milliseconds: float) -> dict[str, Union[str, float]]:
     """Pause execution for the specified number of milliseconds.
 
     Convenience function for shorter sleep durations.
@@ -137,7 +138,7 @@ def sleep_milliseconds(milliseconds: Union[int, float]) -> dict[str, Union[str, 
 
 
 @strands_tool
-def precise_sleep(seconds: Union[int, float]) -> dict[str, Union[str, float]]:
+def precise_sleep(seconds: float) -> dict[str, Union[str, float]]:
     """Perform a high-precision sleep using busy-waiting for the final portion.
 
     This function combines time.sleep() with busy-waiting to achieve more precise
