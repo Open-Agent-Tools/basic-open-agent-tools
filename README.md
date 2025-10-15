@@ -2,7 +2,15 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions.
 
-## 🆕 What's New in v0.13.3
+## 🆕 What's New in v0.13.6
+
+💬 **Enhanced Confirmation Previews**: Confirmation dialogs now show meaningful previews of new content being created instead of just old file sizes
+
+📊 **Better User Feedback**: File writes show content previews, CSV writes show row/column counts with sample data, archive operations show file lists
+
+🎯 **Comprehensive Coverage**: All 22 confirmation operations now provide context-aware previews for better decision making
+
+### Previous Release (v0.13.3)
 
 🔍 **Structured Logging**: Migrated 157 print statements to Python logging framework with `BOAT_LOG_LEVEL` environment variable control
 
