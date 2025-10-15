@@ -1,6 +1,6 @@
 # System Tools TODO
 
-## Current Status (v0.15.0)
+## Current Status (v0.13.1)
 
 ### ✅ **SYSTEM UTILITIES TOOLKIT COMPLETED**
 
@@ -65,4 +65,4 @@ All functions follow the agent-friendly design principles:
 
 ---
 
-**Last Updated**: v0.15.0 (2025-10-10) - Core system utilities (shell, environment, info) implemented with full testing
+**Last Updated**: v0.13.1 (2025-10-14) - Core system utilities (shell, environment, info) implemented with full testing
