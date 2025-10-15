@@ -11,6 +11,37 @@ from ..exceptions import DataError
 logger = get_logger("data.csv_tools")
 
 
+def _generate_csv_preview(data: list[dict[str, str]], delimiter: str = ",") -> str:
+    """Generate a preview of CSV data for confirmation prompts.
+
+    Args:
+        data: The CSV data as list of dictionaries
+        delimiter: CSV delimiter character
+
+    Returns:
+        Formatted preview string with row/column count and sample rows
+    """
+    if not data:
+        return "Writing empty CSV file (0 rows)"
+
+    row_count = len(data)
+    col_count = len(data[0].keys()) if data else 0
+
+    preview = f"Writing {row_count} rows, {col_count} columns\n"
+
+    # Show first 3 rows as preview
+    sample_rows = min(3, len(data))
+    if sample_rows > 0:
+        preview += f"\nFirst {sample_rows} row(s):\n"
+        for i, row in enumerate(data[:sample_rows]):
+            row_str = delimiter.join(f"{k}={v}" for k, v in list(row.items())[:3])
+            if len(row.items()) > 3:
+                row_str += f"... ({len(row)} total fields)"
+            preview += f"  {i + 1}. {row_str}\n"
+
+    return preview.strip()
+
+
 @adk_tool
 @strands_tool
 def read_csv_simple(
@@ -139,8 +170,8 @@ def write_csv_simple(
     file_existed = os.path.exists(file_path_str)
 
     if file_existed:
-        # Check user confirmation
-        preview = f"{os.path.getsize(file_path_str)} bytes" if file_existed else None
+        # Check user confirmation - show preview of NEW data being written
+        preview = _generate_csv_preview(data, delimiter)
         confirmed = check_user_confirmation(
             operation="overwrite existing CSV file",
             target=file_path_str,

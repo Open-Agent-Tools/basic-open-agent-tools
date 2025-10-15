@@ -29,6 +29,35 @@ except ImportError:
 logger = get_logger("data.config_processing")
 
 
+def _generate_dict_preview(data: dict, format_name: str) -> str:
+    """Generate a preview of dictionary data for confirmation prompts.
+
+    Args:
+        data: The dictionary data to preview
+        format_name: Name of the format (YAML, TOML, INI, etc.)
+
+    Returns:
+        Formatted preview string with key count and sample entries
+    """
+    if not data:
+        return f"Writing empty {format_name} file (0 keys)"
+
+    key_count = len(data)
+    preview = f"Writing {key_count} top-level key(s)\n"
+
+    # Show first 3 keys and their values (truncated)
+    sample_keys = min(3, len(data))
+    if sample_keys > 0:
+        preview += f"\nFirst {sample_keys} key(s):\n"
+        for i, (key, value) in enumerate(list(data.items())[:sample_keys]):
+            value_repr = repr(value)
+            if len(value_repr) > 80:
+                value_repr = value_repr[:77] + "..."
+            preview += f"  {i + 1}. {key}: {value_repr}\n"
+
+    return preview.strip()
+
+
 @adk_tool
 @strands_tool
 def read_yaml_file(file_path: str) -> dict:
@@ -102,8 +131,8 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     file_existed = os.path.exists(file_path)
 
     if file_existed:
-        # Check user confirmation
-        preview = f"{os.path.getsize(file_path)} bytes" if file_existed else None
+        # Check user confirmation - show preview of NEW data being written
+        preview = _generate_dict_preview(data, "YAML")
         confirmed = check_user_confirmation(
             operation="overwrite existing YAML file",
             target=file_path,
@@ -208,8 +237,8 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     file_existed = os.path.exists(file_path)
 
     if file_existed:
-        # Check user confirmation
-        preview = f"{os.path.getsize(file_path)} bytes" if file_existed else None
+        # Check user confirmation - show preview of NEW data being written
+        preview = _generate_dict_preview(data, "TOML")
         confirmed = check_user_confirmation(
             operation="overwrite existing TOML file",
             target=file_path,
@@ -315,8 +344,8 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     file_existed = os.path.exists(file_path)
 
     if file_existed:
-        # Check user confirmation
-        preview = f"{os.path.getsize(file_path)} bytes" if file_existed else None
+        # Check user confirmation - show preview of NEW data being written
+        preview = _generate_dict_preview(data, "INI")
         confirmed = check_user_confirmation(
             operation="overwrite existing INI file",
             target=file_path,

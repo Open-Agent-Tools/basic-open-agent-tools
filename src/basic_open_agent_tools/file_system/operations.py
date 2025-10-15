@@ -11,6 +11,33 @@ from .validation import validate_file_content, validate_path
 logger = get_logger("file_system.operations")
 
 
+def _generate_content_preview(content: str, max_chars: int = 200) -> str:
+    """Generate a preview of content for confirmation prompts.
+
+    Args:
+        content: The content to preview
+        max_chars: Maximum number of characters to show in preview
+
+    Returns:
+        Formatted preview string with line count, byte size, and content sample
+    """
+    line_count = len(content.splitlines()) if content else 0
+    byte_size = len(content.encode("utf-8"))
+
+    preview = f"Writing {line_count} lines ({byte_size} bytes)\n"
+
+    if content:
+        # Show first max_chars of content
+        sample = content[:max_chars]
+        if len(content) > max_chars:
+            sample += "..."
+        preview += f"Content preview: {repr(sample)}"
+    else:
+        preview += "Content: (empty file)"
+
+    return preview
+
+
 @adk_tool
 @strands_tool
 def read_file_to_string(file_path: str) -> str:
@@ -68,7 +95,8 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
 
     if file_existed:
         # Check user confirmation (interactive prompt, agent error, or bypass)
-        preview = f"{path.stat().st_size} bytes" if file_existed else None
+        # Show preview of NEW content being written, not old file size
+        preview = _generate_content_preview(content)
         confirmed = check_user_confirmation(
             operation="overwrite existing file",
             target=str(path),
