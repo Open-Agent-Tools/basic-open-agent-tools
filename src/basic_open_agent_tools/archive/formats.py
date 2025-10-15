@@ -8,6 +8,7 @@ from .._logging import get_logger
 from ..confirmation import check_user_confirmation
 from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
+from .compression import _generate_archive_preview
 
 logger = get_logger("archive.formats")
 
@@ -48,8 +49,8 @@ def create_tar(
     file_existed = os.path.exists(output_path)
 
     if file_existed:
-        # Check user confirmation
-        preview = f"{os.path.getsize(output_path)} bytes" if file_existed else None
+        # Check user confirmation - show preview of NEW archive being created
+        preview = _generate_archive_preview(source_paths)
         confirmed = check_user_confirmation(
             operation="overwrite existing TAR archive",
             target=output_path,

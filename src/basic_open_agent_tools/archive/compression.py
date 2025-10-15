@@ -16,6 +16,59 @@ from ..exceptions import BasicAgentToolsError
 logger = get_logger("archive.compression")
 
 
+def _generate_archive_preview(source_paths: list[str]) -> str:
+    """Generate a preview of files being archived.
+
+    Args:
+        source_paths: List of source file/directory paths
+
+    Returns:
+        Formatted preview string with file count and sample paths
+    """
+    file_count = len(source_paths)
+    preview = f"Archiving {file_count} source(s)\n"
+
+    # Show first 5 sources
+    sample_count = min(5, file_count)
+    if sample_count > 0:
+        preview += f"\nFirst {sample_count} source(s):\n"
+        for i, path in enumerate(source_paths[:sample_count]):
+            # Try to get size if it's a file
+            try:
+                if os.path.isfile(path):
+                    size = os.path.getsize(path)
+                    preview += f"  {i + 1}. {path} ({size} bytes)\n"
+                elif os.path.isdir(path):
+                    preview += f"  {i + 1}. {path}/ (directory)\n"
+                else:
+                    preview += f"  {i + 1}. {path}\n"
+            except OSError:
+                preview += f"  {i + 1}. {path}\n"
+
+    if file_count > 5:
+        preview += f"  ... and {file_count - 5} more"
+
+    return preview.strip()
+
+
+def _generate_compression_preview(input_path: str, compression_type: str) -> str:
+    """Generate a preview of single file compression.
+
+    Args:
+        input_path: Path to file being compressed
+        compression_type: Type of compression (GZIP, BZIP2, XZ)
+
+    Returns:
+        Formatted preview string with file info
+    """
+    try:
+        input_size = os.path.getsize(input_path)
+        size_kb = round(input_size / 1024, 1)
+        return f"Compressing {input_path} ({input_size} bytes / {size_kb} KB) with {compression_type}"
+    except OSError:
+        return f"Compressing {input_path} with {compression_type}"
+
+
 @adk_tool
 @strands_tool
 def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) -> str:
@@ -50,7 +103,8 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
 
     if file_existed:
         # Check user confirmation (interactive prompt, agent error, or bypass)
-        preview = f"{os.path.getsize(output_path)} bytes" if file_existed else None
+        # Show preview of NEW archive being created, not old file size
+        preview = _generate_archive_preview(source_paths)
         confirmed = check_user_confirmation(
             operation="overwrite existing ZIP archive",
             target=output_path,
@@ -221,8 +275,8 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
     file_existed = os.path.exists(output_path)
 
     if file_existed:
-        # Check user confirmation
-        preview = f"{os.path.getsize(output_path)} bytes" if file_existed else None
+        # Check user confirmation - show preview of source file being compressed
+        preview = _generate_compression_preview(input_path, "GZIP")
         confirmed = check_user_confirmation(
             operation="overwrite existing GZIP file",
             target=output_path,
@@ -356,8 +410,8 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
     file_existed = os.path.exists(output_path)
 
     if file_existed:
-        # Check user confirmation
-        preview = f"{os.path.getsize(output_path)} bytes" if file_existed else None
+        # Check user confirmation - show preview of source file being compressed
+        preview = _generate_compression_preview(input_path, "BZIP2")
         confirmed = check_user_confirmation(
             operation="overwrite existing BZIP2 file",
             target=output_path,
@@ -430,8 +484,8 @@ def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> s
     file_existed = os.path.exists(output_path)
 
     if file_existed:
-        # Check user confirmation
-        preview = f"{os.path.getsize(output_path)} bytes" if file_existed else None
+        # Check user confirmation - show preview of source file being compressed
+        preview = _generate_compression_preview(input_path, "XZ")
         confirmed = check_user_confirmation(
             operation="overwrite existing XZ file",
             target=output_path,
