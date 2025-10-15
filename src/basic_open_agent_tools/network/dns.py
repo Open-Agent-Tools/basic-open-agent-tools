@@ -1,20 +1,13 @@
 """DNS resolution and network utilities."""
 
 import socket
-from typing import Any, Callable, Union
+from typing import Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
-
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
+@adk_tool
 @strands_tool
 def resolve_hostname(
     hostname: str,
@@ -69,6 +62,7 @@ def resolve_hostname(
         raise BasicAgentToolsError(f"DNS resolution error: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def reverse_dns_lookup(ip_address: str) -> dict[str, Union[str, bool]]:
     """
@@ -123,6 +117,7 @@ def reverse_dns_lookup(ip_address: str) -> dict[str, Union[str, bool]]:
         raise BasicAgentToolsError(f"Reverse DNS lookup error: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def check_port_open(
     host: str, port: int, timeout: int

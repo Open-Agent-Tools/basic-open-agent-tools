@@ -1,19 +1,15 @@
 """JSON processing utilities for AI agents."""
 
 import json
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
-        return func
-
-
+from .._logging import get_logger
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import SerializationError
 
+logger = get_logger("data.json_tools")
 
+
+@adk_tool
 @strands_tool
 def safe_json_serialize(data: dict, indent: int) -> str:
     """Safely serialize data to JSON string with error handling.
@@ -36,7 +32,7 @@ def safe_json_serialize(data: dict, indent: int) -> str:
         '{\\n  "a": 1,\\n  "b": 2\\n}'
     """
     data_type = type(data).__name__
-    print(f"[DATA] Serializing {data_type} to JSON (indent={indent})")
+    logger.debug(f"Serializing {data_type} to JSON (indent={indent})")
 
     if not isinstance(indent, int):
         raise TypeError("indent must be an integer")
@@ -45,13 +41,14 @@ def safe_json_serialize(data: dict, indent: int) -> str:
         # Use None for compact format when indent is 0
         actual_indent = None if indent == 0 else indent
         result = json.dumps(data, indent=actual_indent, ensure_ascii=False)
-        print(f"[DATA] JSON serialized: {len(result)} characters")
+        logger.debug(f"JSON serialized: {len(result)} characters")
         return result
     except (TypeError, ValueError) as e:
-        print(f"[DATA] JSON serialization error: {e}")
+        logger.error(f"JSON serialization error: {e}")
         raise SerializationError(f"Failed to serialize data to JSON: {e}")
 
 
+@adk_tool
 @strands_tool
 def safe_json_deserialize(json_str: str) -> dict:
     """Safely deserialize JSON string to Python object with error handling.
@@ -72,7 +69,7 @@ def safe_json_deserialize(json_str: str) -> dict:
         >>> safe_json_deserialize('[1, 2, 3]')
         [1, 2, 3]
     """
-    print(f"[DATA] Deserializing JSON string ({len(json_str)} characters)")
+    logger.debug(f"Deserializing JSON string ({len(json_str)} characters)")
 
     if not isinstance(json_str, str):
         raise TypeError("Input must be a string")
@@ -86,15 +83,16 @@ def safe_json_deserialize(json_str: str) -> dict:
             # Wrap non-dict results in a dict for consistency
             final_result = {"result": result}
 
-        print(
-            f"[DATA] JSON deserialized: {type(final_result).__name__} with {len(final_result)} keys"
+        logger.debug(
+            f"JSON deserialized: {type(final_result).__name__} with {len(final_result)} keys"
         )
         return final_result
     except (json.JSONDecodeError, ValueError) as e:
-        print(f"[DATA] JSON deserialization error: {e}")
+        logger.error(f"JSON deserialization error: {e}")
         raise SerializationError(f"Failed to deserialize JSON string: {e}")
 
 
+@adk_tool
 @strands_tool
 def validate_json_string(json_str: str) -> bool:
     """Validate JSON string without deserializing.
@@ -111,16 +109,16 @@ def validate_json_string(json_str: str) -> bool:
         >>> validate_json_string('{"invalid": }')
         False
     """
-    print(f"[DATA] Validating JSON string ({len(json_str)} characters)")
+    logger.debug(f"Validating JSON string ({len(json_str)} characters)")
 
     if not isinstance(json_str, str):
-        print("[DATA] JSON validation failed: not a string")  # type: ignore[unreachable]
+        logger.debug("[DATA] JSON validation failed: not a string")  # type: ignore[unreachable]
         return False  # False positive - mypy thinks isinstance always narrows, but runtime can differ
 
     try:
         json.loads(json_str)
-        print("[DATA] JSON validation: valid")
+        logger.debug("[DATA] JSON validation: valid")
         return True
     except (json.JSONDecodeError, ValueError) as e:
-        print(f"[DATA] JSON validation failed: {e}")
+        logger.error(f"JSON validation failed: {e}")
         return False

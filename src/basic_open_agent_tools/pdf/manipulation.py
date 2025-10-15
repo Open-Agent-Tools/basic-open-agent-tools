@@ -5,15 +5,8 @@ manipulating existing PDF files.
 """
 
 import os
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
+from ..decorators import adk_tool, strands_tool
 
 try:
     from PyPDF2 import (  # type: ignore[import-untyped, import-not-found]
@@ -45,6 +38,7 @@ except ImportError:
 MAX_PDF_FILE_SIZE = 100 * 1024 * 1024
 
 
+@adk_tool
 @strands_tool
 def merge_pdfs(input_paths: list[str], output_path: str, skip_confirm: bool) -> str:
     """Merge multiple PDF files into one.
@@ -137,6 +131,7 @@ def merge_pdfs(input_paths: list[str], output_path: str, skip_confirm: bool) -> 
         raise ValueError(f"Failed to merge PDFs: {e}")
 
 
+@adk_tool
 @strands_tool
 def split_pdf(input_path: str, output_dir: str, skip_confirm: bool) -> str:
     """Split PDF into individual page files.
@@ -226,6 +221,7 @@ def split_pdf(input_path: str, output_dir: str, skip_confirm: bool) -> str:
         raise ValueError(f"Failed to split PDF: {e}")
 
 
+@adk_tool
 @strands_tool
 def extract_pdf_pages(
     input_path: str, output_path: str, page_numbers: list[int], skip_confirm: bool
@@ -335,6 +331,7 @@ def extract_pdf_pages(
         raise ValueError(f"Failed to extract pages: {e}")
 
 
+@adk_tool
 @strands_tool
 def rotate_pdf_pages(
     input_path: str,
@@ -449,6 +446,7 @@ def rotate_pdf_pages(
         raise ValueError(f"Failed to rotate pages: {e}")
 
 
+@adk_tool
 @strands_tool
 def remove_pdf_pages(
     input_path: str, output_path: str, page_numbers: list[int], skip_confirm: bool
@@ -552,6 +550,7 @@ def remove_pdf_pages(
         raise ValueError(f"Failed to remove pages: {e}")
 
 
+@adk_tool
 @strands_tool
 def add_page_numbers(input_path: str, output_path: str, skip_confirm: bool) -> str:
     """Add page numbers to PDF.
@@ -647,6 +646,7 @@ def add_page_numbers(input_path: str, output_path: str, skip_confirm: bool) -> s
         raise ValueError(f"Failed to add page numbers: {e}")
 
 
+@adk_tool
 @strands_tool
 def watermark_pdf(
     input_path: str, output_path: str, watermark_text: str, skip_confirm: bool

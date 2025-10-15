@@ -5,16 +5,11 @@ strings for consistent date representation.
 """
 
 from datetime import date, timedelta
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
-        return func
+from ..decorators import adk_tool, strands_tool
 
 
+@adk_tool
 @strands_tool
 def get_next_business_day(date_string: str) -> str:
     """Get the next business day after the given date.
@@ -58,6 +53,7 @@ def get_next_business_day(date_string: str) -> str:
     return next_date.isoformat()
 
 
+@adk_tool
 @strands_tool
 def is_business_day(date_string: str) -> bool:
     """Check if a date is a business day.

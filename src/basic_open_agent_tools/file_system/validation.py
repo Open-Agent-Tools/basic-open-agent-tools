@@ -1,18 +1,12 @@
 """Path validation utilities for file system operations."""
 
 from pathlib import Path
-from typing import Any, Callable
 
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import FileSystemError
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
 
-
+@adk_tool
 @strands_tool
 def validate_path(path: str, operation: str) -> Path:
     """Validate and convert path string to Path object.
@@ -37,6 +31,7 @@ def validate_path(path: str, operation: str) -> Path:
         raise FileSystemError(f"Invalid path for {operation}: {path} - {e}")
 
 
+@adk_tool
 @strands_tool
 def validate_file_content(content: str, operation: str) -> None:
     """Validate file content for write operations.

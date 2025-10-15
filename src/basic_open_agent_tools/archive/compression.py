@@ -6,20 +6,17 @@ import lzma
 import os
 import shutil
 import zipfile
-from typing import Any, Callable, Union
+from typing import Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
-
+from .._logging import get_logger
 from ..confirmation import check_user_confirmation
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
+logger = get_logger("archive.compression")
 
+
+@adk_tool
 @strands_tool
 def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) -> str:
     """Create a ZIP archive from files and directories with permission checking.
@@ -35,8 +32,8 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
     Raises:
         BasicAgentToolsError: If archive creation fails or file exists without skip_confirm
     """
-    print(
-        f"[ARCHIVE] Creating ZIP: {output_path} from {len(source_paths)} sources (skip_confirm={skip_confirm})"
+    logger.debug(
+        f"Creating ZIP: {output_path} from {len(source_paths)} sources (skip_confirm={skip_confirm})"
     )
 
     if not isinstance(source_paths, list) or not source_paths:
@@ -62,7 +59,7 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
         )
 
         if not confirmed:
-            print(f"[ARCHIVE] ZIP creation cancelled by user: {output_path}")
+            logger.debug(f"ZIP creation cancelled by user: {output_path}")
             return f"Operation cancelled by user: {output_path}"
 
     try:
@@ -88,13 +85,14 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
         action = "Overwrote" if file_existed else "Created"
 
         result = f"{action} ZIP archive {output_path} with {file_count} files ({archive_size} bytes)"
-        print(f"[ARCHIVE] {result}")
+        logger.debug(f"{result}")
         return result
     except Exception as e:
-        print(f"[ARCHIVE] ZIP creation failed: {e}")
+        logger.error(f"ZIP creation failed: {e}")
         raise BasicAgentToolsError(f"Failed to create ZIP archive: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
     """Extract a ZIP archive to a directory with permission checking.
@@ -110,8 +108,8 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
     Raises:
         BasicAgentToolsError: If extraction fails or directory is not empty without skip_confirm
     """
-    print(
-        f"[ARCHIVE] Extracting ZIP: {zip_path} to {extract_to} (skip_confirm={skip_confirm})"
+    logger.debug(
+        f"Extracting ZIP: {zip_path} to {extract_to} (skip_confirm={skip_confirm})"
     )
 
     if not isinstance(zip_path, str) or not zip_path.strip():
@@ -124,7 +122,7 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
         raise BasicAgentToolsError("skip_confirm must be a boolean")
 
     if not os.path.exists(zip_path):
-        print(f"[ARCHIVE] ZIP file not found: {zip_path}")
+        logger.debug(f"ZIP file not found: {zip_path}")
         raise BasicAgentToolsError(f"ZIP file not found: {zip_path}")
 
     # Check if extraction directory exists and has contents
@@ -142,7 +140,7 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
                 )
 
                 if not confirmed:
-                    print(f"[ARCHIVE] ZIP extraction cancelled by user: {extract_to}")
+                    logger.debug(f"ZIP extraction cancelled by user: {extract_to}")
                     return f"Operation cancelled by user: {extract_to}"
         except OSError:
             pass  # Can't read directory, proceed anyway
@@ -159,13 +157,14 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
         archive_size = os.path.getsize(zip_path)
 
         result = f"Extracted ZIP archive {zip_path} to {extract_to} ({files_extracted} files, {archive_size} bytes)"
-        print(f"[ARCHIVE] {result}")
+        logger.debug(f"{result}")
         return result
     except Exception as e:
-        print(f"[ARCHIVE] ZIP extraction failed: {e}")
+        logger.error(f"ZIP extraction failed: {e}")
         raise BasicAgentToolsError(f"Failed to extract ZIP archive: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def compress_files(file_paths: list[str], output_path: str, skip_confirm: bool) -> str:
     """Compress multiple files into a ZIP archive.
@@ -178,10 +177,11 @@ def compress_files(file_paths: list[str], output_path: str, skip_confirm: bool) 
     Returns:
         String describing the operation result
     """
-    print(f"[ARCHIVE] Compressing {len(file_paths)} files to: {output_path}")
+    logger.debug(f"Compressing {len(file_paths)} files to: {output_path}")
     return create_zip(file_paths, output_path, skip_confirm)  # type: ignore[no-any-return]
 
 
+@adk_tool
 @strands_tool
 def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) -> str:
     """
@@ -231,7 +231,7 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
         )
 
         if not confirmed:
-            print(f"[ARCHIVE] GZIP compression cancelled by user: {output_path}")
+            logger.debug(f"GZIP compression cancelled by user: {output_path}")
             return f"Operation cancelled by user: {output_path}"
 
     try:
@@ -247,14 +247,15 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
 
         action = "Overwrote" if file_existed else "Created"
         result = f"{action} GZIP compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
-        print(f"[ARCHIVE] {result}")
+        logger.debug(f"{result}")
         return result
 
     except Exception as e:
-        print(f"[ARCHIVE] GZIP compression failed: {e}")
+        logger.error(f"GZIP compression failed: {e}")
         raise BasicAgentToolsError(f"Failed to compress file with gzip: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def decompress_file_gzip(
     input_path: str, output_path: str
@@ -315,6 +316,7 @@ def decompress_file_gzip(
         raise BasicAgentToolsError(f"Failed to decompress gzip file: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -> str:
     """
@@ -364,7 +366,7 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
         )
 
         if not confirmed:
-            print(f"[ARCHIVE] BZIP2 compression cancelled by user: {output_path}")
+            logger.debug(f"BZIP2 compression cancelled by user: {output_path}")
             return f"Operation cancelled by user: {output_path}"
 
     try:
@@ -380,14 +382,15 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
 
         action = "Overwrote" if file_existed else "Created"
         result = f"{action} BZIP2 compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
-        print(f"[ARCHIVE] {result}")
+        logger.debug(f"{result}")
         return result
 
     except Exception as e:
-        print(f"[ARCHIVE] BZIP2 compression failed: {e}")
+        logger.error(f"BZIP2 compression failed: {e}")
         raise BasicAgentToolsError(f"Failed to compress file with bzip2: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> str:
     """
@@ -437,7 +440,7 @@ def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> s
         )
 
         if not confirmed:
-            print(f"[ARCHIVE] XZ compression cancelled by user: {output_path}")
+            logger.debug(f"XZ compression cancelled by user: {output_path}")
             return f"Operation cancelled by user: {output_path}"
 
     try:
@@ -453,9 +456,9 @@ def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> s
 
         action = "Overwrote" if file_existed else "Created"
         result = f"{action} XZ compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
-        print(f"[ARCHIVE] {result}")
+        logger.debug(f"{result}")
         return result
 
     except Exception as e:
-        print(f"[ARCHIVE] XZ compression failed: {e}")
+        logger.error(f"XZ compression failed: {e}")
         raise BasicAgentToolsError(f"Failed to compress file with XZ: {str(e)}")

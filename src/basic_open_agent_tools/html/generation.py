@@ -2,19 +2,13 @@
 
 import os
 import re
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
+from ..decorators import adk_tool, strands_tool
 
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
+@adk_tool
 @strands_tool
 def create_simple_html(
     file_path: str, title: str, content: str, skip_confirm: bool
@@ -81,6 +75,7 @@ def create_simple_html(
         raise ValueError(f"Failed to create HTML file: {e}")
 
 
+@adk_tool
 @strands_tool
 def create_html_with_head(
     file_path: str, head: dict[str, str], body: str, skip_confirm: bool
@@ -154,6 +149,7 @@ def create_html_with_head(
         raise ValueError(f"Failed to create HTML file: {e}")
 
 
+@adk_tool
 @strands_tool
 def create_html_table(headers: list[str], rows: list[list[str]]) -> str:
     """Generate HTML table string.
@@ -208,6 +204,7 @@ def create_html_table(headers: list[str], rows: list[list[str]]) -> str:
     return "\n".join(lines)
 
 
+@adk_tool
 @strands_tool
 def create_html_list(items: list[str], ordered: bool) -> str:
     """Generate HTML list string.
@@ -246,6 +243,7 @@ def create_html_list(items: list[str], ordered: bool) -> str:
     return "\n".join(lines)
 
 
+@adk_tool
 @strands_tool
 def wrap_in_html_tag(content: str, tag: str, attributes: dict[str, str]) -> str:
     """Wrap content in HTML tag with attributes.
@@ -283,6 +281,7 @@ def wrap_in_html_tag(content: str, tag: str, attributes: dict[str, str]) -> str:
     return f"<{tag}{attr_str}>{content}</{tag}>"
 
 
+@adk_tool
 @strands_tool
 def append_to_html_body(file_path: str, content: str, skip_confirm: bool) -> str:
     """Append content to HTML body tag.
@@ -341,6 +340,7 @@ def append_to_html_body(file_path: str, content: str, skip_confirm: bool) -> str
         raise ValueError(f"Failed to append to HTML file: {e}")
 
 
+@adk_tool
 @strands_tool
 def markdown_to_html_file(md_path: str, html_path: str, skip_confirm: bool) -> str:
     """Convert Markdown file to HTML file.
@@ -399,6 +399,7 @@ def markdown_to_html_file(md_path: str, html_path: str, skip_confirm: bool) -> s
         raise ValueError(f"Failed to convert Markdown to HTML: {e}")
 
 
+@adk_tool
 @strands_tool
 def html_to_markdown_file(html_path: str, md_path: str, skip_confirm: bool) -> str:
     """Convert HTML file to Markdown file (basic conversion).
@@ -500,6 +501,7 @@ def html_to_markdown_file(html_path: str, md_path: str, skip_confirm: bool) -> s
         raise ValueError(f"Failed to convert HTML to Markdown: {e}")
 
 
+@adk_tool
 @strands_tool
 def prettify_html(file_path: str, skip_confirm: bool) -> str:
     """Format/indent HTML file for readability.

@@ -2,20 +2,16 @@
 
 import hashlib
 import os
-from typing import Any, Callable, Union
+from typing import Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
-
+from .._logging import get_logger
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
+logger = get_logger("crypto.hashing")
 
+
+@adk_tool
 @strands_tool
 def hash_md5(data: str) -> dict[str, Union[str, int]]:
     """
@@ -33,7 +29,7 @@ def hash_md5(data: str) -> dict[str, Union[str, int]]:
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
 
-    print(f"[CRYPTO] Hashing {len(data)} chars with MD5")
+    logger.debug(f"Hashing {len(data)} chars with MD5")
 
     try:
         hash_obj = hashlib.md5(data.encode("utf-8"))
@@ -47,14 +43,15 @@ def hash_md5(data: str) -> dict[str, Union[str, int]]:
             "hash_length": len(hex_hash),
         }
 
-        print(f"[CRYPTO] MD5 hash generated: {hex_hash[:16]}...")
+        logger.debug(f"MD5 hash generated: {hex_hash[:16]}...")
         return result  # type: ignore[return-value]
 
     except Exception as e:
-        print(f"[CRYPTO] MD5 hash failed: {e}")
+        logger.error(f"MD5 hash failed: {e}")
         raise BasicAgentToolsError(f"Failed to generate MD5 hash: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def hash_sha256(data: str) -> dict[str, Union[str, int]]:
     """
@@ -72,7 +69,7 @@ def hash_sha256(data: str) -> dict[str, Union[str, int]]:
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
 
-    print(f"[CRYPTO] Hashing {len(data)} chars with SHA-256")
+    logger.debug(f"Hashing {len(data)} chars with SHA-256")
 
     try:
         hash_obj = hashlib.sha256(data.encode("utf-8"))
@@ -86,14 +83,15 @@ def hash_sha256(data: str) -> dict[str, Union[str, int]]:
             "hash_length": len(hex_hash),
         }
 
-        print(f"[CRYPTO] SHA-256 hash generated: {hex_hash[:16]}...")
+        logger.debug(f"SHA-256 hash generated: {hex_hash[:16]}...")
         return result  # type: ignore[return-value]
 
     except Exception as e:
-        print(f"[CRYPTO] SHA-256 hash failed: {e}")
+        logger.error(f"SHA-256 hash failed: {e}")
         raise BasicAgentToolsError(f"Failed to generate SHA-256 hash: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def hash_sha512(data: str) -> dict[str, Union[str, int]]:
     """
@@ -127,6 +125,7 @@ def hash_sha512(data: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to generate SHA-512 hash: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def hash_file(file_path: str, algorithm: str) -> dict[str, Union[str, int]]:
     """
@@ -142,7 +141,7 @@ def hash_file(file_path: str, algorithm: str) -> dict[str, Union[str, int]]:
     Raises:
         BasicAgentToolsError: If file path is invalid or algorithm is unsupported
     """
-    print(f"[CRYPTO] Hashing file: {file_path} with {algorithm}")
+    logger.debug(f"Hashing file: {file_path} with {algorithm}")
 
     if not isinstance(file_path, str) or not file_path.strip():
         raise BasicAgentToolsError("File path must be a non-empty string")
@@ -193,7 +192,7 @@ def hash_file(file_path: str, algorithm: str) -> dict[str, Union[str, int]]:
             "hash_length": len(hex_hash),
         }
 
-        print(f"[CRYPTO] File hash ({file_size} bytes): {hex_hash[:16]}...")
+        logger.debug(f"File hash ({file_size} bytes): {hex_hash[:16]}...")
         return result  # type: ignore[return-value]
 
     except FileNotFoundError:
@@ -204,6 +203,7 @@ def hash_file(file_path: str, algorithm: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to hash file {file_path}: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def verify_checksum(
     data: str, expected_hash: str, algorithm: str

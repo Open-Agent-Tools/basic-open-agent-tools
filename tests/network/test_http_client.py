@@ -61,7 +61,9 @@ class TestHttpRequest:
         mock_urlopen.return_value = mock_response
 
         json_data = '{"name": "test"}'
-        result = http_request("POST", "https://example.com/users", "{}", json_data, 30, True, True)
+        result = http_request(
+            "POST", "https://example.com/users", "{}", json_data, 30, True, True
+        )
 
         assert result["status_code"] == 201
         assert result["body"] == '{"id": 123}'
@@ -76,7 +78,9 @@ class TestHttpRequest:
         mock_response.geturl.return_value = "https://example.com"
         mock_urlopen.return_value = mock_response
 
-        custom_headers = '{"Authorization": "Bearer token123", "X-Custom-Header": "custom-value"}'
+        custom_headers = (
+            '{"Authorization": "Bearer token123", "X-Custom-Header": "custom-value"}'
+        )
 
         http_request("GET", "https://example.com", custom_headers, "", 30, True, True)
 
@@ -123,7 +127,9 @@ class TestHttpRequest:
         mock_response.geturl.return_value = "https://example.com/image.png"
         mock_urlopen.return_value = mock_response
 
-        result = http_request("GET", "https://example.com/image.png", "{}", "", 30, True, True)
+        result = http_request(
+            "GET", "https://example.com/image.png", "{}", "", 30, True, True
+        )
 
         assert result["status_code"] == 200
         assert result["body"].startswith("[Binary content - base64]:")

@@ -7,16 +7,9 @@ but designed for cross-platform compatibility and all agent frameworks.
 import json
 import re
 from pathlib import Path
-from typing import Any, Callable, Union, cast
+from typing import Union, cast
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
-
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import FileSystemError
 from .operations import (
     insert_at_line,
@@ -27,6 +20,7 @@ from .operations import (
 from .validation import validate_path
 
 
+@adk_tool
 @strands_tool
 def file_editor(command: str, path: str, skip_confirm: bool, options_json: str) -> str:
     """Comprehensive file editor with multiple operations.

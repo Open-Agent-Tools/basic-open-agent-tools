@@ -5,15 +5,8 @@ metadata, and searching within PDFs.
 """
 
 import os
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
+from ..decorators import adk_tool, strands_tool
 
 try:
     from PyPDF2 import PdfReader  # type: ignore[import-untyped, import-not-found]
@@ -27,6 +20,7 @@ except ImportError:
 MAX_PDF_FILE_SIZE = 100 * 1024 * 1024
 
 
+@adk_tool
 @strands_tool
 def extract_text_from_pdf(file_path: str) -> str:
     """Extract all text content from PDF file.
@@ -96,6 +90,7 @@ def extract_text_from_pdf(file_path: str) -> str:
         raise ValueError(f"Failed to read PDF file {file_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def extract_text_from_page(file_path: str, page_number: int) -> str:
     """Extract text content from specific PDF page.
@@ -168,6 +163,7 @@ def extract_text_from_page(file_path: str, page_number: int) -> str:
         raise ValueError(f"Failed to extract text from page {page_number}: {e}")
 
 
+@adk_tool
 @strands_tool
 def get_pdf_metadata(file_path: str) -> dict[str, str]:
     """Extract metadata from PDF file.
@@ -245,6 +241,7 @@ def get_pdf_metadata(file_path: str) -> dict[str, str]:
         raise ValueError(f"Failed to extract metadata from {file_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def get_pdf_page_count(file_path: str) -> int:
     """Get total number of pages in PDF file.
@@ -292,6 +289,7 @@ def get_pdf_page_count(file_path: str) -> int:
         raise ValueError(f"Failed to read PDF file {file_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def extract_pdf_pages_to_text(
     file_path: str, start_page: int, end_page: int
@@ -367,6 +365,7 @@ def extract_pdf_pages_to_text(
         raise ValueError(f"Failed to extract text from page range: {e}")
 
 
+@adk_tool
 @strands_tool
 def search_pdf_text(
     file_path: str, search_term: str, case_sensitive: bool
@@ -463,6 +462,7 @@ def search_pdf_text(
         raise ValueError(f"Failed to search PDF file {file_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def get_pdf_info(file_path: str) -> dict[str, object]:
     """Get comprehensive information about PDF file.

@@ -3,17 +3,14 @@
 import re
 import textwrap
 import unicodedata
-from re import Match
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
-        return func
+from .._logging import get_logger
+from ..decorators import adk_tool, strands_tool
+
+logger = get_logger("text.processing")
 
 
+@adk_tool
 @strands_tool
 def clean_whitespace(text: str) -> str:
     """Clean and normalize whitespace in text.
@@ -28,7 +25,7 @@ def clean_whitespace(text: str) -> str:
         >>> clean_whitespace("  hello    world  \\n\\t  ")
         "hello world"
     """
-    print(f"[TEXT] Cleaning whitespace in {len(text)} character text")
+    logger.debug(f"Cleaning whitespace in {len(text)} character text")
 
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
@@ -38,10 +35,11 @@ def clean_whitespace(text: str) -> str:
     # Strip leading and trailing whitespace
     result = cleaned.strip()
 
-    print(f"[TEXT] Whitespace cleaned: {len(result)} characters")
+    logger.debug(f"Whitespace cleaned: {len(result)} characters")
     return result
 
 
+@adk_tool
 @strands_tool
 def normalize_line_endings(text: str, style: str) -> str:
     """Normalize line endings in text.
@@ -60,7 +58,7 @@ def normalize_line_endings(text: str, style: str) -> str:
         >>> normalize_line_endings("line1\\r\\nline2\\rline3\\n", "unix")
         "line1\\nline2\\nline3\\n"
     """
-    print(f"[TEXT] Normalizing line endings: {len(text)} chars to {style} style")
+    logger.debug(f"Normalizing line endings: {len(text)} chars to {style} style")
 
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
@@ -77,10 +75,11 @@ def normalize_line_endings(text: str, style: str) -> str:
     if style != "unix":
         normalized = normalized.replace("\n", line_endings[style])
 
-    print(f"[TEXT] Line endings normalized: {len(normalized)} characters")
+    logger.debug(f"Line endings normalized: {len(normalized)} characters")
     return normalized
 
 
+@adk_tool
 @strands_tool
 def strip_html_tags(text: str) -> str:
     """Remove HTML tags from text.
@@ -95,7 +94,7 @@ def strip_html_tags(text: str) -> str:
         >>> strip_html_tags("<p>Hello <strong>world</strong>!</p>")
         "Hello world!"
     """
-    print(f"[TEXT] Stripping HTML tags from {len(text)} character text")
+    logger.debug(f"Stripping HTML tags from {len(text)} character text")
 
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
@@ -108,10 +107,11 @@ def strip_html_tags(text: str) -> str:
     # Clean up extra whitespace that might result from tag removal
     result: str = clean_whitespace(cleaned)
 
-    print(f"[TEXT] HTML tags stripped: {len(result)} characters")
+    logger.debug(f"HTML tags stripped: {len(result)} characters")
     return result
 
 
+@adk_tool
 @strands_tool
 def normalize_unicode(text: str, form: str) -> str:
     """Normalize Unicode text.
@@ -140,6 +140,7 @@ def normalize_unicode(text: str, form: str) -> str:
     return str(unicodedata.normalize(form, text))  # type: ignore[arg-type]
 
 
+@adk_tool
 @strands_tool
 def to_snake_case(text: str) -> str:
     """Convert text to snake_case.
@@ -169,6 +170,7 @@ def to_snake_case(text: str) -> str:
     return text.lower()
 
 
+@adk_tool
 @strands_tool
 def to_camel_case(text: str, upper_first: bool) -> str:
     """Convert text to camelCase or PascalCase.
@@ -205,6 +207,7 @@ def to_camel_case(text: str, upper_first: bool) -> str:
         return words[0] + "".join(word.capitalize() for word in words[1:])
 
 
+@adk_tool
 @strands_tool
 def to_title_case(text: str) -> str:
     """Convert text to Title Case.
@@ -224,12 +227,6 @@ def to_title_case(text: str) -> str:
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
 
-    # Split on common delimiters but preserve the structure
-    @strands_tool
-    def capitalize_word(match: Match[str]) -> str:
-        word = match.group(0)
-        return word.capitalize()
-
     # Split on word separators (spaces, hyphens, underscores) but preserve them
     parts = re.split(r"([\s\-_]+)", text)  # Split on whitespace, hyphens, underscores
     result = []
@@ -241,6 +238,7 @@ def to_title_case(text: str) -> str:
     return "".join(result)
 
 
+@adk_tool
 @strands_tool
 def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> list[str]:
     """Split text into lines with maximum length.
@@ -285,6 +283,7 @@ def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> list[
         return lines
 
 
+@adk_tool
 @strands_tool
 def extract_sentences(text: str) -> list[str]:
     """Extract sentences from text using simple rules.
@@ -323,6 +322,7 @@ def extract_sentences(text: str) -> list[str]:
     return result
 
 
+@adk_tool
 @strands_tool
 def join_with_oxford_comma(items: list[str], conjunction: str) -> str:
     """Join a list of items with Oxford comma.

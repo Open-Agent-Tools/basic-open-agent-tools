@@ -6,16 +6,11 @@ using ISO format strings for consistent date/time representation.
 
 import calendar
 from datetime import date
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
-        return func
+from ..decorators import adk_tool, strands_tool
 
 
+@adk_tool
 @strands_tool
 def get_weekday_name(date_string: str) -> str:
     """Get the weekday name for a date.
@@ -45,6 +40,7 @@ def get_weekday_name(date_string: str) -> str:
         raise ValueError(f"Invalid ISO date format '{date_string}': {e}")
 
 
+@adk_tool
 @strands_tool
 def get_month_name(date_string: str) -> str:
     """Get the month name for a date.
@@ -74,6 +70,7 @@ def get_month_name(date_string: str) -> str:
         raise ValueError(f"Invalid ISO date format '{date_string}': {e}")
 
 
+@adk_tool
 @strands_tool
 def get_week_number(date_string: str) -> int:
     """Get the ISO week number for a date.
@@ -103,6 +100,7 @@ def get_week_number(date_string: str) -> int:
         raise ValueError(f"Invalid ISO date format '{date_string}': {e}")
 
 
+@adk_tool
 @strands_tool
 def get_day_of_year(date_string: str) -> int:
     """Get the day of year for a date.
@@ -132,6 +130,7 @@ def get_day_of_year(date_string: str) -> int:
         raise ValueError(f"Invalid ISO date format '{date_string}': {e}")
 
 
+@adk_tool
 @strands_tool
 def is_leap_year(year: int) -> bool:
     """Check if a year is a leap year.
@@ -159,6 +158,7 @@ def is_leap_year(year: int) -> bool:
     return calendar.isleap(year)
 
 
+@adk_tool
 @strands_tool
 def get_days_in_month(year: int, month: int) -> int:
     """Get the number of days in a month.

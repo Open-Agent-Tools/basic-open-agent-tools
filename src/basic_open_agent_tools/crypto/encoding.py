@@ -2,20 +2,16 @@
 
 import base64
 import urllib.parse
-from typing import Any, Callable, Union
+from typing import Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
-
+from .._logging import get_logger
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
+logger = get_logger("crypto.encoding")
 
+
+@adk_tool
 @strands_tool
 def base64_encode(data: str) -> dict[str, Union[str, int]]:
     """
@@ -33,7 +29,7 @@ def base64_encode(data: str) -> dict[str, Union[str, int]]:
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
 
-    print(f"[CRYPTO] Encoding {len(data)} chars to Base64")
+    logger.debug(f"Encoding {len(data)} chars to Base64")
 
     try:
         # Encode string to bytes, then to base64
@@ -41,8 +37,8 @@ def base64_encode(data: str) -> dict[str, Union[str, int]]:
         encoded_bytes = base64.b64encode(data_bytes)
         encoded_string = encoded_bytes.decode("ascii")
 
-        print(
-            f"[CRYPTO] Base64 encoding complete: {len(data)} chars -> {len(encoded_string)} chars"
+        logger.debug(
+            f"Base64 encoding complete: {len(data)} chars -> {len(encoded_string)} chars"
         )
 
         return {
@@ -54,10 +50,11 @@ def base64_encode(data: str) -> dict[str, Union[str, int]]:
         }
 
     except Exception as e:
-        print(f"[CRYPTO] Base64 encoding failed: {e}")
+        logger.error(f"Base64 encoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to encode data to Base64: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def base64_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     """
@@ -75,7 +72,7 @@ def base64_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     if not isinstance(encoded_data, str):
         raise BasicAgentToolsError("Encoded data must be a string")
 
-    print(f"[CRYPTO] Decoding {len(encoded_data)} chars from Base64")
+    logger.debug(f"Decoding {len(encoded_data)} chars from Base64")
 
     if not encoded_data.strip():
         raise BasicAgentToolsError("Encoded data cannot be empty")
@@ -86,8 +83,8 @@ def base64_decode(encoded_data: str) -> dict[str, Union[str, int]]:
         decoded_bytes = base64.b64decode(encoded_bytes)
         decoded_string = decoded_bytes.decode("utf-8")
 
-        print(
-            f"[CRYPTO] Base64 decoding complete: {len(encoded_data)} chars -> {len(decoded_string)} chars"
+        logger.debug(
+            f"Base64 decoding complete: {len(encoded_data)} chars -> {len(decoded_string)} chars"
         )
 
         return {
@@ -99,10 +96,11 @@ def base64_decode(encoded_data: str) -> dict[str, Union[str, int]]:
         }
 
     except Exception as e:
-        print(f"[CRYPTO] Base64 decoding failed: {e}")
+        logger.error(f"Base64 decoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to decode Base64 data: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def url_encode(data: str) -> dict[str, Union[str, int]]:
     """
@@ -120,13 +118,13 @@ def url_encode(data: str) -> dict[str, Union[str, int]]:
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
 
-    print(f"[CRYPTO] URL encoding {len(data)} chars")
+    logger.debug(f"URL encoding {len(data)} chars")
 
     try:
         encoded_string = urllib.parse.quote(data, safe="")
 
-        print(
-            f"[CRYPTO] URL encoding complete: {len(data)} chars -> {len(encoded_string)} chars"
+        logger.debug(
+            f"URL encoding complete: {len(data)} chars -> {len(encoded_string)} chars"
         )
 
         return {
@@ -138,10 +136,11 @@ def url_encode(data: str) -> dict[str, Union[str, int]]:
         }
 
     except Exception as e:
-        print(f"[CRYPTO] URL encoding failed: {e}")
+        logger.error(f"URL encoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to URL encode data: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def url_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     """
@@ -159,13 +158,13 @@ def url_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     if not isinstance(encoded_data, str):
         raise BasicAgentToolsError("Encoded data must be a string")
 
-    print(f"[CRYPTO] URL decoding {len(encoded_data)} chars")
+    logger.debug(f"URL decoding {len(encoded_data)} chars")
 
     try:
         decoded_string = urllib.parse.unquote(encoded_data)
 
-        print(
-            f"[CRYPTO] URL decoding complete: {len(encoded_data)} chars -> {len(decoded_string)} chars"
+        logger.debug(
+            f"URL decoding complete: {len(encoded_data)} chars -> {len(decoded_string)} chars"
         )
 
         return {
@@ -177,10 +176,11 @@ def url_decode(encoded_data: str) -> dict[str, Union[str, int]]:
         }
 
     except Exception as e:
-        print(f"[CRYPTO] URL decoding failed: {e}")
+        logger.error(f"URL decoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to URL decode data: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def hex_encode(data: str) -> dict[str, Union[str, int]]:
     """
@@ -198,15 +198,15 @@ def hex_encode(data: str) -> dict[str, Union[str, int]]:
     if not isinstance(data, str):
         raise BasicAgentToolsError("Data must be a string")
 
-    print(f"[CRYPTO] Hex encoding {len(data)} chars")
+    logger.debug(f"Hex encoding {len(data)} chars")
 
     try:
         # Encode string to bytes, then to hex
         data_bytes = data.encode("utf-8")
         hex_string = data_bytes.hex()
 
-        print(
-            f"[CRYPTO] Hex encoding complete: {len(data)} chars -> {len(hex_string)} chars"
+        logger.debug(
+            f"Hex encoding complete: {len(data)} chars -> {len(hex_string)} chars"
         )
 
         return {
@@ -218,10 +218,11 @@ def hex_encode(data: str) -> dict[str, Union[str, int]]:
         }
 
     except Exception as e:
-        print(f"[CRYPTO] Hex encoding failed: {e}")
+        logger.error(f"Hex encoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to encode data to hex: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def hex_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     """
@@ -239,7 +240,7 @@ def hex_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     if not isinstance(encoded_data, str):
         raise BasicAgentToolsError("Encoded data must be a string")
 
-    print(f"[CRYPTO] Hex decoding {len(encoded_data)} chars")
+    logger.debug(f"Hex decoding {len(encoded_data)} chars")
 
     if not encoded_data.strip():
         raise BasicAgentToolsError("Encoded data cannot be empty")
@@ -255,8 +256,8 @@ def hex_decode(encoded_data: str) -> dict[str, Union[str, int]]:
         decoded_bytes = bytes.fromhex(encoded_data)
         decoded_string = decoded_bytes.decode("utf-8")
 
-        print(
-            f"[CRYPTO] Hex decoding complete: {len(encoded_data)} chars -> {len(decoded_string)} chars"
+        logger.debug(
+            f"Hex decoding complete: {len(encoded_data)} chars -> {len(decoded_string)} chars"
         )
 
         return {
@@ -268,14 +269,14 @@ def hex_decode(encoded_data: str) -> dict[str, Union[str, int]]:
         }
 
     except UnicodeDecodeError:
-        print("[CRYPTO] Hex decoding failed: Invalid UTF-8")
+        logger.debug("[CRYPTO] Hex decoding failed: Invalid UTF-8")
         raise BasicAgentToolsError("Decoded bytes do not represent valid UTF-8 text")
     except ValueError as e:
-        print(f"[CRYPTO] Hex decoding failed: {e}")
+        logger.error(f"Hex decoding failed: {e}")
         if "non-hexadecimal" in str(e).lower() or "invalid" in str(e).lower():
             raise BasicAgentToolsError("Invalid hexadecimal string")
         else:
             raise BasicAgentToolsError(f"Failed to decode hex data: {str(e)}")
     except Exception as e:
-        print(f"[CRYPTO] Hex decoding failed: {e}")
+        logger.error(f"Hex decoding failed: {e}")
         raise BasicAgentToolsError(f"Failed to decode hex data: {str(e)}")

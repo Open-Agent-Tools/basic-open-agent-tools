@@ -1,15 +1,8 @@
 """Image reading and information extraction functions for AI agents."""
 
 import os
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
+from ..decorators import adk_tool, strands_tool
 
 try:
     from PIL import Image
@@ -19,6 +12,7 @@ except ImportError:
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB limit
 
 
+@adk_tool
 @strands_tool
 def get_image_info(file_path: str) -> dict[str, str]:
     """Get comprehensive image information and metadata.
@@ -72,6 +66,7 @@ def get_image_info(file_path: str) -> dict[str, str]:
         raise ValueError(f"Failed to read image info: {e}")
 
 
+@adk_tool
 @strands_tool
 def get_image_size(file_path: str) -> dict[str, int]:
     """Get image dimensions.
@@ -118,6 +113,7 @@ def get_image_size(file_path: str) -> dict[str, int]:
         raise ValueError(f"Failed to get image size: {e}")
 
 
+@adk_tool
 @strands_tool
 def get_image_format(file_path: str) -> str:
     """Get image format (PNG, JPEG, GIF, etc.).
@@ -164,6 +160,7 @@ def get_image_format(file_path: str) -> str:
         raise ValueError(f"Failed to get image format: {e}")
 
 
+@adk_tool
 @strands_tool
 def extract_image_exif(file_path: str) -> dict[str, str]:
     """Extract EXIF metadata from image.
@@ -221,6 +218,7 @@ def extract_image_exif(file_path: str) -> dict[str, str]:
         raise ValueError(f"Failed to extract EXIF data: {e}")
 
 
+@adk_tool
 @strands_tool
 def get_image_colors(file_path: str, num_colors: int) -> list[str]:
     """Get dominant colors from image.
@@ -294,6 +292,7 @@ def get_image_colors(file_path: str, num_colors: int) -> list[str]:
         raise ValueError(f"Failed to extract image colors: {e}")
 
 
+@adk_tool
 @strands_tool
 def verify_image_file(file_path: str) -> bool:
     """Verify if file is a valid image.

@@ -1,20 +1,13 @@
 """Color analysis and accessibility utilities."""
 
-from typing import Any, Callable
+from typing import Any
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
-
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 from .conversion import hex_to_rgb
 
 
+@adk_tool
 @strands_tool
 def calculate_luminance(r: int, g: int, b: int) -> float:
     """Calculate relative luminance of an RGB color.
@@ -45,7 +38,6 @@ def calculate_luminance(r: int, g: int, b: int) -> float:
     b_norm = b / 255.0
 
     # Apply gamma correction
-    @strands_tool
     def adjust_gamma(channel: float) -> float:
         if channel <= 0.03928:
             return channel / 12.92
@@ -63,6 +55,7 @@ def calculate_luminance(r: int, g: int, b: int) -> float:
     return luminance
 
 
+@adk_tool
 @strands_tool
 def calculate_contrast_ratio(color1: str, color2: str) -> dict[str, Any]:
     """Calculate WCAG contrast ratio between two colors.
@@ -117,6 +110,7 @@ def calculate_contrast_ratio(color1: str, color2: str) -> dict[str, Any]:
     }
 
 
+@adk_tool
 @strands_tool
 def check_wcag_compliance(
     foreground: str, background: str, level: str
@@ -181,6 +175,7 @@ def check_wcag_compliance(
     }
 
 
+@adk_tool
 @strands_tool
 def get_complementary_color(hex_color: str) -> str:
     """Get the complementary color (opposite on color wheel).

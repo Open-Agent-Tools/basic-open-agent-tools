@@ -2,20 +2,17 @@
 
 import os
 import tarfile
-from typing import Any, Callable, Union
+from typing import Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
-
+from .._logging import get_logger
 from ..confirmation import check_user_confirmation
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
+logger = get_logger("archive.formats")
 
+
+@adk_tool
 @strands_tool
 def create_tar(
     source_paths: list[str], output_path: str, compression: str, skip_confirm: bool
@@ -34,8 +31,8 @@ def create_tar(
     Raises:
         BasicAgentToolsError: If archive creation fails or file exists without skip_confirm
     """
-    print(
-        f"[ARCHIVE] Creating TAR: {output_path} from {len(source_paths)} sources (compression={compression}, skip_confirm={skip_confirm})"
+    logger.debug(
+        f"Creating TAR: {output_path} from {len(source_paths)} sources (compression={compression}, skip_confirm={skip_confirm})"
     )
 
     if not isinstance(source_paths, list) or not source_paths:
@@ -61,7 +58,7 @@ def create_tar(
         )
 
         if not confirmed:
-            print(f"[ARCHIVE] TAR creation cancelled by user: {output_path}")
+            logger.debug(f"TAR creation cancelled by user: {output_path}")
             return f"Operation cancelled by user: {output_path}"
 
     try:
@@ -79,20 +76,21 @@ def create_tar(
         action = "Overwrote" if file_existed else "Created"
 
         result = f"{action} TAR archive {output_path} with {files_added} items using {compression} compression ({file_size} bytes)"
-        print(f"[ARCHIVE] {result}")
+        logger.debug(f"{result}")
         return result
     except Exception as e:
-        print(f"[ARCHIVE] TAR creation failed: {e}")
+        logger.error(f"TAR creation failed: {e}")
         raise BasicAgentToolsError(f"Failed to create TAR archive: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def extract_tar(tar_path: str, extract_to: str) -> dict[str, Union[str, int]]:
     """Extract a TAR archive to a directory."""
-    print(f"[ARCHIVE] Extracting TAR: {tar_path} to {extract_to}")
+    logger.debug(f"Extracting TAR: {tar_path} to {extract_to}")
 
     if not os.path.exists(tar_path):
-        print(f"[ARCHIVE] TAR file not found: {tar_path}")
+        logger.debug(f"TAR file not found: {tar_path}")
         raise BasicAgentToolsError(f"TAR file not found: {tar_path}")
 
     try:
@@ -107,8 +105,8 @@ def extract_tar(tar_path: str, extract_to: str) -> dict[str, Union[str, int]]:
             "status": "success",
         }
 
-        print(f"[ARCHIVE] TAR extracted: {files_extracted} files to {extract_to}")
+        logger.debug(f"TAR extracted: {files_extracted} files to {extract_to}")
         return result  # type: ignore[return-value]
     except Exception as e:
-        print(f"[ARCHIVE] TAR extraction failed: {e}")
+        logger.error(f"TAR extraction failed: {e}")
         raise BasicAgentToolsError(f"Failed to extract TAR archive: {str(e)}")

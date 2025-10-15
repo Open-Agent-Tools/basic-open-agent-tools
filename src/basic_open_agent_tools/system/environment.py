@@ -1,20 +1,13 @@
 """Environment variable operations."""
 
 import os
-from typing import Any, Callable, Optional, Union
+from typing import Optional, Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
-
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
+@adk_tool
 @strands_tool
 def get_env_var(variable_name: str) -> dict[str, Union[str, bool]]:
     """
@@ -50,6 +43,7 @@ def get_env_var(variable_name: str) -> dict[str, Union[str, bool]]:
         )
 
 
+@adk_tool
 @strands_tool
 def set_env_var(variable_name: str, value: str) -> dict[str, Union[str, bool]]:
     """
@@ -95,6 +89,7 @@ def set_env_var(variable_name: str, value: str) -> dict[str, Union[str, bool]]:
         )
 
 
+@adk_tool
 @strands_tool
 def list_env_vars(
     filter_pattern: str, limit: int

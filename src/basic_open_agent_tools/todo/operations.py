@@ -5,17 +5,11 @@ their own workflow during a session.
 """
 
 from datetime import datetime
-from typing import Any, Callable
+from typing import Any
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
-        return func
-
-
+from .._logging import get_logger
 from ..confirmation import check_user_confirmation
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 from .validation import (
     validate_dependencies,
@@ -37,11 +31,15 @@ _task_storage: dict[str, Any] = {
 }
 
 
+logger = get_logger("todo.operations")
+
+
 def _get_current_timestamp() -> str:
     """Get current ISO timestamp."""
     return datetime.now().isoformat()
 
 
+@adk_tool
 @strands_tool
 def add_task(
     title: str,
@@ -127,6 +125,7 @@ def add_task(
         raise BasicAgentToolsError(f"Failed to create task: {e}") from e
 
 
+@adk_tool
 @strands_tool
 def list_tasks(status: str, tag: str) -> dict[str, Any]:
     """List all tasks or filter by status and/or tag.
@@ -186,6 +185,7 @@ def list_tasks(status: str, tag: str) -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to list tasks: {e}") from e
 
 
+@adk_tool
 @strands_tool
 def get_task(task_id: int) -> dict[str, Any]:
     """Retrieve a single task by ID.
@@ -223,6 +223,7 @@ def get_task(task_id: int) -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to get task: {e}") from e
 
 
+@adk_tool
 @strands_tool
 def update_task(
     task_id: int,
@@ -309,6 +310,7 @@ def update_task(
         raise BasicAgentToolsError(f"Failed to update task: {e}") from e
 
 
+@adk_tool
 @strands_tool
 def delete_task(task_id: int, skip_confirm: bool) -> str:
     """Remove a task from memory with permission checking.
@@ -329,7 +331,7 @@ def delete_task(task_id: int, skip_confirm: bool) -> str:
         >>> result = delete_task(1, skip_confirm=True)
         "Deleted task 1: 'Complete project setup' (was 'in_progress')"
     """
-    print(f"[TODO] Deleting task {task_id} (skip_confirm={skip_confirm})")
+    logger.debug(f"Deleting task {task_id} (skip_confirm={skip_confirm})")
 
     try:
         validate_task_exists(task_id, _task_storage["tasks"])
@@ -350,21 +352,22 @@ def delete_task(task_id: int, skip_confirm: bool) -> str:
             )
 
             if not confirmed:
-                print(f"[TODO] Task deletion cancelled by user: {task_id}")
+                logger.debug(f"Task deletion cancelled by user: {task_id}")
                 return f"Operation cancelled by user: Task {task_id}"
 
         # Remove task
         del _task_storage["tasks"][task_id]
 
-        print(f"[TODO] Task {task_id} deleted: '{task_title}' (was '{task_status}')")
+        logger.debug(f"Task {task_id} deleted: '{task_title}' (was '{task_status}')")
 
         return f"Deleted task {task_id}: '{task_title}' (was '{task_status}')"
 
     except ValueError as e:
-        print(f"[TODO] Delete failed: {e}")
+        logger.error(f"Delete failed: {e}")
         raise BasicAgentToolsError(f"Failed to delete task: {e}") from e
 
 
+@adk_tool
 @strands_tool
 def complete_task(task_id: int) -> dict[str, Any]:
     """Mark a task as completed.
@@ -407,6 +410,7 @@ def complete_task(task_id: int) -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to complete task: {e}") from e
 
 
+@adk_tool
 @strands_tool
 def get_task_stats() -> dict[str, Any]:
     """Get summary statistics about all tasks.
@@ -467,6 +471,7 @@ def get_task_stats() -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to get task statistics: {e}") from e
 
 
+@adk_tool
 @strands_tool
 def clear_all_tasks() -> dict[str, Any]:
     """Clear all tasks from memory (for testing/reset).
@@ -484,19 +489,19 @@ def clear_all_tasks() -> dict[str, Any]:
         >>> result["cleared_count"]
         10
     """
-    print("[TODO] Clearing all tasks from memory")
+    logger.debug("[TODO] Clearing all tasks from memory")
 
     try:
         cleared_count = len(_task_storage["tasks"])
 
-        print(f"[TODO] Clearing {cleared_count} tasks")
+        logger.debug(f"Clearing {cleared_count} tasks")
 
         # Reset storage
         _task_storage["tasks"] = {}
         _task_storage["next_id"] = 1
         _task_storage["total_count"] = 0
 
-        print(f"[TODO] All tasks cleared: {cleared_count} tasks removed")
+        logger.debug(f"All tasks cleared: {cleared_count} tasks removed")
 
         return {
             "success": True,

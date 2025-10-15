@@ -1,6 +1,8 @@
 """Process management and information tools."""
 
-from typing import Any, Callable, Union
+from typing import Any, Union
+
+from ..decorators import adk_tool, strands_tool
 
 try:
     import psutil  # type: ignore[import-untyped]
@@ -9,18 +11,11 @@ try:
 except ImportError:
     HAS_PSUTIL = False
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
 
 from ..exceptions import BasicAgentToolsError
 
 
+@adk_tool
 @strands_tool
 def get_current_process_info() -> dict[str, Union[str, int, float, Any]]:
     """
@@ -61,6 +56,7 @@ def get_current_process_info() -> dict[str, Union[str, int, float, Any]]:
         )
 
 
+@adk_tool
 @strands_tool
 def list_running_processes(limit: int) -> list[dict[str, Union[str, int, float]]]:
     """
@@ -117,6 +113,7 @@ def list_running_processes(limit: int) -> list[dict[str, Union[str, int, float]]
         raise BasicAgentToolsError(f"Failed to list running processes: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def get_process_info(process_id: int) -> dict[str, Union[str, int, float, None]]:
     """
@@ -170,6 +167,7 @@ def get_process_info(process_id: int) -> dict[str, Union[str, int, float, None]]
         )
 
 
+@adk_tool
 @strands_tool
 def is_process_running(
     process_name: str,

@@ -3,20 +3,16 @@
 import secrets
 import string
 import uuid
-from typing import Any, Callable, Union
+from typing import Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
-
+from .._logging import get_logger
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
+logger = get_logger("crypto.generation")
 
+
+@adk_tool
 @strands_tool
 def generate_uuid(version: int) -> dict[str, Union[str, int]]:
     """
@@ -31,7 +27,7 @@ def generate_uuid(version: int) -> dict[str, Union[str, int]]:
     Raises:
         BasicAgentToolsError: If version is invalid
     """
-    print(f"[CRYPTO] Generating UUID version {version}")
+    logger.debug(f"Generating UUID version {version}")
 
     if not isinstance(version, int) or version not in [1, 4]:
         raise BasicAgentToolsError("Version must be 1 or 4")
@@ -49,7 +45,7 @@ def generate_uuid(version: int) -> dict[str, Union[str, int]]:
         uuid_string = str(generated_uuid)
         uuid_hex = generated_uuid.hex
 
-        print(f"[CRYPTO] UUID generated: {uuid_string}")
+        logger.debug(f"UUID generated: {uuid_string}")
 
         return {
             "uuid_version": version,
@@ -61,10 +57,11 @@ def generate_uuid(version: int) -> dict[str, Union[str, int]]:
         }
 
     except Exception as e:
-        print(f"[CRYPTO] UUID generation failed: {e}")
+        logger.error(f"UUID generation failed: {e}")
         raise BasicAgentToolsError(f"Failed to generate UUID: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def generate_random_string(
     length: int, character_set: str
@@ -82,9 +79,7 @@ def generate_random_string(
     Raises:
         BasicAgentToolsError: If parameters are invalid
     """
-    print(
-        f"[CRYPTO] Generating random string: length={length}, charset={character_set}"
-    )
+    logger.debug(f"Generating random string: length={length}, charset={character_set}")
 
     if not isinstance(length, int) or length < 1 or length > 1000:
         raise BasicAgentToolsError("Length must be an integer between 1 and 1000")
@@ -112,8 +107,8 @@ def generate_random_string(
         # Generate random string
         random_string = "".join(secrets.choice(chars) for _ in range(length))
 
-        print(
-            f"[CRYPTO] Random string generated: {length} chars, {length * len(chars).bit_length()} bits entropy"
+        logger.debug(
+            f"Random string generated: {length} chars, {length * len(chars).bit_length()} bits entropy"
         )
 
         return {
@@ -126,10 +121,11 @@ def generate_random_string(
         }
 
     except Exception as e:
-        print(f"[CRYPTO] Random string generation failed: {e}")
+        logger.error(f"Random string generation failed: {e}")
         raise BasicAgentToolsError(f"Failed to generate random string: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def generate_random_bytes(length: int, encoding: str) -> dict[str, Union[str, int]]:
     """
@@ -145,7 +141,7 @@ def generate_random_bytes(length: int, encoding: str) -> dict[str, Union[str, in
     Raises:
         BasicAgentToolsError: If parameters are invalid
     """
-    print(f"[CRYPTO] Generating random bytes: length={length}, encoding={encoding}")
+    logger.debug(f"Generating random bytes: length={length}, encoding={encoding}")
 
     if not isinstance(length, int) or length < 1 or length > 1000:
         raise BasicAgentToolsError("Length must be an integer between 1 and 1000")
@@ -170,8 +166,8 @@ def generate_random_bytes(length: int, encoding: str) -> dict[str, Union[str, in
 
             encoded_data = base64.b64encode(random_bytes).decode("ascii")
 
-        print(
-            f"[CRYPTO] Random bytes generated: {length} bytes, {length * 8} bits entropy, encoded as {encoding}"
+        logger.debug(
+            f"Random bytes generated: {length} bytes, {length * 8} bits entropy, encoded as {encoding}"
         )
 
         return {
@@ -183,5 +179,5 @@ def generate_random_bytes(length: int, encoding: str) -> dict[str, Union[str, in
         }
 
     except Exception as e:
-        print(f"[CRYPTO] Random bytes generation failed: {e}")
+        logger.error(f"Random bytes generation failed: {e}")
         raise BasicAgentToolsError(f"Failed to generate random bytes: {str(e)}")

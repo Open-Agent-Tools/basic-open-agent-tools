@@ -2,20 +2,16 @@
 
 import csv
 import io
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
-        return func
-
-
+from .._logging import get_logger
 from ..confirmation import check_user_confirmation
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import DataError
 
+logger = get_logger("data.csv_tools")
 
+
+@adk_tool
 @strands_tool
 def read_csv_simple(
     file_path: str, delimiter: str, headers: bool
@@ -40,8 +36,8 @@ def read_csv_simple(
         >>> data
         [{'name': 'Alice', 'age': '25'}, {'name': 'Bob', 'age': '30'}]
     """
-    print(
-        f"[DATA] Reading CSV file: {file_path} (delimiter='{delimiter}', headers={headers})"
+    logger.debug(
+        f"Reading CSV file: {file_path} (delimiter='{delimiter}', headers={headers})"
     )
 
     if not isinstance(file_path, str):
@@ -72,19 +68,20 @@ def read_csv_simple(
                         row_dict = {f"col_{i}": value for i, value in enumerate(row)}
                         result.append(row_dict)
 
-            print(f"[DATA] CSV loaded: {len(result)} rows")
+            logger.debug(f"CSV loaded: {len(result)} rows")
             return result
     except FileNotFoundError:
-        print(f"[DATA] CSV file not found: {file_path_str}")
+        logger.debug(f"CSV file not found: {file_path_str}")
         raise DataError(f"CSV file not found: {file_path_str}")
     except UnicodeDecodeError as e:
-        print(f"[DATA] CSV encoding error: {e}")
+        logger.error(f"CSV encoding error: {e}")
         raise DataError(f"Failed to decode CSV file {file_path_str}: {e}")
     except csv.Error as e:
-        print(f"[DATA] CSV parse error: {e}")
+        logger.error(f"CSV parse error: {e}")
         raise DataError(f"Failed to parse CSV file {file_path_str}: {e}")
 
 
+@adk_tool
 @strands_tool
 def write_csv_simple(
     data: list[dict[str, str]],
@@ -114,8 +111,8 @@ def write_csv_simple(
         >>> write_csv_simple(data, "output.csv", ",", True, skip_confirm=True)
         "Created CSV file output.csv with 2 rows and 2 columns"
     """
-    print(
-        f"[DATA] Writing CSV file: {file_path} ({len(data)} rows, delimiter='{delimiter}', headers={headers}, skip_confirm={skip_confirm})"
+    logger.debug(
+        f"Writing CSV file: {file_path} ({len(data)} rows, delimiter='{delimiter}', headers={headers}, skip_confirm={skip_confirm})"
     )
 
     # Check if data is a list
@@ -152,7 +149,7 @@ def write_csv_simple(
         )
 
         if not confirmed:
-            print(f"[DATA] CSV write cancelled by user: {file_path_str}")
+            logger.debug(f"CSV write cancelled by user: {file_path_str}")
             return f"Operation cancelled by user: {file_path_str}"
 
     if not data:
@@ -193,13 +190,14 @@ def write_csv_simple(
         file_size = os.path.getsize(file_path_str)
 
         result = f"{action} CSV file {file_path_str} with {row_count} rows and {col_count} columns ({file_size} bytes)"
-        print(f"[DATA] {result}")
+        logger.debug(f"{result}")
         return result
     except OSError as e:
-        print(f"[DATA] CSV write error: {e}")
+        logger.error(f"CSV write error: {e}")
         raise DataError(f"Failed to write CSV file {file_path_str}: {e}")
 
 
+@adk_tool
 @strands_tool
 def csv_to_dict_list(csv_data: str, delimiter: str) -> list[dict[str, str]]:
     """Convert CSV string to list of dictionaries.
@@ -236,6 +234,7 @@ def csv_to_dict_list(csv_data: str, delimiter: str) -> list[dict[str, str]]:
         raise DataError(f"Failed to parse CSV data: {e}")
 
 
+@adk_tool
 @strands_tool
 def dict_list_to_csv(data: list[dict[str, str]], delimiter: str) -> str:
     """Convert list of dictionaries to CSV string.
@@ -282,6 +281,7 @@ def dict_list_to_csv(data: list[dict[str, str]], delimiter: str) -> str:
     return output.getvalue()
 
 
+@adk_tool
 @strands_tool
 def detect_csv_delimiter(file_path: str, sample_size: int) -> str:
     """Auto-detect CSV delimiter by analyzing file content.
@@ -329,6 +329,7 @@ def detect_csv_delimiter(file_path: str, sample_size: int) -> str:
         raise DataError(f"Failed to detect delimiter in {file_path_str}: {e}")
 
 
+@adk_tool
 @strands_tool
 def validate_csv_structure(file_path: str, expected_columns: list[str]) -> bool:
     """Validate CSV file structure and column headers.
@@ -392,6 +393,7 @@ def validate_csv_structure(file_path: str, expected_columns: list[str]) -> bool:
         raise DataError(f"Invalid CSV structure in {file_path_str}: {e}")
 
 
+@adk_tool
 @strands_tool
 def clean_csv_data(
     data: list[dict[str, str]], rules: dict[str, str]

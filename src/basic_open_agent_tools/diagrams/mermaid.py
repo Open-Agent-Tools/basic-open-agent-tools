@@ -2,19 +2,13 @@
 
 import os
 import re
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
+from ..decorators import adk_tool, strands_tool
 
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB limit
 
 
+@adk_tool
 @strands_tool
 def create_mermaid_flowchart(
     nodes: list[dict[str, str]], edges: list[dict[str, str]], direction: str
@@ -93,6 +87,7 @@ def create_mermaid_flowchart(
     return "\n".join(lines)
 
 
+@adk_tool
 @strands_tool
 def create_mermaid_sequence_diagram(
     participants: list[str], messages: list[dict[str, str]]
@@ -151,6 +146,7 @@ def create_mermaid_sequence_diagram(
     return "\n".join(lines)
 
 
+@adk_tool
 @strands_tool
 def create_mermaid_gantt_chart(
     title: str, sections: list[dict[str, str]], tasks: list[dict[str, str]]
@@ -214,6 +210,7 @@ def create_mermaid_gantt_chart(
     return "\n".join(lines)
 
 
+@adk_tool
 @strands_tool
 def create_mermaid_er_diagram(
     entities: list[dict[str, str]], relationships: list[dict[str, str]]
@@ -290,6 +287,7 @@ def create_mermaid_er_diagram(
     return "\n".join(lines)
 
 
+@adk_tool
 @strands_tool
 def parse_mermaid_file(file_path: str) -> dict[str, str]:
     """Parse Mermaid file to extract basic structure.
@@ -351,6 +349,7 @@ def parse_mermaid_file(file_path: str) -> dict[str, str]:
         raise ValueError(f"Failed to parse Mermaid file: {e}")
 
 
+@adk_tool
 @strands_tool
 def write_mermaid_file(file_path: str, diagram_content: str, skip_confirm: bool) -> str:
     """Write Mermaid diagram to file.
@@ -401,6 +400,7 @@ def write_mermaid_file(file_path: str, diagram_content: str, skip_confirm: bool)
         raise ValueError(f"Failed to write Mermaid file: {e}")
 
 
+@adk_tool
 @strands_tool
 def embed_mermaid_in_markdown(
     md_file_path: str, diagram_content: str, skip_confirm: bool
@@ -459,6 +459,7 @@ def embed_mermaid_in_markdown(
         raise ValueError(f"Failed to embed Mermaid diagram: {e}")
 
 
+@adk_tool
 @strands_tool
 def extract_mermaid_from_markdown(md_file_path: str) -> list[str]:
     """Extract Mermaid diagrams from markdown file.

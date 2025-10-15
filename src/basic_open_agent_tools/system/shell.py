@@ -3,20 +3,16 @@
 import platform
 import subprocess
 import time
-from typing import Any, Callable, Union
+from typing import Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
-
+from .._logging import get_logger
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
+logger = get_logger("system.shell")
 
+
+@adk_tool
 @strands_tool
 def execute_shell_command(
     command: str,
@@ -64,10 +60,10 @@ def execute_shell_command(
             shell = False
 
         # Print command info to stdout
-        print(f"[SHELL] Executing: {command}")
-        print(f"[SHELL] Platform: {system}")
-        print(f"[SHELL] Working directory: {working_directory or 'current'}")
-        print(f"[SHELL] Timeout: {timeout}s")
+        logger.debug(f"Executing: {command}")
+        logger.debug(f"Platform: {system}")
+        logger.debug(f"Working directory: {working_directory or 'current'}")
+        logger.debug(f"Timeout: {timeout}s")
         print("-" * 50)
 
         # Execute the command
@@ -86,14 +82,14 @@ def execute_shell_command(
         execution_time = end_time - start_time
 
         # Print execution results to stdout
-        print(f"[SHELL] Command completed in {execution_time:.3f}s")
-        print(f"[SHELL] Return code: {result.returncode}")
+        logger.debug(f"Command completed in {execution_time:.3f}s")
+        logger.debug(f"Return code: {result.returncode}")
 
         if capture_output and result.stdout:
-            print(f"[SHELL] STDOUT:\n{result.stdout}")
+            logger.debug(f"STDOUT:\n{result.stdout}")
 
         if capture_output and result.stderr:
-            print(f"[SHELL] STDERR:\n{result.stderr}")
+            logger.debug(f"STDERR:\n{result.stderr}")
 
         print("-" * 50)
 
@@ -121,6 +117,7 @@ def execute_shell_command(
         raise BasicAgentToolsError(f"Command execution failed: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def run_bash(
     command: str,
@@ -157,10 +154,10 @@ def run_bash(
 
     try:
         # Print command info to stdout
-        print(f"[SHELL] Executing (bash): {command}")
-        print(f"[SHELL] Platform: {system}")
-        print(f"[SHELL] Working directory: {working_directory or 'current'}")
-        print(f"[SHELL] Timeout: {timeout}s")
+        logger.debug(f"Executing (bash): {command}")
+        logger.debug(f"Platform: {system}")
+        logger.debug(f"Working directory: {working_directory or 'current'}")
+        logger.debug(f"Timeout: {timeout}s")
         print("-" * 50)
 
         # Execute the command
@@ -179,14 +176,14 @@ def run_bash(
         execution_time = end_time - start_time
 
         # Print execution results to stdout
-        print(f"[SHELL] Command completed in {execution_time:.3f}s")
-        print(f"[SHELL] Return code: {result.returncode}")
+        logger.debug(f"Command completed in {execution_time:.3f}s")
+        logger.debug(f"Return code: {result.returncode}")
 
         if capture_output and result.stdout:
-            print(f"[SHELL] STDOUT:\n{result.stdout}")
+            logger.debug(f"STDOUT:\n{result.stdout}")
 
         if capture_output and result.stderr:
-            print(f"[SHELL] STDERR:\n{result.stderr}")
+            logger.debug(f"STDERR:\n{result.stderr}")
 
         print("-" * 50)
 
@@ -211,6 +208,7 @@ def run_bash(
         raise BasicAgentToolsError(f"Bash command execution failed: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def run_powershell(
     command: str,
@@ -247,10 +245,10 @@ def run_powershell(
 
     try:
         # Print command info to stdout
-        print(f"[SHELL] Executing (powershell): {command}")
-        print(f"[SHELL] Platform: {system}")
-        print(f"[SHELL] Working directory: {working_directory or 'current'}")
-        print(f"[SHELL] Timeout: {timeout}s")
+        logger.debug(f"Executing (powershell): {command}")
+        logger.debug(f"Platform: {system}")
+        logger.debug(f"Working directory: {working_directory or 'current'}")
+        logger.debug(f"Timeout: {timeout}s")
         print("-" * 50)
 
         # Execute the command
@@ -269,14 +267,14 @@ def run_powershell(
         execution_time = end_time - start_time
 
         # Print execution results to stdout
-        print(f"[SHELL] Command completed in {execution_time:.3f}s")
-        print(f"[SHELL] Return code: {result.returncode}")
+        logger.debug(f"Command completed in {execution_time:.3f}s")
+        logger.debug(f"Return code: {result.returncode}")
 
         if capture_output and result.stdout:
-            print(f"[SHELL] STDOUT:\n{result.stdout}")
+            logger.debug(f"STDOUT:\n{result.stdout}")
 
         if capture_output and result.stderr:
-            print(f"[SHELL] STDERR:\n{result.stderr}")
+            logger.debug(f"STDERR:\n{result.stderr}")
 
         print("-" * 50)
 

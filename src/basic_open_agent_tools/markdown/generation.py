@@ -4,20 +4,14 @@ This module provides functions for creating and generating Markdown (.md) files.
 """
 
 import os
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
+from ..decorators import adk_tool, strands_tool
 
 # Maximum file size: 10MB
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
+@adk_tool
 @strands_tool
 def create_markdown_from_text(file_path: str, content: str, skip_confirm: bool) -> str:
     """Create simple Markdown file from text content.
@@ -72,6 +66,7 @@ def create_markdown_from_text(file_path: str, content: str, skip_confirm: bool) 
         raise ValueError(f"Failed to create Markdown file: {e}")
 
 
+@adk_tool
 @strands_tool
 def create_markdown_with_frontmatter(
     file_path: str, frontmatter: dict[str, str], content: str, skip_confirm: bool
@@ -129,6 +124,7 @@ def create_markdown_with_frontmatter(
     return create_markdown_from_text(file_path, full_content, skip_confirm)
 
 
+@adk_tool
 @strands_tool
 def create_markdown_table(headers: list[str], rows: list[list[str]]) -> str:
     """Generate Markdown table string from headers and rows.
@@ -194,6 +190,7 @@ def create_markdown_table(headers: list[str], rows: list[list[str]]) -> str:
     return "\n".join(lines)
 
 
+@adk_tool
 @strands_tool
 def create_markdown_list(items: list[str], ordered: bool) -> str:
     """Generate Markdown list string from items.
@@ -241,6 +238,7 @@ def create_markdown_list(items: list[str], ordered: bool) -> str:
     return "\n".join(lines)
 
 
+@adk_tool
 @strands_tool
 def append_to_markdown(file_path: str, content: str, skip_confirm: bool) -> str:
     """Append content to existing Markdown file.
@@ -296,6 +294,7 @@ def append_to_markdown(file_path: str, content: str, skip_confirm: bool) -> str:
         raise ValueError(f"Failed to append to Markdown file: {e}")
 
 
+@adk_tool
 @strands_tool
 def markdown_to_html_string(markdown_text: str) -> str:
     """Convert Markdown string to HTML string.
@@ -338,7 +337,6 @@ def markdown_to_html_string(markdown_text: str) -> str:
         text = re.sub(pattern, rf"<h{level}>\1</h{level}>", text, flags=re.MULTILINE)
 
     # Convert code blocks (before inline code)
-    @strands_tool
     def replace_code_block(match: re.Match[str]) -> str:
         code = match.group(2)
         # Unescape for code blocks

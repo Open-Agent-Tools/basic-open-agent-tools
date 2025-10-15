@@ -3,19 +3,13 @@
 import glob
 import logging.handlers
 import os
-from typing import Any, Callable, Union
+from typing import Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
-
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
+@adk_tool
 @strands_tool
 def setup_rotating_log(
     logger_name: str,
@@ -46,6 +40,7 @@ def setup_rotating_log(
         raise BasicAgentToolsError(f"Failed to setup rotating log: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def cleanup_old_logs(log_pattern: str, keep_count: int) -> dict[str, Union[str, int]]:
     """Clean up old log files matching a pattern."""

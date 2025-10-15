@@ -2,7 +2,9 @@
 
 import platform
 import time
-from typing import Any, Callable, Union
+from typing import Union
+
+from ..decorators import adk_tool, strands_tool
 
 try:
     import psutil  # type: ignore[import-untyped]
@@ -11,18 +13,11 @@ try:
 except ImportError:
     HAS_PSUTIL = False
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
 
 from ..exceptions import BasicAgentToolsError
 
 
+@adk_tool
 @strands_tool
 def get_system_info() -> dict[str, str]:
     """
@@ -50,6 +45,7 @@ def get_system_info() -> dict[str, str]:
         raise BasicAgentToolsError(f"Failed to get system information: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def get_cpu_info() -> dict[str, Union[str, int, float]]:
     """
@@ -93,6 +89,7 @@ def get_cpu_info() -> dict[str, Union[str, int, float]]:
         raise BasicAgentToolsError(f"Failed to get CPU information: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def get_memory_info() -> dict[str, Union[int, float]]:
     """
@@ -128,6 +125,7 @@ def get_memory_info() -> dict[str, Union[int, float]]:
         raise BasicAgentToolsError(f"Failed to get memory information: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def get_disk_usage(path: str) -> dict[str, Union[int, float, str]]:
     """
@@ -172,6 +170,7 @@ def get_disk_usage(path: str) -> dict[str, Union[int, float, str]]:
         raise BasicAgentToolsError(f"Failed to get disk usage for {path}: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def get_uptime() -> dict[str, Union[int, float, str]]:
     """

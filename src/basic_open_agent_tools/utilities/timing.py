@@ -5,19 +5,13 @@ Provides timing utilities and execution control functions with agent-friendly si
 
 import signal
 import time
-from typing import Any, Callable, Union
+from typing import Any, Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
-        return func
-
-
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
+@adk_tool
 @strands_tool
 def sleep_seconds(seconds: float) -> dict[str, Union[str, float]]:
     """Pause execution for the specified number of seconds.
@@ -57,7 +51,6 @@ def sleep_seconds(seconds: float) -> dict[str, Union[str, float]]:
     start_time = time.time()
     interrupted = False
 
-    @strands_tool
     def signal_handler(signum: int, frame: Any) -> None:
         nonlocal interrupted
         interrupted = True
@@ -101,6 +94,7 @@ def sleep_seconds(seconds: float) -> dict[str, Union[str, float]]:
         }
 
 
+@adk_tool
 @strands_tool
 def sleep_milliseconds(milliseconds: float) -> dict[str, Union[str, float]]:
     """Pause execution for the specified number of milliseconds.
@@ -137,6 +131,7 @@ def sleep_milliseconds(milliseconds: float) -> dict[str, Union[str, float]]:
     return result
 
 
+@adk_tool
 @strands_tool
 def precise_sleep(seconds: float) -> dict[str, Union[str, float]]:
     """Perform a high-precision sleep using busy-waiting for the final portion.

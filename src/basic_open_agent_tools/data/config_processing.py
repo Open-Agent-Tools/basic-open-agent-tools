@@ -2,17 +2,10 @@
 
 import configparser
 import json
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
-        return func
-
-
+from .._logging import get_logger
 from ..confirmation import check_user_confirmation
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import DataError
 
 # Simple YAML support using json fallback
@@ -33,6 +26,10 @@ except ImportError:
     HAS_TOML = False
 
 
+logger = get_logger("data.config_processing")
+
+
+@adk_tool
 @strands_tool
 def read_yaml_file(file_path: str) -> dict:
     """Read and parse a YAML configuration file.
@@ -50,7 +47,7 @@ def read_yaml_file(file_path: str) -> dict:
         >>> read_yaml_file("config.yaml")
         {"database": {"host": "localhost", "port": 5432}}
     """
-    print(f"[DATA] Reading YAML file: {file_path}")
+    logger.debug(f"Reading YAML file: {file_path}")
 
     if not HAS_YAML:
         raise DataError("YAML support not available. Install PyYAML to use YAML files.")
@@ -59,19 +56,20 @@ def read_yaml_file(file_path: str) -> dict:
         with open(file_path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
             result = data if data is not None else {}
-            print(f"[DATA] YAML loaded: {len(result)} top-level keys")
+            logger.debug(f"YAML loaded: {len(result)} top-level keys")
             return result
     except FileNotFoundError:
-        print(f"[DATA] YAML file not found: {file_path}")
+        logger.debug(f"YAML file not found: {file_path}")
         raise FileNotFoundError(f"YAML file not found: {file_path}")
     except yaml.YAMLError as e:
-        print(f"[DATA] YAML parse error: {e}")
+        logger.error(f"YAML parse error: {e}")
         raise ValueError(f"Failed to parse YAML file {file_path}: {e}")
     except Exception as e:
-        print(f"[DATA] YAML read error: {e}")
+        logger.error(f"YAML read error: {e}")
         raise DataError(f"Failed to read YAML file {file_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     """Write dictionary data to a YAML file with permission checking.
@@ -92,8 +90,8 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         >>> write_yaml_file(data, "config.yaml", skip_confirm=True)
         "Created YAML file config.yaml with 1 top-level keys (87 bytes)"
     """
-    print(
-        f"[DATA] Writing YAML file: {file_path} ({len(data)} top-level keys, skip_confirm={skip_confirm})"
+    logger.debug(
+        f"Writing YAML file: {file_path} ({len(data)} top-level keys, skip_confirm={skip_confirm})"
     )
 
     if not HAS_YAML:
@@ -114,7 +112,7 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         )
 
         if not confirmed:
-            print(f"[DATA] YAML write cancelled by user: {file_path}")
+            logger.debug(f"YAML write cancelled by user: {file_path}")
             return f"Operation cancelled by user: {file_path}"
 
     try:
@@ -127,13 +125,14 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         action = "Overwrote" if file_existed else "Created"
 
         result = f"{action} YAML file {file_path} with {key_count} top-level keys ({file_size} bytes)"
-        print(f"[DATA] {result}")
+        logger.debug(f"{result}")
         return result
     except Exception as e:
-        print(f"[DATA] YAML write error: {e}")
+        logger.error(f"YAML write error: {e}")
         raise DataError(f"Failed to write YAML file {file_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def read_toml_file(file_path: str) -> dict:
     """Read and parse a TOML configuration file.
@@ -151,7 +150,7 @@ def read_toml_file(file_path: str) -> dict:
         >>> read_toml_file("config.toml")
         {"database": {"host": "localhost", "port": 5432}}
     """
-    print(f"[DATA] Reading TOML file: {file_path}")
+    logger.debug(f"Reading TOML file: {file_path}")
 
     if not HAS_TOML:
         raise DataError(
@@ -161,19 +160,20 @@ def read_toml_file(file_path: str) -> dict:
     try:
         with open(file_path, "rb") as f:
             result: dict = tomli.load(f)
-            print(f"[DATA] TOML loaded: {len(result)} top-level keys")
+            logger.debug(f"TOML loaded: {len(result)} top-level keys")
             return result
     except FileNotFoundError:
-        print(f"[DATA] TOML file not found: {file_path}")
+        logger.debug(f"TOML file not found: {file_path}")
         raise FileNotFoundError(f"TOML file not found: {file_path}")
     except tomli.TOMLDecodeError as e:
-        print(f"[DATA] TOML parse error: {e}")
+        logger.error(f"TOML parse error: {e}")
         raise ValueError(f"Failed to parse TOML file {file_path}: {e}")
     except Exception as e:
-        print(f"[DATA] TOML read error: {e}")
+        logger.error(f"TOML read error: {e}")
         raise DataError(f"Failed to read TOML file {file_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     """Write dictionary data to a TOML file with permission checking.
@@ -194,8 +194,8 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         >>> write_toml_file(data, "config.toml", skip_confirm=True)
         "Created TOML file config.toml with 1 top-level keys (87 bytes)"
     """
-    print(
-        f"[DATA] Writing TOML file: {file_path} ({len(data)} top-level keys, skip_confirm={skip_confirm})"
+    logger.debug(
+        f"Writing TOML file: {file_path} ({len(data)} top-level keys, skip_confirm={skip_confirm})"
     )
 
     if not HAS_TOML:
@@ -218,7 +218,7 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         )
 
         if not confirmed:
-            print(f"[DATA] TOML write cancelled by user: {file_path}")
+            logger.debug(f"TOML write cancelled by user: {file_path}")
             return f"Operation cancelled by user: {file_path}"
 
     try:
@@ -231,13 +231,14 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         action = "Overwrote" if file_existed else "Created"
 
         result = f"{action} TOML file {file_path} with {key_count} top-level keys ({file_size} bytes)"
-        print(f"[DATA] {result}")
+        logger.debug(f"{result}")
         return result
     except Exception as e:
-        print(f"[DATA] TOML write error: {e}")
+        logger.error(f"TOML write error: {e}")
         raise DataError(f"Failed to write TOML file {file_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def read_ini_file(file_path: str) -> dict:
     """Read and parse an INI configuration file.
@@ -255,13 +256,13 @@ def read_ini_file(file_path: str) -> dict:
         >>> read_ini_file("config.ini")
         {"database": {"host": "localhost", "port": "5432"}}
     """
-    print(f"[DATA] Reading INI file: {file_path}")
+    logger.debug(f"Reading INI file: {file_path}")
 
     # Check if file exists first (ConfigParser.read doesn't raise FileNotFoundError)
     import os
 
     if not os.path.isfile(file_path):
-        print(f"[DATA] INI file not found: {file_path}")
+        logger.debug(f"INI file not found: {file_path}")
         raise FileNotFoundError(f"INI file not found: {file_path}")
 
     try:
@@ -272,18 +273,19 @@ def read_ini_file(file_path: str) -> dict:
         for section_name in config.sections():
             result[section_name] = dict(config[section_name])
 
-        print(f"[DATA] INI loaded: {len(result)} sections")
+        logger.debug(f"INI loaded: {len(result)} sections")
         return result
     except FileNotFoundError:
         raise DataError(f"INI file not found: {file_path}")
     except configparser.Error as e:
-        print(f"[DATA] INI parse error: {e}")
+        logger.error(f"INI parse error: {e}")
         raise DataError(f"Failed to parse INI file {file_path}: {e}")
     except Exception as e:
-        print(f"[DATA] INI read error: {e}")
+        logger.error(f"INI read error: {e}")
         raise DataError(f"Failed to read INI file {file_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     """Write dictionary data to an INI file with permission checking.
@@ -304,8 +306,8 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         >>> write_ini_file(data, "config.ini", skip_confirm=True)
         "Created INI file config.ini with 1 sections (87 bytes)"
     """
-    print(
-        f"[DATA] Writing INI file: {file_path} ({len(data)} sections, skip_confirm={skip_confirm})"
+    logger.debug(
+        f"Writing INI file: {file_path} ({len(data)} sections, skip_confirm={skip_confirm})"
     )
 
     import os
@@ -323,7 +325,7 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         )
 
         if not confirmed:
-            print(f"[DATA] INI write cancelled by user: {file_path}")
+            logger.debug(f"INI write cancelled by user: {file_path}")
             return f"Operation cancelled by user: {file_path}"
 
     try:
@@ -345,13 +347,14 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         action = "Overwrote" if file_existed else "Created"
 
         result = f"{action} INI file {file_path} with {section_count} sections ({file_size} bytes)"
-        print(f"[DATA] {result}")
+        logger.debug(f"{result}")
         return result
     except Exception as e:
-        print(f"[DATA] INI write error: {e}")
+        logger.error(f"INI write error: {e}")
         raise DataError(f"Failed to write INI file {file_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def validate_config_schema(config_data: dict, schema_definition: dict) -> list:
     """Validate configuration data against a schema.
@@ -409,6 +412,7 @@ def validate_config_schema(config_data: dict, schema_definition: dict) -> list:
     return errors
 
 
+@adk_tool
 @strands_tool
 def merge_config_files(config_paths: list[str], format_type: str) -> dict:
     """Merge multiple configuration files into a single dictionary.

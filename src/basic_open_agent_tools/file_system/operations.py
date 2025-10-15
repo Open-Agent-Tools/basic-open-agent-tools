@@ -1,21 +1,17 @@
 """Core file and directory operations."""
 
 import shutil
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]  # type: ignore
-        return func
-
-
+from .._logging import get_logger
 from ..confirmation import check_user_confirmation
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import FileSystemError
 from .validation import validate_file_content, validate_path
 
+logger = get_logger("file_system.operations")
 
+
+@adk_tool
 @strands_tool
 def read_file_to_string(file_path: str) -> str:
     """Load string from a text file.
@@ -29,7 +25,7 @@ def read_file_to_string(file_path: str) -> str:
     Raises:
         FileSystemError: If file doesn't exist or can't be read
     """
-    print(f"[FILE] Reading: {file_path}")
+    logger.debug(f"Reading: {file_path}")
 
     path = validate_path(file_path, "read")
 
@@ -38,13 +34,14 @@ def read_file_to_string(file_path: str) -> str:
 
     try:
         content = path.read_text(encoding="utf-8").strip()
-        print(f"[FILE] Read {len(content)} characters from {path}")
+        logger.debug(f"Read {len(content)} characters from {path}")
         return content
     except (OSError, UnicodeDecodeError) as e:
-        print(f"[FILE] Failed to read {path}: {e}")
+        logger.error(f"Failed to read {path}: {e}")
         raise FileSystemError(f"Failed to read file {path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> str:
     """Write string content to a text file with permission checking.
@@ -60,8 +57,8 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
     Raises:
         FileSystemError: If write operation fails or file exists without skip_confirm
     """
-    print(
-        f"[FILE] Writing to: {file_path} ({len(content)} chars, skip_confirm={skip_confirm})"
+    logger.debug(
+        f"Writing to: {file_path} ({len(content)} chars, skip_confirm={skip_confirm})"
     )
 
     validate_file_content(content, "write")
@@ -80,7 +77,7 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
         )
 
         if not confirmed:
-            print(f"[FILE] Write cancelled by user: {path}")
+            logger.debug(f"Write cancelled by user: {path}")
             return f"Operation cancelled by user: {path}"
 
     try:
@@ -90,13 +87,14 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
         line_count = len(content.splitlines()) if content else 0
         action = "Overwrote" if file_existed else "Created"
         result = f"{action} file {path} with {line_count} lines"
-        print(f"[FILE] {result}")
+        logger.debug(f"{result}")
         return result
     except OSError as e:
-        print(f"[FILE] Failed to write {path}: {e}")
+        logger.error(f"Failed to write {path}: {e}")
         raise FileSystemError(f"Failed to write file {path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def append_to_file(file_path: str, content: str) -> str:
     """Append string content to a text file.
@@ -134,6 +132,7 @@ def append_to_file(file_path: str, content: str) -> str:
         raise FileSystemError(f"Failed to append to file {path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def list_directory_contents(directory_path: str, include_hidden: bool) -> list[str]:
     """List contents of a directory.
@@ -148,8 +147,8 @@ def list_directory_contents(directory_path: str, include_hidden: bool) -> list[s
     Raises:
         FileSystemError: If directory doesn't exist or can't be read
     """
-    print(
-        f"[FILE] Listing directory: {directory_path} (include_hidden={include_hidden})"
+    logger.debug(
+        f"Listing directory: {directory_path} (include_hidden={include_hidden})"
     )
 
     path = validate_path(directory_path, "list directory")
@@ -162,13 +161,14 @@ def list_directory_contents(directory_path: str, include_hidden: bool) -> list[s
         if not include_hidden:
             contents = [name for name in contents if not name.startswith(".")]
         sorted_contents = sorted(contents)
-        print(f"[FILE] Found {len(sorted_contents)} items in {path}")
+        logger.debug(f"Found {len(sorted_contents)} items in {path}")
         return sorted_contents
     except OSError as e:
-        print(f"[FILE] Failed to list directory {path}: {e}")
+        logger.error(f"Failed to list directory {path}: {e}")
         raise FileSystemError(f"Failed to list directory {path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def create_directory(directory_path: str, skip_confirm: bool) -> str:
     """Create a directory and any necessary parent directories.
@@ -210,6 +210,7 @@ def create_directory(directory_path: str, skip_confirm: bool) -> str:
         raise FileSystemError(f"Failed to create directory {path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def delete_file(file_path: str, skip_confirm: bool) -> str:
     """Delete a file with permission checking.
@@ -224,7 +225,7 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
     Raises:
         FileSystemError: If deletion fails or file doesn't exist without skip_confirm
     """
-    print(f"[FILE] Deleting file: {file_path} (skip_confirm={skip_confirm})")
+    logger.debug(f"Deleting file: {file_path} (skip_confirm={skip_confirm})")
 
     path = validate_path(file_path, "delete file")
 
@@ -257,19 +258,20 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
     )
 
     if not confirmed:
-        print(f"[FILE] Deletion cancelled by user: {path}")
+        logger.debug(f"Deletion cancelled by user: {path}")
         return f"Operation cancelled by user: {path}"
 
     try:
         path.unlink()
         result = f"Deleted file {path} ({file_size} bytes)"
-        print(f"[FILE] {result}")
+        logger.debug(f"{result}")
         return result
     except OSError as e:
-        print(f"[FILE] Failed to delete {path}: {e}")
+        logger.error(f"Failed to delete {path}: {e}")
         raise FileSystemError(f"Failed to delete file {path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -> str:
     """Delete a directory with permission checking.
@@ -345,6 +347,7 @@ def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -
         raise FileSystemError(f"Failed to delete directory {path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> str:
     """Move or rename a file or directory with permission checking.
@@ -360,8 +363,8 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
     Raises:
         FileSystemError: If move operation fails or destination exists without skip_confirm
     """
-    print(
-        f"[FILE] Moving: {source_path} -> {destination_path} (skip_confirm={skip_confirm})"
+    logger.debug(
+        f"Moving: {source_path} -> {destination_path} (skip_confirm={skip_confirm})"
     )
 
     src_path = validate_path(source_path, "move source")
@@ -394,7 +397,7 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
         )
 
         if not confirmed:
-            print(f"[FILE] Move cancelled by user: {src_path} -> {dst_path}")
+            logger.debug(f"Move cancelled by user: {src_path} -> {dst_path}")
             return f"Operation cancelled by user: move from {src_path} to {dst_path}"
 
     try:
@@ -403,13 +406,14 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
 
         action = "Moved and overwrote" if destination_existed else "Moved"
         result = f"{action} {item_type} from {src_path} to {dst_path}{size_info}"
-        print(f"[FILE] {result}")
+        logger.debug(f"{result}")
         return result
     except OSError as e:
-        print(f"[FILE] Failed to move {src_path} to {dst_path}: {e}")
+        logger.error(f"Failed to move {src_path} to {dst_path}: {e}")
         raise FileSystemError(f"Failed to move {src_path} to {dst_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> str:
     """Copy a file or directory with permission checking.
@@ -489,6 +493,7 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
         raise FileSystemError(f"Failed to copy {src_path} to {dst_path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) -> str:
     """Replace occurrences of text within a file with detailed feedback.
@@ -513,8 +518,8 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
         raise ValueError("old_text cannot be empty")
 
     # Enhanced input logging for security auditing
-    print(
-        f"[FILE] replace_in_file: file_path='{file_path}', old_text='{old_text[:100]}{'...' if len(old_text) > 100 else ''}', new_text='{new_text[:100]}{'...' if len(new_text) > 100 else ''}', count={count}"
+    logger.debug(
+        f"replace_in_file: file_path='{file_path}', old_text='{old_text[:100]}{'...' if len(old_text) > 100 else ''}', new_text='{new_text[:100]}{'...' if len(new_text) > 100 else ''}', count={count}"
     )
 
     validate_file_content(new_text, "replace")
@@ -551,6 +556,7 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
         raise FileSystemError(f"Failed to replace text in file {path}: {e}")
 
 
+@adk_tool
 @strands_tool
 def insert_at_line(file_path: str, line_number: int, content: str) -> str:
     """Insert content at a specific line number in a file with detailed feedback.
@@ -574,8 +580,8 @@ def insert_at_line(file_path: str, line_number: int, content: str) -> str:
         raise ValueError("line_number must be 1 or greater")
 
     # Enhanced input logging for security auditing
-    print(
-        f"[FILE] insert_at_line: file_path='{file_path}', line_number={line_number}, content='{content[:100]}{'...' if len(content) > 100 else ''}')"
+    logger.debug(
+        f"insert_at_line: file_path='{file_path}', line_number={line_number}, content='{content[:100]}{'...' if len(content) > 100 else ''}')"
     )
 
     validate_file_content(content, "insert")

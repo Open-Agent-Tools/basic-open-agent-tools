@@ -3,20 +3,13 @@
 import inspect
 import sys
 import traceback
-from typing import Any, Callable, Union
+from typing import Any, Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
-
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
+@adk_tool
 @strands_tool
 def inspect_function_signature(
     function_name: str, module_name: str
@@ -150,6 +143,7 @@ def inspect_function_signature(
         )
 
 
+@adk_tool
 @strands_tool
 def get_call_stack_info() -> dict[str, Union[list, int, str, Any]]:
     """
@@ -195,6 +189,7 @@ def get_call_stack_info() -> dict[str, Union[list, int, str, Any]]:
         raise BasicAgentToolsError(f"Failed to get call stack info: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def format_exception_details(
     exception_info: str,
@@ -286,6 +281,7 @@ def format_exception_details(
         raise BasicAgentToolsError(f"Failed to format exception details: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def validate_function_call(
     function_name: str, arguments: dict[str, str], module_name: str
@@ -387,7 +383,10 @@ def validate_function_call(
             validation_results["can_call"] = False
             validation_results["binding_error"] = str(e)
             issues = validation_results["validation_issues"]
-            assert isinstance(issues, list)
+            if not isinstance(issues, list):
+                raise TypeError(
+                    f"validation_issues should be list, got {type(issues).__name__}"
+                )
             issues.append(f"Binding failed: {str(e)}")
 
         # Additional parameter analysis
@@ -419,6 +418,7 @@ def validate_function_call(
         raise BasicAgentToolsError(f"Failed to validate function call: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def trace_variable_changes(
     variable_name: str, initial_value: str, operations: list[str]

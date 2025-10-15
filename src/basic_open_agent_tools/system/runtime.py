@@ -5,20 +5,13 @@ import platform
 import sys
 import time
 from pathlib import Path
-from typing import Any, Callable, Union
+from typing import Any, Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
-
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
+@adk_tool
 @strands_tool
 def inspect_runtime_environment() -> dict[
     str, Union[str, int, float, list[str], dict, Any]
@@ -130,6 +123,7 @@ def inspect_runtime_environment() -> dict[
         raise BasicAgentToolsError(f"Failed to inspect runtime environment: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def get_python_module_info() -> dict[str, Union[str, int, bool, list[str]]]:
     """
@@ -178,6 +172,7 @@ def get_python_module_info() -> dict[str, Union[str, int, bool, list[str]]]:
         raise BasicAgentToolsError(f"Failed to get Python module information: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def get_file_system_context() -> dict[str, Union[str, list[str], bool, int]]:
     """
@@ -275,6 +270,7 @@ def get_file_system_context() -> dict[str, Union[str, list[str], bool, int]]:
         raise BasicAgentToolsError(f"Failed to get file system context: {str(e)}")
 
 
+@adk_tool
 @strands_tool
 def get_network_environment() -> dict[str, Union[str, list[str], bool, int, dict]]:
     """

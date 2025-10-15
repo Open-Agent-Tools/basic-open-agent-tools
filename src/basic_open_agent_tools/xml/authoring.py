@@ -6,14 +6,9 @@ from simple dictionary structures.
 
 import os
 import xml.etree.ElementTree as ET
-from typing import Any, Callable, Optional
+from typing import Optional
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
+from ..decorators import adk_tool, strands_tool
 
 
 def _dict_to_element(data: dict, parent: Optional[ET.Element] = None) -> ET.Element:
@@ -43,6 +38,7 @@ def _dict_to_element(data: dict, parent: Optional[ET.Element] = None) -> ET.Elem
     return element
 
 
+@adk_tool
 @strands_tool
 def create_xml_from_dict(data: dict, root_tag: str, encoding: str, indent: bool) -> str:
     """Create XML string from nested dictionary structure.
@@ -118,10 +114,14 @@ def create_xml_from_dict(data: dict, root_tag: str, encoding: str, indent: bool)
     # Use ET.tostring for proper encoding support
     xml_bytes_result = ET.tostring(root, encoding=encoding, xml_declaration=True)
     decoded_str = xml_bytes_result.decode(encoding)
-    assert isinstance(decoded_str, str)
+    if not isinstance(decoded_str, str):
+        raise TypeError(
+            f"XML decoding produced {type(decoded_str).__name__}, expected str"
+        )
     return decoded_str
 
 
+@adk_tool
 @strands_tool
 def write_xml_file(
     data: dict, file_path: str, root_tag: str, encoding: str, skip_confirm: bool
@@ -197,6 +197,7 @@ def write_xml_file(
     return f"Created XML file {file_path} ({file_size} bytes)"
 
 
+@adk_tool
 @strands_tool
 def create_xml_element(tag: str, text: str, attributes: dict[str, str]) -> dict:
     """Create a single XML element as dict structure.
@@ -254,6 +255,7 @@ def create_xml_element(tag: str, text: str, attributes: dict[str, str]) -> dict:
     }
 
 
+@adk_tool
 @strands_tool
 def add_xml_child_element(parent: dict, child: dict) -> dict:
     """Add child element to parent element structure.
@@ -302,6 +304,7 @@ def add_xml_child_element(parent: dict, child: dict) -> dict:
     return parent
 
 
+@adk_tool
 @strands_tool
 def set_xml_element_attribute(
     element: dict, attribute_name: str, attribute_value: str
@@ -354,6 +357,7 @@ def set_xml_element_attribute(
     return element
 
 
+@adk_tool
 @strands_tool
 def build_simple_xml(root_tag: str, elements: list[dict]) -> str:
     """Build simple flat XML document from list of elements.
@@ -409,6 +413,7 @@ def build_simple_xml(root_tag: str, elements: list[dict]) -> str:
     return create_xml_from_dict(root_data, root_tag, "UTF-8", indent=True)
 
 
+@adk_tool
 @strands_tool
 def xml_from_csv(csv_data: list[dict], root_tag: str, row_tag: str) -> str:
     """Convert CSV data (list of dicts) to XML format.
