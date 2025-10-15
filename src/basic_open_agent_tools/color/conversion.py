@@ -1,19 +1,37 @@
 """Color format conversion utilities."""
 
-from typing import Any, Callable
-
-try:
-    from strands import tool as strands_tool
-except ImportError:
-
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        """Fallback decorator when strands is not available."""
-        return func
-
-
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
+def _hue_to_rgb(p: float, q: float, t: float) -> float:
+    """Convert hue component to RGB value.
+
+    Helper function for HSL to RGB conversion. Calculates the RGB component
+    value for a given hue position using the HSL color model.
+
+    Args:
+        p: Lower RGB component bound
+        q: Upper RGB component bound
+        t: Hue position (normalized 0-1)
+
+    Returns:
+        RGB component value (0-1 range)
+    """
+    if t < 0:
+        t += 1
+    if t > 1:
+        t -= 1
+    if t < 1 / 6:
+        return p + (q - p) * 6 * t
+    if t < 1 / 2:
+        return q
+    if t < 2 / 3:
+        return p + (q - p) * (2 / 3 - t) * 6
+    return p
+
+
+@adk_tool
 @strands_tool
 def rgb_to_hex(r: int, g: int, b: int) -> str:
     """Convert RGB color values to hexadecimal color code.
@@ -38,6 +56,7 @@ def rgb_to_hex(r: int, g: int, b: int) -> str:
     return f"#{r:02X}{g:02X}{b:02X}"
 
 
+@adk_tool
 @strands_tool
 def hex_to_rgb(hex_color: str) -> dict[str, int]:
     """Convert hexadecimal color code to RGB values.
@@ -80,6 +99,7 @@ def hex_to_rgb(hex_color: str) -> dict[str, int]:
     return {"r": r, "g": g, "b": b}
 
 
+@adk_tool
 @strands_tool
 def rgb_to_hsl(r: int, g: int, b: int) -> dict[str, int]:
     """Convert RGB color values to HSL (Hue, Saturation, Lightness).
@@ -144,6 +164,7 @@ def rgb_to_hsl(r: int, g: int, b: int) -> dict[str, int]:
     }
 
 
+@adk_tool
 @strands_tool
 def hsl_to_rgb(h: int, s: int, lightness: int) -> dict[str, int]:
     """Convert HSL (Hue, Saturation, Lightness) to RGB color values.
@@ -176,21 +197,6 @@ def hsl_to_rgb(h: int, s: int, lightness: int) -> dict[str, int]:
     s_norm = s / 100.0
     l_norm = lightness / 100.0
 
-    # Helper function
-    @strands_tool
-    def hue_to_rgb(p: float, q: float, t: float) -> float:
-        if t < 0:
-            t += 1
-        if t > 1:
-            t -= 1
-        if t < 1 / 6:
-            return p + (q - p) * 6 * t
-        if t < 1 / 2:
-            return q
-        if t < 2 / 3:
-            return p + (q - p) * (2 / 3 - t) * 6
-        return p
-
     if s == 0:
         # Achromatic (gray)
         r = g = b = int(round(l_norm * 255))
@@ -202,13 +208,14 @@ def hsl_to_rgb(h: int, s: int, lightness: int) -> dict[str, int]:
         p = 2 * l_norm - q
 
         h_norm = h / 360.0
-        r = int(round(hue_to_rgb(p, q, h_norm + 1 / 3) * 255))
-        g = int(round(hue_to_rgb(p, q, h_norm) * 255))
-        b = int(round(hue_to_rgb(p, q, h_norm - 1 / 3) * 255))
+        r = int(round(_hue_to_rgb(p, q, h_norm + 1 / 3) * 255))
+        g = int(round(_hue_to_rgb(p, q, h_norm) * 255))
+        b = int(round(_hue_to_rgb(p, q, h_norm - 1 / 3) * 255))
 
     return {"r": r, "g": g, "b": b}
 
 
+@adk_tool
 @strands_tool
 def rgb_to_cmyk(r: int, g: int, b: int) -> dict[str, int]:
     """Convert RGB color values to CMYK (Cyan, Magenta, Yellow, Key/Black).
@@ -255,6 +262,7 @@ def rgb_to_cmyk(r: int, g: int, b: int) -> dict[str, int]:
     }
 
 
+@adk_tool
 @strands_tool
 def cmyk_to_rgb(c: int, m: int, y: int, k: int) -> dict[str, int]:
     """Convert CMYK (Cyan, Magenta, Yellow, Key/Black) to RGB color values.

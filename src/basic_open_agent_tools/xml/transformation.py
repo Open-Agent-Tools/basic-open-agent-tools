@@ -5,16 +5,10 @@ formatting XML, and transforming XML documents.
 """
 
 import json
+import warnings
 import xml.etree.ElementTree as ET
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
+from ..decorators import adk_tool, strands_tool
 
 try:
     from defusedxml.ElementTree import (
@@ -24,6 +18,13 @@ try:
     HAS_DEFUSEDXML = True
 except ImportError:
     HAS_DEFUSEDXML = False
+    warnings.warn(
+        "defusedxml is not installed. XML parsing may be vulnerable to XXE attacks "
+        "and XML bombs. For production use, install with: "
+        "pip install basic-open-agent-tools[xml]",
+        RuntimeWarning,
+        stacklevel=2,
+    )
 
 try:
     from lxml import etree as lxml_etree  # type: ignore[import-untyped]
@@ -65,7 +66,10 @@ def _element_to_json_dict(element: ET.Element) -> dict:
                 result[tag] = [existing]
             # Type cast to list before appending
             children_list = result[tag]
-            assert isinstance(children_list, list)
+            if not isinstance(children_list, list):
+                raise TypeError(
+                    f"Expected list for tag '{tag}', got {type(children_list).__name__}"
+                )
             children_list.append(child_dict)
         else:
             result[tag] = child_dict
@@ -73,6 +77,7 @@ def _element_to_json_dict(element: ET.Element) -> dict:
     return result
 
 
+@adk_tool
 @strands_tool
 def xml_to_json(xml_content: str) -> str:
     """Convert XML to JSON format preserving structure.
@@ -120,6 +125,7 @@ def xml_to_json(xml_content: str) -> str:
         raise ValueError(f"Invalid XML content: {e}")
 
 
+@adk_tool
 @strands_tool
 def json_to_xml(json_content: str, root_tag: str) -> str:
     """Convert JSON to XML format.
@@ -168,7 +174,6 @@ def json_to_xml(json_content: str, root_tag: str) -> str:
         root = ET.Element(root_tag)
 
         # Convert dict to XML elements
-        @strands_tool
         def dict_to_element(parent: ET.Element, data: dict) -> None:
             """Recursively convert dict to XML elements."""
             for key, value in data.items():
@@ -214,13 +219,17 @@ def json_to_xml(json_content: str, root_tag: str) -> str:
         # Convert to string with XML declaration
         xml_bytes = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
         decoded_str = xml_bytes.decode("UTF-8")
-        assert isinstance(decoded_str, str)
+        if not isinstance(decoded_str, str):
+            raise TypeError(
+                f"XML decoding produced {type(decoded_str).__name__}, expected str"
+            )
         return decoded_str
 
     except json.JSONDecodeError as e:
         raise ValueError(f"Invalid JSON content: {e}")
 
 
+@adk_tool
 @strands_tool
 def format_xml(xml_content: str, indent_size: int) -> str:
     """Format XML with proper indentation and line breaks.
@@ -271,13 +280,17 @@ def format_xml(xml_content: str, indent_size: int) -> str:
         # Convert to string
         xml_bytes_result = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
         decoded_str = xml_bytes_result.decode("UTF-8")
-        assert isinstance(decoded_str, str)
+        if not isinstance(decoded_str, str):
+            raise TypeError(
+                f"XML decoding produced {type(decoded_str).__name__}, expected str"
+            )
         return decoded_str
 
     except ET.ParseError as e:
         raise ValueError(f"Invalid XML content: {e}")
 
 
+@adk_tool
 @strands_tool
 def strip_xml_namespaces(xml_content: str) -> str:
     """Remove namespace declarations and prefixes from XML.
@@ -316,7 +329,6 @@ def strip_xml_namespaces(xml_content: str) -> str:
             root = ET.fromstring(xml_content)
 
         # Strip namespaces from all elements
-        @strands_tool
         def strip_ns(element: ET.Element) -> None:
             """Remove namespace from element and descendants."""
             # Remove namespace from tag
@@ -342,13 +354,17 @@ def strip_xml_namespaces(xml_content: str) -> str:
         ET.indent(root, space="  ")
         xml_bytes_result = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
         decoded_str = xml_bytes_result.decode("UTF-8")
-        assert isinstance(decoded_str, str)
+        if not isinstance(decoded_str, str):
+            raise TypeError(
+                f"XML decoding produced {type(decoded_str).__name__}, expected str"
+            )
         return decoded_str
 
     except ET.ParseError as e:
         raise ValueError(f"Invalid XML content: {e}")
 
 
+@adk_tool
 @strands_tool
 def transform_xml_with_xslt(xml_content: str, xslt_path: str) -> str:
     """Apply XSLT transformation to XML.
@@ -408,7 +424,10 @@ def transform_xml_with_xslt(xml_content: str, xslt_path: str) -> str:
 
         # Convert result to string
         result_str = str(result_tree)
-        assert isinstance(result_str, str)
+        if not isinstance(result_str, str):
+            raise TypeError(
+                f"XSLT transformation produced {type(result_str).__name__}, expected str"
+            )
         return result_str
 
     except FileNotFoundError:
@@ -419,6 +438,7 @@ def transform_xml_with_xslt(xml_content: str, xslt_path: str) -> str:
         raise ValueError(f"Invalid XML syntax: {e}")
 
 
+@adk_tool
 @strands_tool
 def extract_xml_to_csv(xml_content: str, element_tag: str) -> list[dict]:
     """Extract repeating elements to CSV-style list of dicts.

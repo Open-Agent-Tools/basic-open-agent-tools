@@ -8,19 +8,37 @@ import json
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Any, Callable, Union
+import warnings
+from typing import Any, Union
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
-
+from .._logging import get_logger
+from ..decorators import adk_tool, strands_tool
 from ..exceptions import BasicAgentToolsError
 
+logger = get_logger("network.http_client")
 
+
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """HTTP handler that prevents automatic redirect following.
+
+    This handler is used when follow_redirects=False to prevent urllib
+    from automatically following 3xx redirect responses.
+    """
+
+    def redirect_request(
+        self,
+        req: Any,
+        fp: Any,
+        code: Any,
+        msg: Any,
+        headers: Any,
+        newurl: Any,
+    ) -> None:
+        """Override redirect_request to prevent automatic redirects."""
+        return None
+
+
+@adk_tool
 @strands_tool
 def http_request(
     method: str,
@@ -33,6 +51,11 @@ def http_request(
 ) -> dict[str, Union[str, int]]:
     """Make an HTTP request with simplified parameters.
 
+    This function makes HTTP requests and returns response information in a
+    consistent dictionary format. HTTP errors (4xx, 5xx) are returned as
+    responses rather than raising exceptions, allowing agents to handle
+    error responses programmatically.
+
     Args:
         method: HTTP method (GET, POST, PUT, DELETE, etc.)
         url: Target URL for the request
@@ -44,18 +67,30 @@ def http_request(
 
     Returns:
         Dictionary containing:
-        - status_code: HTTP response status code
-        - headers: Response headers as string
-        - body: Response body content
-        - url: Final URL (after redirects)
+        - status_code: HTTP response status code (includes 4xx/5xx errors)
+        - headers: Response headers as JSON string
+        - body: Response body content (or error message for HTTP errors)
+        - url: Final URL (after redirects if followed)
+
+        Note: HTTP errors (404, 500, etc.) are returned as responses with
+        status_code set to the error code. This allows agents to inspect
+        and handle HTTP errors programmatically.
 
     Raises:
-        BasicAgentToolsError: If request fails or invalid parameters
+        BasicAgentToolsError: Only for network errors (connection failures,
+        timeouts, DNS errors) or invalid parameters. HTTP errors (4xx, 5xx)
+        are returned as responses, not raised as exceptions.
 
     Example:
+        >>> # Successful request
         >>> response = http_request("GET", "https://api.github.com/user", "{}", "", 30, True, True)
         >>> print(response["status_code"])
         200
+
+        >>> # HTTP error (404) returned as response
+        >>> response = http_request("GET", "https://api.github.com/notfound", "{}", "", 30, True, True)
+        >>> print(response["status_code"])
+        404
     """
     # Parse headers from JSON string
     if not isinstance(headers, str):
@@ -71,7 +106,7 @@ def http_request(
     # Log the HTTP request details for security auditing
     body_info = f" with {len(body)} char body" if body else ""
     headers_info = f" with {len(headers_dict)} headers" if headers_dict else ""
-    print(f"[HTTP] {method} {url}{body_info}{headers_info} (timeout={timeout}s)")
+    logger.debug(f"{method} {url}{body_info}{headers_info} (timeout={timeout}s)")
 
     if not method or not isinstance(method, str):
         raise BasicAgentToolsError("Method must be a non-empty string")
@@ -116,6 +151,14 @@ def http_request(
         if not verify_ssl:
             import ssl
 
+            warnings.warn(
+                f"SSL certificate verification disabled for {url}. "
+                "This connection is vulnerable to man-in-the-middle attacks. "
+                "Only use verify_ssl=False for testing with trusted servers.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+
             ssl_context = ssl.create_default_context()
             ssl_context.check_hostname = False
             ssl_context.verify_mode = ssl.CERT_NONE
@@ -124,21 +167,7 @@ def http_request(
 
         # Configure redirects
         if not follow_redirects:
-
-            class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
-                @strands_tool
-                def redirect_request(
-                    self,
-                    req: Any,
-                    fp: Any,
-                    code: Any,
-                    msg: Any,
-                    headers: Any,
-                    newurl: Any,
-                ) -> None:
-                    return None
-
-            opener = urllib.request.build_opener(NoRedirectHandler)
+            opener = urllib.request.build_opener(_NoRedirectHandler)
             if ssl_context:
                 https_handler = urllib.request.HTTPSHandler(context=ssl_context)
                 opener.add_handler(https_handler)
@@ -177,7 +206,7 @@ def http_request(
 
         # Log response details
         body_size = len(decoded_body) if decoded_body else 0
-        print(f"[HTTP] Response: {result['status_code']} ({body_size} chars)")
+        logger.debug(f"Response: {result['status_code']} ({body_size} chars)")
 
         return result
 

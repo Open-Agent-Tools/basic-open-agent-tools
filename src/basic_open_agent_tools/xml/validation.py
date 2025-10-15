@@ -4,16 +4,10 @@ This module provides XML validation including well-formedness checking,
 required element validation, and schema validation (when lxml is available).
 """
 
+import warnings
 import xml.etree.ElementTree as ET
-from typing import Any, Callable
 
-try:
-    from strands import tool as strands_tool
-except ImportError:
-    # Create a no-op decorator if strands is not installed
-    def strands_tool(func: Callable[..., Any]) -> Callable[..., Any]:  # type: ignore[no-redef]
-        return func
-
+from ..decorators import adk_tool, strands_tool
 
 try:
     from defusedxml.ElementTree import (
@@ -23,6 +17,13 @@ try:
     HAS_DEFUSEDXML = True
 except ImportError:
     HAS_DEFUSEDXML = False
+    warnings.warn(
+        "defusedxml is not installed. XML parsing may be vulnerable to XXE attacks "
+        "and XML bombs. For production use, install with: "
+        "pip install basic-open-agent-tools[xml]",
+        RuntimeWarning,
+        stacklevel=2,
+    )
 
 try:
     from lxml import etree as lxml_etree  # type: ignore[import-untyped]
@@ -32,6 +33,7 @@ except ImportError:
     HAS_LXML = False
 
 
+@adk_tool
 @strands_tool
 def validate_xml_well_formed(xml_content: str) -> bool:
     """Check if XML is well-formed (valid syntax).
@@ -80,6 +82,7 @@ def validate_xml_well_formed(xml_content: str) -> bool:
         raise ValueError(f"XML is not well-formed: {e}")
 
 
+@adk_tool
 @strands_tool
 def validate_xml_against_dtd(xml_content: str, dtd_path: str) -> bool:
     """Validate XML against DTD schema.
@@ -148,6 +151,7 @@ def validate_xml_against_dtd(xml_content: str, dtd_path: str) -> bool:
         raise ValueError(f"Invalid XML syntax: {e}")
 
 
+@adk_tool
 @strands_tool
 def validate_xml_against_xsd(xml_content: str, xsd_path: str) -> bool:
     """Validate XML against XSD schema.
@@ -217,6 +221,7 @@ def validate_xml_against_xsd(xml_content: str, xsd_path: str) -> bool:
         raise ValueError(f"Invalid XML syntax: {e}")
 
 
+@adk_tool
 @strands_tool
 def check_xml_has_required_elements(xml_content: str, required_tags: list[str]) -> dict:
     """Verify XML contains all required element tags.
@@ -297,6 +302,7 @@ def check_xml_has_required_elements(xml_content: str, required_tags: list[str]) 
         raise ValueError(f"Invalid XML content: {e}")
 
 
+@adk_tool
 @strands_tool
 def create_xml_validation_report(xml_content: str, schema_path: str) -> dict:
     """Generate detailed validation report against schema.
