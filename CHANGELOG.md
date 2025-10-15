@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Smart Confirmation System**: 3-mode hybrid confirmation for write/delete operations
+  - **Bypass Mode**: `skip_confirm=True` or `BYPASS_TOOL_CONSENT=true` environment variable proceeds immediately
+  - **Interactive Mode**: TTY-enabled terminals with `skip_confirm=False` prompt user with `y/n` confirmation
+  - **Agent Mode**: Non-TTY environments with `skip_confirm=False` raise `CONFIRMATION_REQUIRED` error with instructions
+- **New Module**: `confirmation.py` - Centralized confirmation handling with context-aware behavior
+- **Environment Variable**: `BYPASS_TOOL_CONSENT` for CI/CD and automation workflows
+
+### Changed
+- **Confirmation Behavior**: All functions with `skip_confirm` now use intelligent 3-mode confirmation system
+  - File operations: `write_file_from_string`, `create_directory`, `delete_file`, `delete_directory`, `move_file`, `copy_file`, `file_editor`
+  - Data operations: `write_csv_simple`, `write_ini_file`, `write_yaml_file`, `write_toml_file`
+  - Archive operations: `create_zip`, `extract_zip`, `compress_files`, `create_tar`, `compress_file_gzip`, `compress_file_bzip2`, `compress_file_xz`
+  - TODO operations: `delete_task`
+- **User Experience**: Interactive terminal users get confirmation prompts instead of errors
+- **Agent Integration**: LLM agents receive instructive error messages to guide user permission workflow
+- **Documentation**: Enhanced README, getting-started.md, api-reference.md, faq.md, and CLAUDE.md with confirmation system details
+
+### Fixed
+- **Agent UX**: Resolved issue where agents couldn't provide user feedback loop for confirmations
+- **Type Safety**: Added explicit type casts for mypy compliance in file_system/editor.py
+
 ## [0.13.1] - 2025-10-14
 
 ### Removed

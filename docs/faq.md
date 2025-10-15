@@ -120,6 +120,59 @@ except Exception as e:
     print(f"Unexpected error: {e}")
 ```
 
+### How does the skip_confirm parameter work?
+
+**The confirmation system adapts to your execution context with 3 modes:**
+
+**1. Bypass Mode** (`skip_confirm=True` or `BYPASS_TOOL_CONSENT=true` env var)
+```python
+# Direct bypass
+result = boat.file_system.write_file_from_string(
+    file_path="/tmp/file.txt",
+    content="Data",
+    skip_confirm=True  # Proceeds immediately
+)
+
+# Or use environment variable for CI/CD
+import os
+os.environ['BYPASS_TOOL_CONSENT'] = 'true'
+# All confirmations bypassed automatically
+```
+
+**2. Interactive Mode** (Terminal with `skip_confirm=False`)
+```python
+# In a terminal, you'll be prompted:
+result = boat.file_system.write_file_from_string(
+    file_path="/tmp/file.txt",
+    content="Data",
+    skip_confirm=False
+)
+# ⚠️  WARNING: overwrite existing file
+# Target: /tmp/file.txt
+# Preview: 1024 bytes
+#
+# Proceed? (y/n):
+```
+
+**3. Agent Mode** (Non-TTY with `skip_confirm=False`)
+```python
+# Agent receives instructive error to ask user
+from basic_open_agent_tools.exceptions import BasicAgentToolsError
+
+try:
+    result = boat.file_system.write_file_from_string(
+        file_path="/tmp/file.txt",
+        content="Data",
+        skip_confirm=False
+    )
+except BasicAgentToolsError as e:
+    # Error says: "CONFIRMATION_REQUIRED: overwrite existing file"
+    # Agent should ask user, then retry with skip_confirm=True
+    print(e)
+```
+
+**Best practice for agents**: Always start with `skip_confirm=False`, handle `CONFIRMATION_REQUIRED` errors by asking the user, then retry with `skip_confirm=True` if approved.
+
 ### What's the difference between modules?
 
 Each module serves a specific purpose:

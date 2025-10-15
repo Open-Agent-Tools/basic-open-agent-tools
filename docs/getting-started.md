@@ -132,23 +132,60 @@ file_system.write_file_from_string(
 
 ## Safety Features
 
-Many write operations include `skip_confirm` parameter:
+### Smart Confirmation System
 
+All write/delete operations include `skip_confirm` parameter with **3-mode intelligent confirmation**:
+
+#### 1. Bypass Mode
+Set `skip_confirm=True` or use `BYPASS_TOOL_CONSENT=true` environment variable:
 ```python
-# Safe by default - raises error if file exists
+# Direct bypass
+result = boat.file_system.write_file_from_string(
+    file_path="/tmp/example.txt",
+    content="Updated content",
+    skip_confirm=True  # Bypasses all confirmations
+)
+
+# Environment variable (great for CI/CD)
+import os
+os.environ['BYPASS_TOOL_CONSENT'] = 'true'
+# All confirmations bypassed automatically
+```
+
+#### 2. Interactive Mode
+When running in a terminal with `skip_confirm=False`, you'll get interactive prompts:
+```python
 result = boat.file_system.write_file_from_string(
     file_path="/tmp/example.txt",
     content="Hello, World!",
     skip_confirm=False
 )
-
-# Explicit overwrite when needed
-result = boat.file_system.write_file_from_string(
-    file_path="/tmp/example.txt",
-    content="Updated content",
-    skip_confirm=True  # Overwrites existing file
-)
+# Displays:
+# ⚠️  WARNING: overwrite existing file
+# Target: /tmp/example.txt
+# Preview: 1024 bytes
+#
+# Proceed? (y/n):
 ```
+
+#### 3. Agent Mode
+When running in non-TTY environments (agent frameworks) with `skip_confirm=False`:
+```python
+# Agent receives CONFIRMATION_REQUIRED error with instructions
+try:
+    result = boat.file_system.write_file_from_string(
+        file_path="/tmp/example.txt",
+        content="Hello, World!",
+        skip_confirm=False
+    )
+except BasicAgentToolsError as e:
+    # Error message guides agent to:
+    # 1. Ask user for permission
+    # 2. Retry with skip_confirm=True if approved
+    print(e)  # "CONFIRMATION_REQUIRED: overwrite existing file - /tmp/example.txt"
+```
+
+**Best Practice for Agents**: Always start with `skip_confirm=False`, then handle `CONFIRMATION_REQUIRED` errors by asking the user and retrying with `skip_confirm=True` if approved.
 
 ## Migration Notice
 

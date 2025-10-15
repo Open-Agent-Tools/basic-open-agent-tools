@@ -73,15 +73,20 @@ def function_name(
 
 ### Safety Parameter: skip_confirm
 
-Many write operations include a `skip_confirm` parameter:
+Write/delete operations include `skip_confirm` with **3-mode intelligent confirmation**:
 
-- **`skip_confirm=False`** - Safe default, prevents accidental overwrites
-- **`skip_confirm=True`** - Bypass confirmation, allows overwrites
+**Modes:**
+1. **Bypass** - `skip_confirm=True` or `BYPASS_TOOL_CONSENT=true` env var → proceeds immediately
+2. **Interactive** - TTY terminal with `skip_confirm=False` → prompts user `y/n`
+3. **Agent** - Non-TTY with `skip_confirm=False` → raises `CONFIRMATION_REQUIRED` error
 
-Functions with `skip_confirm`:
-- File operations: `write_file_from_string`, `create_directory`, `delete_file`, `delete_directory`, `move_file`, `copy_file`
-- Data operations: `write_csv_simple`, `write_ini_file`, `write_yaml_file`, `write_toml_file`
-- Archive operations: `create_zip`, `extract_zip`, `compress_files`, `create_tar`, `compress_file_gzip`, `compress_file_bzip2`, `compress_file_xz`
+**Functions with skip_confirm:**
+- **File operations**: `write_file_from_string`, `create_directory`, `delete_file`, `delete_directory`, `move_file`, `copy_file`, `file_editor` (create)
+- **Data operations**: `write_csv_simple`, `write_ini_file`, `write_yaml_file`, `write_toml_file`
+- **Archive operations**: `create_zip`, `extract_zip`, `compress_files`, `create_tar`, `compress_file_gzip`, `compress_file_bzip2`, `compress_file_xz`
+- **TODO operations**: `delete_task`
+
+**For detailed confirmation system documentation**, see [Getting Started - Safety Features](getting-started.md#safety-features).
 
 ## Loading Tools
 

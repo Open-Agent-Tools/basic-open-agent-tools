@@ -104,24 +104,41 @@ agent = Agent(tools=all_tools)
 
 ## Safety Features
 
-All write operations include `skip_confirm` parameter:
-- `skip_confirm=False` - Safe default, prevents accidental overwrites
-- `skip_confirm=True` - Bypass confirmation for intentional overwrites
+### Smart Confirmation System (3 Modes)
+
+All write/delete operations include a `skip_confirm` parameter with intelligent confirmation handling:
+
+**🔄 Bypass Mode** - `skip_confirm=True` or `BYPASS_TOOL_CONSENT=true` env var
+- Proceeds immediately without prompts
+- Perfect for CI/CD and automation
+
+**💬 Interactive Mode** - Terminal with `skip_confirm=False`
+- Prompts user with `y/n` confirmation
+- Shows preview info (file sizes, etc.)
+
+**🤖 Agent Mode** - Non-TTY with `skip_confirm=False`
+- Raises `CONFIRMATION_REQUIRED` error with instructions
+- LLM agents can ask user and retry with `skip_confirm=True`
 
 ```python
-# Safe by default
+# Safe by default - adapts to context
 result = boat.file_system.write_file_from_string(
     file_path="/tmp/example.txt",
     content="Hello, World!",
-    skip_confirm=False  # Raises error if file exists
+    skip_confirm=False  # Interactive prompt OR agent error
 )
 
 # Explicit overwrite
 result = boat.file_system.write_file_from_string(
     file_path="/tmp/example.txt",
     content="Updated content",
-    skip_confirm=True  # Overwrites existing file
+    skip_confirm=True  # Bypasses all confirmations
 )
+
+# Automation mode
+import os
+os.environ['BYPASS_TOOL_CONSENT'] = 'true'
+# All confirmations bypassed for CI/CD
 ```
 
 ## Documentation
