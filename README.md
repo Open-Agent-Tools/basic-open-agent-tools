@@ -2,7 +2,17 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions.
 
-## 🆕 What's New in v0.13.1
+## 🆕 What's New in v0.13.2
+
+🎛️ **Enhanced Confirmation System**: Hybrid confirmation mode intelligently adapts to execution context (agent vs interactive vs bypass)
+
+🤖 **Agent-Aware Operations**: File operations now raise structured `CONFIRMATION_REQUIRED` errors that LLM agents can interpret and act on
+
+✅ **Smart Defaults**: `skip_confirm=False` safely handles both human interactions (prompts) and agent workflows (structured errors)
+
+🔧 **Test Coverage**: Comprehensive test suite (27 tests) for confirmation system with 100% coverage
+
+### Previous Release (v0.13.1)
 
 🔀 **Module Migration**: Code analysis, git tools, profiling, and static analysis modules (39 functions) migrated to **[coding-open-agent-tools](https://github.com/open-agent-tools/coding-open-agent-tools)**
 
