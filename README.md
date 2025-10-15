@@ -2,7 +2,15 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions.
 
-## 🆕 What's New in v0.13.2
+## 🆕 What's New in v0.13.3
+
+🔍 **Structured Logging**: Migrated 157 print statements to Python logging framework with `BOAT_LOG_LEVEL` environment variable control
+
+🛡️ **Enhanced Error Handling**: Replaced all assert statements with explicit type checking and descriptive error messages
+
+🧹 **Code Quality**: Improved type safety and debugging with proper exception raising patterns
+
+### Previous Release (v0.13.2)
 
 🎛️ **Enhanced Confirmation System**: Hybrid confirmation mode intelligently adapts to execution context (agent vs interactive vs bypass)
 
