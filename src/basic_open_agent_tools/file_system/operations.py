@@ -11,7 +11,7 @@ from .validation import validate_file_content, validate_path
 logger = get_logger("file_system.operations")
 
 
-def _generate_content_preview(content: str, max_chars: int = 200) -> str:
+def _generate_content_preview(content: str, max_chars: int = 1200) -> str:
     """Generate a preview of content for confirmation prompts.
 
     Args:

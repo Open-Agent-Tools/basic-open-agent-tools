@@ -29,8 +29,8 @@ def _generate_csv_preview(data: list[dict[str, str]], delimiter: str = ",") -> s
 
     preview = f"Writing {row_count} rows, {col_count} columns\n"
 
-    # Show first 3 rows as preview
-    sample_rows = min(3, len(data))
+    # Show first 5 rows as preview
+    sample_rows = min(5, len(data))
     if sample_rows > 0:
         preview += f"\nFirst {sample_rows} row(s):\n"
         for i, row in enumerate(data[:sample_rows]):

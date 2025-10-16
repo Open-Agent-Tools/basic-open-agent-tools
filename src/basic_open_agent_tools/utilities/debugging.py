@@ -195,7 +195,7 @@ def format_exception_details(
     Format detailed exception information from the last exception or provided info.
 
     Args:
-        exception_info: Optional exception info string (uses last exception if None)
+        exception_info: Exception info string (use empty string to get last exception)
 
     Returns:
         Dictionary with formatted exception details
@@ -204,7 +204,10 @@ def format_exception_details(
         BasicAgentToolsError: If no exception information available
     """
     try:
-        if exception_info is None:
+        if not isinstance(exception_info, str):
+            raise BasicAgentToolsError("Exception info must be a string")
+
+        if not exception_info or exception_info.strip() == "":
             # Get the last exception
             exc_type, exc_value, exc_traceback = sys.exc_info()
 
@@ -212,9 +215,6 @@ def format_exception_details(
                 raise BasicAgentToolsError("No exception information available")
 
         else:
-            if not isinstance(exception_info, str):
-                raise BasicAgentToolsError("Exception info must be a string")
-
             # Parse provided exception info
             return {
                 "exception_source": "provided_string",

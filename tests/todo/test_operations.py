@@ -291,10 +291,11 @@ class TestDeleteTask:
 
     def test_delete_task_success(self):
         """Test successful task deletion."""
-        result = delete_task(self.task_id)
+        result = delete_task(self.task_id, skip_confirm=True)
 
-        assert result["success"] is True
-        assert result["deleted_task_id"] == self.task_id
+        assert isinstance(result, str)
+        assert "deleted" in result.lower()
+        assert str(self.task_id) in result
 
         # Verify task is deleted
         with pytest.raises(BasicAgentToolsError):
@@ -303,7 +304,7 @@ class TestDeleteTask:
     def test_delete_task_not_found(self):
         """Test deleting non-existent task."""
         with pytest.raises(BasicAgentToolsError):
-            delete_task(999)
+            delete_task(999, skip_confirm=True)
 
 
 class TestCompleteTask:

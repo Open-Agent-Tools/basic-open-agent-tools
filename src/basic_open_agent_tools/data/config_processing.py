@@ -45,8 +45,8 @@ def _generate_dict_preview(data: dict, format_name: str) -> str:
     key_count = len(data)
     preview = f"Writing {key_count} top-level key(s)\n"
 
-    # Show first 3 keys and their values (truncated)
-    sample_keys = min(3, len(data))
+    # Show first 10 keys and their values (truncated)
+    sample_keys = min(10, len(data))
     if sample_keys > 0:
         preview += f"\nFirst {sample_keys} key(s):\n"
         for i, (key, value) in enumerate(list(data.items())[:sample_keys]):

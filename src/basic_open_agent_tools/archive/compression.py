@@ -28,8 +28,8 @@ def _generate_archive_preview(source_paths: list[str]) -> str:
     file_count = len(source_paths)
     preview = f"Archiving {file_count} source(s)\n"
 
-    # Show first 5 sources
-    sample_count = min(5, file_count)
+    # Show first 10 sources
+    sample_count = min(10, file_count)
     if sample_count > 0:
         preview += f"\nFirst {sample_count} source(s):\n"
         for i, path in enumerate(source_paths[:sample_count]):
@@ -45,8 +45,8 @@ def _generate_archive_preview(source_paths: list[str]) -> str:
             except OSError:
                 preview += f"  {i + 1}. {path}\n"
 
-    if file_count > 5:
-        preview += f"  ... and {file_count - 5} more"
+    if file_count > 10:
+        preview += f"  ... and {file_count - 10} more"
 
     return preview.strip()
 

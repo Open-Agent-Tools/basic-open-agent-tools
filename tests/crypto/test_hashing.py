@@ -115,17 +115,17 @@ class TestHashFile:
         with pytest.raises(
             BasicAgentToolsError, match="File path must be a non-empty string"
         ):
-            hash_file("")
+            hash_file("", algorithm="sha256")
 
         with pytest.raises(
             BasicAgentToolsError, match="File path must be a non-empty string"
         ):
-            hash_file(None)
+            hash_file(None, algorithm="sha256")
 
         with pytest.raises(
             BasicAgentToolsError, match="File path must be a non-empty string"
         ):
-            hash_file("   ")
+            hash_file("   ", algorithm="sha256")
 
     def test_invalid_algorithm(self):
         """Test error handling for invalid algorithm."""
@@ -138,7 +138,7 @@ class TestHashFile:
     def test_file_not_found(self):
         """Test error handling when file doesn't exist."""
         with pytest.raises(BasicAgentToolsError, match="File not found"):
-            hash_file("/nonexistent/path/file.txt")
+            hash_file("/nonexistent/path/file.txt", algorithm="sha256")
 
     def test_successful_file_hash_sha256(self):
         """Test successful file hashing with SHA-256."""
@@ -181,7 +181,7 @@ class TestHashFile:
         """Test error handling when path is a directory."""
         with tempfile.TemporaryDirectory() as temp_dir:
             with pytest.raises(BasicAgentToolsError, match="Path is not a file"):
-                hash_file(temp_dir)
+                hash_file(temp_dir, algorithm="sha256")
 
     def test_large_file_chunked_reading(self):
         """Test that large files are read in chunks."""
@@ -208,19 +208,19 @@ class TestVerifyChecksum:
     def test_invalid_data_type(self):
         """Test error handling for invalid data types."""
         with pytest.raises(BasicAgentToolsError, match="Data must be a string"):
-            verify_checksum(123, "abcdef123456")
+            verify_checksum(123, "abcdef123456", algorithm="md5")
 
     def test_invalid_expected_hash_type(self):
         """Test error handling for invalid expected hash types."""
         with pytest.raises(
             BasicAgentToolsError, match="Expected hash must be a non-empty string"
         ):
-            verify_checksum("test", "")
+            verify_checksum("test", "", algorithm="md5")
 
         with pytest.raises(
             BasicAgentToolsError, match="Expected hash must be a non-empty string"
         ):
-            verify_checksum("test", None)
+            verify_checksum("test", None, algorithm="md5")
 
     def test_invalid_algorithm(self):
         """Test error handling for invalid algorithm."""
@@ -233,13 +233,13 @@ class TestVerifyChecksum:
             BasicAgentToolsError,
             match="Expected hash must be a valid hexadecimal string",
         ):
-            verify_checksum("test", "not_hex_format")
+            verify_checksum("test", "not_hex_format", algorithm="md5")
 
         with pytest.raises(
             BasicAgentToolsError,
             match="Expected hash must be a valid hexadecimal string",
         ):
-            verify_checksum("test", "gggggg")
+            verify_checksum("test", "gggggg", algorithm="md5")
 
     def test_successful_checksum_verification_valid(self):
         """Test successful checksum verification with valid hash."""

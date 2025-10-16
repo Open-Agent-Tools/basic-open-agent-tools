@@ -20,18 +20,18 @@ class TestInspectFunctionSignature:
     def test_invalid_function_name_type(self):
         """Test with invalid function name type."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
-            inspect_function_signature(123)
+            inspect_function_signature(123, "")
         assert "Function name must be a non-empty string" in str(exc_info.value)
 
     def test_empty_function_name(self):
         """Test with empty function name."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
-            inspect_function_signature("")
+            inspect_function_signature("", "")
         assert "Function name must be a non-empty string" in str(exc_info.value)
 
     def test_builtin_function_inspection(self):
         """Test inspecting a built-in function."""
-        result = inspect_function_signature("print")
+        result = inspect_function_signature("print", "")
 
         assert result["function_name"] == "print"
         assert result["module_name"] == "current_scope"
@@ -42,7 +42,7 @@ class TestInspectFunctionSignature:
     def test_nonexistent_function(self):
         """Test with nonexistent function name."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
-            inspect_function_signature("nonexistent_function_12345")
+            inspect_function_signature("nonexistent_function_12345", "")
         assert "not found in current scope" in str(exc_info.value)
 
     def test_invalid_module_name(self):
@@ -61,7 +61,7 @@ class TestInspectFunctionSignature:
         # Add to current scope
         globals()["test_func"] = test_func
 
-        result = inspect_function_signature("test_func")
+        result = inspect_function_signature("test_func", "")
 
         assert result["function_name"] == "test_func"
         assert result["parameter_count"] == 2
@@ -137,7 +137,7 @@ class TestFormatExceptionDetails:
         sys.exc_clear() if hasattr(sys, "exc_clear") else None
 
         with pytest.raises(BasicAgentToolsError) as exc_info:
-            format_exception_details()
+            format_exception_details("")
         assert "No exception information available" in str(exc_info.value)
 
     def test_format_current_exception(self):
@@ -145,7 +145,7 @@ class TestFormatExceptionDetails:
         try:
             _ = 1 / 0  # Intentional division by zero for test
         except ZeroDivisionError:
-            result = format_exception_details()
+            result = format_exception_details("")
 
             assert result["exception_type"] == "ZeroDivisionError"
             assert "division by zero" in result["exception_message"].lower()
@@ -177,20 +177,20 @@ class TestValidateFunctionCall:
     def test_invalid_function_name_type(self):
         """Test with invalid function name type."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
-            validate_function_call(123, {})
+            validate_function_call(123, {}, "")
         assert "Function name must be a non-empty string" in str(exc_info.value)
 
     def test_invalid_arguments_type(self):
         """Test with invalid arguments type."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
-            validate_function_call("print", "not_a_dict")
+            validate_function_call("print", "not_a_dict", "")
         assert "Arguments must be a dictionary" in str(exc_info.value)
 
     def test_successful_validation(self):
         """Test successful function call validation."""
         arguments = {"sep": " ", "end": "\n"}
 
-        result = validate_function_call("print", arguments)
+        result = validate_function_call("print", arguments, "")
 
         assert result["function_name"] == "print"
         assert result["is_valid"] is True
@@ -203,7 +203,7 @@ class TestValidateFunctionCall:
         # Test with len() which requires one argument
         arguments = {}
 
-        result = validate_function_call("len", arguments)
+        result = validate_function_call("len", arguments, "")
 
         assert result["is_valid"] is False
         assert result["can_call"] is False
@@ -214,7 +214,7 @@ class TestValidateFunctionCall:
         """Test validation with extra arguments."""
         arguments = {"value": "Hello", "extra_arg": "not_needed"}
 
-        result = validate_function_call("print", arguments)
+        result = validate_function_call("print", arguments, "")
 
         # print() accepts **kwargs so this should still be valid
         assert "extra_arg" in result["provided_arguments"]
@@ -222,7 +222,7 @@ class TestValidateFunctionCall:
     def test_nonexistent_function(self):
         """Test validation of nonexistent function."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
-            validate_function_call("nonexistent_function_98765", {})
+            validate_function_call("nonexistent_function_98765", {}, "")
         assert "not found in current scope" in str(exc_info.value)
 
 
