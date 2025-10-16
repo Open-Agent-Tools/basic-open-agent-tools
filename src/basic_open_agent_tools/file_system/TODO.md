@@ -1,6 +1,6 @@
 # File System Tools TODO
 
-## Current Status (v0.13.1) - ✅ MODULE COMPLETE
+## Current Status (v0.13.6) - ✅ MODULE COMPLETE
 
 ### ✅ Fully Implemented (18+ functions)
 - ✅ **File Operations**: read_file_to_string, write_file_from_string, append_to_file
@@ -13,7 +13,7 @@
 - ✅ **Cross-Platform**: Works on Windows, macOS, and Linux
 - ✅ **Helper Integration**: Included in load_all_filesystem_tools() and read-only helpers
 
-### ✅ Quality Metrics (v0.13.1)
+### ✅ Quality Metrics (v0.13.6)
 - Test coverage: 96%+ comprehensive test coverage
 - Type safety: 100% mypy compliance with JSON-serializable types only
 - Documentation: Comprehensive docstrings with agent framework examples
@@ -61,4 +61,4 @@
 
 The file system module is **complete** and feature-complete for the current project scope. All core functionality has been implemented with Google ADK compliant signatures, comprehensive testing, and full quality assurance. Future enhancements below are **optional** and may be considered for later versions if there's demand.
 
-**Last Updated**: v0.13.1 (2025-10-14) - Module remains stable and complete
+**Last Updated**: v0.13.6 (2025-10-15) - @strands_tool decorator only (deprecated @adk_tool)

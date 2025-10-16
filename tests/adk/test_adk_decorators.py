@@ -1,4 +1,4 @@
-"""Test @adk_tool decorator functionality in basic-open-agent-tools."""
+"""Test Google ADK compatibility requirements in basic-open-agent-tools."""
 
 import inspect
 import sys
@@ -10,13 +10,11 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 
-class TestAdkDecorators:
-    """Test the @adk_tool decorator functionality."""
+class TestAdkCompatibility:
+    """Test Google ADK compatibility requirements (function signatures, types, etc.)."""
 
-    def test_adk_decorator_import(self):
-        """Test that we can import adk decorator without error."""
-        # The decorator is implemented with graceful fallback
-        # So it should always be importable even if Google ADK is not installed
+    def test_functions_importable(self):
+        """Test that functions can be imported and are callable."""
         from basic_open_agent_tools.file_system import read_file_to_string
         from basic_open_agent_tools.text import clean_whitespace
 
@@ -24,8 +22,8 @@ class TestAdkDecorators:
         assert callable(read_file_to_string)
         assert callable(clean_whitespace)
 
-    def test_decorator_preserves_function_metadata(self):
-        """Test that @adk_tool preserves original function metadata."""
+    def test_function_metadata_preserved(self):
+        """Test that function metadata is properly preserved."""
         from basic_open_agent_tools.file_system import read_file_to_string
         from basic_open_agent_tools.text import normalize_line_endings
 
@@ -48,8 +46,8 @@ class TestAdkDecorators:
             sig = inspect.signature(func)
             assert sig.return_annotation != inspect.Parameter.empty
 
-    def test_adk_decorator_fallback_behavior(self):
-        """Test decorator behavior when Google ADK is not available."""
+    def test_adk_signature_compatibility(self):
+        """Test that function signatures are compatible with Google ADK."""
         # This should work regardless of whether Google ADK is installed
         from basic_open_agent_tools.data import safe_json_deserialize
         from basic_open_agent_tools.datetime import get_current_date
@@ -72,8 +70,8 @@ class TestAdkDecorators:
                         f"Parameter {param.name} in {func.__name__} missing type annotation"
                     )
 
-    def test_all_modules_have_adk_decorators(self):
-        """Test that all modules have @adk_tool decorators applied."""
+    def test_all_modules_have_proper_signatures(self):
+        """Test that all modules have ADK-compatible function signatures."""
         import basic_open_agent_tools as boat
 
         # Get tools from each module
@@ -125,8 +123,8 @@ class TestAdkDecorators:
                     f"Tool {tool.__name__} missing return type annotation"
                 )
 
-    def test_adk_tool_signature_compatibility(self):
-        """Test that @adk_tool decorated functions have compatible signatures."""
+    def test_strict_adk_signature_requirements(self):
+        """Test that functions strictly meet Google ADK signature requirements."""
         import basic_open_agent_tools as boat
 
         # Test a sample of tools from different modules
@@ -290,11 +288,11 @@ class TestAdkPython39Compatibility:
                 assert len(return_str) > 0
 
 
-class TestAdkDecoratorStacking:
-    """Test that @adk_tool and @strands_tool decorators work together."""
+class TestStrandsDecoratorCompatibility:
+    """Test that @strands_tool decorator works with ADK-compatible functions."""
 
-    def test_dual_decorator_application(self):
-        """Test that both decorators are applied without conflicts."""
+    def test_strands_decorator_application(self):
+        """Test that @strands_tool decorator is properly applied."""
         from basic_open_agent_tools.text import clean_whitespace
 
         # Function should still be callable
@@ -308,12 +306,12 @@ class TestAdkDecoratorStacking:
         result = clean_whitespace("  hello  world  ")
         assert result == "hello world"
 
-    def test_decorator_order_does_not_affect_behavior(self):
-        """Test that decorator order (@adk_tool then @strands_tool) works."""
+    def test_strands_decorator_preserves_behavior(self):
+        """Test that @strands_tool decorator preserves function behavior and metadata."""
         from basic_open_agent_tools.crypto import hash_md5
         from basic_open_agent_tools.data import safe_json_serialize
 
-        # Both should work regardless of decorator order
+        # Functions should work with @strands_tool decorator
         functions = [hash_md5, safe_json_serialize]
 
         for func in functions:

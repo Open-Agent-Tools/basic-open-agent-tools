@@ -6,10 +6,9 @@ strings for consistent date representation.
 
 from datetime import date, timedelta
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 
-@adk_tool
 @strands_tool
 def get_next_business_day(date_string: str) -> str:
     """Get the next business day after the given date.
@@ -53,7 +52,6 @@ def get_next_business_day(date_string: str) -> str:
     return next_date.isoformat()
 
 
-@adk_tool
 @strands_tool
 def is_business_day(date_string: str) -> bool:
     """Check if a date is a business day.

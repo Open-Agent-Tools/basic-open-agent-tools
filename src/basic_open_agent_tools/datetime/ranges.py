@@ -7,10 +7,9 @@ for consistent date/time representation.
 
 from datetime import date, timedelta
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 
-@adk_tool
 @strands_tool
 def get_date_range(start_date: str, end_date: str) -> list[str]:
     """Generate all dates between two dates (inclusive).
@@ -57,7 +56,6 @@ def get_date_range(start_date: str, end_date: str) -> list[str]:
     return dates
 
 
-@adk_tool
 @strands_tool
 def get_quarter_dates(year: int, quarter: int) -> dict[str, str]:
     """Get start and end dates for a specific quarter.
@@ -103,7 +101,6 @@ def get_quarter_dates(year: int, quarter: int) -> dict[str, str]:
     return {"start": start_date.isoformat(), "end": end_date.isoformat()}
 
 
-@adk_tool
 @strands_tool
 def get_year_to_date_range(reference_date: str) -> dict[str, str]:
     """Get the date range from January 1st to the reference date.
@@ -139,7 +136,6 @@ def get_year_to_date_range(reference_date: str) -> dict[str, str]:
     return {"start": start_date.isoformat(), "end": reference_date}
 
 
-@adk_tool
 @strands_tool
 def get_days_ago(days: int, reference_date: str) -> str:
     """Get the date N days before the reference date.
@@ -180,7 +176,6 @@ def get_days_ago(days: int, reference_date: str) -> str:
     return target_date.isoformat()
 
 
-@adk_tool
 @strands_tool
 def get_months_ago(months: int, reference_date: str) -> str:
     """Get the date N months before the reference date.
@@ -239,7 +234,6 @@ def get_months_ago(months: int, reference_date: str) -> str:
     return target_date.isoformat()
 
 
-@adk_tool
 @strands_tool
 def get_last_business_day(reference_date: str) -> str:
     """Get the last business day before or on the reference date.
@@ -278,7 +272,6 @@ def get_last_business_day(reference_date: str) -> str:
     return current_date.isoformat()
 
 
-@adk_tool
 @strands_tool
 def is_date_in_range(check_date: str, start_date: str, end_date: str) -> bool:
     """Check if a date falls within a specified range (inclusive).
@@ -320,7 +313,6 @@ def is_date_in_range(check_date: str, start_date: str, end_date: str) -> bool:
     return start <= check <= end
 
 
-@adk_tool
 @strands_tool
 def get_month_range(year: int, month: int) -> dict[str, str]:
     """Get the start and end dates for a specific month.
@@ -363,7 +355,6 @@ def get_month_range(year: int, month: int) -> dict[str, str]:
     return {"start": start_date.isoformat(), "end": end_date.isoformat()}
 
 
-@adk_tool
 @strands_tool
 def calculate_days_between(start_date: str, end_date: str) -> int:
     """Calculate the number of days between two dates.
@@ -401,7 +392,6 @@ def calculate_days_between(start_date: str, end_date: str) -> int:
     return (end - start).days
 
 
-@adk_tool
 @strands_tool
 def get_business_days_in_range(start_date: str, end_date: str) -> int:
     """Count business days between two dates (inclusive).

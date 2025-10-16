@@ -7,13 +7,12 @@ Markdown (.md) files using standard library only.
 import os
 import re
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 # Maximum file size: 10MB
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
-@adk_tool
 @strands_tool
 def parse_markdown_to_dict(file_path: str) -> dict[str, object]:
     """Parse Markdown file into structured dictionary.
@@ -108,7 +107,6 @@ def parse_markdown_to_dict(file_path: str) -> dict[str, object]:
         raise ValueError(f"Failed to parse Markdown file: {e}")
 
 
-@adk_tool
 @strands_tool
 def extract_markdown_headings(file_path: str) -> list[dict[str, str]]:
     """Extract all headings from Markdown file.
@@ -161,7 +159,6 @@ def extract_markdown_headings(file_path: str) -> list[dict[str, str]]:
         raise ValueError(f"Failed to extract headings: {e}")
 
 
-@adk_tool
 @strands_tool
 def extract_markdown_links(file_path: str) -> list[dict[str, str]]:
     """Extract all links from Markdown file.
@@ -218,7 +215,6 @@ def extract_markdown_links(file_path: str) -> list[dict[str, str]]:
         raise ValueError(f"Failed to extract links: {e}")
 
 
-@adk_tool
 @strands_tool
 def extract_markdown_code_blocks(file_path: str) -> list[dict[str, str]]:
     """Extract all code blocks from Markdown file.
@@ -274,7 +270,6 @@ def extract_markdown_code_blocks(file_path: str) -> list[dict[str, str]]:
         raise ValueError(f"Failed to extract code blocks: {e}")
 
 
-@adk_tool
 @strands_tool
 def extract_markdown_tables(file_path: str) -> list[list[list[str]]]:
     """Extract all tables from Markdown file.
@@ -359,7 +354,6 @@ def extract_markdown_tables(file_path: str) -> list[list[list[str]]]:
         raise ValueError(f"Failed to extract tables: {e}")
 
 
-@adk_tool
 @strands_tool
 def markdown_to_plain_text(file_path: str) -> str:
     """Convert Markdown file to plain text by stripping formatting.

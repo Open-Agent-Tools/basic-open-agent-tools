@@ -4,7 +4,7 @@ import shutil
 
 from .._logging import get_logger
 from ..confirmation import check_user_confirmation
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import FileSystemError
 from .validation import validate_file_content, validate_path
 
@@ -38,7 +38,6 @@ def _generate_content_preview(content: str, max_chars: int = 200) -> str:
     return preview
 
 
-@adk_tool
 @strands_tool
 def read_file_to_string(file_path: str) -> str:
     """Load string from a text file.
@@ -68,7 +67,6 @@ def read_file_to_string(file_path: str) -> str:
         raise FileSystemError(f"Failed to read file {path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> str:
     """Write string content to a text file with permission checking.
@@ -122,7 +120,6 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
         raise FileSystemError(f"Failed to write file {path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def append_to_file(file_path: str, content: str) -> str:
     """Append string content to a text file.
@@ -160,7 +157,6 @@ def append_to_file(file_path: str, content: str) -> str:
         raise FileSystemError(f"Failed to append to file {path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def list_directory_contents(directory_path: str, include_hidden: bool) -> list[str]:
     """List contents of a directory.
@@ -196,7 +192,6 @@ def list_directory_contents(directory_path: str, include_hidden: bool) -> list[s
         raise FileSystemError(f"Failed to list directory {path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def create_directory(directory_path: str, skip_confirm: bool) -> str:
     """Create a directory and any necessary parent directories.
@@ -238,7 +233,6 @@ def create_directory(directory_path: str, skip_confirm: bool) -> str:
         raise FileSystemError(f"Failed to create directory {path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def delete_file(file_path: str, skip_confirm: bool) -> str:
     """Delete a file with permission checking.
@@ -299,7 +293,6 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
         raise FileSystemError(f"Failed to delete file {path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -> str:
     """Delete a directory with permission checking.
@@ -375,7 +368,6 @@ def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -
         raise FileSystemError(f"Failed to delete directory {path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> str:
     """Move or rename a file or directory with permission checking.
@@ -441,7 +433,6 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
         raise FileSystemError(f"Failed to move {src_path} to {dst_path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> str:
     """Copy a file or directory with permission checking.
@@ -521,7 +512,6 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
         raise FileSystemError(f"Failed to copy {src_path} to {dst_path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) -> str:
     """Replace occurrences of text within a file with detailed feedback.
@@ -584,7 +574,6 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
         raise FileSystemError(f"Failed to replace text in file {path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def insert_at_line(file_path: str, line_number: int, content: str) -> str:
     """Insert content at a specific line number in a file with detailed feedback.

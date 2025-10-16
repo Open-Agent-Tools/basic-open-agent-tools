@@ -8,7 +8,7 @@ import os
 import warnings
 import xml.etree.ElementTree as ET
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 try:
     from defusedxml.ElementTree import (
@@ -59,7 +59,6 @@ def _element_to_dict(element: ET.Element) -> dict:
     return result
 
 
-@adk_tool
 @strands_tool
 def read_xml_file(file_path: str) -> dict:
     """Read XML file and convert to nested dict structure.
@@ -122,7 +121,6 @@ def read_xml_file(file_path: str) -> dict:
         raise ValueError(f"Invalid XML in file {file_path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def parse_xml_string(xml_content: str) -> dict:
     """Parse XML string into nested dict structure.
@@ -179,7 +177,6 @@ def parse_xml_string(xml_content: str) -> dict:
         raise ValueError(f"Invalid XML content: {e}")
 
 
-@adk_tool
 @strands_tool
 def extract_xml_elements_by_tag(file_path: str, tag_name: str) -> list[dict]:
     """Extract all elements with specific tag name from XML file.
@@ -246,7 +243,6 @@ def extract_xml_elements_by_tag(file_path: str, tag_name: str) -> list[dict]:
         raise ValueError(f"Invalid XML in file {file_path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def get_xml_element_text(xml_content: str, xpath: str) -> str:
     """Get text content of element at XPath location.
@@ -302,7 +298,6 @@ def get_xml_element_text(xml_content: str, xpath: str) -> str:
         raise ValueError(f"Invalid XML content: {e}")
 
 
-@adk_tool
 @strands_tool
 def get_xml_element_attribute(xml_content: str, xpath: str, attribute_name: str) -> str:
     """Get attribute value from element at XPath location.
@@ -372,7 +367,6 @@ def get_xml_element_attribute(xml_content: str, xpath: str, attribute_name: str)
         raise ValueError(f"Invalid XML content: {e}")
 
 
-@adk_tool
 @strands_tool
 def list_xml_element_tags(file_path: str) -> list[str]:
     """Get unique list of all element tag names in XML document.

@@ -5,10 +5,9 @@ Provides input validation and constraint enforcement for the todo module.
 
 from typing import Any, Optional
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 
-@adk_tool
 @strands_tool
 def validate_title(title: str) -> None:
     """Validate task title.
@@ -30,7 +29,6 @@ def validate_title(title: str) -> None:
         raise ValueError("Title cannot exceed 500 characters")
 
 
-@adk_tool
 @strands_tool
 def validate_status(status: str) -> None:
     """Validate task status.
@@ -57,7 +55,6 @@ def validate_status(status: str) -> None:
         raise ValueError(f"Invalid status '{status}'. Must be one of: {valid_statuses}")
 
 
-@adk_tool
 @strands_tool
 def validate_priority(priority: str) -> None:
     """Validate task priority.
@@ -79,7 +76,6 @@ def validate_priority(priority: str) -> None:
         )
 
 
-@adk_tool
 @strands_tool
 def validate_task_count(current_count: int) -> None:
     """Validate that task count doesn't exceed maximum.
@@ -95,7 +91,6 @@ def validate_task_count(current_count: int) -> None:
         raise ValueError(f"Maximum task limit of {max_tasks} reached")
 
 
-@adk_tool
 @strands_tool
 def validate_task_exists(task_id: int, tasks: dict[int, dict[str, Any]]) -> None:
     """Validate that a task exists.
@@ -115,7 +110,6 @@ def validate_task_exists(task_id: int, tasks: dict[int, dict[str, Any]]) -> None
         raise ValueError(f"Task with ID {task_id} not found")
 
 
-@adk_tool
 @strands_tool
 def validate_dependencies(
     dependencies: list[int],
@@ -195,7 +189,6 @@ def _check_circular_dependencies(
             )
 
 
-@adk_tool
 @strands_tool
 def validate_tags(tags: list[str]) -> None:
     """Validate task tags.
@@ -228,7 +221,6 @@ def validate_tags(tags: list[str]) -> None:
         raise ValueError("Maximum 20 tags allowed per task")
 
 
-@adk_tool
 @strands_tool
 def validate_estimated_duration(estimated_duration: str) -> None:
     """Validate estimated duration string.
@@ -251,7 +243,6 @@ def validate_estimated_duration(estimated_duration: str) -> None:
         raise ValueError("Estimated duration cannot exceed 100 characters")
 
 
-@adk_tool
 @strands_tool
 def validate_notes(notes: str) -> None:
     """Validate task notes.

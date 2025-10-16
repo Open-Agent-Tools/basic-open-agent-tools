@@ -5,11 +5,10 @@ import logging.handlers
 import os
 from typing import Union
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
-@adk_tool
 @strands_tool
 def setup_rotating_log(
     logger_name: str,
@@ -40,7 +39,6 @@ def setup_rotating_log(
         raise BasicAgentToolsError(f"Failed to setup rotating log: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def cleanup_old_logs(log_pattern: str, keep_count: int) -> dict[str, Union[str, int]]:
     """Clean up old log files matching a pattern."""

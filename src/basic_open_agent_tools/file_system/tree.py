@@ -2,12 +2,11 @@
 
 from pathlib import Path
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import FileSystemError
 from .validation import validate_path
 
 
-@adk_tool
 @strands_tool
 def list_all_directory_contents(directory_path: str) -> str:
     """Generate a tree of all contents in a directory and its subdirectories.
@@ -70,7 +69,6 @@ def list_all_directory_contents(directory_path: str) -> str:
         raise FileSystemError(f"Failed to list directory contents {path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def generate_directory_tree(
     directory_path: str, max_depth: int, include_hidden: bool

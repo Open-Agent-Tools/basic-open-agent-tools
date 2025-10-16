@@ -7,11 +7,10 @@ import signal
 import time
 from typing import Any, Union
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
-@adk_tool
 @strands_tool
 def sleep_seconds(seconds: float) -> dict[str, Union[str, float]]:
     """Pause execution for the specified number of seconds.
@@ -94,7 +93,6 @@ def sleep_seconds(seconds: float) -> dict[str, Union[str, float]]:
         }
 
 
-@adk_tool
 @strands_tool
 def sleep_milliseconds(milliseconds: float) -> dict[str, Union[str, float]]:
     """Pause execution for the specified number of milliseconds.
@@ -131,7 +129,6 @@ def sleep_milliseconds(milliseconds: float) -> dict[str, Union[str, float]]:
     return result
 
 
-@adk_tool
 @strands_tool
 def precise_sleep(seconds: float) -> dict[str, Union[str, float]]:
     """Perform a high-precision sleep using busy-waiting for the final portion.

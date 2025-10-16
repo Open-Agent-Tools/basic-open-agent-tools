@@ -1,10 +1,9 @@
 """Data validation utilities for AI agents."""
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import ValidationError
 
 
-@adk_tool
 @strands_tool
 def validate_schema_simple(data: dict, schema_definition: dict) -> bool:
     """Validate data against a JSON Schema-style schema.
@@ -64,7 +63,6 @@ def _validate_against_schema(data: dict, schema: dict) -> None:
         raise ValidationError("Array validation not supported with dict-only input")
 
 
-@adk_tool
 @strands_tool
 def check_required_fields(data: dict, required: list[str]) -> bool:
     """Check if all required fields are present in data.
@@ -100,7 +98,6 @@ def check_required_fields(data: dict, required: list[str]) -> bool:
     return True
 
 
-@adk_tool
 @strands_tool
 def validate_data_types_simple(data: dict, type_map: dict[str, str]) -> bool:
     """Check that field types match expectations.
@@ -155,7 +152,6 @@ def validate_data_types_simple(data: dict, type_map: dict[str, str]) -> bool:
     return True
 
 
-@adk_tool
 @strands_tool
 def validate_range_simple(
     value: float,
@@ -200,7 +196,6 @@ def validate_range_simple(
     return True
 
 
-@adk_tool
 @strands_tool
 def create_validation_report(data: dict, rules: dict) -> dict:
     """Create comprehensive validation report for data.
@@ -285,7 +280,6 @@ def create_validation_report(data: dict, rules: dict) -> dict:
     }
 
 
-@adk_tool
 @strands_tool
 def check_required_fields_simple(data: dict, required: list[str]) -> bool:
     """Check if all required fields are present in data.
@@ -311,7 +305,6 @@ def check_required_fields_simple(data: dict, required: list[str]) -> bool:
     return result
 
 
-@adk_tool
 @strands_tool
 def create_validation_report_simple(data: dict, rules: dict) -> dict:
     """Create simplified validation report for data.

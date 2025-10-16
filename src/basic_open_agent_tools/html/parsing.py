@@ -9,7 +9,7 @@ import re
 from html.parser import HTMLParser
 from typing import Union
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 # Maximum file size: 10MB
 MAX_FILE_SIZE = 10 * 1024 * 1024
@@ -107,7 +107,6 @@ class HTMLStructureParser(HTMLParser):
             self.text_parts.append(text)
 
 
-@adk_tool
 @strands_tool
 def parse_html_to_dict(file_path: str) -> dict[str, object]:
     """Parse HTML file into structured dictionary.
@@ -161,7 +160,6 @@ def parse_html_to_dict(file_path: str) -> dict[str, object]:
         raise ValueError(f"Failed to parse HTML file: {e}")
 
 
-@adk_tool
 @strands_tool
 def extract_html_text(file_path: str) -> str:
     """Extract all text content from HTML file.
@@ -186,7 +184,6 @@ def extract_html_text(file_path: str) -> str:
     return str(data["text"])
 
 
-@adk_tool
 @strands_tool
 def extract_html_links(file_path: str) -> list[dict[str, str]]:
     """Extract all links from HTML file.
@@ -211,7 +208,6 @@ def extract_html_links(file_path: str) -> list[dict[str, str]]:
     return data["links"]  # type: ignore[return-value]
 
 
-@adk_tool
 @strands_tool
 def extract_html_images(file_path: str) -> list[dict[str, str]]:
     """Extract all image sources from HTML file.
@@ -236,7 +232,6 @@ def extract_html_images(file_path: str) -> list[dict[str, str]]:
     return data["images"]  # type: ignore[return-value]
 
 
-@adk_tool
 @strands_tool
 def extract_html_tables(file_path: str) -> list[list[list[str]]]:
     """Extract all tables from HTML file.
@@ -261,7 +256,6 @@ def extract_html_tables(file_path: str) -> list[list[list[str]]]:
     return data["tables"]  # type: ignore[return-value]
 
 
-@adk_tool
 @strands_tool
 def extract_html_headings(file_path: str) -> list[dict[str, str]]:
     """Extract all headings (h1-h6) from HTML file.
@@ -286,7 +280,6 @@ def extract_html_headings(file_path: str) -> list[dict[str, str]]:
     return data["headings"]  # type: ignore[return-value]
 
 
-@adk_tool
 @strands_tool
 def extract_html_metadata(file_path: str) -> dict[str, str]:
     """Extract metadata from HTML meta tags.
@@ -311,7 +304,6 @@ def extract_html_metadata(file_path: str) -> dict[str, str]:
     return data["metadata"]  # type: ignore[return-value]
 
 
-@adk_tool
 @strands_tool
 def html_to_plain_text(file_path: str) -> str:
     """Convert HTML file to plain text by stripping tags.

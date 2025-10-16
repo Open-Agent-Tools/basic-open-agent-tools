@@ -6,13 +6,12 @@ import uuid
 from typing import Union
 
 from .._logging import get_logger
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 logger = get_logger("crypto.generation")
 
 
-@adk_tool
 @strands_tool
 def generate_uuid(version: int) -> dict[str, Union[str, int]]:
     """
@@ -61,7 +60,6 @@ def generate_uuid(version: int) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to generate UUID: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def generate_random_string(
     length: int, character_set: str
@@ -125,7 +123,6 @@ def generate_random_string(
         raise BasicAgentToolsError(f"Failed to generate random string: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def generate_random_bytes(length: int, encoding: str) -> dict[str, Union[str, int]]:
     """

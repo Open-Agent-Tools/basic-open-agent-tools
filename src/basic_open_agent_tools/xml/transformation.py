@@ -8,7 +8,7 @@ import json
 import warnings
 import xml.etree.ElementTree as ET
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 try:
     from defusedxml.ElementTree import (
@@ -77,7 +77,6 @@ def _element_to_json_dict(element: ET.Element) -> dict:
     return result
 
 
-@adk_tool
 @strands_tool
 def xml_to_json(xml_content: str) -> str:
     """Convert XML to JSON format preserving structure.
@@ -125,7 +124,6 @@ def xml_to_json(xml_content: str) -> str:
         raise ValueError(f"Invalid XML content: {e}")
 
 
-@adk_tool
 @strands_tool
 def json_to_xml(json_content: str, root_tag: str) -> str:
     """Convert JSON to XML format.
@@ -229,7 +227,6 @@ def json_to_xml(json_content: str, root_tag: str) -> str:
         raise ValueError(f"Invalid JSON content: {e}")
 
 
-@adk_tool
 @strands_tool
 def format_xml(xml_content: str, indent_size: int) -> str:
     """Format XML with proper indentation and line breaks.
@@ -290,7 +287,6 @@ def format_xml(xml_content: str, indent_size: int) -> str:
         raise ValueError(f"Invalid XML content: {e}")
 
 
-@adk_tool
 @strands_tool
 def strip_xml_namespaces(xml_content: str) -> str:
     """Remove namespace declarations and prefixes from XML.
@@ -364,7 +360,6 @@ def strip_xml_namespaces(xml_content: str) -> str:
         raise ValueError(f"Invalid XML content: {e}")
 
 
-@adk_tool
 @strands_tool
 def transform_xml_with_xslt(xml_content: str, xslt_path: str) -> str:
     """Apply XSLT transformation to XML.
@@ -438,7 +433,6 @@ def transform_xml_with_xslt(xml_content: str, xslt_path: str) -> str:
         raise ValueError(f"Invalid XML syntax: {e}")
 
 
-@adk_tool
 @strands_tool
 def extract_xml_to_csv(xml_content: str, element_tag: str) -> list[dict]:
     """Extract repeating elements to CSV-style list of dicts.

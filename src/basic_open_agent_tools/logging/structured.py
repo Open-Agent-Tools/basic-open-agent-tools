@@ -5,11 +5,10 @@ import logging
 import time
 from typing import Union
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
-@adk_tool
 @strands_tool
 def log_info(
     message: str, logger_name: str, extra_data_json: str
@@ -57,7 +56,6 @@ def log_info(
         raise BasicAgentToolsError(f"Failed to log info message: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def log_error(
     message: str, logger_name: str, extra_data_json: str
@@ -105,7 +103,6 @@ def log_error(
         raise BasicAgentToolsError(f"Failed to log error message: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def configure_logger(logger_name: str, log_file: str, level: str) -> dict[str, str]:
     """Configure a logger with file output."""

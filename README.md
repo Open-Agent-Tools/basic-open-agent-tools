@@ -10,6 +10,8 @@ An open foundational toolkit providing essential components for building AI agen
 
 🎯 **Comprehensive Coverage**: All 22 confirmation operations now provide context-aware previews for better decision making
 
+🧹 **Decorator Cleanup**: Deprecated `@adk_tool` decorator (Google ADK uses function signatures, not decorators) - now using `@strands_tool` only
+
 ### Previous Release (v0.13.3)
 
 🔍 **Structured Logging**: Migrated 157 print statements to Python logging framework with `BOAT_LOG_LEVEL` environment variable control
@@ -124,7 +126,7 @@ agent = Agent(tools=all_tools)
 
 🔧 **Modular**: Load only what you need
 
-🤝 **Multi-Framework**: Works with Google ADK, LangChain, Strands Agents, custom frameworks
+🤝 **Multi-Framework**: Works with Google ADK (signature-based), LangChain, Strands Agents (@strands_tool decorator), custom frameworks
 
 🔍 **Enhanced Feedback**: Detailed operation confirmations with `skip_confirm` safety parameter
 

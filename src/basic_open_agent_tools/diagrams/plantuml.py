@@ -3,12 +3,11 @@
 import os
 import re
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB limit
 
 
-@adk_tool
 @strands_tool
 def create_plantuml_class_diagram(
     classes: list[dict[str, str]], relationships: list[dict[str, str]]
@@ -98,7 +97,6 @@ def create_plantuml_class_diagram(
     return "\n".join(lines)
 
 
-@adk_tool
 @strands_tool
 def create_plantuml_sequence_diagram(
     participants: list[str], interactions: list[dict[str, str]]
@@ -161,7 +159,6 @@ def create_plantuml_sequence_diagram(
     return "\n".join(lines)
 
 
-@adk_tool
 @strands_tool
 def create_plantuml_activity_diagram(
     activities: list[dict[str, str]], transitions: list[dict[str, str]]
@@ -218,7 +215,6 @@ def create_plantuml_activity_diagram(
     return "\n".join(lines)
 
 
-@adk_tool
 @strands_tool
 def create_plantuml_component_diagram(
     components: list[dict[str, str]], connections: list[dict[str, str]]
@@ -284,7 +280,6 @@ def create_plantuml_component_diagram(
     return "\n".join(lines)
 
 
-@adk_tool
 @strands_tool
 def parse_plantuml_file(file_path: str) -> dict[str, str]:
     """Parse PlantUML file to extract basic structure.
@@ -349,7 +344,6 @@ def parse_plantuml_file(file_path: str) -> dict[str, str]:
         raise ValueError(f"Failed to parse PlantUML file: {e}")
 
 
-@adk_tool
 @strands_tool
 def write_plantuml_file(
     file_path: str, diagram_content: str, skip_confirm: bool
@@ -402,7 +396,6 @@ def write_plantuml_file(
         raise ValueError(f"Failed to write PlantUML file: {e}")
 
 
-@adk_tool
 @strands_tool
 def validate_plantuml_syntax(diagram_content: str) -> bool:
     """Validate basic PlantUML syntax.
@@ -431,7 +424,6 @@ def validate_plantuml_syntax(diagram_content: str) -> bool:
     return has_start and has_end
 
 
-@adk_tool
 @strands_tool
 def extract_plantuml_elements(diagram_content: str) -> list[str]:
     """Extract elements from PlantUML diagram.

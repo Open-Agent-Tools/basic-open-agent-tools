@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from typing import Union, cast
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import FileSystemError
 from .operations import (
     insert_at_line,
@@ -20,7 +20,6 @@ from .operations import (
 from .validation import validate_path
 
 
-@adk_tool
 @strands_tool
 def file_editor(command: str, path: str, skip_confirm: bool, options_json: str) -> str:
     """Comprehensive file editor with multiple operations.

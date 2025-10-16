@@ -5,7 +5,7 @@ import json
 
 from .._logging import get_logger
 from ..confirmation import check_user_confirmation
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import DataError
 
 # Simple YAML support using json fallback
@@ -58,7 +58,6 @@ def _generate_dict_preview(data: dict, format_name: str) -> str:
     return preview.strip()
 
 
-@adk_tool
 @strands_tool
 def read_yaml_file(file_path: str) -> dict:
     """Read and parse a YAML configuration file.
@@ -98,7 +97,6 @@ def read_yaml_file(file_path: str) -> dict:
         raise DataError(f"Failed to read YAML file {file_path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     """Write dictionary data to a YAML file with permission checking.
@@ -161,7 +159,6 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         raise DataError(f"Failed to write YAML file {file_path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def read_toml_file(file_path: str) -> dict:
     """Read and parse a TOML configuration file.
@@ -202,7 +199,6 @@ def read_toml_file(file_path: str) -> dict:
         raise DataError(f"Failed to read TOML file {file_path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     """Write dictionary data to a TOML file with permission checking.
@@ -267,7 +263,6 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         raise DataError(f"Failed to write TOML file {file_path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def read_ini_file(file_path: str) -> dict:
     """Read and parse an INI configuration file.
@@ -314,7 +309,6 @@ def read_ini_file(file_path: str) -> dict:
         raise DataError(f"Failed to read INI file {file_path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     """Write dictionary data to an INI file with permission checking.
@@ -383,7 +377,6 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         raise DataError(f"Failed to write INI file {file_path}: {e}")
 
 
-@adk_tool
 @strands_tool
 def validate_config_schema(config_data: dict, schema_definition: dict) -> list:
     """Validate configuration data against a schema.
@@ -441,7 +434,6 @@ def validate_config_schema(config_data: dict, schema_definition: dict) -> list:
     return errors
 
 
-@adk_tool
 @strands_tool
 def merge_config_files(config_paths: list[str], format_type: str) -> dict:
     """Merge multiple configuration files into a single dictionary.

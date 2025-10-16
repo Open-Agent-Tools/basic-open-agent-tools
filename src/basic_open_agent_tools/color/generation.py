@@ -2,12 +2,11 @@
 
 from typing import Any
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 from .conversion import hex_to_rgb, hsl_to_rgb, rgb_to_hex, rgb_to_hsl
 
 
-@adk_tool
 @strands_tool
 def lighten_color(hex_color: str, percent: int) -> str:
     """Lighten a color by increasing its lightness.
@@ -48,7 +47,6 @@ def lighten_color(hex_color: str, percent: int) -> str:
     return result
 
 
-@adk_tool
 @strands_tool
 def darken_color(hex_color: str, percent: int) -> str:
     """Darken a color by decreasing its lightness.
@@ -89,7 +87,6 @@ def darken_color(hex_color: str, percent: int) -> str:
     return result
 
 
-@adk_tool
 @strands_tool
 def adjust_saturation(hex_color: str, percent: int) -> str:
     """Adjust color saturation by a percentage.
@@ -133,7 +130,6 @@ def adjust_saturation(hex_color: str, percent: int) -> str:
     return result
 
 
-@adk_tool
 @strands_tool
 def generate_palette(base_color: str, scheme: str, count: int) -> dict[str, Any]:
     """Generate a color palette based on color theory schemes.

@@ -5,13 +5,12 @@ import urllib.parse
 from typing import Union
 
 from .._logging import get_logger
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 logger = get_logger("crypto.encoding")
 
 
-@adk_tool
 @strands_tool
 def base64_encode(data: str) -> dict[str, Union[str, int]]:
     """
@@ -54,7 +53,6 @@ def base64_encode(data: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to encode data to Base64: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def base64_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     """
@@ -100,7 +98,6 @@ def base64_decode(encoded_data: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to decode Base64 data: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def url_encode(data: str) -> dict[str, Union[str, int]]:
     """
@@ -140,7 +137,6 @@ def url_encode(data: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to URL encode data: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def url_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     """
@@ -180,7 +176,6 @@ def url_decode(encoded_data: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to URL decode data: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def hex_encode(data: str) -> dict[str, Union[str, int]]:
     """
@@ -222,7 +217,6 @@ def hex_encode(data: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to encode data to hex: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def hex_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     """

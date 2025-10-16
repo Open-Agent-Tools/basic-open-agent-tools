@@ -12,7 +12,7 @@ import warnings
 from typing import Any, Union
 
 from .._logging import get_logger
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 logger = get_logger("network.http_client")
@@ -38,7 +38,6 @@ class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
         return None
 
 
-@adk_tool
 @strands_tool
 def http_request(
     method: str,

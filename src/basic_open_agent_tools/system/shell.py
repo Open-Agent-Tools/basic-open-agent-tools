@@ -6,13 +6,12 @@ import time
 from typing import Union
 
 from .._logging import get_logger
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 logger = get_logger("system.shell")
 
 
-@adk_tool
 @strands_tool
 def execute_shell_command(
     command: str,
@@ -117,7 +116,6 @@ def execute_shell_command(
         raise BasicAgentToolsError(f"Command execution failed: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def run_bash(
     command: str,
@@ -208,7 +206,6 @@ def run_bash(
         raise BasicAgentToolsError(f"Bash command execution failed: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def run_powershell(
     command: str,

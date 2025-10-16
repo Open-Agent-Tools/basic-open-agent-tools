@@ -2,7 +2,7 @@
 
 import os
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 try:
     from pptx import Presentation
@@ -13,7 +13,6 @@ except ImportError:
     Pt = None  # type: ignore[assignment,misc]
 
 
-@adk_tool
 @strands_tool
 def create_simple_pptx(
     file_path: str, title: str, subtitle: str, skip_confirm: bool
@@ -82,7 +81,6 @@ def create_simple_pptx(
         raise ValueError(f"Failed to create PowerPoint presentation: {e}")
 
 
-@adk_tool
 @strands_tool
 def add_pptx_title_slide(file_path: str, title: str, subtitle: str) -> str:
     """Add title slide to existing PowerPoint presentation.
@@ -138,7 +136,6 @@ def add_pptx_title_slide(file_path: str, title: str, subtitle: str) -> str:
         raise ValueError(f"Failed to add title slide: {e}")
 
 
-@adk_tool
 @strands_tool
 def add_pptx_content_slide(file_path: str, title: str, bullet_points: list[str]) -> str:
     """Add content slide with title and bullet points.
@@ -210,7 +207,6 @@ def add_pptx_content_slide(file_path: str, title: str, bullet_points: list[str])
         raise ValueError(f"Failed to add content slide: {e}")
 
 
-@adk_tool
 @strands_tool
 def add_pptx_blank_slide(file_path: str) -> str:
     """Add blank slide to existing PowerPoint presentation.

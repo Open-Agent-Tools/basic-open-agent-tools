@@ -5,13 +5,12 @@ import os
 from typing import Union
 
 from .._logging import get_logger
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 logger = get_logger("crypto.hashing")
 
 
-@adk_tool
 @strands_tool
 def hash_md5(data: str) -> dict[str, Union[str, int]]:
     """
@@ -51,7 +50,6 @@ def hash_md5(data: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to generate MD5 hash: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def hash_sha256(data: str) -> dict[str, Union[str, int]]:
     """
@@ -91,7 +89,6 @@ def hash_sha256(data: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to generate SHA-256 hash: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def hash_sha512(data: str) -> dict[str, Union[str, int]]:
     """
@@ -125,7 +122,6 @@ def hash_sha512(data: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to generate SHA-512 hash: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def hash_file(file_path: str, algorithm: str) -> dict[str, Union[str, int]]:
     """
@@ -203,7 +199,6 @@ def hash_file(file_path: str, algorithm: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError(f"Failed to hash file {file_path}: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def verify_checksum(
     data: str, expected_hash: str, algorithm: str

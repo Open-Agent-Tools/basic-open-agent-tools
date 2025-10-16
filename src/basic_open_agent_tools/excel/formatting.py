@@ -7,7 +7,7 @@ Excel (.xlsx) spreadsheets.
 import os
 import re
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 try:
     from openpyxl import load_workbook  # type: ignore[import-untyped, import-not-found]
@@ -22,7 +22,6 @@ except ImportError:
     HAS_OPENPYXL = False
 
 
-@adk_tool
 @strands_tool
 def apply_excel_bold(
     file_path: str, sheet_name: str, cell_range: str, skip_confirm: bool
@@ -100,7 +99,6 @@ def apply_excel_bold(
         raise ValueError(f"Failed to apply bold formatting: {e}")
 
 
-@adk_tool
 @strands_tool
 def apply_excel_font_size(
     file_path: str,
@@ -188,7 +186,6 @@ def apply_excel_font_size(
         raise ValueError(f"Failed to set font size: {e}")
 
 
-@adk_tool
 @strands_tool
 def apply_excel_alignment(
     file_path: str,
@@ -292,7 +289,6 @@ def apply_excel_alignment(
         raise ValueError(f"Failed to set alignment: {e}")
 
 
-@adk_tool
 @strands_tool
 def set_excel_column_width(
     file_path: str, sheet_name: str, column_letter: str, width: int, skip_confirm: bool
@@ -377,7 +373,6 @@ def set_excel_column_width(
         raise ValueError(f"Failed to set column width: {e}")
 
 
-@adk_tool
 @strands_tool
 def set_excel_row_height(
     file_path: str, sheet_name: str, row_number: int, height: int, skip_confirm: bool
@@ -461,7 +456,6 @@ def set_excel_row_height(
         raise ValueError(f"Failed to set row height: {e}")
 
 
-@adk_tool
 @strands_tool
 def apply_excel_cell_color(
     file_path: str,
@@ -556,7 +550,6 @@ def apply_excel_cell_color(
         raise ValueError(f"Failed to apply cell color: {e}")
 
 
-@adk_tool
 @strands_tool
 def freeze_excel_panes(
     file_path: str, sheet_name: str, cell_reference: str, skip_confirm: bool
@@ -632,7 +625,6 @@ def freeze_excel_panes(
         raise ValueError(f"Failed to freeze panes: {e}")
 
 
-@adk_tool
 @strands_tool
 def add_excel_formula(
     file_path: str,

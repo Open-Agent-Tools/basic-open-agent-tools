@@ -3,11 +3,10 @@
 import socket
 from typing import Union
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
-@adk_tool
 @strands_tool
 def resolve_hostname(
     hostname: str,
@@ -62,7 +61,6 @@ def resolve_hostname(
         raise BasicAgentToolsError(f"DNS resolution error: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def reverse_dns_lookup(ip_address: str) -> dict[str, Union[str, bool]]:
     """
@@ -117,7 +115,6 @@ def reverse_dns_lookup(ip_address: str) -> dict[str, Union[str, bool]]:
         raise BasicAgentToolsError(f"Reverse DNS lookup error: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def check_port_open(
     host: str, port: int, timeout: int

@@ -6,7 +6,7 @@ Word (.docx) documents.
 
 import os
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 try:
     from docx import Document  # type: ignore[import-untyped, import-not-found]
@@ -19,7 +19,6 @@ except ImportError:
     HAS_PYTHON_DOCX = False
 
 
-@adk_tool
 @strands_tool
 def apply_heading_style(
     file_path: str, paragraph_index: int, heading_level: int, skip_confirm: bool
@@ -104,7 +103,6 @@ def apply_heading_style(
         raise ValueError(f"Failed to apply heading style: {e}")
 
 
-@adk_tool
 @strands_tool
 def apply_bold_to_paragraph(
     file_path: str, paragraph_index: int, skip_confirm: bool
@@ -182,7 +180,6 @@ def apply_bold_to_paragraph(
         raise ValueError(f"Failed to apply bold formatting: {e}")
 
 
-@adk_tool
 @strands_tool
 def set_paragraph_alignment(
     file_path: str, paragraph_index: int, alignment: str, skip_confirm: bool
@@ -279,7 +276,6 @@ def set_paragraph_alignment(
         raise ValueError(f"Failed to set paragraph alignment: {e}")
 
 
-@adk_tool
 @strands_tool
 def add_page_break(file_path: str, after_paragraph: int, skip_confirm: bool) -> str:
     """Insert page break after specified paragraph in Word document.

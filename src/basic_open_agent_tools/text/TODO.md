@@ -2,7 +2,7 @@
 
 This document outlines planned enhancements for the text processing module to better support LLM-based agents with natural language tasks.
 
-## Current Implementation Status (v0.13.1) ✅
+## Current Implementation Status (v0.13.6) ✅
 
 ### ✅ Core Text Processing (Complete - 10+ functions)
 - [x] **Basic text cleaning**: `clean_whitespace()`, `normalize_line_endings()`
@@ -12,7 +12,7 @@ This document outlines planned enhancements for the text processing module to be
 - [x] **Text splitting**: `smart_split_lines()`, `extract_sentences()`
 - [x] **List formatting**: `join_with_oxford_comma()`
 
-### ✅ Google ADK Compliance (v0.13.1)
+### ✅ Google ADK Compliance (v0.13.6)
 - [x] **Google ADK Function Tool Compliance**: Full compatibility with Google ADK standards
 - [x] **Enhanced Test Coverage**: Achieved 96%+ test coverage with comprehensive testing
 - [x] **Quality Assurance**: 100% ruff + mypy compliance across all functions

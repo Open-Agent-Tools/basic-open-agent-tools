@@ -9,7 +9,7 @@ from typing import Any
 
 from .._logging import get_logger
 from ..confirmation import check_user_confirmation
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 from .validation import (
     validate_dependencies,
@@ -39,7 +39,6 @@ def _get_current_timestamp() -> str:
     return datetime.now().isoformat()
 
 
-@adk_tool
 @strands_tool
 def add_task(
     title: str,
@@ -125,7 +124,6 @@ def add_task(
         raise BasicAgentToolsError(f"Failed to create task: {e}") from e
 
 
-@adk_tool
 @strands_tool
 def list_tasks(status: str, tag: str) -> dict[str, Any]:
     """List all tasks or filter by status and/or tag.
@@ -185,7 +183,6 @@ def list_tasks(status: str, tag: str) -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to list tasks: {e}") from e
 
 
-@adk_tool
 @strands_tool
 def get_task(task_id: int) -> dict[str, Any]:
     """Retrieve a single task by ID.
@@ -223,7 +220,6 @@ def get_task(task_id: int) -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to get task: {e}") from e
 
 
-@adk_tool
 @strands_tool
 def update_task(
     task_id: int,
@@ -310,7 +306,6 @@ def update_task(
         raise BasicAgentToolsError(f"Failed to update task: {e}") from e
 
 
-@adk_tool
 @strands_tool
 def delete_task(task_id: int, skip_confirm: bool) -> str:
     """Remove a task from memory with permission checking.
@@ -367,7 +362,6 @@ def delete_task(task_id: int, skip_confirm: bool) -> str:
         raise BasicAgentToolsError(f"Failed to delete task: {e}") from e
 
 
-@adk_tool
 @strands_tool
 def complete_task(task_id: int) -> dict[str, Any]:
     """Mark a task as completed.
@@ -410,7 +404,6 @@ def complete_task(task_id: int) -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to complete task: {e}") from e
 
 
-@adk_tool
 @strands_tool
 def get_task_stats() -> dict[str, Any]:
     """Get summary statistics about all tasks.
@@ -471,7 +464,6 @@ def get_task_stats() -> dict[str, Any]:
         raise BasicAgentToolsError(f"Failed to get task statistics: {e}") from e
 
 
-@adk_tool
 @strands_tool
 def clear_all_tasks() -> dict[str, Any]:
     """Clear all tasks from memory (for testing/reset).

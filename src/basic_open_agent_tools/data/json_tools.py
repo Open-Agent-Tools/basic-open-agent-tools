@@ -3,13 +3,12 @@
 import json
 
 from .._logging import get_logger
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import SerializationError
 
 logger = get_logger("data.json_tools")
 
 
-@adk_tool
 @strands_tool
 def safe_json_serialize(data: dict, indent: int) -> str:
     """Safely serialize data to JSON string with error handling.
@@ -48,7 +47,6 @@ def safe_json_serialize(data: dict, indent: int) -> str:
         raise SerializationError(f"Failed to serialize data to JSON: {e}")
 
 
-@adk_tool
 @strands_tool
 def safe_json_deserialize(json_str: str) -> dict:
     """Safely deserialize JSON string to Python object with error handling.
@@ -92,7 +90,6 @@ def safe_json_deserialize(json_str: str) -> dict:
         raise SerializationError(f"Failed to deserialize JSON string: {e}")
 
 
-@adk_tool
 @strands_tool
 def validate_json_string(json_str: str) -> bool:
     """Validate JSON string without deserializing.

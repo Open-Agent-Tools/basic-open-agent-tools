@@ -2,11 +2,10 @@
 
 from pathlib import Path
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import FileSystemError
 
 
-@adk_tool
 @strands_tool
 def validate_path(path: str, operation: str) -> Path:
     """Validate and convert path string to Path object.
@@ -31,7 +30,6 @@ def validate_path(path: str, operation: str) -> Path:
         raise FileSystemError(f"Invalid path for {operation}: {path} - {e}")
 
 
-@adk_tool
 @strands_tool
 def validate_file_content(content: str, operation: str) -> None:
     """Validate file content for write operations.

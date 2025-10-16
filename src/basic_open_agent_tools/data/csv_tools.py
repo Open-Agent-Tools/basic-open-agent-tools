@@ -5,7 +5,7 @@ import io
 
 from .._logging import get_logger
 from ..confirmation import check_user_confirmation
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import DataError
 
 logger = get_logger("data.csv_tools")
@@ -42,7 +42,6 @@ def _generate_csv_preview(data: list[dict[str, str]], delimiter: str = ",") -> s
     return preview.strip()
 
 
-@adk_tool
 @strands_tool
 def read_csv_simple(
     file_path: str, delimiter: str, headers: bool
@@ -112,7 +111,6 @@ def read_csv_simple(
         raise DataError(f"Failed to parse CSV file {file_path_str}: {e}")
 
 
-@adk_tool
 @strands_tool
 def write_csv_simple(
     data: list[dict[str, str]],
@@ -228,7 +226,6 @@ def write_csv_simple(
         raise DataError(f"Failed to write CSV file {file_path_str}: {e}")
 
 
-@adk_tool
 @strands_tool
 def csv_to_dict_list(csv_data: str, delimiter: str) -> list[dict[str, str]]:
     """Convert CSV string to list of dictionaries.
@@ -265,7 +262,6 @@ def csv_to_dict_list(csv_data: str, delimiter: str) -> list[dict[str, str]]:
         raise DataError(f"Failed to parse CSV data: {e}")
 
 
-@adk_tool
 @strands_tool
 def dict_list_to_csv(data: list[dict[str, str]], delimiter: str) -> str:
     """Convert list of dictionaries to CSV string.
@@ -312,7 +308,6 @@ def dict_list_to_csv(data: list[dict[str, str]], delimiter: str) -> str:
     return output.getvalue()
 
 
-@adk_tool
 @strands_tool
 def detect_csv_delimiter(file_path: str, sample_size: int) -> str:
     """Auto-detect CSV delimiter by analyzing file content.
@@ -360,7 +355,6 @@ def detect_csv_delimiter(file_path: str, sample_size: int) -> str:
         raise DataError(f"Failed to detect delimiter in {file_path_str}: {e}")
 
 
-@adk_tool
 @strands_tool
 def validate_csv_structure(file_path: str, expected_columns: list[str]) -> bool:
     """Validate CSV file structure and column headers.
@@ -424,7 +418,6 @@ def validate_csv_structure(file_path: str, expected_columns: list[str]) -> bool:
         raise DataError(f"Invalid CSV structure in {file_path_str}: {e}")
 
 
-@adk_tool
 @strands_tool
 def clean_csv_data(
     data: list[dict[str, str]], rules: dict[str, str]

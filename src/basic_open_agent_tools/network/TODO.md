@@ -1,6 +1,6 @@
 # Network Tools TODO
 
-## Current Status (v0.13.1)
+## Current Status (v0.13.6)
 
 ### ✅ **NETWORK UTILITIES TOOLKIT COMPLETED**
 
@@ -75,4 +75,4 @@ All functions follow the agent-friendly design principles:
 
 ---
 
-**Last Updated**: v0.13.1 (2025-10-14) - Core network utilities implemented with full testing
+**Last Updated**: v0.13.6 (2025-10-15) - @strands_tool decorator only (deprecated @adk_tool)

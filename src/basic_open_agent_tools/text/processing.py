@@ -5,12 +5,11 @@ import textwrap
 import unicodedata
 
 from .._logging import get_logger
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 logger = get_logger("text.processing")
 
 
-@adk_tool
 @strands_tool
 def clean_whitespace(text: str) -> str:
     """Clean and normalize whitespace in text.
@@ -39,7 +38,6 @@ def clean_whitespace(text: str) -> str:
     return result
 
 
-@adk_tool
 @strands_tool
 def normalize_line_endings(text: str, style: str) -> str:
     """Normalize line endings in text.
@@ -79,7 +77,6 @@ def normalize_line_endings(text: str, style: str) -> str:
     return normalized
 
 
-@adk_tool
 @strands_tool
 def strip_html_tags(text: str) -> str:
     """Remove HTML tags from text.
@@ -111,7 +108,6 @@ def strip_html_tags(text: str) -> str:
     return result
 
 
-@adk_tool
 @strands_tool
 def normalize_unicode(text: str, form: str) -> str:
     """Normalize Unicode text.
@@ -140,7 +136,6 @@ def normalize_unicode(text: str, form: str) -> str:
     return str(unicodedata.normalize(form, text))  # type: ignore[arg-type]
 
 
-@adk_tool
 @strands_tool
 def to_snake_case(text: str) -> str:
     """Convert text to snake_case.
@@ -170,7 +165,6 @@ def to_snake_case(text: str) -> str:
     return text.lower()
 
 
-@adk_tool
 @strands_tool
 def to_camel_case(text: str, upper_first: bool) -> str:
     """Convert text to camelCase or PascalCase.
@@ -207,7 +201,6 @@ def to_camel_case(text: str, upper_first: bool) -> str:
         return words[0] + "".join(word.capitalize() for word in words[1:])
 
 
-@adk_tool
 @strands_tool
 def to_title_case(text: str) -> str:
     """Convert text to Title Case.
@@ -238,7 +231,6 @@ def to_title_case(text: str) -> str:
     return "".join(result)
 
 
-@adk_tool
 @strands_tool
 def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> list[str]:
     """Split text into lines with maximum length.
@@ -283,7 +275,6 @@ def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> list[
         return lines
 
 
-@adk_tool
 @strands_tool
 def extract_sentences(text: str) -> list[str]:
     """Extract sentences from text using simple rules.
@@ -322,7 +313,6 @@ def extract_sentences(text: str) -> list[str]:
     return result
 
 
-@adk_tool
 @strands_tool
 def join_with_oxford_comma(items: list[str], conjunction: str) -> str:
     """Join a list of items with Oxford comma.

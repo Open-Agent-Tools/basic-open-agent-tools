@@ -1,6 +1,6 @@
 """Color format conversion utilities."""
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 
@@ -31,7 +31,6 @@ def _hue_to_rgb(p: float, q: float, t: float) -> float:
     return p
 
 
-@adk_tool
 @strands_tool
 def rgb_to_hex(r: int, g: int, b: int) -> str:
     """Convert RGB color values to hexadecimal color code.
@@ -56,7 +55,6 @@ def rgb_to_hex(r: int, g: int, b: int) -> str:
     return f"#{r:02X}{g:02X}{b:02X}"
 
 
-@adk_tool
 @strands_tool
 def hex_to_rgb(hex_color: str) -> dict[str, int]:
     """Convert hexadecimal color code to RGB values.
@@ -99,7 +97,6 @@ def hex_to_rgb(hex_color: str) -> dict[str, int]:
     return {"r": r, "g": g, "b": b}
 
 
-@adk_tool
 @strands_tool
 def rgb_to_hsl(r: int, g: int, b: int) -> dict[str, int]:
     """Convert RGB color values to HSL (Hue, Saturation, Lightness).
@@ -164,7 +161,6 @@ def rgb_to_hsl(r: int, g: int, b: int) -> dict[str, int]:
     }
 
 
-@adk_tool
 @strands_tool
 def hsl_to_rgb(h: int, s: int, lightness: int) -> dict[str, int]:
     """Convert HSL (Hue, Saturation, Lightness) to RGB color values.
@@ -215,7 +211,6 @@ def hsl_to_rgb(h: int, s: int, lightness: int) -> dict[str, int]:
     return {"r": r, "g": g, "b": b}
 
 
-@adk_tool
 @strands_tool
 def rgb_to_cmyk(r: int, g: int, b: int) -> dict[str, int]:
     """Convert RGB color values to CMYK (Cyan, Magenta, Yellow, Key/Black).
@@ -262,7 +257,6 @@ def rgb_to_cmyk(r: int, g: int, b: int) -> dict[str, int]:
     }
 
 
-@adk_tool
 @strands_tool
 def cmyk_to_rgb(c: int, m: int, y: int, k: int) -> dict[str, int]:
     """Convert CMYK (Cyan, Magenta, Yellow, Key/Black) to RGB color values.

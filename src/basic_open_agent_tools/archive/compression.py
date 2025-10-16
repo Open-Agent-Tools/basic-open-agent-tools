@@ -10,7 +10,7 @@ from typing import Union
 
 from .._logging import get_logger
 from ..confirmation import check_user_confirmation
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 
 logger = get_logger("archive.compression")
@@ -69,7 +69,6 @@ def _generate_compression_preview(input_path: str, compression_type: str) -> str
         return f"Compressing {input_path} with {compression_type}"
 
 
-@adk_tool
 @strands_tool
 def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) -> str:
     """Create a ZIP archive from files and directories with permission checking.
@@ -146,7 +145,6 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
         raise BasicAgentToolsError(f"Failed to create ZIP archive: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
     """Extract a ZIP archive to a directory with permission checking.
@@ -218,7 +216,6 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
         raise BasicAgentToolsError(f"Failed to extract ZIP archive: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def compress_files(file_paths: list[str], output_path: str, skip_confirm: bool) -> str:
     """Compress multiple files into a ZIP archive.
@@ -235,7 +232,6 @@ def compress_files(file_paths: list[str], output_path: str, skip_confirm: bool) 
     return create_zip(file_paths, output_path, skip_confirm)  # type: ignore[no-any-return]
 
 
-@adk_tool
 @strands_tool
 def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) -> str:
     """
@@ -309,7 +305,6 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
         raise BasicAgentToolsError(f"Failed to compress file with gzip: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def decompress_file_gzip(
     input_path: str, output_path: str
@@ -370,7 +365,6 @@ def decompress_file_gzip(
         raise BasicAgentToolsError(f"Failed to decompress gzip file: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -> str:
     """
@@ -444,7 +438,6 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
         raise BasicAgentToolsError(f"Failed to compress file with bzip2: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> str:
     """

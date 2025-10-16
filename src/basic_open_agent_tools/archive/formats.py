@@ -6,14 +6,13 @@ from typing import Union
 
 from .._logging import get_logger
 from ..confirmation import check_user_confirmation
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 from ..exceptions import BasicAgentToolsError
 from .compression import _generate_archive_preview
 
 logger = get_logger("archive.formats")
 
 
-@adk_tool
 @strands_tool
 def create_tar(
     source_paths: list[str], output_path: str, compression: str, skip_confirm: bool
@@ -84,7 +83,6 @@ def create_tar(
         raise BasicAgentToolsError(f"Failed to create TAR archive: {str(e)}")
 
 
-@adk_tool
 @strands_tool
 def extract_tar(tar_path: str, extract_to: str) -> dict[str, Union[str, int]]:
     """Extract a TAR archive to a directory."""

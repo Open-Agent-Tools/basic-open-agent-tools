@@ -7,10 +7,9 @@ All functions are designed to be agent-friendly with clear error handling.
 import zoneinfo
 from datetime import date, datetime, time, timedelta
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 
-@adk_tool
 @strands_tool
 def get_current_datetime(timezone: str) -> str:
     """Get the current date and time in the specified timezone.
@@ -44,7 +43,6 @@ def get_current_datetime(timezone: str) -> str:
         raise ValueError(f"Invalid timezone '{timezone}': {e}")
 
 
-@adk_tool
 @strands_tool
 def get_current_date(timezone: str) -> str:
     """Get the current date in the specified timezone.
@@ -78,7 +76,6 @@ def get_current_date(timezone: str) -> str:
         raise ValueError(f"Invalid timezone '{timezone}': {e}")
 
 
-@adk_tool
 @strands_tool
 def get_current_time(timezone: str) -> str:
     """Get the current time in the specified timezone.
@@ -112,7 +109,6 @@ def get_current_time(timezone: str) -> str:
         raise ValueError(f"Invalid timezone '{timezone}': {e}")
 
 
-@adk_tool
 @strands_tool
 def is_valid_iso_date(date_string: str) -> bool:
     """Check if a string is a valid ISO format date.
@@ -147,7 +143,6 @@ def is_valid_iso_date(date_string: str) -> bool:
         return False
 
 
-@adk_tool
 @strands_tool
 def is_valid_iso_time(time_string: str) -> bool:
     """Check if a string is a valid ISO format time.
@@ -182,7 +177,6 @@ def is_valid_iso_time(time_string: str) -> bool:
         return False
 
 
-@adk_tool
 @strands_tool
 def is_valid_iso_datetime(datetime_string: str) -> bool:
     """Check if a string is a valid ISO format datetime.
@@ -217,7 +211,6 @@ def is_valid_iso_datetime(datetime_string: str) -> bool:
         return False
 
 
-@adk_tool
 @strands_tool
 def add_days(date_string: str, days: int) -> str:
     """Add a specified number of days to a date.
@@ -257,7 +250,6 @@ def add_days(date_string: str, days: int) -> str:
         raise ValueError(f"Invalid ISO date format '{date_string}': {e}")
 
 
-@adk_tool
 @strands_tool
 def subtract_days(date_string: str, days: int) -> str:
     """Subtract a specified number of days from a date.
@@ -299,7 +291,6 @@ def subtract_days(date_string: str, days: int) -> str:
         raise ValueError(f"Invalid ISO date format '{date_string}': {e}")
 
 
-@adk_tool
 @strands_tool
 def add_hours(datetime_string: str, hours: int) -> str:
     """Add hours to a datetime string."""
@@ -315,7 +306,6 @@ def add_hours(datetime_string: str, hours: int) -> str:
         raise ValueError(f"Invalid ISO datetime format '{datetime_string}': {e}")
 
 
-@adk_tool
 @strands_tool
 def subtract_hours(datetime_string: str, hours: int) -> str:
     """Subtract hours from a datetime string."""
@@ -333,7 +323,6 @@ def subtract_hours(datetime_string: str, hours: int) -> str:
         raise ValueError(f"Invalid ISO datetime format '{datetime_string}': {e}")
 
 
-@adk_tool
 @strands_tool
 def add_minutes(datetime_string: str, minutes: int) -> str:
     """Add minutes to a datetime string."""
@@ -349,7 +338,6 @@ def add_minutes(datetime_string: str, minutes: int) -> str:
         raise ValueError(f"Invalid ISO datetime format '{datetime_string}': {e}")
 
 
-@adk_tool
 @strands_tool
 def subtract_minutes(datetime_string: str, minutes: int) -> str:
     """Subtract minutes from a datetime string."""
@@ -367,7 +355,6 @@ def subtract_minutes(datetime_string: str, minutes: int) -> str:
         raise ValueError(f"Invalid ISO datetime format '{datetime_string}': {e}")
 
 
-@adk_tool
 @strands_tool
 def calculate_time_difference(time1: str, time2: str, unit: str) -> int:
     """Calculate difference between two times in specified unit."""

@@ -2,7 +2,7 @@
 
 import os
 
-from ..decorators import adk_tool, strands_tool
+from ..decorators import strands_tool
 
 try:
     from PIL import Image
@@ -12,7 +12,6 @@ except ImportError:
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB limit
 
 
-@adk_tool
 @strands_tool
 def resize_image(
     file_path: str, output_path: str, width: int, height: int, skip_confirm: bool
@@ -84,7 +83,6 @@ def resize_image(
         raise ValueError(f"Failed to resize image: {e}")
 
 
-@adk_tool
 @strands_tool
 def crop_image(
     file_path: str,
@@ -168,7 +166,6 @@ def crop_image(
         raise ValueError(f"Failed to crop image: {e}")
 
 
-@adk_tool
 @strands_tool
 def rotate_image(
     file_path: str, output_path: str, degrees: int, skip_confirm: bool
@@ -234,7 +231,6 @@ def rotate_image(
         raise ValueError(f"Failed to rotate image: {e}")
 
 
-@adk_tool
 @strands_tool
 def convert_image_format(
     file_path: str, output_path: str, output_format: str, skip_confirm: bool
@@ -309,7 +305,6 @@ def convert_image_format(
         raise ValueError(f"Failed to convert image format: {e}")
 
 
-@adk_tool
 @strands_tool
 def create_thumbnail(
     file_path: str, output_path: str, max_size: int, skip_confirm: bool
@@ -378,7 +373,6 @@ def create_thumbnail(
         raise ValueError(f"Failed to create thumbnail: {e}")
 
 
-@adk_tool
 @strands_tool
 def flip_image(
     file_path: str, output_path: str, direction: str, skip_confirm: bool
