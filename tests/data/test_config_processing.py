@@ -247,7 +247,7 @@ class TestWriteYamlFile:
         """Test error when PyYAML is not installed."""
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", False):
             with pytest.raises(DataError, match="YAML support not available"):
-                write_yaml_file({}, "test.yaml")
+                write_yaml_file({}, "test.yaml", skip_confirm=True)
 
     def test_write_yaml_file_permission_error(self, tmp_path: Path) -> None:
         """Test error handling for permission denied."""
@@ -261,7 +261,7 @@ class TestWriteYamlFile:
                     "builtins.open", side_effect=PermissionError("Permission denied")
                 ):
                     with pytest.raises(DataError, match="Failed to write YAML file"):
-                        write_yaml_file({"test": "data"}, str(yaml_file))
+                        write_yaml_file({"test": "data"}, str(yaml_file), skip_confirm=True)
 
 
 class TestReadTomlFile:
