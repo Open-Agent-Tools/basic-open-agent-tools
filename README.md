@@ -2,15 +2,21 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions.
 
-## 🆕 What's New in v0.13.6
+## 🆕 What's New in v0.13.7
+
+🧹 **Decorator Cleanup**: Complete deprecation of `@adk_tool` decorator across all 351 functions - using `@strands_tool` only for cleaner codebase
+
+📝 **Documentation Updates**: Enhanced agent prompt and CLAUDE.md with accurate decorator architecture (Google ADK uses signatures, not decorators)
+
+✅ **Quality Improvements**: Updated all TODO files to v0.13.7 with decorator deprecation notes
+
+### Previous Release (v0.13.6)
 
 💬 **Enhanced Confirmation Previews**: Confirmation dialogs now show meaningful previews of new content being created instead of just old file sizes
 
 📊 **Better User Feedback**: File writes show content previews, CSV writes show row/column counts with sample data, archive operations show file lists
 
 🎯 **Comprehensive Coverage**: All 22 confirmation operations now provide context-aware previews for better decision making
-
-🧹 **Decorator Cleanup**: Deprecated `@adk_tool` decorator (Google ADK uses function signatures, not decorators) - now using `@strands_tool` only
 
 ### Previous Release (v0.13.3)
 
