@@ -241,8 +241,8 @@ class TestStrandsIntegrationValidation:
         result3 = get_current_date("UTC")
         assert isinstance(result3, str)
 
-        result4 = generate_uuid()
-        assert isinstance(result4, str)
+        result4 = generate_uuid(4)
+        assert isinstance(result4["uuid_string"], str)
 
         # All return values should be JSON-serializable
         import json
@@ -251,7 +251,7 @@ class TestStrandsIntegrationValidation:
             "clean_whitespace": result1,
             "to_snake_case": result2,
             "current_date": result3,
-            "uuid": result4,
+            "uuid": result4["uuid_string"],
         }
 
         # Should be able to serialize to JSON

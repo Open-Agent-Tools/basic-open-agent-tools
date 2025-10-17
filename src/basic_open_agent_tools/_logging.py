@@ -81,8 +81,18 @@ def _configure_logging() -> None:
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(log_level)
 
+    # Create custom formatter that strips package prefix for cleaner output
+    class ShortNameFormatter(logging.Formatter):
+        """Formatter that displays only module names without package prefix."""
+
+        def format(self, record: logging.LogRecord) -> str:
+            # Strip 'basic_open_agent_tools.' prefix for cleaner display
+            if record.name.startswith("basic_open_agent_tools."):
+                record.name = record.name[len("basic_open_agent_tools.") :]
+            return super().format(record)
+
     # Create formatter matching existing [MODULE] pattern
-    formatter = logging.Formatter("[%(name)s] %(message)s")
+    formatter = ShortNameFormatter("[%(name)s] %(message)s")
     handler.setFormatter(formatter)
 
     # Add handler to root logger
