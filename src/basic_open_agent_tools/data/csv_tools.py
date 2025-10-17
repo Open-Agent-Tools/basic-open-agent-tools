@@ -66,10 +66,6 @@ def read_csv_simple(
         >>> data
         [{'name': 'Alice', 'age': '25'}, {'name': 'Bob', 'age': '30'}]
     """
-    logger.debug(
-        f"Reading CSV file: {file_path} (delimiter='{delimiter}', headers={headers})"
-    )
-
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
@@ -80,6 +76,9 @@ def read_csv_simple(
 
     if not isinstance(headers, bool):
         raise TypeError("headers must be a boolean")
+
+    logger.info(f"Reading CSV: {file_path_str}")
+    logger.debug(f"delimiter: '{delimiter}', headers: {headers}")
 
     try:
         with open(file_path_str, encoding="utf-8", newline="") as csvfile:
@@ -98,7 +97,10 @@ def read_csv_simple(
                         row_dict = {f"col_{i}": value for i, value in enumerate(row)}
                         result.append(row_dict)
 
-            logger.debug(f"CSV loaded: {len(result)} rows")
+            logger.info(f"CSV loaded successfully: {len(result)} rows")
+            logger.debug(
+                f"First row keys: {list(result[0].keys()) if result else 'none'}"
+            )
             return result
     except FileNotFoundError:
         logger.debug(f"CSV file not found: {file_path_str}")
@@ -140,10 +142,6 @@ def write_csv_simple(
         >>> write_csv_simple(data, "output.csv", ",", True, skip_confirm=True)
         "Created CSV file output.csv with 2 rows and 2 columns"
     """
-    logger.debug(
-        f"Writing CSV file: {file_path} ({len(data)} rows, delimiter='{delimiter}', headers={headers}, skip_confirm={skip_confirm})"
-    )
-
     # Check if data is a list
     if not isinstance(data, list):
         raise TypeError("data must be a list")
@@ -166,6 +164,11 @@ def write_csv_simple(
     import os
 
     file_existed = os.path.exists(file_path_str)
+
+    logger.info(f"Writing CSV: {file_path_str} ({len(data)} rows)")
+    logger.debug(
+        f"delimiter: '{delimiter}', headers: {headers}, skip_confirm: {skip_confirm}, file_existed: {file_existed}"
+    )
 
     if file_existed:
         # Check user confirmation - show preview of NEW data being written
@@ -219,6 +222,9 @@ def write_csv_simple(
         file_size = os.path.getsize(file_path_str)
 
         result = f"{action} CSV file {file_path_str} with {row_count} rows and {col_count} columns ({file_size} bytes)"
+        logger.info(
+            f"CSV written successfully: {row_count} rows, {col_count} columns, {file_size} bytes ({action.lower()})"
+        )
         logger.debug(f"{result}")
         return result
     except OSError as e:

@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Agent Mode**: Non-TTY environments with `skip_confirm=False` raise `CONFIRMATION_REQUIRED` error with instructions
 - **New Module**: `confirmation.py` - Centralized confirmation handling with context-aware behavior
 - **Environment Variable**: `BYPASS_TOOL_CONSENT` for CI/CD and automation workflows
+- **INFO-Level Logging**: Enhanced operational visibility across high-traffic modules
+  - File operations: Read, write, delete, move, copy operations log start/completion with metrics
+  - Network operations: HTTP requests log method, URL, timing, status, and response size
+  - Archive operations: Compression/extraction operations log file counts and compression ratios
+  - Data operations: CSV, YAML, TOML, INI operations log row/key counts and file sizes
+  - TAR operations: Archive creation/extraction logs item counts and sizes
 
 ### Changed
 - **Confirmation Behavior**: All functions with `skip_confirm` now use intelligent 3-mode confirmation system
@@ -24,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **User Experience**: Interactive terminal users get confirmation prompts instead of errors
 - **Agent Integration**: LLM agents receive instructive error messages to guide user permission workflow
 - **Documentation**: Enhanced README, getting-started.md, api-reference.md, faq.md, and CLAUDE.md with confirmation system details
+- **Logging Levels**: INFO logs visible in TTY mode, silent in agent/automation mode (controlled by TTY detection or BOAT_LOG_LEVEL)
 
 ### Fixed
 - **Agent UX**: Resolved issue where agents couldn't provide user feedback loop for confirmations

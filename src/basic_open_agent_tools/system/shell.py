@@ -58,12 +58,11 @@ def execute_shell_command(
             shell_command = ["/bin/sh", "-c", command]
             shell = False
 
-        # Print command info to stdout
-        logger.debug(f"Executing: {command}")
+        # Log command info
+        logger.info(f"Executing: {command}")
         logger.debug(f"Platform: {system}")
         logger.debug(f"Working directory: {working_directory or 'current'}")
         logger.debug(f"Timeout: {timeout}s")
-        print("-" * 50)
 
         # Execute the command
         start_time = time.time()
@@ -80,17 +79,16 @@ def execute_shell_command(
         end_time = time.time()
         execution_time = end_time - start_time
 
-        # Print execution results to stdout
-        logger.debug(f"Command completed in {execution_time:.3f}s")
-        logger.debug(f"Return code: {result.returncode}")
+        # Log execution results
+        logger.info(
+            f"Command completed in {execution_time:.3f}s (return code: {result.returncode})"
+        )
 
         if capture_output and result.stdout:
             logger.debug(f"STDOUT:\n{result.stdout}")
 
         if capture_output and result.stderr:
             logger.debug(f"STDERR:\n{result.stderr}")
-
-        print("-" * 50)
 
         return {
             "status": "success" if result.returncode == 0 else "error",
@@ -151,12 +149,11 @@ def run_bash(
         )
 
     try:
-        # Print command info to stdout
-        logger.debug(f"Executing (bash): {command}")
+        # Log command info
+        logger.info(f"Executing (bash): {command}")
         logger.debug(f"Platform: {system}")
         logger.debug(f"Working directory: {working_directory or 'current'}")
         logger.debug(f"Timeout: {timeout}s")
-        print("-" * 50)
 
         # Execute the command
         start_time = time.time()
@@ -173,17 +170,16 @@ def run_bash(
         end_time = time.time()
         execution_time = end_time - start_time
 
-        # Print execution results to stdout
-        logger.debug(f"Command completed in {execution_time:.3f}s")
-        logger.debug(f"Return code: {result.returncode}")
+        # Log execution results
+        logger.info(
+            f"Command completed in {execution_time:.3f}s (return code: {result.returncode})"
+        )
 
         if capture_output and result.stdout:
             logger.debug(f"STDOUT:\n{result.stdout}")
 
         if capture_output and result.stderr:
             logger.debug(f"STDERR:\n{result.stderr}")
-
-        print("-" * 50)
 
         return {
             "status": "success" if result.returncode == 0 else "error",
@@ -241,12 +237,11 @@ def run_powershell(
         )
 
     try:
-        # Print command info to stdout
-        logger.debug(f"Executing (powershell): {command}")
+        # Log command info
+        logger.info(f"Executing (powershell): {command}")
         logger.debug(f"Platform: {system}")
         logger.debug(f"Working directory: {working_directory or 'current'}")
         logger.debug(f"Timeout: {timeout}s")
-        print("-" * 50)
 
         # Execute the command
         start_time = time.time()
@@ -263,17 +258,16 @@ def run_powershell(
         end_time = time.time()
         execution_time = end_time - start_time
 
-        # Print execution results to stdout
-        logger.debug(f"Command completed in {execution_time:.3f}s")
-        logger.debug(f"Return code: {result.returncode}")
+        # Log execution results
+        logger.info(
+            f"Command completed in {execution_time:.3f}s (return code: {result.returncode})"
+        )
 
         if capture_output and result.stdout:
             logger.debug(f"STDOUT:\n{result.stdout}")
 
         if capture_output and result.stderr:
             logger.debug(f"STDERR:\n{result.stderr}")
-
-        print("-" * 50)
 
         return {
             "status": "success" if result.returncode == 0 else "error",

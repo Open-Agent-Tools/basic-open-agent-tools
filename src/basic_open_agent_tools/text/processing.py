@@ -56,10 +56,10 @@ def normalize_line_endings(text: str, style: str) -> str:
         >>> normalize_line_endings("line1\\r\\nline2\\rline3\\n", "unix")
         "line1\\nline2\\nline3\\n"
     """
-    logger.debug(f"Normalizing line endings: {len(text)} chars to {style} style")
-
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
+
+    logger.debug(f"Normalizing line endings: {len(text)} chars to {style} style")
 
     line_endings = {"unix": "\n", "windows": "\r\n", "mac": "\r"}
 
@@ -91,10 +91,10 @@ def strip_html_tags(text: str) -> str:
         >>> strip_html_tags("<p>Hello <strong>world</strong>!</p>")
         "Hello world!"
     """
-    logger.debug(f"Stripping HTML tags from {len(text)} character text")
-
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
+
+    logger.debug(f"Stripping HTML tags from {len(text)} character text")
 
     # Remove HTML tags - be smart about spacing to avoid extra spaces around punctuation
     # First pass: remove tags that are followed by punctuation without adding space

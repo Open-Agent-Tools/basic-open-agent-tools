@@ -84,10 +84,6 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
     Raises:
         BasicAgentToolsError: If archive creation fails or file exists without skip_confirm
     """
-    logger.debug(
-        f"Creating ZIP: {output_path} from {len(source_paths)} sources (skip_confirm={skip_confirm})"
-    )
-
     if not isinstance(source_paths, list) or not source_paths:
         raise BasicAgentToolsError("Source paths must be a non-empty list")
 
@@ -99,6 +95,9 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
 
     # Check if output file exists
     file_existed = os.path.exists(output_path)
+
+    logger.info(f"Creating ZIP: {output_path} from {len(source_paths)} source(s)")
+    logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
 
     if file_existed:
         # Check user confirmation (interactive prompt, agent error, or bypass)
@@ -138,6 +137,9 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
         action = "Overwrote" if file_existed else "Created"
 
         result = f"{action} ZIP archive {output_path} with {file_count} files ({archive_size} bytes)"
+        logger.info(
+            f"ZIP created successfully: {file_count} files, {archive_size} bytes ({action.lower()})"
+        )
         logger.debug(f"{result}")
         return result
     except Exception as e:
@@ -160,10 +162,6 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
     Raises:
         BasicAgentToolsError: If extraction fails or directory is not empty without skip_confirm
     """
-    logger.debug(
-        f"Extracting ZIP: {zip_path} to {extract_to} (skip_confirm={skip_confirm})"
-    )
-
     if not isinstance(zip_path, str) or not zip_path.strip():
         raise BasicAgentToolsError("ZIP path must be a non-empty string")
 
@@ -176,6 +174,9 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
     if not os.path.exists(zip_path):
         logger.debug(f"ZIP file not found: {zip_path}")
         raise BasicAgentToolsError(f"ZIP file not found: {zip_path}")
+
+    logger.info(f"Extracting ZIP: {zip_path} → {extract_to}")
+    logger.debug(f"skip_confirm: {skip_confirm}")
 
     # Check if extraction directory exists and has contents
     extract_exists = os.path.exists(extract_to)
@@ -209,6 +210,9 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
         archive_size = os.path.getsize(zip_path)
 
         result = f"Extracted ZIP archive {zip_path} to {extract_to} ({files_extracted} files, {archive_size} bytes)"
+        logger.info(
+            f"ZIP extracted successfully: {files_extracted} files, {archive_size} bytes"
+        )
         logger.debug(f"{result}")
         return result
     except Exception as e:
@@ -269,6 +273,12 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
 
     # Check if output file exists
     file_existed = os.path.exists(output_path)
+    input_size = os.path.getsize(input_path)
+
+    logger.info(
+        f"Compressing with GZIP: {input_path} → {output_path} ({input_size} bytes)"
+    )
+    logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
 
     if file_existed:
         # Check user confirmation - show preview of source file being compressed
@@ -285,8 +295,6 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
             return f"Operation cancelled by user: {output_path}"
 
     try:
-        input_size = os.path.getsize(input_path)
-
         with open(input_path, "rb") as f_in:
             with gzip.open(output_path, "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
@@ -297,6 +305,9 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
 
         action = "Overwrote" if file_existed else "Created"
         result = f"{action} GZIP compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
+        logger.info(
+            f"GZIP compression completed: {input_size} → {output_size} bytes ({compression_percent}% reduction)"
+        )
         logger.debug(f"{result}")
         return result
 
@@ -330,8 +341,8 @@ def decompress_file_gzip(
     if not os.path.exists(input_path):
         raise BasicAgentToolsError(f"Input file not found: {input_path}")
 
-    if output_path is None:
-        if input_path.endswith(".gz"):
+    if output_path is None:  # type: ignore[comparison-overlap]
+        if input_path.endswith(".gz"):  # type: ignore[unreachable]
             output_path = input_path[:-3]
         else:
             output_path = f"{input_path}.decompressed"
@@ -402,6 +413,12 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
 
     # Check if output file exists
     file_existed = os.path.exists(output_path)
+    input_size = os.path.getsize(input_path)
+
+    logger.info(
+        f"Compressing with BZIP2: {input_path} → {output_path} ({input_size} bytes)"
+    )
+    logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
 
     if file_existed:
         # Check user confirmation - show preview of source file being compressed
@@ -418,8 +435,6 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
             return f"Operation cancelled by user: {output_path}"
 
     try:
-        input_size = os.path.getsize(input_path)
-
         with open(input_path, "rb") as f_in:
             with bz2.BZ2File(output_path, "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
@@ -430,6 +445,9 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
 
         action = "Overwrote" if file_existed else "Created"
         result = f"{action} BZIP2 compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
+        logger.info(
+            f"BZIP2 compression completed: {input_size} → {output_size} bytes ({compression_percent}% reduction)"
+        )
         logger.debug(f"{result}")
         return result
 
@@ -475,6 +493,12 @@ def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> s
 
     # Check if output file exists
     file_existed = os.path.exists(output_path)
+    input_size = os.path.getsize(input_path)
+
+    logger.info(
+        f"Compressing with XZ: {input_path} → {output_path} ({input_size} bytes)"
+    )
+    logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
 
     if file_existed:
         # Check user confirmation - show preview of source file being compressed
@@ -491,8 +515,6 @@ def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> s
             return f"Operation cancelled by user: {output_path}"
 
     try:
-        input_size = os.path.getsize(input_path)
-
         with open(input_path, "rb") as f_in:
             with lzma.LZMAFile(output_path, "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
@@ -503,6 +525,9 @@ def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> s
 
         action = "Overwrote" if file_existed else "Created"
         result = f"{action} XZ compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
+        logger.info(
+            f"XZ compression completed: {input_size} → {output_size} bytes ({compression_percent}% reduction)"
+        )
         logger.debug(f"{result}")
         return result
 

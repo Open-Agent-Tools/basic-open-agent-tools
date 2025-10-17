@@ -1,12 +1,14 @@
 """Internal logging utility for basic-open-agent-tools.
 
 This module provides a centralized logging configuration for all toolkit modules.
-It respects the BOAT_LOG_LEVEL environment variable and defaults to WARNING level
-to avoid verbose output in production environments.
+It respects the BOAT_LOG_LEVEL environment variable and uses TTY-aware defaults
+to provide appropriate output for interactive and automated environments.
 
 Environment Variables:
     BOAT_LOG_LEVEL: Set log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-                    Defaults to WARNING if not set.
+                    If not set, defaults based on TTY:
+                    - TTY (interactive terminal): INFO (show execution messages)
+                    - Non-TTY (agents/automation): WARNING (silent operation)
 
 Example:
     >>> import os
@@ -26,19 +28,36 @@ _logging_configured = False
 
 
 def _configure_logging() -> None:
-    """Configure root logger with consistent format and level.
+    """Configure root logger with consistent format and TTY-aware level.
 
     This function is called automatically when getting the first logger.
     It sets up the root logger with a format matching the existing
     [MODULE] message pattern used throughout the codebase.
+
+    Log level is determined by:
+    1. BOAT_LOG_LEVEL environment variable (if set) - explicit override
+    2. TTY detection (if env var not set):
+       - TTY (interactive): INFO level (show execution messages)
+       - Non-TTY (agents): WARNING level (silent operation)
     """
     global _logging_configured
 
     if _logging_configured:
         return
 
-    # Get log level from environment variable, default to WARNING
-    log_level_str = os.environ.get("BOAT_LOG_LEVEL", "WARNING").upper()
+    # Get log level from environment variable, or use TTY-aware default
+    log_level_str = os.environ.get("BOAT_LOG_LEVEL", None)
+
+    if log_level_str is None:
+        # No explicit log level set - use TTY-aware default
+        if sys.stdout.isatty():
+            # Interactive terminal - show execution messages
+            log_level_str = "INFO"
+        else:
+            # Agent/automation - silent operation
+            log_level_str = "WARNING"
+    else:
+        log_level_str = log_level_str.upper()
 
     # Map string to logging level
     level_map = {
@@ -79,7 +98,10 @@ def get_logger(module_name: Optional[str] = None) -> logging.Logger:
     """Get a logger instance for a specific module.
 
     This function returns a logger configured for the toolkit's internal use.
-    The logger respects the BOAT_LOG_LEVEL environment variable.
+    The logger uses TTY-aware defaults:
+    - Interactive terminals (TTY): INFO level by default
+    - Agents/automation (non-TTY): WARNING level by default
+    - BOAT_LOG_LEVEL environment variable can override defaults
 
     Args:
         module_name: Name of the module (e.g., 'file_system', 'network')

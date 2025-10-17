@@ -5,6 +5,7 @@ and comprehensive error handling.
 """
 
 import json
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -102,11 +103,6 @@ def http_request(
     except json.JSONDecodeError as e:
         raise BasicAgentToolsError(f"Invalid JSON in headers: {e}")
 
-    # Log the HTTP request details for security auditing
-    body_info = f" with {len(body)} char body" if body else ""
-    headers_info = f" with {len(headers_dict)} headers" if headers_dict else ""
-    logger.debug(f"{method} {url}{body_info}{headers_info} (timeout={timeout}s)")
-
     if not method or not isinstance(method, str):
         raise BasicAgentToolsError("Method must be a non-empty string")
 
@@ -117,6 +113,14 @@ def http_request(
         raise BasicAgentToolsError("URL must start with http:// or https://")
 
     method = method.upper()
+
+    # Log the HTTP request details
+    body_info = f" ({len(body)} bytes)" if body else ""
+    headers_info = f", {len(headers_dict)} headers" if headers_dict else ""
+    logger.info(f"{method} {url}{body_info}")
+    logger.debug(
+        f"Timeout: {timeout}s{headers_info}, follow_redirects: {follow_redirects}, verify_ssl: {verify_ssl}"
+    )
 
     # Prepare headers
     request_headers = dict(headers_dict)
@@ -178,6 +182,7 @@ def http_request(
                 opener = urllib.request.build_opener()
 
         # Make the request
+        start_time = time.time()
         if not follow_redirects or ssl_context:
             response = opener.open(req, timeout=timeout)
         else:
@@ -186,6 +191,8 @@ def http_request(
         # Read response
         response_body = response.read()
         response_headers = dict(response.headers)
+        end_time = time.time()
+        request_time = end_time - start_time
 
         # Try to decode response body
         try:
@@ -205,7 +212,12 @@ def http_request(
 
         # Log response details
         body_size = len(decoded_body) if decoded_body else 0
-        logger.debug(f"Response: {result['status_code']} ({body_size} chars)")
+        logger.info(
+            f"Response: {result['status_code']} ({request_time:.3f}s, {body_size} bytes)"
+        )
+        logger.debug(
+            f"Final URL: {result['url']}, Headers: {len(response_headers)} headers"
+        )
 
         return result
 

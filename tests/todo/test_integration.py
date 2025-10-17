@@ -643,7 +643,7 @@ class TestErrorHandlingIntegration:
             get_task(999)  # Non-existent task
 
         with pytest.raises(BasicAgentToolsError):
-            delete_task(999)  # Non-existent task
+            delete_task(999, skip_confirm=True)  # Non-existent task
 
         with pytest.raises(BasicAgentToolsError):
             update_task(1, "", "open", "medium", "", [], "", [])  # Empty title

@@ -51,16 +51,19 @@ def read_file_to_string(file_path: str) -> str:
     Raises:
         FileSystemError: If file doesn't exist or can't be read
     """
-    logger.debug(f"Reading: {file_path}")
-
     path = validate_path(file_path, "read")
 
     if not path.is_file():
         raise FileSystemError(f"File not found: {path}")
 
+    logger.info(f"Reading file: {path}")
+
     try:
-        content = path.read_text(encoding="utf-8").strip()
-        logger.debug(f"Read {len(content)} characters from {path}")
+        content: str = path.read_text(encoding="utf-8").strip()
+        logger.info(f"File read successfully: {len(content)} characters")
+        logger.debug(
+            f"Content preview: {content[:100]}{'...' if len(content) > 100 else ''}"
+        )
         return content
     except (OSError, UnicodeDecodeError) as e:
         logger.error(f"Failed to read {path}: {e}")
@@ -82,14 +85,15 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
     Raises:
         FileSystemError: If write operation fails or file exists without skip_confirm
     """
-    logger.debug(
-        f"Writing to: {file_path} ({len(content)} chars, skip_confirm={skip_confirm})"
-    )
-
     validate_file_content(content, "write")
     path = validate_path(file_path, "write")
 
     file_existed = path.exists()
+    line_count = len(content.splitlines()) if content else 0
+    byte_size = len(content.encode("utf-8"))
+
+    logger.info(f"Writing file: {path} ({line_count} lines, {byte_size} bytes)")
+    logger.debug(f"File exists: {file_existed}, skip_confirm: {skip_confirm}")
 
     if file_existed:
         # Check user confirmation (interactive prompt, agent error, or bypass)
@@ -110,9 +114,11 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
 
-        line_count = len(content.splitlines()) if content else 0
         action = "Overwrote" if file_existed else "Created"
         result = f"{action} file {path} with {line_count} lines"
+        logger.info(
+            f"File written successfully: {action.lower()} {line_count} lines, {byte_size} bytes"
+        )
         logger.debug(f"{result}")
         return result
     except OSError as e:
@@ -247,8 +253,6 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
     Raises:
         FileSystemError: If deletion fails or file doesn't exist without skip_confirm
     """
-    logger.debug(f"Deleting file: {file_path} (skip_confirm={skip_confirm})")
-
     path = validate_path(file_path, "delete file")
 
     if not path.exists():
@@ -271,6 +275,9 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
     # Get file info before deletion
     file_size = path.stat().st_size
 
+    logger.info(f"Deleting file: {path} ({file_size} bytes)")
+    logger.debug(f"skip_confirm: {skip_confirm}")
+
     # Check user confirmation for deletion
     confirmed = check_user_confirmation(
         operation="delete file",
@@ -286,6 +293,7 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
     try:
         path.unlink()
         result = f"Deleted file {path} ({file_size} bytes)"
+        logger.info(f"File deleted successfully: {file_size} bytes")
         logger.debug(f"{result}")
         return result
     except OSError as e:
@@ -383,10 +391,6 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
     Raises:
         FileSystemError: If move operation fails or destination exists without skip_confirm
     """
-    logger.debug(
-        f"Moving: {source_path} -> {destination_path} (skip_confirm={skip_confirm})"
-    )
-
     src_path = validate_path(source_path, "move source")
     dst_path = validate_path(destination_path, "move destination")
 
@@ -400,12 +404,21 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
     if src_path.is_file():
         file_size = src_path.stat().st_size
         size_info = f" ({file_size} bytes)"
-        preview = f"Will overwrite existing file ({dst_path.stat().st_size} bytes)"
+        preview = (
+            f"Will overwrite existing file ({dst_path.stat().st_size} bytes)"
+            if destination_existed
+            else None
+        )
     else:
         size_info = ""
-        preview = "Will overwrite existing directory"
+        preview = "Will overwrite existing directory" if destination_existed else None
 
     item_type = "directory" if is_directory else "file"
+
+    logger.info(f"Moving {item_type}: {src_path} → {dst_path}{size_info}")
+    logger.debug(
+        f"Destination exists: {destination_existed}, skip_confirm: {skip_confirm}"
+    )
 
     if destination_existed:
         # Check user confirmation for overwrite
@@ -426,6 +439,7 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
 
         action = "Moved and overwrote" if destination_existed else "Moved"
         result = f"{action} {item_type} from {src_path} to {dst_path}{size_info}"
+        logger.info(f"Move completed successfully: {action.lower()} {item_type}")
         logger.debug(f"{result}")
         return result
     except OSError as e:
@@ -485,6 +499,11 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
 
     item_type = "directory" if is_directory else "file"
 
+    logger.info(f"Copying {item_type}: {src_path} → {dst_path}{size_info}")
+    logger.debug(
+        f"Destination exists: {destination_existed}, skip_confirm: {skip_confirm}"
+    )
+
     if destination_existed:
         # Check user confirmation for overwrite
         confirmed = check_user_confirmation(
@@ -507,7 +526,9 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
             shutil.copytree(str(src_path), str(dst_path))
 
         action = "Copied and overwrote" if destination_existed else "Copied"
-        return f"{action} {item_type} from {src_path} to {dst_path}{size_info}"
+        result = f"{action} {item_type} from {src_path} to {dst_path}{size_info}"
+        logger.info(f"Copy completed successfully: {action.lower()} {item_type}")
+        return result
     except OSError as e:
         raise FileSystemError(f"Failed to copy {src_path} to {dst_path}: {e}")
 

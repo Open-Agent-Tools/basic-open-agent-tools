@@ -31,10 +31,6 @@ def create_tar(
     Raises:
         BasicAgentToolsError: If archive creation fails or file exists without skip_confirm
     """
-    logger.debug(
-        f"Creating TAR: {output_path} from {len(source_paths)} sources (compression={compression}, skip_confirm={skip_confirm})"
-    )
-
     if not isinstance(source_paths, list) or not source_paths:
         raise BasicAgentToolsError("Source paths must be a non-empty list")
 
@@ -46,6 +42,11 @@ def create_tar(
 
     # Check if output file exists
     file_existed = os.path.exists(output_path)
+
+    logger.info(
+        f"Creating TAR: {output_path} from {len(source_paths)} source(s), compression={compression}"
+    )
+    logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
 
     if file_existed:
         # Check user confirmation - show preview of NEW archive being created
@@ -76,7 +77,9 @@ def create_tar(
         action = "Overwrote" if file_existed else "Created"
 
         result = f"{action} TAR archive {output_path} with {files_added} items using {compression} compression ({file_size} bytes)"
-        logger.debug(f"{result}")
+        logger.info(
+            f"TAR created successfully: {files_added} items, {file_size} bytes ({action.lower()})"
+        )
         return result
     except Exception as e:
         logger.error(f"TAR creation failed: {e}")
@@ -86,11 +89,12 @@ def create_tar(
 @strands_tool
 def extract_tar(tar_path: str, extract_to: str) -> dict[str, Union[str, int]]:
     """Extract a TAR archive to a directory."""
-    logger.debug(f"Extracting TAR: {tar_path} to {extract_to}")
-
     if not os.path.exists(tar_path):
         logger.debug(f"TAR file not found: {tar_path}")
         raise BasicAgentToolsError(f"TAR file not found: {tar_path}")
+
+    archive_size = os.path.getsize(tar_path)
+    logger.info(f"Extracting TAR: {tar_path} → {extract_to} ({archive_size} bytes)")
 
     try:
         with tarfile.open(tar_path, "r:*") as tf:
@@ -104,7 +108,7 @@ def extract_tar(tar_path: str, extract_to: str) -> dict[str, Union[str, int]]:
             "status": "success",
         }
 
-        logger.debug(f"TAR extracted: {files_extracted} files to {extract_to}")
+        logger.info(f"TAR extracted successfully: {files_extracted} files")
         return result  # type: ignore[return-value]
     except Exception as e:
         logger.error(f"TAR extraction failed: {e}")

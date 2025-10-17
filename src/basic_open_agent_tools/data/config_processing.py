@@ -75,16 +75,17 @@ def read_yaml_file(file_path: str) -> dict:
         >>> read_yaml_file("config.yaml")
         {"database": {"host": "localhost", "port": 5432}}
     """
-    logger.debug(f"Reading YAML file: {file_path}")
-
     if not HAS_YAML:
         raise DataError("YAML support not available. Install PyYAML to use YAML files.")
+
+    logger.info(f"Reading YAML: {file_path}")
 
     try:
         with open(file_path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
             result = data if data is not None else {}
-            logger.debug(f"YAML loaded: {len(result)} top-level keys")
+            logger.info(f"YAML loaded successfully: {len(result)} top-level keys")
+            logger.debug(f"Keys: {list(result.keys())[:5]}")
             return result
     except FileNotFoundError:
         logger.debug(f"YAML file not found: {file_path}")
@@ -117,16 +118,15 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         >>> write_yaml_file(data, "config.yaml", skip_confirm=True)
         "Created YAML file config.yaml with 1 top-level keys (87 bytes)"
     """
-    logger.debug(
-        f"Writing YAML file: {file_path} ({len(data)} top-level keys, skip_confirm={skip_confirm})"
-    )
-
     if not HAS_YAML:
         raise DataError("YAML support not available. Install PyYAML to use YAML files.")
 
     import os
 
     file_existed = os.path.exists(file_path)
+
+    logger.info(f"Writing YAML: {file_path} ({len(data)} top-level keys)")
+    logger.debug(f"File exists: {file_existed}, skip_confirm: {skip_confirm}")
 
     if file_existed:
         # Check user confirmation - show preview of NEW data being written
@@ -152,7 +152,9 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         action = "Overwrote" if file_existed else "Created"
 
         result = f"{action} YAML file {file_path} with {key_count} top-level keys ({file_size} bytes)"
-        logger.debug(f"{result}")
+        logger.info(
+            f"YAML written successfully: {key_count} keys, {file_size} bytes ({action.lower()})"
+        )
         return result
     except Exception as e:
         logger.error(f"YAML write error: {e}")
@@ -176,17 +178,18 @@ def read_toml_file(file_path: str) -> dict:
         >>> read_toml_file("config.toml")
         {"database": {"host": "localhost", "port": 5432}}
     """
-    logger.debug(f"Reading TOML file: {file_path}")
-
     if not HAS_TOML:
         raise DataError(
             "TOML support not available. Install tomli and tomli-w to use TOML files."
         )
 
+    logger.info(f"Reading TOML: {file_path}")
+
     try:
         with open(file_path, "rb") as f:
             result: dict = tomli.load(f)
-            logger.debug(f"TOML loaded: {len(result)} top-level keys")
+            logger.info(f"TOML loaded successfully: {len(result)} top-level keys")
+            logger.debug(f"Keys: {list(result.keys())[:5]}")
             return result
     except FileNotFoundError:
         logger.debug(f"TOML file not found: {file_path}")
@@ -219,10 +222,6 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         >>> write_toml_file(data, "config.toml", skip_confirm=True)
         "Created TOML file config.toml with 1 top-level keys (87 bytes)"
     """
-    logger.debug(
-        f"Writing TOML file: {file_path} ({len(data)} top-level keys, skip_confirm={skip_confirm})"
-    )
-
     if not HAS_TOML:
         raise DataError(
             "TOML support not available. Install tomli and tomli-w to use TOML files."
@@ -231,6 +230,9 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     import os
 
     file_existed = os.path.exists(file_path)
+
+    logger.info(f"Writing TOML: {file_path} ({len(data)} top-level keys)")
+    logger.debug(f"File exists: {file_existed}, skip_confirm: {skip_confirm}")
 
     if file_existed:
         # Check user confirmation - show preview of NEW data being written
@@ -256,7 +258,9 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         action = "Overwrote" if file_existed else "Created"
 
         result = f"{action} TOML file {file_path} with {key_count} top-level keys ({file_size} bytes)"
-        logger.debug(f"{result}")
+        logger.info(
+            f"TOML written successfully: {key_count} keys, {file_size} bytes ({action.lower()})"
+        )
         return result
     except Exception as e:
         logger.error(f"TOML write error: {e}")
@@ -280,14 +284,14 @@ def read_ini_file(file_path: str) -> dict:
         >>> read_ini_file("config.ini")
         {"database": {"host": "localhost", "port": "5432"}}
     """
-    logger.debug(f"Reading INI file: {file_path}")
-
     # Check if file exists first (ConfigParser.read doesn't raise FileNotFoundError)
     import os
 
     if not os.path.isfile(file_path):
         logger.debug(f"INI file not found: {file_path}")
         raise FileNotFoundError(f"INI file not found: {file_path}")
+
+    logger.info(f"Reading INI: {file_path}")
 
     try:
         config = configparser.ConfigParser()
@@ -297,7 +301,8 @@ def read_ini_file(file_path: str) -> dict:
         for section_name in config.sections():
             result[section_name] = dict(config[section_name])
 
-        logger.debug(f"INI loaded: {len(result)} sections")
+        logger.info(f"INI loaded successfully: {len(result)} sections")
+        logger.debug(f"Sections: {list(result.keys())[:5]}")
         return result
     except FileNotFoundError:
         raise DataError(f"INI file not found: {file_path}")
@@ -329,13 +334,12 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         >>> write_ini_file(data, "config.ini", skip_confirm=True)
         "Created INI file config.ini with 1 sections (87 bytes)"
     """
-    logger.debug(
-        f"Writing INI file: {file_path} ({len(data)} sections, skip_confirm={skip_confirm})"
-    )
-
     import os
 
     file_existed = os.path.exists(file_path)
+
+    logger.info(f"Writing INI: {file_path} ({len(data)} sections)")
+    logger.debug(f"File exists: {file_existed}, skip_confirm: {skip_confirm}")
 
     if file_existed:
         # Check user confirmation - show preview of NEW data being written
@@ -370,7 +374,9 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         action = "Overwrote" if file_existed else "Created"
 
         result = f"{action} INI file {file_path} with {section_count} sections ({file_size} bytes)"
-        logger.debug(f"{result}")
+        logger.info(
+            f"INI written successfully: {section_count} sections, {file_size} bytes ({action.lower()})"
+        )
         return result
     except Exception as e:
         logger.error(f"INI write error: {e}")

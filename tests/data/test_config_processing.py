@@ -261,7 +261,9 @@ class TestWriteYamlFile:
                     "builtins.open", side_effect=PermissionError("Permission denied")
                 ):
                     with pytest.raises(DataError, match="Failed to write YAML file"):
-                        write_yaml_file({"test": "data"}, str(yaml_file), skip_confirm=True)
+                        write_yaml_file(
+                            {"test": "data"}, str(yaml_file), skip_confirm=True
+                        )
 
 
 class TestReadTomlFile:
@@ -423,7 +425,7 @@ class TestWriteTomlFile:
             with patch(
                 "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
             ):
-                write_toml_file(data, str(toml_file))
+                write_toml_file(data, str(toml_file), skip_confirm=True)
 
         # Verify file was created
         assert toml_file.exists()
@@ -442,7 +444,7 @@ class TestWriteTomlFile:
             with patch(
                 "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
             ):
-                write_toml_file(data, str(toml_file))
+                write_toml_file(data, str(toml_file), skip_confirm=True)
 
         assert toml_file.exists()
 
@@ -460,7 +462,7 @@ class TestWriteTomlFile:
             with patch(
                 "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
             ):
-                write_toml_file(data, str(toml_file))
+                write_toml_file(data, str(toml_file), skip_confirm=True)
 
         assert toml_file.exists()
 
@@ -475,7 +477,7 @@ class TestWriteTomlFile:
             with patch(
                 "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
             ):
-                write_toml_file(data, str(toml_file))
+                write_toml_file(data, str(toml_file), skip_confirm=True)
 
         assert toml_file.exists()
 
@@ -483,7 +485,7 @@ class TestWriteTomlFile:
         """Test error when TOML support is not installed."""
         with patch("basic_open_agent_tools.data.config_processing.HAS_TOML", False):
             with pytest.raises(DataError, match="TOML support not available"):
-                write_toml_file({}, "test.toml")
+                write_toml_file({}, "test.toml", skip_confirm=True)
 
     def test_write_toml_file_permission_error(self, tmp_path: Path) -> None:
         """Test error handling for permission denied."""
@@ -499,7 +501,9 @@ class TestWriteTomlFile:
                     "builtins.open", side_effect=PermissionError("Permission denied")
                 ):
                     with pytest.raises(DataError, match="Failed to write TOML file"):
-                        write_toml_file({"test": "data"}, str(toml_file))
+                        write_toml_file(
+                            {"test": "data"}, str(toml_file), skip_confirm=True
+                        )
 
 
 class TestReadIniFile:
@@ -637,7 +641,7 @@ class TestWriteIniFile:
             "app": {"name": "Test App", "debug": "true"},
         }
 
-        write_ini_file(data, str(ini_file))
+        write_ini_file(data, str(ini_file), skip_confirm=True)
 
         # Verify file was created and contains expected content
         assert ini_file.exists()
@@ -651,7 +655,7 @@ class TestWriteIniFile:
         ini_file = tmp_path / "unicode.ini"
         data = {"cities": {"chinese": "北京", "japanese": "東京"}}
 
-        write_ini_file(data, str(ini_file))
+        write_ini_file(data, str(ini_file), skip_confirm=True)
 
         assert ini_file.exists()
         content = ini_file.read_text(encoding="utf-8")
@@ -669,7 +673,7 @@ class TestWriteIniFile:
             }
         }
 
-        write_ini_file(data, str(ini_file))
+        write_ini_file(data, str(ini_file), skip_confirm=True)
 
         assert ini_file.exists()
         content = ini_file.read_text(encoding="utf-8")
@@ -683,7 +687,7 @@ class TestWriteIniFile:
         ini_file = tmp_path / "empty.ini"
         data = {}
 
-        write_ini_file(data, str(ini_file))
+        write_ini_file(data, str(ini_file), skip_confirm=True)
 
         assert ini_file.exists()
         content = ini_file.read_text(encoding="utf-8").strip()
@@ -695,7 +699,7 @@ class TestWriteIniFile:
         ini_file = tmp_path / "non_dict.ini"
         data = {"section1": "not_a_dict", "section2": {"key": "value"}}
 
-        write_ini_file(data, str(ini_file))
+        write_ini_file(data, str(ini_file), skip_confirm=True)
 
         assert ini_file.exists()
         content = ini_file.read_text(encoding="utf-8")
@@ -709,7 +713,9 @@ class TestWriteIniFile:
 
         with patch("builtins.open", side_effect=PermissionError("Permission denied")):
             with pytest.raises(DataError, match="Failed to write INI file"):
-                write_ini_file({"test": {"key": "value"}}, str(ini_file))
+                write_ini_file(
+                    {"test": {"key": "value"}}, str(ini_file), skip_confirm=True
+                )
 
 
 class TestValidateConfigSchema:
@@ -1145,7 +1151,7 @@ class TestConfigProcessingIntegration:
 
             with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
                 # Write then read back
-                write_yaml_file(original_data, str(yaml_file))
+                write_yaml_file(original_data, str(yaml_file), skip_confirm=True)
                 result = read_yaml_file(str(yaml_file))
 
         assert result == original_data
@@ -1167,7 +1173,7 @@ class TestConfigProcessingIntegration:
                     "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
                 ):
                     # Write then read back
-                    write_toml_file(original_data, str(toml_file))
+                    write_toml_file(original_data, str(toml_file), skip_confirm=True)
                     result = read_toml_file(str(toml_file))
 
         assert result == original_data
@@ -1181,7 +1187,7 @@ class TestConfigProcessingIntegration:
         }
 
         # Write then read back
-        write_ini_file(original_data, str(ini_file))
+        write_ini_file(original_data, str(ini_file), skip_confirm=True)
         result = read_ini_file(str(ini_file))
 
         assert result == original_data

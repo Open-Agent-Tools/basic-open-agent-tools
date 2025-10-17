@@ -166,7 +166,7 @@ class TestWriteCsvSimple:
         ]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_simple(data, str(csv_file), ",", True)
+        write_csv_simple(data, str(csv_file), ",", True, skip_confirm=True)
 
         # Read back and verify
         content = csv_file.read_text(encoding="utf-8")
@@ -183,7 +183,7 @@ class TestWriteCsvSimple:
         ]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_simple(data, str(csv_file), ",", False)
+        write_csv_simple(data, str(csv_file), ",", False, skip_confirm=True)
 
         # Read back and verify
         content = csv_file.read_text(encoding="utf-8")
@@ -198,7 +198,7 @@ class TestWriteCsvSimple:
         data = [{"name": "Alice", "age": "25"}]
         csv_file = tmp_path / "output.csv"
 
-        write_csv_simple(data, str(csv_file), ";", True)
+        write_csv_simple(data, str(csv_file), ";", True, skip_confirm=True)
 
         content = csv_file.read_text(encoding="utf-8")
         assert "name;age" in content
@@ -209,7 +209,7 @@ class TestWriteCsvSimple:
         data = []
         csv_file = tmp_path / "empty.csv"
 
-        write_csv_simple(data, str(csv_file), ",", True)
+        write_csv_simple(data, str(csv_file), ",", True, skip_confirm=True)
 
         content = csv_file.read_text(encoding="utf-8")
         assert content == ""
@@ -222,7 +222,7 @@ class TestWriteCsvSimple:
         ]
         csv_file = tmp_path / "unicode.csv"
 
-        write_csv_simple(data, str(csv_file), ",", True)
+        write_csv_simple(data, str(csv_file), ",", True, skip_confirm=True)
 
         content = csv_file.read_text(encoding="utf-8")
         assert "北京" in content
@@ -237,7 +237,7 @@ class TestWriteCsvSimple:
         ]
         csv_file = tmp_path / "mixed.csv"
 
-        write_csv_simple(data, str(csv_file), ",", True)
+        write_csv_simple(data, str(csv_file), ",", True, skip_confirm=True)
 
         # Read back to verify all keys are included
         result = read_csv_simple(str(csv_file), ",", True)
@@ -256,14 +256,16 @@ class TestWriteCsvSimple:
         csv_file = tmp_path / "output.csv"
 
         with pytest.raises(TypeError, match="data must be a list"):
-            write_csv_simple({"not": "list"}, str(csv_file), ",", True)  # type: ignore[arg-type]
+            write_csv_simple(
+                {"not": "list"}, str(csv_file), ",", True, skip_confirm=True
+            )  # type: ignore[arg-type]
 
     def test_write_csv_invalid_file_path_type(self) -> None:
         """Test error handling for invalid file_path type."""
         data = [{"name": "Alice"}]
 
         with pytest.raises(TypeError, match="file_path must be a string"):
-            write_csv_simple(data, 123, ",", True)  # type: ignore[arg-type]
+            write_csv_simple(data, 123, ",", True, skip_confirm=True)  # type: ignore[arg-type]
 
     def test_write_csv_invalid_data_items(self, tmp_path: Path) -> None:
         """Test error handling for invalid data items."""
@@ -271,7 +273,7 @@ class TestWriteCsvSimple:
         csv_file = tmp_path / "output.csv"
 
         with pytest.raises(TypeError, match="All items in data must be dictionaries"):
-            write_csv_simple(data, str(csv_file), ",", True)
+            write_csv_simple(data, str(csv_file), ",", True, skip_confirm=True)
 
     def test_write_csv_permission_error(self, tmp_path: Path) -> None:
         """Test error handling for file permission issues."""
@@ -281,7 +283,7 @@ class TestWriteCsvSimple:
         invalid_path.mkdir()
 
         with pytest.raises(DataError, match="Failed to write CSV file"):
-            write_csv_simple(data, str(invalid_path), ",", True)
+            write_csv_simple(data, str(invalid_path), ",", True, skip_confirm=True)
 
 
 class TestCsvToDictList:
@@ -791,7 +793,7 @@ class TestCsvToolsIntegration:
 
         # Step 2: Write to file
         csv_file = tmp_path / "workflow.csv"
-        write_csv_simple(original_data, str(csv_file), ",", True)
+        write_csv_simple(original_data, str(csv_file), ",", True, skip_confirm=True)
 
         # Step 3: Detect delimiter
         detected_delimiter = detect_csv_delimiter(str(csv_file), 1000)
@@ -864,7 +866,7 @@ class TestCsvToolsIntegration:
 
         # Step 1: Write Unicode data
         csv_file = tmp_path / "unicode.csv"
-        write_csv_simple(unicode_data, str(csv_file), ",", True)
+        write_csv_simple(unicode_data, str(csv_file), ",", True, skip_confirm=True)
 
         # Step 2: Read back
         read_data = read_csv_simple(str(csv_file), ",", True)

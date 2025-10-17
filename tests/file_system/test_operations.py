@@ -93,8 +93,8 @@ class TestWriteFileFromString:
         test_file = tmp_path / "new.txt"
         test_content = "Hello World!"
 
-        result = write_file_from_string(str(test_file), test_content)
-        assert result is True
+        result = write_file_from_string(str(test_file), test_content, skip_confirm=True)
+        assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == test_content
 
     def test_write_to_existing_file(self, tmp_path: Path) -> None:
@@ -103,16 +103,16 @@ class TestWriteFileFromString:
         test_file.write_text("Old content", encoding="utf-8")
         new_content = "New content"
 
-        result = write_file_from_string(str(test_file), new_content)
-        assert result is True
+        result = write_file_from_string(str(test_file), new_content, skip_confirm=True)
+        assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == new_content
 
     def test_write_empty_content(self, tmp_path: Path) -> None:
         """Test writing empty content to a file."""
         test_file = tmp_path / "empty.txt"
 
-        result = write_file_from_string(str(test_file), "")
-        assert result is True
+        result = write_file_from_string(str(test_file), "", skip_confirm=True)
+        assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == ""
 
     def test_write_unicode_content(self, tmp_path: Path) -> None:
@@ -120,8 +120,8 @@ class TestWriteFileFromString:
         test_file = tmp_path / "unicode.txt"
         test_content = "Hello 世界! 🌍"
 
-        result = write_file_from_string(str(test_file), test_content)
-        assert result is True
+        result = write_file_from_string(str(test_file), test_content, skip_confirm=True)
+        assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == test_content
 
     def test_write_creates_parent_directories(self, tmp_path: Path) -> None:
@@ -129,8 +129,8 @@ class TestWriteFileFromString:
         test_file = tmp_path / "nested" / "dir" / "test.txt"
         test_content = "Nested content"
 
-        result = write_file_from_string(str(test_file), test_content)
-        assert result is True
+        result = write_file_from_string(str(test_file), test_content, skip_confirm=True)
+        assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == test_content
 
     def test_write_file_permission_denied(self, tmp_path: Path) -> None:
@@ -141,15 +141,15 @@ class TestWriteFileFromString:
             "pathlib.Path.write_text", side_effect=PermissionError("Access denied")
         ):
             with pytest.raises(FileSystemError, match="Failed to write file"):
-                write_file_from_string(str(test_file), "content")
+                write_file_from_string(str(test_file), "content", skip_confirm=True)
 
     def test_write_multiline_content(self, tmp_path: Path) -> None:
         """Test writing multiline content to a file."""
         test_file = tmp_path / "multiline.txt"
         test_content = "Line 1\nLine 2\nLine 3"
 
-        result = write_file_from_string(str(test_file), test_content)
-        assert result is True
+        result = write_file_from_string(str(test_file), test_content, skip_confirm=True)
+        assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == test_content
 
 
@@ -164,7 +164,7 @@ class TestAppendToFile:
         test_file.write_text(initial_content, encoding="utf-8")
 
         result = append_to_file(str(test_file), append_content)
-        assert result is True
+        assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == initial_content + append_content
 
     def test_append_to_new_file(self, tmp_path: Path) -> None:
@@ -173,7 +173,7 @@ class TestAppendToFile:
         test_content = "New content"
 
         result = append_to_file(str(test_file), test_content)
-        assert result is True
+        assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == test_content
 
     def test_append_empty_content(self, tmp_path: Path) -> None:
@@ -183,7 +183,7 @@ class TestAppendToFile:
         test_file.write_text(initial_content, encoding="utf-8")
 
         result = append_to_file(str(test_file), "")
-        assert result is True
+        assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == initial_content
 
     def test_append_creates_parent_directories(self, tmp_path: Path) -> None:
@@ -192,7 +192,7 @@ class TestAppendToFile:
         test_content = "Nested content"
 
         result = append_to_file(str(test_file), test_content)
-        assert result is True
+        assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == test_content
 
     def test_append_file_permission_denied(self, tmp_path: Path) -> None:
@@ -289,8 +289,8 @@ class TestCreateDirectory:
         """Test creating a new directory."""
         new_dir = tmp_path / "newdir"
 
-        result = create_directory(str(new_dir))
-        assert result is True
+        result = create_directory(str(new_dir), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert new_dir.is_dir()
 
     def test_create_existing_directory(self, tmp_path: Path) -> None:
@@ -298,16 +298,16 @@ class TestCreateDirectory:
         existing_dir = tmp_path / "existing"
         existing_dir.mkdir()
 
-        result = create_directory(str(existing_dir))
-        assert result is True
+        result = create_directory(str(existing_dir), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert existing_dir.is_dir()
 
     def test_create_nested_directories(self, tmp_path: Path) -> None:
         """Test creating nested directories."""
         nested_dir = tmp_path / "level1" / "level2" / "level3"
 
-        result = create_directory(str(nested_dir))
-        assert result is True
+        result = create_directory(str(nested_dir), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert nested_dir.is_dir()
 
     def test_create_directory_permission_denied(self, tmp_path: Path) -> None:
@@ -316,7 +316,7 @@ class TestCreateDirectory:
 
         with patch("pathlib.Path.mkdir", side_effect=PermissionError("Access denied")):
             with pytest.raises(FileSystemError, match="Failed to create directory"):
-                create_directory(str(new_dir))
+                create_directory(str(new_dir), skip_confirm=True)
 
     def test_create_directory_over_file(self, tmp_path: Path) -> None:
         """Test creating a directory where a file already exists."""
@@ -324,7 +324,7 @@ class TestCreateDirectory:
         test_file.write_text("content")
 
         with pytest.raises(FileSystemError, match="Failed to create directory"):
-            create_directory(str(test_file))
+            create_directory(str(test_file), skip_confirm=True)
 
 
 class TestDeleteFile:
@@ -335,16 +335,16 @@ class TestDeleteFile:
         test_file = tmp_path / "test.txt"
         test_file.write_text("content")
 
-        result = delete_file(str(test_file))
-        assert result is True
+        result = delete_file(str(test_file), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert not test_file.exists()
 
     def test_delete_nonexistent_file(self, tmp_path: Path) -> None:
         """Test deleting a file that doesn't exist."""
         nonexistent_file = tmp_path / "nonexistent.txt"
 
-        result = delete_file(str(nonexistent_file))
-        assert result is True  # Should succeed with missing_ok=True
+        result = delete_file(str(nonexistent_file), skip_confirm=True)
+        assert isinstance(result, str)  # Should succeed with missing_ok=True
 
     def test_delete_file_permission_denied(self, tmp_path: Path) -> None:
         """Test deleting a file with permission denied."""
@@ -353,15 +353,15 @@ class TestDeleteFile:
 
         with patch("pathlib.Path.unlink", side_effect=PermissionError("Access denied")):
             with pytest.raises(FileSystemError, match="Failed to delete file"):
-                delete_file(str(test_file))
+                delete_file(str(test_file), skip_confirm=True)
 
     def test_delete_directory_with_delete_file(self, tmp_path: Path) -> None:
         """Test deleting a directory using delete_file function."""
         test_dir = tmp_path / "testdir"
         test_dir.mkdir()
 
-        with pytest.raises(FileSystemError, match="Failed to delete file"):
-            delete_file(str(test_dir))
+        with pytest.raises(FileSystemError, match="Path is not a file"):
+            delete_file(str(test_dir), skip_confirm=True)
 
 
 class TestDeleteDirectory:
@@ -372,8 +372,8 @@ class TestDeleteDirectory:
         test_dir = tmp_path / "empty_dir"
         test_dir.mkdir()
 
-        result = delete_directory(str(test_dir), False)
-        assert result is True
+        result = delete_directory(str(test_dir), False, skip_confirm=True)
+        assert isinstance(result, str) and result
         assert not test_dir.exists()
 
     def test_delete_non_empty_directory_non_recursive(self, tmp_path: Path) -> None:
@@ -382,8 +382,8 @@ class TestDeleteDirectory:
         test_dir.mkdir()
         (test_dir / "file.txt").write_text("content")
 
-        with pytest.raises(FileSystemError, match="Failed to delete directory"):
-            delete_directory(str(test_dir), False)
+        with pytest.raises(FileSystemError, match="Directory not empty"):
+            delete_directory(str(test_dir), False, skip_confirm=True)
 
     def test_delete_non_empty_directory_recursive(self, tmp_path: Path) -> None:
         """Test deleting a non-empty directory recursively."""
@@ -393,16 +393,16 @@ class TestDeleteDirectory:
         (test_dir / "subdir").mkdir()
         (test_dir / "subdir" / "nested.txt").write_text("content")
 
-        result = delete_directory(str(test_dir), True)
-        assert result is True
+        result = delete_directory(str(test_dir), True, skip_confirm=True)
+        assert isinstance(result, str) and result
         assert not test_dir.exists()
 
     def test_delete_nonexistent_directory(self, tmp_path: Path) -> None:
         """Test deleting a directory that doesn't exist."""
         nonexistent_dir = tmp_path / "nonexistent"
 
-        result = delete_directory(str(nonexistent_dir), True)
-        assert result is True  # Should succeed if directory doesn't exist
+        result = delete_directory(str(nonexistent_dir), True, skip_confirm=True)
+        assert isinstance(result, str)  # Should succeed if directory doesn't exist
 
     def test_delete_directory_permission_denied(self, tmp_path: Path) -> None:
         """Test deleting a directory with permission denied."""
@@ -411,7 +411,7 @@ class TestDeleteDirectory:
 
         with patch("pathlib.Path.rmdir", side_effect=PermissionError("Access denied")):
             with pytest.raises(FileSystemError, match="Failed to delete directory"):
-                delete_directory(str(test_dir), False)
+                delete_directory(str(test_dir), False, skip_confirm=True)
 
 
 class TestMoveFile:
@@ -424,8 +424,8 @@ class TestMoveFile:
         test_content = "Test content"
         source_file.write_text(test_content)
 
-        result = move_file(str(source_file), str(dest_file))
-        assert result is True
+        result = move_file(str(source_file), str(dest_file), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert not source_file.exists()
         assert dest_file.read_text() == test_content
 
@@ -437,8 +437,8 @@ class TestMoveFile:
         test_content = "Test content"
         source_file.write_text(test_content)
 
-        result = move_file(str(source_file), str(dest_file))
-        assert result is True
+        result = move_file(str(source_file), str(dest_file), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert not source_file.exists()
         assert dest_file.read_text() == test_content
 
@@ -449,8 +449,8 @@ class TestMoveFile:
         source_dir.mkdir()
         (source_dir / "file.txt").write_text("content")
 
-        result = move_file(str(source_dir), str(dest_dir))
-        assert result is True
+        result = move_file(str(source_dir), str(dest_dir), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert not source_dir.exists()
         assert (dest_dir / "file.txt").read_text() == "content"
 
@@ -460,7 +460,7 @@ class TestMoveFile:
         dest_file = tmp_path / "destination.txt"
 
         with pytest.raises(FileSystemError, match="Source path not found"):
-            move_file(str(nonexistent_file), str(dest_file))
+            move_file(str(nonexistent_file), str(dest_file), skip_confirm=True)
 
     def test_move_creates_destination_directory(self, tmp_path: Path) -> None:
         """Test moving a file to a destination with non-existent parent directories."""
@@ -469,8 +469,8 @@ class TestMoveFile:
         test_content = "Test content"
         source_file.write_text(test_content)
 
-        result = move_file(str(source_file), str(dest_file))
-        assert result is True
+        result = move_file(str(source_file), str(dest_file), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert not source_file.exists()
         assert dest_file.read_text() == test_content
 
@@ -482,7 +482,7 @@ class TestMoveFile:
 
         with patch("shutil.move", side_effect=PermissionError("Access denied")):
             with pytest.raises(FileSystemError, match="Failed to move"):
-                move_file(str(source_file), str(dest_file))
+                move_file(str(source_file), str(dest_file), skip_confirm=True)
 
 
 class TestCopyFile:
@@ -495,8 +495,8 @@ class TestCopyFile:
         test_content = "Test content"
         source_file.write_text(test_content)
 
-        result = copy_file(str(source_file), str(dest_file))
-        assert result is True
+        result = copy_file(str(source_file), str(dest_file), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert source_file.read_text() == test_content  # Original still exists
         assert dest_file.read_text() == test_content
 
@@ -509,8 +509,8 @@ class TestCopyFile:
         (source_dir / "subdir").mkdir()
         (source_dir / "subdir" / "nested.txt").write_text("nested")
 
-        result = copy_file(str(source_dir), str(dest_dir))
-        assert result is True
+        result = copy_file(str(source_dir), str(dest_dir), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert source_dir.exists()  # Original still exists
         assert (dest_dir / "file.txt").read_text() == "content"
         assert (dest_dir / "subdir" / "nested.txt").read_text() == "nested"
@@ -521,7 +521,7 @@ class TestCopyFile:
         dest_file = tmp_path / "destination.txt"
 
         with pytest.raises(FileSystemError, match="Source path not found"):
-            copy_file(str(nonexistent_file), str(dest_file))
+            copy_file(str(nonexistent_file), str(dest_file), skip_confirm=True)
 
     def test_copy_creates_destination_directory(self, tmp_path: Path) -> None:
         """Test copying a file to a destination with non-existent parent directories."""
@@ -530,8 +530,8 @@ class TestCopyFile:
         test_content = "Test content"
         source_file.write_text(test_content)
 
-        result = copy_file(str(source_file), str(dest_file))
-        assert result is True
+        result = copy_file(str(source_file), str(dest_file), skip_confirm=True)
+        assert isinstance(result, str) and result
         assert source_file.read_text() == test_content  # Original still exists
         assert dest_file.read_text() == test_content
 
@@ -543,7 +543,7 @@ class TestCopyFile:
 
         with patch("shutil.copy2", side_effect=PermissionError("Access denied")):
             with pytest.raises(FileSystemError, match="Failed to copy"):
-                copy_file(str(source_file), str(dest_file))
+                copy_file(str(source_file), str(dest_file), skip_confirm=True)
 
 
 class TestReplaceInFile:
@@ -556,7 +556,7 @@ class TestReplaceInFile:
         test_file.write_text(original_content)
 
         result = replace_in_file(str(test_file), "world", "universe", 1)
-        assert result is True
+        assert isinstance(result, str) and result
         assert test_file.read_text() == "Hello universe! This is a test."
 
     def test_replace_all_occurrences(self, tmp_path: Path) -> None:
@@ -566,7 +566,7 @@ class TestReplaceInFile:
         test_file.write_text(original_content)
 
         result = replace_in_file(str(test_file), "foo", "bar", -1)
-        assert result is True
+        assert isinstance(result, str) and result
         assert test_file.read_text() == "bar bar bar baz bar"
 
     def test_replace_limited_count(self, tmp_path: Path) -> None:
@@ -576,7 +576,7 @@ class TestReplaceInFile:
         test_file.write_text(original_content)
 
         result = replace_in_file(str(test_file), "foo", "bar", 2)
-        assert result is True
+        assert isinstance(result, str) and result
         assert test_file.read_text() == "bar bar foo foo"
 
     def test_replace_no_matches(self, tmp_path: Path) -> None:
@@ -586,7 +586,7 @@ class TestReplaceInFile:
         test_file.write_text(original_content)
 
         result = replace_in_file(str(test_file), "xyz", "abc", 1)
-        assert result is True
+        assert isinstance(result, str) and result
         assert test_file.read_text() == original_content  # Unchanged
 
     def test_replace_empty_old_text(self, tmp_path: Path) -> None:
@@ -611,7 +611,7 @@ class TestReplaceInFile:
         test_file.write_text(original_content)
 
         result = replace_in_file(str(test_file), "Old text", "New text", 1)
-        assert result is True
+        assert isinstance(result, str) and result
         assert test_file.read_text() == "Line 1\nNew text\nLine 3"
 
     def test_replace_file_permission_denied(self, tmp_path: Path) -> None:
@@ -636,7 +636,7 @@ class TestInsertAtLine:
         test_file.write_text(original_content)
 
         result = insert_at_line(str(test_file), 1, "New first line")
-        assert result is True
+        assert isinstance(result, str) and result
         expected = "New first line\nLine 1\nLine 2\nLine 3"
         assert test_file.read_text() == expected
 
@@ -647,7 +647,7 @@ class TestInsertAtLine:
         test_file.write_text(original_content)
 
         result = insert_at_line(str(test_file), 2, "Inserted line")
-        assert result is True
+        assert isinstance(result, str) and result
         expected = "Line 1\nInserted line\nLine 2\nLine 3"
         assert test_file.read_text() == expected
 
@@ -658,7 +658,7 @@ class TestInsertAtLine:
         test_file.write_text(original_content)
 
         result = insert_at_line(str(test_file), 3, "New last line")
-        assert result is True
+        assert isinstance(result, str) and result
         expected = "Line 1\nLine 2New last line\n"
         assert test_file.read_text() == expected
 
@@ -669,7 +669,7 @@ class TestInsertAtLine:
         test_file.write_text(original_content)
 
         result = insert_at_line(str(test_file), 10, "Far beyond")
-        assert result is True
+        assert isinstance(result, str) and result
         expected = "Line 1\nLine 2Far beyond\n"
         assert test_file.read_text() == expected
 
@@ -679,7 +679,7 @@ class TestInsertAtLine:
         test_file.write_text("")
 
         result = insert_at_line(str(test_file), 1, "First line")
-        assert result is True
+        assert isinstance(result, str) and result
         assert test_file.read_text() == "First line\n"
 
     def test_insert_content_with_newline(self, tmp_path: Path) -> None:
@@ -689,7 +689,7 @@ class TestInsertAtLine:
         test_file.write_text(original_content)
 
         result = insert_at_line(str(test_file), 2, "Inserted line\n")
-        assert result is True
+        assert isinstance(result, str) and result
         expected = "Line 1\nInserted line\nLine 2"
         assert test_file.read_text() == expected
 
@@ -734,10 +734,12 @@ class TestOperationsIntegration:
         test_file = tmp_path / "workflow.txt"
         content = "Hello World!"
 
-        write_result = write_file_from_string(str(test_file), content)
+        write_result = write_file_from_string(
+            str(test_file), content, skip_confirm=True
+        )
         read_result = read_file_to_string(str(test_file))
 
-        assert write_result is True
+        assert isinstance(write_result, str) and write_result
         assert read_result == content
 
     def test_copy_modify_workflow(self, tmp_path: Path) -> None:
@@ -748,12 +750,12 @@ class TestOperationsIntegration:
         source_file.write_text(original_content)
 
         # Copy file
-        copy_result = copy_file(str(source_file), str(dest_file))
-        assert copy_result is True
+        copy_result = copy_file(str(source_file), str(dest_file), skip_confirm=True)
+        assert isinstance(copy_result, str) and copy_result
 
         # Modify copy
         replace_result = replace_in_file(str(dest_file), "Original", "Modified", 1)
-        assert replace_result is True
+        assert isinstance(replace_result, str) and replace_result
 
         # Verify both files
         assert source_file.read_text() == original_content
@@ -764,8 +766,8 @@ class TestOperationsIntegration:
         test_dir = tmp_path / "test_workflow"
 
         # Create directory
-        create_result = create_directory(str(test_dir))
-        assert create_result is True
+        create_result = create_directory(str(test_dir), skip_confirm=True)
+        assert isinstance(create_result, str) and create_result
 
         # Add some files
         (test_dir / "file1.txt").write_text("content1")
@@ -776,6 +778,6 @@ class TestOperationsIntegration:
         assert sorted(contents) == ["file1.txt", "file2.txt"]
 
         # Delete directory
-        delete_result = delete_directory(str(test_dir), True)
-        assert delete_result is True
+        delete_result = delete_directory(str(test_dir), True, skip_confirm=True)
+        assert isinstance(delete_result, str) and delete_result
         assert not test_dir.exists()

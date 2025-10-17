@@ -20,46 +20,62 @@ class TestExecuteShellCommand:
         with pytest.raises(
             BasicAgentToolsError, match="Command must be a non-empty string"
         ):
-            execute_shell_command("")
+            execute_shell_command(
+                "", timeout=30, capture_output=True, working_directory=""
+            )
 
         with pytest.raises(
             BasicAgentToolsError, match="Command must be a non-empty string"
         ):
-            execute_shell_command(None)
+            execute_shell_command(
+                None, timeout=30, capture_output=True, working_directory=""
+            )
 
         with pytest.raises(
             BasicAgentToolsError, match="Command must be a non-empty string"
         ):
-            execute_shell_command(123)
+            execute_shell_command(
+                123, timeout=30, capture_output=True, working_directory=""
+            )
 
     def test_invalid_timeout(self):
         """Test error handling for invalid timeout values."""
         with pytest.raises(
             BasicAgentToolsError, match="Timeout must be a positive integer"
         ):
-            execute_shell_command("echo test", timeout=0)
+            execute_shell_command(
+                "echo test", timeout=0, capture_output=True, working_directory=""
+            )
 
         with pytest.raises(
             BasicAgentToolsError, match="Timeout must be a positive integer"
         ):
-            execute_shell_command("echo test", timeout=-1)
+            execute_shell_command(
+                "echo test", timeout=-1, capture_output=True, working_directory=""
+            )
 
         with pytest.raises(
             BasicAgentToolsError, match="Timeout must be a positive integer"
         ):
-            execute_shell_command("echo test", timeout=301)
+            execute_shell_command(
+                "echo test", timeout=301, capture_output=True, working_directory=""
+            )
 
         with pytest.raises(
             BasicAgentToolsError, match="Timeout must be a positive integer"
         ):
-            execute_shell_command("echo test", timeout="30")
+            execute_shell_command(
+                "echo test", timeout="30", capture_output=True, working_directory=""
+            )
 
     def test_invalid_working_directory(self):
         """Test error handling for invalid working directory."""
         with pytest.raises(
             BasicAgentToolsError, match="Working directory must be a string"
         ):
-            execute_shell_command("echo test", working_directory=123)
+            execute_shell_command(
+                "echo test", timeout=30, capture_output=True, working_directory=123
+            )
 
     @patch("subprocess.run")
     def test_successful_command_execution(self, mock_run):
@@ -71,7 +87,9 @@ class TestExecuteShellCommand:
         mock_result.stderr = ""
         mock_run.return_value = mock_result
 
-        result = execute_shell_command("echo Hello World")
+        result = execute_shell_command(
+            "echo Hello World", timeout=30, capture_output=True, working_directory=""
+        )
 
         assert result["status"] == "success"
         assert result["return_code"] == 0
@@ -90,7 +108,9 @@ class TestExecuteShellCommand:
         mock_result.stderr = "Command failed"
         mock_run.return_value = mock_result
 
-        result = execute_shell_command("false")
+        result = execute_shell_command(
+            "false", timeout=30, capture_output=True, working_directory=""
+        )
 
         assert result["status"] == "error"
         assert result["return_code"] == 1
@@ -106,7 +126,9 @@ class TestExecuteShellCommand:
         with pytest.raises(
             BasicAgentToolsError, match="Command timed out after 5 seconds"
         ):
-            execute_shell_command("sleep 10", timeout=5)
+            execute_shell_command(
+                "sleep 10", timeout=5, capture_output=True, working_directory=""
+            )
 
     @patch("subprocess.run")
     def test_platform_specific_shell_windows(self, mock_run):
@@ -118,7 +140,9 @@ class TestExecuteShellCommand:
         mock_run.return_value = mock_result
 
         with patch("platform.system", return_value="Windows"):
-            execute_shell_command("dir")
+            execute_shell_command(
+                "dir", timeout=30, capture_output=True, working_directory=""
+            )
 
             # Check that cmd.exe was used
             call_args = mock_run.call_args[0][0]
@@ -134,7 +158,9 @@ class TestExecuteShellCommand:
         mock_run.return_value = mock_result
 
         with patch("platform.system", return_value="Linux"):
-            execute_shell_command("ls")
+            execute_shell_command(
+                "ls", timeout=30, capture_output=True, working_directory=""
+            )
 
             # Check that sh was used
             call_args = mock_run.call_args[0][0]
@@ -149,7 +175,9 @@ class TestExecuteShellCommand:
         mock_result.stderr = ""
         mock_run.return_value = mock_result
 
-        execute_shell_command("pwd", working_directory="/tmp")
+        execute_shell_command(
+            "pwd", timeout=30, capture_output=True, working_directory="/tmp"
+        )
 
         # Check that cwd parameter was passed
         call_kwargs = mock_run.call_args[1]
@@ -164,7 +192,7 @@ class TestRunBash:
         with pytest.raises(
             BasicAgentToolsError, match="Command must be a non-empty string"
         ):
-            run_bash("")
+            run_bash("", timeout=30, capture_output=True, working_directory="")
 
     def test_windows_platform_error(self):
         """Test error when trying to use bash on Windows."""
@@ -172,7 +200,7 @@ class TestRunBash:
             with pytest.raises(
                 BasicAgentToolsError, match="Bash execution not available on Windows"
             ):
-                run_bash("ls")
+                run_bash("ls", timeout=30, capture_output=True, working_directory="")
 
     @patch("subprocess.run")
     def test_successful_bash_execution(self, mock_run):
@@ -184,7 +212,12 @@ class TestRunBash:
         mock_run.return_value = mock_result
 
         with patch("platform.system", return_value="Linux"):
-            result = run_bash("echo bash output")
+            result = run_bash(
+                "echo bash output",
+                timeout=30,
+                capture_output=True,
+                working_directory="",
+            )
 
             assert result["status"] == "success"
             assert result["return_code"] == 0
@@ -202,7 +235,9 @@ class TestRunBash:
 
         with patch("platform.system", return_value="Linux"):
             with pytest.raises(BasicAgentToolsError, match="Bash not found"):
-                run_bash("echo test")
+                run_bash(
+                    "echo test", timeout=30, capture_output=True, working_directory=""
+                )
 
 
 class TestRunPowershell:
@@ -213,7 +248,7 @@ class TestRunPowershell:
         with pytest.raises(
             BasicAgentToolsError, match="Command must be a non-empty string"
         ):
-            run_powershell("")
+            run_powershell("", timeout=30, capture_output=True, working_directory="")
 
     def test_non_windows_platform_error(self):
         """Test error when trying to use PowerShell on non-Windows."""
@@ -222,7 +257,9 @@ class TestRunPowershell:
                 BasicAgentToolsError,
                 match="PowerShell execution only available on Windows",
             ):
-                run_powershell("Get-Process")
+                run_powershell(
+                    "Get-Process", timeout=30, capture_output=True, working_directory=""
+                )
 
     @patch("subprocess.run")
     def test_successful_powershell_execution(self, mock_run):
@@ -234,7 +271,9 @@ class TestRunPowershell:
         mock_run.return_value = mock_result
 
         with patch("platform.system", return_value="Windows"):
-            result = run_powershell("Get-Date")
+            result = run_powershell(
+                "Get-Date", timeout=30, capture_output=True, working_directory=""
+            )
 
             assert result["status"] == "success"
             assert result["return_code"] == 0
@@ -258,4 +297,6 @@ class TestRunPowershell:
 
         with patch("platform.system", return_value="Windows"):
             with pytest.raises(BasicAgentToolsError, match="PowerShell not found"):
-                run_powershell("Get-Process")
+                run_powershell(
+                    "Get-Process", timeout=30, capture_output=True, working_directory=""
+                )

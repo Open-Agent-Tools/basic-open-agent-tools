@@ -67,10 +67,10 @@ def safe_json_deserialize(json_str: str) -> dict:
         >>> safe_json_deserialize('[1, 2, 3]')
         [1, 2, 3]
     """
-    logger.debug(f"Deserializing JSON string ({len(json_str)} characters)")
-
     if not isinstance(json_str, str):
         raise TypeError("Input must be a string")
+
+    logger.debug(f"Deserializing JSON string ({len(json_str)} characters)")
 
     try:
         result = json.loads(json_str)
@@ -106,11 +106,11 @@ def validate_json_string(json_str: str) -> bool:
         >>> validate_json_string('{"invalid": }')
         False
     """
-    logger.debug(f"Validating JSON string ({len(json_str)} characters)")
-
     if not isinstance(json_str, str):
         logger.debug("[DATA] JSON validation failed: not a string")  # type: ignore[unreachable]
         return False  # False positive - mypy thinks isinstance always narrows, but runtime can differ
+
+    logger.debug(f"Validating JSON string ({len(json_str)} characters)")
 
     try:
         json.loads(json_str)
