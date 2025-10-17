@@ -167,33 +167,37 @@ os.environ['BYPASS_TOOL_CONSENT'] = 'true'
 ```python
 import basic_open_agent_tools as boat
 
-# Category loaders
+# Master loader
+boat.load_all_tools()  # Load all 326 functions
+
+# Category loaders (21 total)
 boat.load_all_filesystem_tools()
 boat.load_all_text_tools()
 boat.load_all_data_tools()
 boat.load_all_datetime_tools()
-boat.load_all_network_tools()
-boat.load_all_utilities_tools()
-boat.load_all_system_tools()
-boat.load_all_crypto_tools()
-boat.load_all_pdf_tools()
-boat.load_all_archive_tools()
-boat.load_all_logging_tools()
-boat.load_all_diagrams_tools()
 boat.load_all_excel_tools()
+boat.load_all_xml_tools()
+boat.load_all_pdf_tools()
+boat.load_all_word_tools()
 boat.load_all_html_tools()
-boat.load_all_image_tools()
 boat.load_all_markdown_tools()
 boat.load_all_powerpoint_tools()
+boat.load_all_diagrams_tools()
+boat.load_all_system_tools()
+boat.load_all_network_tools()
+boat.load_all_utilities_tools()
+boat.load_all_crypto_tools()
+boat.load_all_color_tools()
+boat.load_all_image_tools()
+boat.load_all_archive_tools()
 boat.load_all_todo_tools()
-boat.load_all_word_tools()
-boat.load_all_xml_tools()
+boat.load_all_logging_tools()
 
-# Specialized data loaders
-boat.load_data_config_tools()  # YAML, TOML, INI
-boat.load_data_csv_tools()     # CSV operations
+# Specialized data loaders (4 total)
 boat.load_data_json_tools()    # JSON operations
+boat.load_data_csv_tools()     # CSV operations
 boat.load_data_validation_tools()  # Data validation
+boat.load_data_config_tools()  # YAML, TOML, INI
 
 # Utility functions
 boat.merge_tool_lists(*tool_lists)  # Merge and deduplicate
