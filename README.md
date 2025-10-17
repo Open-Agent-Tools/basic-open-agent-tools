@@ -4,53 +4,19 @@ An open foundational toolkit providing essential components for building AI agen
 
 ## 🆕 What's New in v0.13.10
 
-✅ **Test Improvements**: Fixed 8 test failures related to missing required parameters in network, system, and text modules
+🐛 **Bug Fixes**: Improved reliability in text processing and system operations
 
-📊 **Coverage Enhancements**: Improved test coverage across 4 modules (text/processing, network/dns, system/environment, system/processes)
+📦 **Stability**: Enhanced parameter validation across network, system, and text modules
 
-🐛 **Bug Fixes**: Fixed validation order in text processing to check types before logging operations
+### Recent Updates
 
-### Previous Release (v0.13.7)
+**v0.13.6** - Enhanced confirmation dialogs with content previews for better decision-making
 
-🧹 **Decorator Cleanup**: Complete deprecation of `@adk_tool` decorator across all 351 functions - using `@strands_tool` only for cleaner codebase
+**v0.13.3** - Added structured logging with `BOAT_LOG_LEVEL` environment variable control
 
-📝 **Documentation Updates**: Enhanced agent prompt and CLAUDE.md with accurate decorator architecture (Google ADK uses signatures, not decorators)
+**v0.13.2** - Smart confirmation system that adapts to interactive, agent, or automation contexts
 
-✅ **Quality Improvements**: Updated all TODO files to v0.13.7 with decorator deprecation notes
-
-### Previous Release (v0.13.6)
-
-💬 **Enhanced Confirmation Previews**: Confirmation dialogs now show meaningful previews of new content being created instead of just old file sizes
-
-📊 **Better User Feedback**: File writes show content previews, CSV writes show row/column counts with sample data, archive operations show file lists
-
-🎯 **Comprehensive Coverage**: All 22 confirmation operations now provide context-aware previews for better decision making
-
-### Previous Release (v0.13.3)
-
-🔍 **Structured Logging**: Migrated 157 print statements to Python logging framework with `BOAT_LOG_LEVEL` environment variable control
-
-🛡️ **Enhanced Error Handling**: Replaced all assert statements with explicit type checking and descriptive error messages
-
-🧹 **Code Quality**: Improved type safety and debugging with proper exception raising patterns
-
-### Previous Release (v0.13.2)
-
-🎛️ **Enhanced Confirmation System**: Hybrid confirmation mode intelligently adapts to execution context (agent vs interactive vs bypass)
-
-🤖 **Agent-Aware Operations**: File operations now raise structured `CONFIRMATION_REQUIRED` errors that LLM agents can interpret and act on
-
-✅ **Smart Defaults**: `skip_confirm=False` safely handles both human interactions (prompts) and agent workflows (structured errors)
-
-🔧 **Test Coverage**: Comprehensive test suite (27 tests) for confirmation system with 100% coverage
-
-### Previous Release (v0.13.1)
-
-🔀 **Module Migration**: Code analysis, git tools, profiling, and static analysis modules (39 functions) migrated to **[coding-open-agent-tools](https://github.com/open-agent-tools/coding-open-agent-tools)**
-
-🎯 **Refocused Scope**: 151 foundational functions across 20 modules
-
-📦 **Sibling Package**: For coding-specific tools, see **[coding-open-agent-tools](https://github.com/open-agent-tools/coding-open-agent-tools)**
+**v0.13.1** - Focused toolkit scope; coding tools migrated to [coding-open-agent-tools](https://github.com/open-agent-tools/coding-open-agent-tools)
 
 ## Installation
 
