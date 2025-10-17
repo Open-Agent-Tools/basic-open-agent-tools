@@ -2,7 +2,15 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions.
 
-## 🆕 What's New in v0.13.7
+## 🆕 What's New in v0.13.10
+
+✅ **Test Improvements**: Fixed 8 test failures related to missing required parameters in network, system, and text modules
+
+📊 **Coverage Enhancements**: Improved test coverage across 4 modules (text/processing, network/dns, system/environment, system/processes)
+
+🐛 **Bug Fixes**: Fixed validation order in text processing to check types before logging operations
+
+### Previous Release (v0.13.7)
 
 🧹 **Decorator Cleanup**: Complete deprecation of `@adk_tool` decorator across all 351 functions - using `@strands_tool` only for cleaner codebase
 
@@ -77,7 +85,7 @@ pip install basic-open-agent-tools[image]       # Image processing
 import basic_open_agent_tools as boat
 
 # Load all tools
-all_tools = boat.load_all_tools()  # 151 functions
+all_tools = boat.load_all_tools()  # 326 functions
 
 # Or load specific categories
 fs_tools = boat.load_all_filesystem_tools()
@@ -92,37 +100,41 @@ from google.adk.agents import Agent
 agent = Agent(tools=all_tools)
 ```
 
-## Available Modules (20 total, 151 functions)
+## Available Modules
 
-### Core Operations
-- **file_system** (18 functions) - File and directory operations
-- **text** (10 functions) - Text processing and formatting
-- **data** (23 functions) - JSON, CSV, YAML, TOML, INI processing
-- **datetime** (40 functions) - Date/time operations and calculations
+**21 modules** with **326 total functions** — all with `@strands_tool` decorator and Google ADK compatible signatures.
 
-### Document Processing
-- **pdf** (8 functions) - PDF reading, creation, manipulation
-- **word** - Word document operations
-- **excel** - Excel spreadsheet operations
-- **powerpoint** - PowerPoint presentations
-- **markdown** - Markdown processing
-- **html** - HTML processing
-- **xml** - XML parsing and validation
+### 📊 Complete Module Breakdown
 
-### System & Network
-- **system** (19 functions) - Shell commands, process management, system info
-- **network** (4 functions) - HTTP client, DNS, port checking
-- **utilities** (8 functions) - Debugging, timing, code validation
-
-### Security & Data
-- **crypto** (14 functions) - Hashing, encoding, random generation
-- **archive** (9 functions) - ZIP, TAR, GZIP, BZIP2, XZ compression
-
-### Utilities
-- **logging** (5 functions) - Structured logging and rotation
-- **todo** - Task management
-- **diagrams** - Diagram generation
-- **image** - Image processing
+| Module | Functions | Description |
+|--------|-----------|-------------|
+| **Core Operations** | | |
+| `file_system` | 19 | File and directory operations, tree generation |
+| `text` | 10 | Text processing, case conversion, formatting |
+| `data` | 23 | JSON, CSV, YAML, TOML processing and validation |
+| `datetime` | 40 | Date/time operations, timezones, business days |
+| **Document Processing** | | |
+| `excel` | 24 | Spreadsheet reading, writing, formatting, charts |
+| `xml` | 24 | XML parsing, authoring, validation, transformation |
+| `pdf` | 20 | PDF creation, reading, manipulation |
+| `word` | 18 | Word document operations and formatting |
+| `html` | 17 | HTML generation and parsing |
+| `diagrams` | 16 | Mermaid and PlantUML diagram generation |
+| `markdown` | 12 | Markdown generation and parsing |
+| `powerpoint` | 10 | PowerPoint presentation operations |
+| **System & Network** | | |
+| `system` | 19 | Shell commands, process management, environment |
+| `network` | 4 | HTTP client, DNS lookup, port checking |
+| `utilities` | 8 | Debugging, timing, performance tools |
+| **Security & Data** | | |
+| `crypto` | 14 | Hashing, encoding, UUID/token generation |
+| `color` | 14 | Color conversion, palette generation, analysis |
+| `image` | 12 | Image manipulation and metadata reading |
+| `archive` | 9 | ZIP, TAR, GZIP, BZIP2, XZ compression |
+| **Task Management** | | |
+| `todo` | 8 | Task creation, validation, management |
+| `logging` | 5 | Structured logging and log rotation |
+| **TOTAL** | **326** | |
 
 ## Key Features
 
