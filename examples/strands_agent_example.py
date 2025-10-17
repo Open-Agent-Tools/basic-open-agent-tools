@@ -5,10 +5,10 @@ Requires: pip install strands anthropic basic-open-agent-tools[all]
 """
 
 import os
-from pathlib import Path
+
+from dotenv import load_dotenv
 from strands import Agent
 from strands.models.anthropic import AnthropicModel
-from dotenv import load_dotenv
 
 import basic_open_agent_tools as boat
 
@@ -36,31 +36,33 @@ def create_basic_tools_agent():
     # agent_tools = boat.load_all_tools()
 
     # Option 2: Load specific categories
-    file_tools = boat.load_all_filesystem_tools()      # File operations
-    text_tools = boat.load_all_text_tools()           # Text processing
-    data_tools = boat.load_all_data_tools()           # JSON, CSV, config
-    datetime_tools = boat.load_all_datetime_tools()   # Date/time ops
-    network_tools = boat.load_all_network_tools()     # HTTP client
-    utilities_tools = boat.load_all_utilities_tools() # Timing, debugging
-    crypto_tools = boat.load_all_crypto_tools()       # Hashing, encoding
+    file_tools = boat.load_all_filesystem_tools()  # File operations
+    text_tools = boat.load_all_text_tools()  # Text processing
+    data_tools = boat.load_all_data_tools()  # JSON, CSV, config
+    datetime_tools = boat.load_all_datetime_tools()  # Date/time ops
+    network_tools = boat.load_all_network_tools()  # HTTP client
+    utilities_tools = boat.load_all_utilities_tools()  # Timing, debugging
+    crypto_tools = boat.load_all_crypto_tools()  # Hashing, encoding
 
     # Optional: Load system tools if available
     try:
-        system_tools = boat.load_all_system_tools()   # Requires psutil
+        system_tools = boat.load_all_system_tools()  # Requires psutil
     except ImportError:
         system_tools = []
-        print("⚠️  System tools not available (install with: pip install basic-open-agent-tools[system])")
+        print(
+            "⚠️  System tools not available (install with: pip install basic-open-agent-tools[system])"
+        )
 
     # Merge selected tools (automatically deduplicates)
     agent_tools = boat.merge_tool_lists(
         file_tools,
         text_tools,
-        data_tools[:15],     # Limit to prevent too many tools
-        datetime_tools[:15], # Limit datetime tools
+        data_tools[:15],  # Limit to prevent too many tools
+        datetime_tools[:15],  # Limit datetime tools
         network_tools,
         utilities_tools,
-        crypto_tools[:10],   # Limit crypto tools
-        system_tools[:10]    # Limit system tools
+        crypto_tools[:10],  # Limit crypto tools
+        system_tools[:10],  # Limit system tools
     )
 
     # Create the Strands agent
@@ -83,7 +85,7 @@ def create_basic_tools_agent():
             "comprehensive local operations capabilities. Use tools appropriately and efficiently. "
             "Always be helpful and explain what you're doing when using tools."
         ),
-        tools=agent_tools
+        tools=agent_tools,
     )
 
     return agent
@@ -97,7 +99,7 @@ def create_specialized_agents():
         model=AnthropicModel(
             client_args={"api_key": os.getenv("ANTHROPIC_API_KEY")},
             model_id="claude-sonnet-4-20250514",
-            max_tokens=512
+            max_tokens=512,
         ),
         name="FileOps Agent",
         description="Specialized file operations agent",
@@ -105,7 +107,7 @@ def create_specialized_agents():
             "You are a file operations specialist. You excel at reading, writing, "
             "organizing, and managing files and directories efficiently."
         ),
-        tools=boat.load_all_filesystem_tools()
+        tools=boat.load_all_filesystem_tools(),
     )
 
     # Data Processing Agent
@@ -113,7 +115,7 @@ def create_specialized_agents():
         model=AnthropicModel(
             client_args={"api_key": os.getenv("ANTHROPIC_API_KEY")},
             model_id="claude-sonnet-4-20250514",
-            max_tokens=512
+            max_tokens=512,
         ),
         name="DataOps Agent",
         description="Specialized data processing agent",
@@ -123,8 +125,8 @@ def create_specialized_agents():
         ),
         tools=boat.merge_tool_lists(
             boat.load_all_data_tools(),
-            boat.load_all_text_tools()  # Text processing helps with data cleaning
-        )
+            boat.load_all_text_tools(),  # Text processing helps with data cleaning
+        ),
     )
 
     return file_agent, data_agent
@@ -156,14 +158,16 @@ def main():
             "Hello! Please introduce yourself and list your main capabilities.",
             "What file operations can you perform?",
             "How can you help with data processing tasks?",
-            "What text processing capabilities do you have?"
+            "What text processing capabilities do you have?",
         ]
 
         for question in test_questions:
             print(f"\n❓ Question: {question}")
             try:
                 response = agent(question)
-                print(f"🤖 Response: {response[:200]}{'...' if len(response) > 200 else ''}")
+                print(
+                    f"🤖 Response: {response[:200]}{'...' if len(response) > 200 else ''}"
+                )
             except Exception as e:
                 print(f"❌ Error: {e}")
                 break
@@ -172,8 +176,12 @@ def main():
         print(f"❌ Error creating agent: {e}")
         print("\n🔧 Troubleshooting:")
         print("1. Make sure you have ANTHROPIC_API_KEY in your .env file")
-        print("2. Install required packages: pip install strands anthropic python-dotenv")
-        print("3. Install basic-open-agent-tools: pip install basic-open-agent-tools[all]")
+        print(
+            "2. Install required packages: pip install strands anthropic python-dotenv"
+        )
+        print(
+            "3. Install basic-open-agent-tools: pip install basic-open-agent-tools[all]"
+        )
 
 
 if __name__ == "__main__":

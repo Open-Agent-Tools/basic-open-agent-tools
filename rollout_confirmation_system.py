@@ -20,7 +20,6 @@ Modules to update (27 remaining functions across 12 modules):
 """
 
 import subprocess
-import sys
 from pathlib import Path
 
 # Modules with skip_confirm functions (count)

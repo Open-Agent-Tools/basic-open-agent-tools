@@ -1,6 +1,6 @@
 """ADK evaluation test for tree generation agent.
 
-This test demonstrates the simplest possible ADK evaluation using the 
+This test demonstrates the simplest possible ADK evaluation using the
 basic_open_agent_tools file system utilities.
 """
 

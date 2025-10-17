@@ -1,9 +1,10 @@
 """Agent module for tree generation."""
 
-import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 from google.adk.agents import Agent
+
 from basic_open_agent_tools.file_system.tree import generate_directory_tree
 
 # Load environment variables for API keys
