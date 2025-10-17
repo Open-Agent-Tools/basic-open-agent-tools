@@ -97,7 +97,7 @@ class TestListRunningProcesses:
         """Test error when psutil is not available."""
         with patch("basic_open_agent_tools.system.processes.HAS_PSUTIL", False):
             with pytest.raises(BasicAgentToolsError, match="psutil package required"):
-                list_running_processes()
+                list_running_processes(limit=10)
 
     @patch("basic_open_agent_tools.system.processes.HAS_PSUTIL", True)
     @patch("basic_open_agent_tools.system.processes.psutil")

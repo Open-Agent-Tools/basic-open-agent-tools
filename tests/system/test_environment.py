@@ -175,29 +175,29 @@ class TestListEnvVars:
         with pytest.raises(
             BasicAgentToolsError, match="Filter pattern must be a string or None"
         ):
-            list_env_vars(filter_pattern=123)
+            list_env_vars(filter_pattern=123, limit=10)  # type: ignore[arg-type]
 
     def test_invalid_limit(self):
         """Test error handling for invalid limit values."""
         with pytest.raises(
             BasicAgentToolsError, match="Limit must be an integer between 1 and 200"
         ):
-            list_env_vars(limit=0)
+            list_env_vars(filter_pattern="", limit=0)
 
         with pytest.raises(
             BasicAgentToolsError, match="Limit must be an integer between 1 and 200"
         ):
-            list_env_vars(limit=-1)
+            list_env_vars(filter_pattern="", limit=-1)
 
         with pytest.raises(
             BasicAgentToolsError, match="Limit must be an integer between 1 and 200"
         ):
-            list_env_vars(limit=201)
+            list_env_vars(filter_pattern="", limit=201)
 
         with pytest.raises(
             BasicAgentToolsError, match="Limit must be an integer between 1 and 200"
         ):
-            list_env_vars(limit="10")
+            list_env_vars(filter_pattern="", limit="10")  # type: ignore[arg-type]
 
     def test_list_all_variables_no_filter(self):
         """Test listing environment variables without filter."""
@@ -208,7 +208,7 @@ class TestListEnvVars:
         }
 
         with patch.dict(os.environ, test_vars, clear=False):
-            result = list_env_vars(limit=200)  # High limit to get all
+            result = list_env_vars(filter_pattern=None, limit=200)  # type: ignore[arg-type] # High limit to get all
 
             assert isinstance(result["variables"], dict)
             assert result["filter_pattern"] is None
@@ -267,7 +267,7 @@ class TestListEnvVars:
     def test_limit_enforcement(self):
         """Test that the limit parameter is enforced."""
         # Use a small limit
-        result = list_env_vars(limit=3)
+        result = list_env_vars(filter_pattern=None, limit=3)  # type: ignore[arg-type]
 
         assert len(result["variables"]) <= 3
         assert result["total_found"] <= 3

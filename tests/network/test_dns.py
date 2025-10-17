@@ -151,13 +151,13 @@ class TestCheckPortOpen:
     def test_invalid_host_type(self):
         """Test with invalid host type."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
-            check_port_open(123, 80)
+            check_port_open(123, 80, 5)  # type: ignore[arg-type]
         assert "Host must be a non-empty string" in str(exc_info.value)
 
     def test_invalid_port_range(self):
         """Test with invalid port number."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
-            check_port_open("example.com", 70000)
+            check_port_open("example.com", 70000, 5)
         assert "Port must be an integer between 1 and 65535" in str(exc_info.value)
 
     def test_invalid_timeout_range(self):

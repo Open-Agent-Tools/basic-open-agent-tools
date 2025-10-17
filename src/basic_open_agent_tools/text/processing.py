@@ -24,10 +24,10 @@ def clean_whitespace(text: str) -> str:
         >>> clean_whitespace("  hello    world  \\n\\t  ")
         "hello world"
     """
-    logger.debug(f"Cleaning whitespace in {len(text)} character text")
-
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
+
+    logger.debug(f"Cleaning whitespace in {len(text)} character text")
 
     # Replace all whitespace sequences with single spaces
     cleaned = re.sub(r"\s+", " ", text)
