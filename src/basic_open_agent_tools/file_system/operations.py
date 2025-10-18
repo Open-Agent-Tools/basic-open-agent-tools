@@ -27,11 +27,18 @@ def _generate_content_preview(content: str, max_chars: int = 1200) -> str:
     preview = f"Writing {line_count} lines ({byte_size} bytes)\n"
 
     if content:
-        # Show first max_chars of content
+        # Show first max_chars of content with actual formatting
         sample = content[:max_chars]
-        if len(content) > max_chars:
-            sample += "..."
-        preview += f"Content preview: {repr(sample)}"
+        truncated = len(content) > max_chars
+
+        preview += "Content preview:\n"
+        preview += "─" * 40 + "\n"
+        preview += sample
+        if truncated:
+            preview += "\n" + "─" * 40
+            preview += f"\n[...truncated, showing first {max_chars} of {len(content)} chars]"
+        else:
+            preview += "\n" + "─" * 40
     else:
         preview += "Content: (empty file)"
 

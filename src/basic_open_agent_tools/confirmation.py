@@ -111,8 +111,14 @@ def _interactive_confirm(
     print(f"Target: {target}")
 
     if preview_info:
-        print("\nPreview:")
-        print(f"  {preview_info}")
+        print()
+        # Check if preview contains newlines for multi-line content
+        if "\n" in preview_info:
+            # Multi-line preview - display as-is without indentation
+            print(preview_info)
+        else:
+            # Single-line preview - indent for readability
+            print(f"Preview: {preview_info}")
 
     try:
         response = input("\nDo you want to proceed? [y/N]: ").strip().lower()
