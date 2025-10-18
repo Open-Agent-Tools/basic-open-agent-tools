@@ -25,19 +25,30 @@ class TestStrandsIntegration:
         # Test that we can import file_system functions with decorators
         from basic_open_agent_tools.file_system import read_file_to_string
 
-        # Check if the function has strands_tool decoration
-        assert hasattr(read_file_to_string, "__wrapped__") or hasattr(
-            read_file_to_string, "_strands_decorated"
-        )
+        # When Strands is installed, check for decorator attributes
+        # When Strands is not installed, the decorator is a no-op
+        try:
+            import strands  # noqa: F401
+
+            # Strands is installed - check for decorator attributes
+            assert hasattr(read_file_to_string, "__wrapped__") or hasattr(
+                read_file_to_string, "_strands_decorated"
+            )
+        except ImportError:
+            # Strands not installed - decorator is a no-op passthrough
+            # Just verify the function is callable and has proper metadata
+            assert callable(read_file_to_string)
+            assert hasattr(read_file_to_string, "__name__")
+            assert hasattr(read_file_to_string, "__doc__")
 
     def test_strands_tool_metadata(self):
         """Test that Strands tool metadata is properly set."""
-        from basic_open_agent_tools.data import read_json_file
+        from basic_open_agent_tools.data import safe_json_serialize
         from basic_open_agent_tools.file_system import read_file_to_string
         from basic_open_agent_tools.text import clean_whitespace
 
         # Check for proper function signatures and docstrings
-        functions_to_test = [read_file_to_string, clean_whitespace, read_json_file]
+        functions_to_test = [read_file_to_string, clean_whitespace, safe_json_serialize]
 
         for func in functions_to_test:
             assert callable(func)
@@ -216,13 +227,18 @@ class TestStrandsToolCompatibility:
     def test_data_tools_compatibility(self):
         """Test data processing tools compatibility with Strands."""
         from basic_open_agent_tools.data import (
-            read_csv_file,
-            read_json_file,
-            validate_json_data,
-            write_json_file,
+            read_csv_simple,
+            safe_json_deserialize,
+            safe_json_serialize,
+            write_csv_simple,
         )
 
-        tools = [read_json_file, write_json_file, read_csv_file, validate_json_data]
+        tools = [
+            safe_json_serialize,
+            safe_json_deserialize,
+            read_csv_simple,
+            write_csv_simple,
+        ]
 
         for tool in tools:
             import inspect

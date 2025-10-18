@@ -2,11 +2,11 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions.
 
-## 🆕 What's New in v0.13.11
+## 🆕 What's New in v0.13.12
 
-🐛 **Bug Fixes**: Fixed test compatibility issues and improved logging output visibility
+🐛 **Bug Fixes**: Fixed Strands decorator detection and updated outdated test imports
 
-📦 **Test Improvements**: Enhanced test reliability for UUID generation and Strands integration
+📦 **Test Improvements**: Corrected test compatibility with current data module structure
 
 ### Recent Updates
 
