@@ -36,7 +36,9 @@ def _generate_content_preview(content: str, max_chars: int = 1200) -> str:
         preview += sample
         if truncated:
             preview += "\n" + "─" * 40
-            preview += f"\n[...truncated, showing first {max_chars} of {len(content)} chars]"
+            preview += (
+                f"\n[...truncated, showing first {max_chars} of {len(content)} chars]"
+            )
         else:
             preview += "\n" + "─" * 40
     else:

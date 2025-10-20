@@ -28,23 +28,100 @@ def file_editor(command: str, path: str, skip_confirm: bool, options_json: str) 
     viewing, creating, modifying, and searching files. It's designed to be safe
     and informative for AI agents working with code and text files.
 
+    AGENT GUIDANCE:
+    This is a powerful multi-command tool, but requires careful JSON formatting.
+    If you encounter errors or find this tool complex, consider these simpler alternatives:
+    - For reading files: use read_file_to_string(path)
+    - For writing files: use write_file_from_string(path, content, skip_confirm)
+    - For replacements: use replace_in_file(path, old, new, max_replacements)
+
     Args:
-        command: The operation to perform
-        path: Path to the file or directory
-        skip_confirm: If True, skip confirmation and bypass safety checks. IMPORTANT: Agents should default to skip_confirm=False for safety.
-        options_json: JSON string with command-specific options:
-            - view: {"view_range": "1-10"} - line range (optional)
-            - create: {"content": "text"} - initial content (optional)
-            - str_replace: {"old_str": "x", "new_str": "y"} - required
-            - insert: {"line_number": 5, "content": "text"} - required
-            - find: {"pattern": "text", "use_regex": false} - pattern required
+        command: The operation to perform. Must be one of:
+            - "view": Display file contents with line numbers
+            - "create": Create a new file (prompts if exists unless skip_confirm=True)
+            - "str_replace": Replace all occurrences of text
+            - "insert": Insert content at a specific line number
+            - "find": Search for text pattern (supports regex)
+
+        path: Path to the file or directory. Can be absolute or relative.
+
+        skip_confirm: Safety parameter for operations that modify files.
+            - False (RECOMMENDED): Will prompt user or raise CONFIRMATION_REQUIRED error
+            - True: Proceeds immediately without confirmation (use only with user approval)
+
+        options_json: JSON string containing command-specific parameters.
+            IMPORTANT: Always pass a valid JSON string, even if empty.
+            - For commands without options, pass "" or "{}"
+            - For commands with options, pass properly formatted JSON
+
+    Command-Specific Options:
+
+        view command:
+            options_json: "" or "{}" for full file, or {"view_range": "1-10"}
+            Examples:
+                file_editor("view", "script.py", False, "")
+                file_editor("view", "script.py", False, '{"view_range": "1-20"}')
+                file_editor("view", "script.py", False, '{"view_range": "15"}')  # single line
+
+        create command:
+            options_json: "" for empty file, or {"content": "file contents"}
+            Examples:
+                file_editor("create", "new.txt", False, "")
+                file_editor("create", "new.txt", False, '{"content": "Hello World"}')
+            Note: Requires skip_confirm=True to overwrite existing files
+
+        str_replace command:
+            options_json: {"old_str": "text to find", "new_str": "replacement text"}
+            REQUIRED: Both old_str and new_str must be provided
+            Examples:
+                file_editor("str_replace", "file.py", False, '{"old_str": "foo", "new_str": "bar"}')
+                file_editor("str_replace", "file.py", False, '{"old_str": "old", "new_str": ""}')  # delete text
+            Note: Replaces ALL occurrences in the file
+
+        insert command:
+            options_json: {"line_number": N, "content": "text to insert"}
+            REQUIRED: Both line_number (integer) and content must be provided
+            Examples:
+                file_editor("insert", "file.py", False, '{"line_number": 5, "content": "new line"}')
+                file_editor("insert", "file.py", False, '{"line_number": 1, "content": "# Header"}')
+            Note: Line number 1 means insert before first line. Lines after are shifted down.
+
+        find command:
+            options_json: {"pattern": "search text"} or {"pattern": "regex", "use_regex": true}
+            REQUIRED: pattern must be provided
+            Examples:
+                file_editor("find", "file.py", False, '{"pattern": "TODO"}')
+                file_editor("find", "file.py", False, '{"pattern": "def \\\\w+", "use_regex": true}')
+            Note: Returns matching lines with line numbers
 
     Returns:
-        String result describing the operation outcome or file contents
+        String result describing the operation outcome or file contents.
+        - view: File contents with line numbers
+        - create: Confirmation message
+        - str_replace: Number of replacements made
+        - insert: Confirmation with insertion location
+        - find: Matching lines with line numbers
 
     Raises:
-        FileSystemError: If file operations fail
-        ValueError: If command or parameters are invalid
+        FileSystemError: If file operations fail or file not found
+        ValueError: If command is invalid or required parameters are missing
+            Error messages include examples of correct usage for easy correction.
+
+    Example Usage (for LLM agents):
+        # View entire file
+        result = file_editor("view", "/path/to/file.py", False, "")
+
+        # View specific lines
+        result = file_editor("view", "/path/to/file.py", False, '{"view_range": "10-20"}')
+
+        # Create new file (will prompt if exists)
+        result = file_editor("create", "new.txt", False, '{"content": "Hello"}')
+
+        # Replace text (all occurrences)
+        result = file_editor("str_replace", "file.py", False, '{"old_str": "old", "new_str": "new"}')
+
+        # Find text
+        result = file_editor("find", "file.py", False, '{"pattern": "TODO"}')
     """
     # Parse options from JSON
     try:
@@ -52,14 +129,27 @@ def file_editor(command: str, path: str, skip_confirm: bool, options_json: str) 
             json.loads(options_json) if options_json and options_json != "{}" else {}
         )
         if not isinstance(options, dict):
-            raise ValueError("options_json must be a JSON object")
+            raise ValueError(
+                "options_json must be a JSON object (e.g., '{}' or '{\"key\": \"value\"}'). "
+                f"Got: {type(options).__name__}"
+            )
     except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON in options_json: {e}")
+        raise ValueError(
+            f"Invalid JSON in options_json: {e}\n"
+            f"Received: {options_json}\n"
+            "Valid examples:\n"
+            '  - Empty options: "" or "{}"\n'
+            '  - With options: \'{"old_str": "foo", "new_str": "bar"}\'\n'
+            "Tip: Ensure strings are properly escaped in JSON."
+        )
 
     valid_commands = ["view", "create", "str_replace", "insert", "find"]
     if command not in valid_commands:
         raise ValueError(
-            f"Invalid command '{command}'. Must be one of: {valid_commands}"
+            f"Invalid command '{command}'. Must be one of: {valid_commands}\n"
+            "Examples:\n"
+            '  - file_editor("view", "file.py", False, "")\n'
+            '  - file_editor("str_replace", "file.py", False, \'{"old_str": "x", "new_str": "y"}\')'
         )
 
     file_path = validate_path(path, command)
@@ -72,18 +162,35 @@ def file_editor(command: str, path: str, skip_confirm: bool, options_json: str) 
         old_str = options.get("old_str")
         new_str = options.get("new_str")
         if old_str is None or new_str is None:
-            raise ValueError("str_replace requires 'old_str' and 'new_str' parameters")
+            raise ValueError(
+                "str_replace requires 'old_str' and 'new_str' parameters.\n"
+                "Example correct usage:\n"
+                f'  file_editor("str_replace", "{path}", False, \'{{"old_str": "find_this", "new_str": "replace_with"}}\')\n'
+                f"Received options: {options}"
+            )
         return _str_replace(file_path, str(old_str), str(new_str))
     elif command == "insert":
         line_number = options.get("line_number")
         content = options.get("content")
         if line_number is None or content is None:
-            raise ValueError("insert requires 'line_number' and 'content' parameters")
+            raise ValueError(
+                "insert requires 'line_number' and 'content' parameters.\n"
+                "Example correct usage:\n"
+                f'  file_editor("insert", "{path}", False, \'{{"line_number": 5, "content": "new line"}}\')\n'
+                f"Received options: {options}\n"
+                "Note: line_number must be an integer (1 = before first line)"
+            )
         return _insert_at_line(file_path, int(line_number), str(content))
     elif command == "find":
         pattern = options.get("pattern")
         if pattern is None:
-            raise ValueError("find requires 'pattern' parameter")
+            raise ValueError(
+                "find requires 'pattern' parameter.\n"
+                "Example correct usage:\n"
+                f'  file_editor("find", "{path}", False, \'{{"pattern": "search_text"}}\')\n'
+                f'  file_editor("find", "{path}", False, \'{{"pattern": "regex.*pattern", "use_regex": true}}\')\n'
+                f"Received options: {options}"
+            )
         use_regex = bool(options.get("use_regex", False))
         return _find_in_file(file_path, str(pattern), use_regex)
 
