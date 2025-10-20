@@ -11,7 +11,10 @@ All functions are also available directly from this module for convenience.
 """
 
 # Import all functions from submodules
-from .editor import file_editor
+from .editor import (
+    find_text_in_file,
+    view_file_with_lines,
+)
 from .info import (
     directory_exists,
     file_exists,
@@ -67,7 +70,9 @@ __all__ = [
     # Tree operations
     "list_all_directory_contents",
     "generate_directory_tree",
-    # Unified file editor
-    "file_editor",
+    # File editor tools (unique additions beyond basic file operations)
+    "view_file_with_lines",  # View files with line numbers
+    "find_text_in_file",  # Search/grep functionality
+    # Note: Use write_file_from_string, replace_in_file, insert_at_line for create/edit operations
     # Note: validation utilities are internal, not exported as agent tools
 ]
