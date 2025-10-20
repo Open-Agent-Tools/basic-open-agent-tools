@@ -4,18 +4,24 @@ This module provides a centralized logging configuration for all toolkit modules
 It respects the BOAT_LOG_LEVEL environment variable and uses TTY-aware defaults
 to provide appropriate output for interactive and automated environments.
 
+Features:
+    - Colored [module] prefixes when outputting to interactive terminals
+    - TTY-aware log levels (INFO for terminals, WARNING for automation)
+    - Respects NO_COLOR environment variable to disable colors
+
 Environment Variables:
     BOAT_LOG_LEVEL: Set log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
                     If not set, defaults based on TTY:
                     - TTY (interactive terminal): INFO (show execution messages)
                     - Non-TTY (agents/automation): WARNING (silent operation)
+    NO_COLOR: When set, disables colored output (follows standard convention)
 
 Example:
     >>> import os
     >>> os.environ['BOAT_LOG_LEVEL'] = 'DEBUG'
     >>> logger = get_logger('my_module')
     >>> logger.debug('Debug message')
-    [my_module] Debug message
+    [my_module] Debug message  # [my_module] appears in cyan in terminals
 """
 
 import logging
@@ -81,18 +87,45 @@ def _configure_logging() -> None:
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(log_level)
 
+    # Detect if we should use colored output (TTY and not disabled)
+    use_color = sys.stdout.isatty() and os.environ.get("NO_COLOR") is None
+
     # Create custom formatter that strips package prefix for cleaner output
     class ShortNameFormatter(logging.Formatter):
-        """Formatter that displays only module names without package prefix."""
+        """Formatter that displays only module names without package prefix.
+
+        Adds color to the [module] prefix when outputting to a TTY terminal.
+        Color can be disabled by setting NO_COLOR environment variable.
+        """
+
+        def __init__(self, fmt: str, use_color: bool = False):
+            super().__init__(fmt)
+            self.use_color = use_color
+            # ANSI color codes
+            self.cyan = "\033[36m"
+            self.reset = "\033[0m"
 
         def format(self, record: logging.LogRecord) -> str:
             # Strip 'basic_open_agent_tools.' prefix for cleaner display
             if record.name.startswith("basic_open_agent_tools."):
                 record.name = record.name[len("basic_open_agent_tools.") :]
-            return super().format(record)
+
+            # Format the record
+            formatted = super().format(record)
+
+            # Add color to [module] prefix if enabled
+            if self.use_color and "[" in formatted:
+                # Color just the [module] part
+                bracket_end = formatted.find("]")
+                if bracket_end != -1:
+                    module_part = formatted[: bracket_end + 1]
+                    rest = formatted[bracket_end + 1 :]
+                    formatted = f"{self.cyan}{module_part}{self.reset}{rest}"
+
+            return formatted
 
     # Create formatter matching existing [MODULE] pattern
-    formatter = ShortNameFormatter("[%(name)s] %(message)s")
+    formatter = ShortNameFormatter("[%(name)s] %(message)s", use_color=use_color)
     handler.setFormatter(formatter)
 
     # Add handler to root logger
