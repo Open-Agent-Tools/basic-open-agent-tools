@@ -2,11 +2,11 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions.
 
-## 🆕 What's New in v0.13.12
+## 🆕 What's New in v0.14.0
 
-🐛 **Bug Fixes**: Fixed Strands decorator detection and updated outdated test imports
+🎯 **New Helper Functions**: Added 10 use-case focused tool loaders for targeted agent capabilities
 
-📦 **Test Improvements**: Corrected test compatibility with current data module structure
+✨ **Enhanced Helpers**: `load_essential()`, `load_converters()`, `load_document_readers()`, `load_writers()`, `load_analyst_tools()`, `load_web_tools()`, `load_devtools()`, `load_structured_data_tools()`, `load_office_suite()`, `load_markup_tools()`
 
 ### Recent Updates
 
@@ -198,6 +198,19 @@ boat.load_data_json_tools()    # JSON operations
 boat.load_data_csv_tools()     # CSV operations
 boat.load_data_validation_tools()  # Data validation
 boat.load_data_config_tools()  # YAML, TOML, INI
+
+# Use-case focused loaders (10 total)
+boat.load_essential()          # ~25 most commonly needed tools
+boat.load_core_readonly()      # 28 read-only tools (filesystem, text, data parsing)
+boat.load_converters()         # 78 pure transformation tools (text, datetime, crypto, color)
+boat.load_document_readers()   # Extract content from PDF, Word, Excel, PowerPoint, images
+boat.load_writers()            # All file creation/modification tools
+boat.load_analyst_tools()      # Data analysis and validation tools
+boat.load_web_tools()          # HTML, Markdown, network operations
+boat.load_devtools()           # Debugging, logging, performance measurement
+boat.load_structured_data_tools()  # CSV, JSON, XML, YAML, TOML, INI
+boat.load_office_suite()       # Excel, Word, PowerPoint tools
+boat.load_markup_tools()       # HTML, Markdown, XML processing
 
 # Utility functions
 boat.merge_tool_lists(*tool_lists)  # Merge and deduplicate

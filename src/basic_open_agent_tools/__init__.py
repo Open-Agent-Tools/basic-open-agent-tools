@@ -4,7 +4,7 @@ An open foundational toolkit providing essential components for building AI agen
 with minimal dependencies for local (non-HTTP/API) actions.
 """
 
-__version__ = "0.13.14"
+__version__ = "0.14.0"
 
 # Modular structure
 from . import (
@@ -61,10 +61,21 @@ from .helpers import (
     load_all_utilities_tools,
     load_all_word_tools,
     load_all_xml_tools,
+    load_analyst_tools,
+    load_converters,
+    load_core_readonly,
     load_data_config_tools,
     load_data_csv_tools,
     load_data_json_tools,
     load_data_validation_tools,
+    load_devtools,
+    load_document_readers,
+    load_essential,
+    load_markup_tools,
+    load_office_suite,
+    load_structured_data_tools,
+    load_web_tools,
+    load_writers,
     merge_tool_lists,
 )
 
@@ -117,10 +128,21 @@ __all__: list[str] = [
     "load_all_utilities_tools",
     "load_all_word_tools",
     "load_all_xml_tools",
+    "load_analyst_tools",
+    "load_converters",
+    "load_core_readonly",
     "load_data_config_tools",
     "load_data_csv_tools",
     "load_data_json_tools",
     "load_data_validation_tools",
+    "load_devtools",
+    "load_document_readers",
+    "load_essential",
+    "load_markup_tools",
+    "load_office_suite",
+    "load_structured_data_tools",
+    "load_web_tools",
+    "load_writers",
     "merge_tool_lists",
     "get_tool_info",
     "list_all_available_tools",
