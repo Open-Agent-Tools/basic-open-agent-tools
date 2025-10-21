@@ -1,12 +1,12 @@
 # Utilities TODO
 
-## Current Status (v0.13.6)
+## Current Status (v0.15.1)
 
 ### ✅ **UTILITIES TOOLKIT COMPLETED**
 
-**Total Functions**: 8+ implemented across 2 modules
+**Total Functions**: 11 implemented across 3 modules
 **Status**: Google ADK compliant with comprehensive error handling
-**Coverage**: TODO management, configuration utilities
+**Coverage**: TODO management, configuration utilities, timing utilities
 
 **Status**: ✅ MODULE COMPLETE - Core utilities implemented
 
@@ -21,13 +21,19 @@ All functions follow the agent-friendly design principles:
 
 ## Implemented Modules
 
-### ✅ High Priority - COMPLETE (partial)
-- [x] **TODO Management** (`todo.py`) - ✅ IMPLEMENTED
+### ✅ High Priority - COMPLETE
+
+**NOTE**: TODO Management is now a separate module at `src/basic_open_agent_tools/todo/`
+
+- [x] **TODO Management** (separate `todo/` module) - ✅ IMPLEMENTED
   - [x] Task creation and management
   - [x] Task listing and filtering
   - [x] Task updating and deletion
+  - [x] Task completion tracking
+  - [x] Task statistics and dependency management
   - [x] Skip confirmation parameter for safety
-  - Functions: add_task, list_tasks, update_task, delete_task, mark_task_complete
+  - [x] Structured logging for visibility
+  - Functions: add_task, list_tasks, get_task, update_task, delete_task, complete_task, get_task_stats, clear_all_tasks
 
 - [x] **Configuration** (`config.py`) - ✅ IMPLEMENTED (partial)
   - [x] Environment variable access
@@ -72,4 +78,4 @@ All functions follow the agent-friendly design principles:
 
 ---
 
-**Last Updated**: v0.13.6 (2025-10-15) - @strands_tool decorator only (deprecated @adk_tool)
+**Last Updated**: v0.15.1 (2025-10-21) - Added structured logging to todo module

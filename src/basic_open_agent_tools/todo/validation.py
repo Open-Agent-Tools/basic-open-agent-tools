@@ -3,12 +3,9 @@
 Provides input validation and constraint enforcement for the todo module.
 """
 
-from typing import Any, Optional
-
-from ..decorators import strands_tool
+from typing import Any
 
 
-@strands_tool
 def validate_title(title: str) -> None:
     """Validate task title.
 
@@ -29,7 +26,6 @@ def validate_title(title: str) -> None:
         raise ValueError("Title cannot exceed 500 characters")
 
 
-@strands_tool
 def validate_status(status: str) -> None:
     """Validate task status.
 
@@ -55,7 +51,6 @@ def validate_status(status: str) -> None:
         raise ValueError(f"Invalid status '{status}'. Must be one of: {valid_statuses}")
 
 
-@strands_tool
 def validate_priority(priority: str) -> None:
     """Validate task priority.
 
@@ -76,7 +71,6 @@ def validate_priority(priority: str) -> None:
         )
 
 
-@strands_tool
 def validate_task_count(current_count: int) -> None:
     """Validate that task count doesn't exceed maximum.
 
@@ -91,7 +85,6 @@ def validate_task_count(current_count: int) -> None:
         raise ValueError(f"Maximum task limit of {max_tasks} reached")
 
 
-@strands_tool
 def validate_task_exists(task_id: int, tasks: dict[int, dict[str, Any]]) -> None:
     """Validate that a task exists.
 
@@ -110,18 +103,17 @@ def validate_task_exists(task_id: int, tasks: dict[int, dict[str, Any]]) -> None
         raise ValueError(f"Task with ID {task_id} not found")
 
 
-@strands_tool
 def validate_dependencies(
     dependencies: list[int],
     tasks: dict[int, dict[str, Any]],
-    exclude_task_id: Optional[int] = None,
+    exclude_task_id: int,
 ) -> None:
     """Validate task dependencies.
 
     Args:
         dependencies: List of task IDs this task depends on
         tasks: Dictionary of existing tasks
-        exclude_task_id: Task ID to exclude from circular dependency check
+        exclude_task_id: Task ID to exclude from circular dependency check (use 0 for no exclusion)
 
     Raises:
         ValueError: If dependencies are invalid
@@ -138,12 +130,12 @@ def validate_dependencies(
         if dep_id not in tasks:
             raise ValueError(f"Dependency task {dep_id} not found")
 
-        # Prevent self-dependency
-        if exclude_task_id is not None and dep_id == exclude_task_id:
+        # Prevent self-dependency (exclude_task_id=0 means no exclusion)
+        if exclude_task_id > 0 and dep_id == exclude_task_id:
             raise ValueError("Task cannot depend on itself")
 
-    # Check for circular dependencies
-    if exclude_task_id is not None:
+    # Check for circular dependencies (exclude_task_id=0 means no check needed)
+    if exclude_task_id > 0:
         _check_circular_dependencies(exclude_task_id, dependencies, tasks)
 
 
@@ -189,7 +181,6 @@ def _check_circular_dependencies(
             )
 
 
-@strands_tool
 def validate_tags(tags: list[str]) -> None:
     """Validate task tags.
 
@@ -221,7 +212,6 @@ def validate_tags(tags: list[str]) -> None:
         raise ValueError("Maximum 20 tags allowed per task")
 
 
-@strands_tool
 def validate_estimated_duration(estimated_duration: str) -> None:
     """Validate estimated duration string.
 
@@ -243,7 +233,6 @@ def validate_estimated_duration(estimated_duration: str) -> None:
         raise ValueError("Estimated duration cannot exceed 100 characters")
 
 
-@strands_tool
 def validate_notes(notes: str) -> None:
     """Validate task notes.
 

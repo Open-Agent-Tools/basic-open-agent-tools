@@ -176,39 +176,39 @@ class TestValidateDependencies:
         """Test valid dependencies pass validation."""
         tasks = {1: {"title": "Task 1"}, 2: {"title": "Task 2"}}
 
-        validate_dependencies([], tasks)  # Empty dependencies
-        validate_dependencies([1], tasks)  # Single dependency
-        validate_dependencies([1, 2], tasks)  # Multiple dependencies
+        validate_dependencies([], tasks, 0)  # Empty dependencies
+        validate_dependencies([1], tasks, 0)  # Single dependency
+        validate_dependencies([1, 2], tasks, 0)  # Multiple dependencies
 
     def test_invalid_dependencies_type(self):
         """Test invalid dependencies type raises TypeError."""
         tasks = {1: {"title": "Task 1"}}
 
         with pytest.raises(TypeError, match="Dependencies must be a list"):
-            validate_dependencies("not_a_list", tasks)
+            validate_dependencies("not_a_list", tasks, 0)
 
         with pytest.raises(TypeError, match="Dependencies must be a list"):
-            validate_dependencies(None, tasks)
+            validate_dependencies(None, tasks, 0)
 
     def test_invalid_dependency_id_type(self):
         """Test invalid dependency ID types raise TypeError."""
         tasks = {1: {"title": "Task 1"}}
 
         with pytest.raises(TypeError, match="must be an integer"):
-            validate_dependencies(["1"], tasks)
+            validate_dependencies(["1"], tasks, 0)
 
         with pytest.raises(TypeError, match="must be an integer"):
-            validate_dependencies([1.5], tasks)
+            validate_dependencies([1.5], tasks, 0)
 
     def test_dependency_not_found(self):
         """Test non-existent dependency raises ValueError."""
         tasks = {1: {"title": "Task 1"}}
 
         with pytest.raises(ValueError, match="Dependency task 999 not found"):
-            validate_dependencies([999], tasks)
+            validate_dependencies([999], tasks, 0)
 
         with pytest.raises(ValueError, match="Dependency task 2 not found"):
-            validate_dependencies([1, 2], tasks)
+            validate_dependencies([1, 2], tasks, 0)
 
     def test_self_dependency_prevention(self):
         """Test prevention of self-dependencies."""

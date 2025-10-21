@@ -90,7 +90,7 @@ def add_task(
         validate_tags(tags)
         validate_estimated_duration(estimated_duration)
         validate_task_count(len(_task_storage["tasks"]))
-        validate_dependencies(dependencies, _task_storage["tasks"])
+        validate_dependencies(dependencies, _task_storage["tasks"], 0)
 
         # Create new task
         task_id = _task_storage["next_id"]
@@ -114,6 +114,13 @@ def add_task(
         _task_storage["next_id"] += 1
         _task_storage["total_count"] += 1
 
+        # Log task creation
+        logger.info(
+            f"[TODO] Created task #{task_id}: '{title}' "
+            f"(priority: {priority}, tags: {tags or 'none'}, "
+            f"dependencies: {dependencies or 'none'})"
+        )
+
         return {
             "success": True,
             "task": task,
@@ -121,6 +128,7 @@ def add_task(
         }
 
     except (ValueError, TypeError) as e:
+        logger.error(f"[TODO] Failed to create task: {e}")
         raise BasicAgentToolsError(f"Failed to create task: {e}") from e
 
 
@@ -168,6 +176,19 @@ def list_tasks(status: str, tag: str) -> dict[str, Any]:
         # Sort by ID for consistent ordering
         tasks.sort(key=lambda x: x["id"])
 
+        # Log task listing with filters
+        filter_desc = []
+        if status:
+            filter_desc.append(f"status={status}")
+        if tag:
+            filter_desc.append(f"tag={tag}")
+        filter_str = ", ".join(filter_desc) if filter_desc else "no filters"
+
+        logger.info(
+            f"[TODO] Listed {len(tasks)} task(s) ({filter_str}) - "
+            f"Total tasks in storage: {original_count}"
+        )
+
         return {
             "success": True,
             "tasks": tasks,
@@ -180,6 +201,7 @@ def list_tasks(status: str, tag: str) -> dict[str, Any]:
         }
 
     except ValueError as e:
+        logger.error(f"[TODO] Failed to list tasks: {e}")
         raise BasicAgentToolsError(f"Failed to list tasks: {e}") from e
 
 
@@ -210,6 +232,12 @@ def get_task(task_id: int) -> dict[str, Any]:
         validate_task_exists(task_id, _task_storage["tasks"])
 
         task = _task_storage["tasks"][task_id]
+
+        logger.info(
+            f"[TODO] Retrieved task #{task_id}: '{task['title']}' "
+            f"(status: {task['status']}, priority: {task['priority']})"
+        )
+
         return {
             "success": True,
             "task": task,
@@ -217,6 +245,7 @@ def get_task(task_id: int) -> dict[str, Any]:
         }
 
     except (ValueError, TypeError) as e:
+        logger.error(f"[TODO] Failed to get task {task_id}: {e}")
         raise BasicAgentToolsError(f"Failed to get task: {e}") from e
 
 
@@ -281,8 +310,12 @@ def update_task(
             dependencies, _task_storage["tasks"], exclude_task_id=task_id
         )
 
-        # Update task
+        # Get current task for logging changes
         task = _task_storage["tasks"][task_id]
+        old_status = task["status"]
+        old_priority = task["priority"]
+
+        # Update task
         task.update(
             {
                 "title": title,
@@ -296,6 +329,16 @@ def update_task(
             }
         )
 
+        # Log changes
+        changes = []
+        if old_status != status:
+            changes.append(f"status: {old_status} → {status}")
+        if old_priority != priority:
+            changes.append(f"priority: {old_priority} → {priority}")
+
+        change_desc = ", ".join(changes) if changes else "metadata updated"
+        logger.info(f"[TODO] Updated task #{task_id}: '{title}' ({change_desc})")
+
         return {
             "success": True,
             "task": task,
@@ -303,6 +346,7 @@ def update_task(
         }
 
     except ValueError as e:
+        logger.error(f"[TODO] Failed to update task {task_id}: {e}")
         raise BasicAgentToolsError(f"Failed to update task: {e}") from e
 
 
@@ -326,8 +370,6 @@ def delete_task(task_id: int, skip_confirm: bool) -> str:
         >>> result = delete_task(1, skip_confirm=True)
         "Deleted task 1: 'Complete project setup' (was 'in_progress')"
     """
-    logger.debug(f"Deleting task {task_id} (skip_confirm={skip_confirm})")
-
     try:
         validate_task_exists(task_id, _task_storage["tasks"])
 
@@ -347,18 +389,20 @@ def delete_task(task_id: int, skip_confirm: bool) -> str:
             )
 
             if not confirmed:
-                logger.debug(f"Task deletion cancelled by user: {task_id}")
+                logger.info(f"[TODO] Task deletion cancelled by user: #{task_id}")
                 return f"Operation cancelled by user: Task {task_id}"
 
         # Remove task
         del _task_storage["tasks"][task_id]
 
-        logger.debug(f"Task {task_id} deleted: '{task_title}' (was '{task_status}')")
+        logger.info(
+            f"[TODO] Deleted task #{task_id}: '{task_title}' (was '{task_status}')"
+        )
 
         return f"Deleted task {task_id}: '{task_title}' (was '{task_status}')"
 
     except ValueError as e:
-        logger.error(f"Delete failed: {e}")
+        logger.error(f"[TODO] Failed to delete task {task_id}: {e}")
         raise BasicAgentToolsError(f"Failed to delete task: {e}") from e
 
 
@@ -391,8 +435,13 @@ def complete_task(task_id: int) -> dict[str, Any]:
 
         # Update status and timestamp
         task = _task_storage["tasks"][task_id]
+        old_status = task["status"]
         task["status"] = "completed"
         task["updated_at"] = _get_current_timestamp()
+
+        logger.info(
+            f"[TODO] Completed task #{task_id}: '{task['title']}' (was '{old_status}')"
+        )
 
         return {
             "success": True,
@@ -401,6 +450,7 @@ def complete_task(task_id: int) -> dict[str, Any]:
         }
 
     except ValueError as e:
+        logger.error(f"[TODO] Failed to complete task {task_id}: {e}")
         raise BasicAgentToolsError(f"Failed to complete task: {e}") from e
 
 
@@ -450,6 +500,12 @@ def get_task_stats() -> dict[str, Any]:
         # Other stats
         tasks_with_dependencies = len([t for t in tasks if t["dependencies"]])
 
+        logger.info(
+            f"[TODO] Task statistics: {total} total tasks "
+            f"(open: {status_counts['open']}, in_progress: {status_counts['in_progress']}, "
+            f"completed: {status_counts['completed']})"
+        )
+
         return {
             "success": True,
             "total_tasks": total,
@@ -461,6 +517,7 @@ def get_task_stats() -> dict[str, Any]:
         }
 
     except Exception as e:
+        logger.error(f"[TODO] Failed to get task statistics: {e}")
         raise BasicAgentToolsError(f"Failed to get task statistics: {e}") from e
 
 
@@ -481,19 +538,17 @@ def clear_all_tasks() -> dict[str, Any]:
         >>> result["cleared_count"]
         10
     """
-    logger.debug("[TODO] Clearing all tasks from memory")
-
     try:
         cleared_count = len(_task_storage["tasks"])
-
-        logger.debug(f"Clearing {cleared_count} tasks")
 
         # Reset storage
         _task_storage["tasks"] = {}
         _task_storage["next_id"] = 1
         _task_storage["total_count"] = 0
 
-        logger.debug(f"All tasks cleared: {cleared_count} tasks removed")
+        logger.info(
+            f"[TODO] Cleared all tasks from memory ({cleared_count} tasks removed)"
+        )
 
         return {
             "success": True,
@@ -502,4 +557,5 @@ def clear_all_tasks() -> dict[str, Any]:
         }
 
     except Exception as e:
+        logger.error(f"[TODO] Failed to clear tasks: {e}")
         raise BasicAgentToolsError(f"Failed to clear tasks: {e}") from e
