@@ -1,8 +1,8 @@
 """Simple in-memory TODO list tool for AI agents.
 
 Provides task management capabilities for agents to track their own
-workflow during a session. Tasks exist only in memory and are designed
-for agent self-organization.
+workflow during a session. Tasks can be persisted to files for
+sharing between agents and sessions.
 """
 
 from .operations import (
@@ -15,6 +15,11 @@ from .operations import (
     list_tasks,
     update_task,
 )
+from .persistence import (
+    load_tasks_from_file,
+    save_tasks_to_file,
+    validate_task_file,
+)
 
 __all__ = [
     "add_task",
@@ -25,4 +30,7 @@ __all__ = [
     "complete_task",
     "get_task_stats",
     "clear_all_tasks",
+    "save_tasks_to_file",
+    "load_tasks_from_file",
+    "validate_task_file",
 ]
