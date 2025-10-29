@@ -811,11 +811,12 @@ def load_writers() -> list[Callable[..., Any]]:
     """
     from .data import config_processing, csv_tools, json_tools
     from .file_system import (
+        append_to_file,
         copy_file,
         create_directory,
         delete_directory,
         delete_file,
-        file_editor,
+        insert_at_line,
         move_file,
         replace_in_file,
         write_file_from_string,
@@ -823,16 +824,17 @@ def load_writers() -> list[Callable[..., Any]]:
 
     tools = []
 
-    # File system write operations (8 tools)
+    # File system write operations (9 tools)
     tools.extend(
         [
             write_file_from_string,
+            append_to_file,
+            insert_at_line,
             create_directory,
             delete_file,
             delete_directory,
             move_file,
             copy_file,
-            file_editor,
             replace_in_file,
         ]
     )

@@ -5,6 +5,7 @@ import sys
 from unittest.mock import patch
 
 from basic_open_agent_tools.system.runtime import (
+    get_current_directory,
     get_file_system_context,
     get_network_environment,
     get_python_module_info,
@@ -248,3 +249,32 @@ class TestGetNetworkEnvironment:
 
             assert result["hostname"] == "test-host"
             assert result["fqdn"] == "test-host"  # Should fallback to hostname
+
+
+class TestGetCurrentDirectory:
+    """Test the get_current_directory function."""
+
+    def test_successful_current_directory_retrieval(self):
+        """Test successful retrieval of current working directory."""
+        result = get_current_directory()
+
+        # Check that result is a string and is an absolute path
+        assert isinstance(result, str)
+        assert len(result) > 0
+        assert os.path.isabs(result)
+
+        # Verify it matches os.getcwd()
+        assert result == os.getcwd()
+
+    @patch("os.getcwd")
+    def test_error_handling(self, mock_getcwd):
+        """Test error handling when getcwd fails."""
+        from basic_open_agent_tools.exceptions import BasicAgentToolsError
+
+        mock_getcwd.side_effect = Exception("Permission denied")
+
+        try:
+            get_current_directory()
+            raise AssertionError("Expected BasicAgentToolsError")
+        except BasicAgentToolsError as e:
+            assert "Failed to get current directory" in str(e)

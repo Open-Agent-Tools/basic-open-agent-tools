@@ -12,6 +12,32 @@ from ..exceptions import BasicAgentToolsError
 
 
 @strands_tool
+def get_current_directory() -> str:
+    """
+    Get the current working directory path.
+
+    This is the equivalent of the 'pwd' command in Unix/Linux or 'cd' without
+    arguments in Windows. Returns the absolute path of the directory where the
+    agent is currently operating.
+
+    Returns:
+        Absolute path of the current working directory as a string
+
+    Raises:
+        BasicAgentToolsError: If current directory cannot be determined
+
+    Example:
+        >>> current_dir = get_current_directory()
+        >>> current_dir
+        "/home/user/projects/my-project"
+    """
+    try:
+        return os.getcwd()
+    except Exception as e:
+        raise BasicAgentToolsError(f"Failed to get current directory: {str(e)}")
+
+
+@strands_tool
 def inspect_runtime_environment() -> dict[
     str, Union[str, int, float, list[str], dict, Any]
 ]:

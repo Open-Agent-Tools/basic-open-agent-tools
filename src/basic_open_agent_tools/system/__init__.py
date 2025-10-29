@@ -15,6 +15,7 @@ from .processes import (
     list_running_processes,
 )
 from .runtime import (
+    get_current_directory,
     get_file_system_context,
     get_network_environment,
     get_python_module_info,
@@ -43,6 +44,7 @@ __all__ = [
     "set_env_var",
     "list_env_vars",
     # Runtime inspection
+    "get_current_directory",
     "inspect_runtime_environment",
     "get_python_module_info",
     "get_file_system_context",
