@@ -569,7 +569,9 @@ class TestReplaceInFile:
         original_content = "Hello world! This is a test."
         test_file.write_text(original_content)
 
-        result = replace_in_file(str(test_file), "world", "universe", 1, skip_confirm=True)
+        result = replace_in_file(
+            str(test_file), "world", "universe", 1, skip_confirm=True
+        )
         assert isinstance(result, str) and result
         assert test_file.read_text() == "Hello universe! This is a test."
 
@@ -624,7 +626,9 @@ class TestReplaceInFile:
         original_content = "Line 1\nOld text\nLine 3"
         test_file.write_text(original_content)
 
-        result = replace_in_file(str(test_file), "Old text", "New text", 1, skip_confirm=True)
+        result = replace_in_file(
+            str(test_file), "Old text", "New text", 1, skip_confirm=True
+        )
         assert isinstance(result, str) and result
         assert test_file.read_text() == "Line 1\nNew text\nLine 3"
 
@@ -796,7 +800,9 @@ class TestOperationsIntegration:
         assert isinstance(copy_result, str) and copy_result
 
         # Modify copy
-        replace_result = replace_in_file(str(dest_file), "Original", "Modified", 1, skip_confirm=True)
+        replace_result = replace_in_file(
+            str(dest_file), "Original", "Modified", 1, skip_confirm=True
+        )
         assert isinstance(replace_result, str) and replace_result
 
         # Verify both files

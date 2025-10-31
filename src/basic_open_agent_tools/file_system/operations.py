@@ -192,9 +192,7 @@ def append_to_file(file_path: str, content: str, skip_confirm: bool) -> str:
         new_size = path.stat().st_size
         bytes_added = new_size - original_size
 
-        logger.info(
-            f"Appended {line_count} lines ({bytes_added} bytes) to {path}"
-        )
+        logger.info(f"Appended {line_count} lines ({bytes_added} bytes) to {path}")
 
         if file_existed:
             return f"Appended {line_count} lines ({bytes_added} bytes) to {path}"
@@ -671,7 +669,9 @@ def replace_in_file(
 
 
 @strands_tool
-def insert_at_line(file_path: str, line_number: int, content: str, skip_confirm: bool) -> str:
+def insert_at_line(
+    file_path: str, line_number: int, content: str, skip_confirm: bool
+) -> str:
     """Insert content at a specific line number in a file with detailed feedback and confirmation.
 
     This function allows precise insertion of text at a specific line,
