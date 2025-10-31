@@ -44,6 +44,9 @@ IMPORTANT: Many operations require a 'skip_confirm' parameter:
 - delete_directory: requires skip_confirm=True to confirm deletion
 - move_file: requires skip_confirm=True to overwrite destination
 - copy_file: requires skip_confirm=True to overwrite destination
+- replace_in_file: requires skip_confirm=True to modify file content
+- append_to_file: requires skip_confirm=True to append content
+- insert_at_line: requires skip_confirm=True to insert content
 
 Always use skip_confirm=True when performing these operations to avoid permission errors.
 The tools now return detailed feedback strings describing exactly what was done.

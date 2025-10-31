@@ -163,7 +163,7 @@ class TestAppendToFile:
         append_content = "\nAppended content"
         test_file.write_text(initial_content, encoding="utf-8")
 
-        result = append_to_file(str(test_file), append_content)
+        result = append_to_file(str(test_file), append_content, skip_confirm=True)
         assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == initial_content + append_content
 
@@ -172,7 +172,7 @@ class TestAppendToFile:
         test_file = tmp_path / "new.txt"
         test_content = "New content"
 
-        result = append_to_file(str(test_file), test_content)
+        result = append_to_file(str(test_file), test_content, skip_confirm=True)
         assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == test_content
 
@@ -182,7 +182,7 @@ class TestAppendToFile:
         initial_content = "Initial"
         test_file.write_text(initial_content, encoding="utf-8")
 
-        result = append_to_file(str(test_file), "")
+        result = append_to_file(str(test_file), "", skip_confirm=True)
         assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == initial_content
 
@@ -191,7 +191,7 @@ class TestAppendToFile:
         test_file = tmp_path / "nested" / "dir" / "test.txt"
         test_content = "Nested content"
 
-        result = append_to_file(str(test_file), test_content)
+        result = append_to_file(str(test_file), test_content, skip_confirm=True)
         assert isinstance(result, str) and result
         assert test_file.read_text(encoding="utf-8") == test_content
 
@@ -201,17 +201,31 @@ class TestAppendToFile:
 
         with patch("pathlib.Path.open", side_effect=PermissionError("Access denied")):
             with pytest.raises(FileSystemError, match="Failed to append to file"):
-                append_to_file(str(test_file), "content")
+                append_to_file(str(test_file), "content", skip_confirm=True)
 
     def test_append_multiple_times(self, tmp_path: Path) -> None:
         """Test multiple append operations to the same file."""
         test_file = tmp_path / "multi.txt"
 
-        append_to_file(str(test_file), "First")
-        append_to_file(str(test_file), "Second")
-        append_to_file(str(test_file), "Third")
+        append_to_file(str(test_file), "First", skip_confirm=True)
+        append_to_file(str(test_file), "Second", skip_confirm=True)
+        append_to_file(str(test_file), "Third", skip_confirm=True)
 
         assert test_file.read_text(encoding="utf-8") == "FirstSecondThird"
+
+    def test_append_with_confirmation_required(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test that append requires confirmation when skip_confirm=False."""
+        test_file = tmp_path / "test.txt"
+        test_file.write_text("Initial content")
+
+        # Simulate non-TTY environment (agent mode)
+        monkeypatch.setattr("sys.stdin.isatty", lambda: False)
+
+        # Should raise error asking for confirmation
+        with pytest.raises(Exception, match="CONFIRMATION_REQUIRED"):
+            append_to_file(str(test_file), "More content", skip_confirm=False)
 
 
 class TestListDirectoryContents:
@@ -555,7 +569,7 @@ class TestReplaceInFile:
         original_content = "Hello world! This is a test."
         test_file.write_text(original_content)
 
-        result = replace_in_file(str(test_file), "world", "universe", 1)
+        result = replace_in_file(str(test_file), "world", "universe", 1, skip_confirm=True)
         assert isinstance(result, str) and result
         assert test_file.read_text() == "Hello universe! This is a test."
 
@@ -565,7 +579,7 @@ class TestReplaceInFile:
         original_content = "foo bar foo baz foo"
         test_file.write_text(original_content)
 
-        result = replace_in_file(str(test_file), "foo", "bar", -1)
+        result = replace_in_file(str(test_file), "foo", "bar", -1, skip_confirm=True)
         assert isinstance(result, str) and result
         assert test_file.read_text() == "bar bar bar baz bar"
 
@@ -575,7 +589,7 @@ class TestReplaceInFile:
         original_content = "foo foo foo foo"
         test_file.write_text(original_content)
 
-        result = replace_in_file(str(test_file), "foo", "bar", 2)
+        result = replace_in_file(str(test_file), "foo", "bar", 2, skip_confirm=True)
         assert isinstance(result, str) and result
         assert test_file.read_text() == "bar bar foo foo"
 
@@ -585,7 +599,7 @@ class TestReplaceInFile:
         original_content = "Hello world!"
         test_file.write_text(original_content)
 
-        result = replace_in_file(str(test_file), "xyz", "abc", 1)
+        result = replace_in_file(str(test_file), "xyz", "abc", 1, skip_confirm=True)
         assert isinstance(result, str) and result
         assert test_file.read_text() == original_content  # Unchanged
 
@@ -595,14 +609,14 @@ class TestReplaceInFile:
         test_file.write_text("content")
 
         with pytest.raises(ValueError, match="old_text cannot be empty"):
-            replace_in_file(str(test_file), "", "new", 1)
+            replace_in_file(str(test_file), "", "new", 1, skip_confirm=True)
 
     def test_replace_nonexistent_file(self, tmp_path: Path) -> None:
         """Test replacing in a file that doesn't exist."""
         nonexistent_file = tmp_path / "nonexistent.txt"
 
         with pytest.raises(FileSystemError, match="File not found"):
-            replace_in_file(str(nonexistent_file), "old", "new", 1)
+            replace_in_file(str(nonexistent_file), "old", "new", 1, skip_confirm=True)
 
     def test_replace_multiline_text(self, tmp_path: Path) -> None:
         """Test replacing multiline text."""
@@ -610,7 +624,7 @@ class TestReplaceInFile:
         original_content = "Line 1\nOld text\nLine 3"
         test_file.write_text(original_content)
 
-        result = replace_in_file(str(test_file), "Old text", "New text", 1)
+        result = replace_in_file(str(test_file), "Old text", "New text", 1, skip_confirm=True)
         assert isinstance(result, str) and result
         assert test_file.read_text() == "Line 1\nNew text\nLine 3"
 
@@ -623,7 +637,21 @@ class TestReplaceInFile:
             "pathlib.Path.read_text", side_effect=PermissionError("Access denied")
         ):
             with pytest.raises(FileSystemError, match="Failed to replace text in file"):
-                replace_in_file(str(test_file), "old", "new", 1)
+                replace_in_file(str(test_file), "old", "new", 1, skip_confirm=True)
+
+    def test_replace_with_confirmation_required(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test that replace requires confirmation when skip_confirm=False."""
+        test_file = tmp_path / "test.txt"
+        test_file.write_text("Hello world!")
+
+        # Simulate non-TTY environment (agent mode)
+        monkeypatch.setattr("sys.stdin.isatty", lambda: False)
+
+        # Should raise error asking for confirmation
+        with pytest.raises(Exception, match="CONFIRMATION_REQUIRED"):
+            replace_in_file(str(test_file), "world", "universe", 1, skip_confirm=False)
 
 
 class TestInsertAtLine:
@@ -635,7 +663,7 @@ class TestInsertAtLine:
         original_content = "Line 1\nLine 2\nLine 3"
         test_file.write_text(original_content)
 
-        result = insert_at_line(str(test_file), 1, "New first line")
+        result = insert_at_line(str(test_file), 1, "New first line", skip_confirm=True)
         assert isinstance(result, str) and result
         expected = "New first line\nLine 1\nLine 2\nLine 3"
         assert test_file.read_text() == expected
@@ -646,7 +674,7 @@ class TestInsertAtLine:
         original_content = "Line 1\nLine 2\nLine 3"
         test_file.write_text(original_content)
 
-        result = insert_at_line(str(test_file), 2, "Inserted line")
+        result = insert_at_line(str(test_file), 2, "Inserted line", skip_confirm=True)
         assert isinstance(result, str) and result
         expected = "Line 1\nInserted line\nLine 2\nLine 3"
         assert test_file.read_text() == expected
@@ -657,7 +685,7 @@ class TestInsertAtLine:
         original_content = "Line 1\nLine 2"
         test_file.write_text(original_content)
 
-        result = insert_at_line(str(test_file), 3, "New last line")
+        result = insert_at_line(str(test_file), 3, "New last line", skip_confirm=True)
         assert isinstance(result, str) and result
         expected = "Line 1\nLine 2New last line\n"
         assert test_file.read_text() == expected
@@ -668,7 +696,7 @@ class TestInsertAtLine:
         original_content = "Line 1\nLine 2"
         test_file.write_text(original_content)
 
-        result = insert_at_line(str(test_file), 10, "Far beyond")
+        result = insert_at_line(str(test_file), 10, "Far beyond", skip_confirm=True)
         assert isinstance(result, str) and result
         expected = "Line 1\nLine 2Far beyond\n"
         assert test_file.read_text() == expected
@@ -678,7 +706,7 @@ class TestInsertAtLine:
         test_file = tmp_path / "empty.txt"
         test_file.write_text("")
 
-        result = insert_at_line(str(test_file), 1, "First line")
+        result = insert_at_line(str(test_file), 1, "First line", skip_confirm=True)
         assert isinstance(result, str) and result
         assert test_file.read_text() == "First line\n"
 
@@ -688,7 +716,7 @@ class TestInsertAtLine:
         original_content = "Line 1\nLine 2"
         test_file.write_text(original_content)
 
-        result = insert_at_line(str(test_file), 2, "Inserted line\n")
+        result = insert_at_line(str(test_file), 2, "Inserted line\n", skip_confirm=True)
         assert isinstance(result, str) and result
         expected = "Line 1\nInserted line\nLine 2"
         assert test_file.read_text() == expected
@@ -699,17 +727,17 @@ class TestInsertAtLine:
         test_file.write_text("content")
 
         with pytest.raises(ValueError, match="line_number must be 1 or greater"):
-            insert_at_line(str(test_file), 0, "content")
+            insert_at_line(str(test_file), 0, "content", skip_confirm=True)
 
         with pytest.raises(ValueError, match="line_number must be 1 or greater"):
-            insert_at_line(str(test_file), -1, "content")
+            insert_at_line(str(test_file), -1, "content", skip_confirm=True)
 
     def test_insert_nonexistent_file(self, tmp_path: Path) -> None:
         """Test inserting in a file that doesn't exist."""
         nonexistent_file = tmp_path / "nonexistent.txt"
 
         with pytest.raises(FileSystemError, match="File not found"):
-            insert_at_line(str(nonexistent_file), 1, "content")
+            insert_at_line(str(nonexistent_file), 1, "content", skip_confirm=True)
 
     def test_insert_file_permission_denied(self, tmp_path: Path) -> None:
         """Test inserting in a file with permission denied."""
@@ -722,7 +750,21 @@ class TestInsertAtLine:
             with pytest.raises(
                 FileSystemError, match="Failed to insert content in file"
             ):
-                insert_at_line(str(test_file), 1, "new content")
+                insert_at_line(str(test_file), 1, "new content", skip_confirm=True)
+
+    def test_insert_with_confirmation_required(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test that insert requires confirmation when skip_confirm=False."""
+        test_file = tmp_path / "test.txt"
+        test_file.write_text("Line 1\nLine 2")
+
+        # Simulate non-TTY environment (agent mode)
+        monkeypatch.setattr("sys.stdin.isatty", lambda: False)
+
+        # Should raise error asking for confirmation
+        with pytest.raises(Exception, match="CONFIRMATION_REQUIRED"):
+            insert_at_line(str(test_file), 2, "Inserted", skip_confirm=False)
 
 
 # Integration tests
@@ -754,7 +796,7 @@ class TestOperationsIntegration:
         assert isinstance(copy_result, str) and copy_result
 
         # Modify copy
-        replace_result = replace_in_file(str(dest_file), "Original", "Modified", 1)
+        replace_result = replace_in_file(str(dest_file), "Original", "Modified", 1, skip_confirm=True)
         assert isinstance(replace_result, str) and replace_result
 
         # Verify both files

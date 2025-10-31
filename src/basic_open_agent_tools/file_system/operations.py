@@ -136,12 +136,13 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
 
 
 @strands_tool
-def append_to_file(file_path: str, content: str) -> str:
-    """Append string content to a text file.
+def append_to_file(file_path: str, content: str, skip_confirm: bool) -> str:
+    """Append string content to a text file with confirmation.
 
     Args:
         file_path: Path to the file
         content: String content to append
+        skip_confirm: If True, skip confirmation prompt. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
@@ -149,11 +150,39 @@ def append_to_file(file_path: str, content: str) -> str:
     Raises:
         FileSystemError: If append operation fails
     """
+    # Enhanced input logging for security auditing
+    logger.debug(
+        f"append_to_file: file_path='{file_path}', content='{content[:100]}{'...' if len(content) > 100 else ''}', skip_confirm={skip_confirm}"
+    )
+
     validate_file_content(content, "append")
     path = validate_path(file_path, "append")
 
     file_existed = path.exists()
     original_size = path.stat().st_size if file_existed else 0
+    line_count = len(content.splitlines()) if content else 0
+    byte_size = len(content.encode("utf-8"))
+
+    # Generate preview for confirmation
+    content_preview = content[:200] + ("..." if len(content) > 200 else "")
+    preview = f"Appending {line_count} lines ({byte_size} bytes)\n"
+    preview += "─" * 40 + "\n"
+    preview += f"Content: {content_preview}\n"
+    preview += "─" * 40
+    if file_existed:
+        preview += f"\nCurrent file size: {original_size} bytes"
+
+    # Check user confirmation
+    confirmed = check_user_confirmation(
+        operation="append to file",
+        target=str(path),
+        skip_confirm=skip_confirm,
+        preview_info=preview,
+    )
+
+    if not confirmed:
+        logger.debug(f"Append operation cancelled by user: {path}")
+        return f"Operation cancelled by user: {path}"
 
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -162,13 +191,17 @@ def append_to_file(file_path: str, content: str) -> str:
 
         new_size = path.stat().st_size
         bytes_added = new_size - original_size
-        line_count = len(content.splitlines()) if content else 0
+
+        logger.info(
+            f"Appended {line_count} lines ({bytes_added} bytes) to {path}"
+        )
 
         if file_existed:
             return f"Appended {line_count} lines ({bytes_added} bytes) to {path}"
         else:
             return f"Created file {path} with {line_count} lines ({bytes_added} bytes)"
     except OSError as e:
+        logger.error(f"Failed to append to {path}: {e}")
         raise FileSystemError(f"Failed to append to file {path}: {e}")
 
 
@@ -543,8 +576,10 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
 
 
 @strands_tool
-def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) -> str:
-    """Replace occurrences of text within a file with detailed feedback.
+def replace_in_file(
+    file_path: str, old_text: str, new_text: str, count: int, skip_confirm: bool
+) -> str:
+    """Replace occurrences of text within a file with detailed feedback and confirmation.
 
     This function performs targeted text replacement, making it safer for agents
     to make small changes without accidentally removing other content.
@@ -554,6 +589,7 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
         old_text: Text to search for and replace
         new_text: Text to replace the old text with
         count: Maximum number of replacements to make (-1 for all occurrences)
+        skip_confirm: If True, skip confirmation prompt. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
@@ -567,7 +603,7 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
 
     # Enhanced input logging for security auditing
     logger.debug(
-        f"replace_in_file: file_path='{file_path}', old_text='{old_text[:100]}{'...' if len(old_text) > 100 else ''}', new_text='{new_text[:100]}{'...' if len(new_text) > 100 else ''}', count={count}"
+        f"replace_in_file: file_path='{file_path}', old_text='{old_text[:100]}{'...' if len(old_text) > 100 else ''}', new_text='{new_text[:100]}{'...' if len(new_text) > 100 else ''}', count={count}, skip_confirm={skip_confirm}"
     )
 
     validate_file_content(new_text, "replace")
@@ -586,6 +622,32 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
         if total_occurrences == 0:
             return f"No occurrences of '{old_text}' found in {path}"
 
+        # Calculate how many replacements will be made
+        replacements_to_make = (
+            total_occurrences if count == -1 else min(count, total_occurrences)
+        )
+
+        # Generate preview for confirmation
+        old_preview = old_text[:200] + ("..." if len(old_text) > 200 else "")
+        new_preview = new_text[:200] + ("..." if len(new_text) > 200 else "")
+        preview = f"Will replace {replacements_to_make} of {total_occurrences} occurrence(s)\n"
+        preview += "─" * 40 + "\n"
+        preview += f"Old text: {old_preview}\n"
+        preview += f"New text: {new_preview}\n"
+        preview += "─" * 40
+
+        # Check user confirmation
+        confirmed = check_user_confirmation(
+            operation="replace text in file",
+            target=str(path),
+            skip_confirm=skip_confirm,
+            preview_info=preview,
+        )
+
+        if not confirmed:
+            logger.debug(f"Replace operation cancelled by user: {path}")
+            return f"Operation cancelled by user: {path}"
+
         # Perform replacement
         updated_content = content.replace(old_text, new_text, count)
 
@@ -596,6 +658,10 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
         # Write back to file
         path.write_text(updated_content, encoding="utf-8")
 
+        logger.info(
+            f"Replaced {replacements_made} occurrence(s) in {path}: '{old_text[:50]}' -> '{new_text[:50]}'"
+        )
+
         if count == -1 or replacements_made == total_occurrences:
             return f"Replaced {replacements_made} occurrence(s) of '{old_text}' with '{new_text}' in {path}"
         else:
@@ -605,8 +671,8 @@ def replace_in_file(file_path: str, old_text: str, new_text: str, count: int) ->
 
 
 @strands_tool
-def insert_at_line(file_path: str, line_number: int, content: str) -> str:
-    """Insert content at a specific line number in a file with detailed feedback.
+def insert_at_line(file_path: str, line_number: int, content: str, skip_confirm: bool) -> str:
+    """Insert content at a specific line number in a file with detailed feedback and confirmation.
 
     This function allows precise insertion of text at a specific line,
     making it safer for agents to add content without overwriting files.
@@ -615,6 +681,7 @@ def insert_at_line(file_path: str, line_number: int, content: str) -> str:
         file_path: Path to the file to modify
         line_number: Line number to insert at (1-based indexing)
         content: Content to insert (will be added as a new line)
+        skip_confirm: If True, skip confirmation prompt. IMPORTANT: Agents should default to skip_confirm=False for safety.
 
     Returns:
         String describing the operation result
@@ -628,7 +695,7 @@ def insert_at_line(file_path: str, line_number: int, content: str) -> str:
 
     # Enhanced input logging for security auditing
     logger.debug(
-        f"insert_at_line: file_path='{file_path}', line_number={line_number}, content='{content[:100]}{'...' if len(content) > 100 else ''}')"
+        f"insert_at_line: file_path='{file_path}', line_number={line_number}, content='{content[:100]}{'...' if len(content) > 100 else ''}', skip_confirm={skip_confirm}"
     )
 
     validate_file_content(content, "insert")
@@ -651,18 +718,47 @@ def insert_at_line(file_path: str, line_number: int, content: str) -> str:
 
         # Determine position description for feedback
         if insert_index >= original_line_count:
-            lines.append(content)
             position_desc = f"end (after line {original_line_count})"
         else:
-            lines.insert(insert_index, content)
             position_desc = f"line {line_number}"
+
+        # Generate preview for confirmation
+        content_lines = len(content.splitlines()) if content else 0
+        content_preview = content[:200] + ("..." if len(content) > 200 else "")
+        preview = f"Inserting {content_lines} line(s) at {position_desc}\n"
+        preview += f"File currently has {original_line_count} lines\n"
+        preview += "─" * 40 + "\n"
+        preview += f"Content: {content_preview}\n"
+        preview += "─" * 40
+
+        # Check user confirmation
+        confirmed = check_user_confirmation(
+            operation="insert content in file",
+            target=str(path),
+            skip_confirm=skip_confirm,
+            preview_info=preview,
+        )
+
+        if not confirmed:
+            logger.debug(f"Insert operation cancelled by user: {path}")
+            return f"Operation cancelled by user: {path}"
+
+        # Perform insertion
+        if insert_index >= original_line_count:
+            lines.append(content)
+        else:
+            lines.insert(insert_index, content)
 
         # Write back to file
         path.write_text("".join(lines), encoding="utf-8")
 
         new_line_count = len(lines)
-        content_lines = len(content.splitlines()) if content else 0
+
+        logger.info(
+            f"Inserted {content_lines} line(s) at {position_desc} in {path} (file now has {new_line_count} lines)"
+        )
 
         return f"Inserted {content_lines} line(s) at {position_desc} in {path} (file now has {new_line_count} lines)"
     except (OSError, UnicodeDecodeError) as e:
+        logger.error(f"Failed to insert content in {path}: {e}")
         raise FileSystemError(f"Failed to insert content in file {path}: {e}")
