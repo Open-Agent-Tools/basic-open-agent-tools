@@ -330,7 +330,7 @@ def save_tasks_to_file(file_path: str, skip_confirm: bool) -> dict[str, Any]:
         # Check if file exists and handle confirmation
         if file_path_obj.exists():
             current_count = len(operations._task_storage["tasks"])
-            confirmed = check_user_confirmation(
+            confirmed, decline_reason = check_user_confirmation(
                 operation="overwrite existing task file",
                 target=str(file_path_obj),
                 skip_confirm=skip_confirm,
@@ -338,12 +338,13 @@ def save_tasks_to_file(file_path: str, skip_confirm: bool) -> dict[str, Any]:
             )
 
             if not confirmed:
-                logger.info(f"[TODO] Save cancelled by user: {file_path}")
+                reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+                logger.info(f"[TODO] Save cancelled by user: {file_path}{reason_msg}")
                 return {
                     "success": False,
                     "file_path": str(file_path_obj),
                     "task_count": 0,
-                    "message": "Save cancelled by user",
+                    "message": f"Save cancelled by user{reason_msg}",
                 }
 
         # Create parent directories if they don't exist

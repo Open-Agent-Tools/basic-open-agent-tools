@@ -173,7 +173,7 @@ def write_csv_simple(
     if file_existed:
         # Check user confirmation - show preview of NEW data being written
         preview = _generate_csv_preview(data, delimiter)
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing CSV file",
             target=file_path_str,
             skip_confirm=skip_confirm,
@@ -181,8 +181,9 @@ def write_csv_simple(
         )
 
         if not confirmed:
-            logger.debug(f"CSV write cancelled by user: {file_path_str}")
-            return f"Operation cancelled by user: {file_path_str}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(f"CSV write cancelled by user: {file_path_str}{reason_msg}")
+            return f"Operation cancelled by user{reason_msg}: {file_path_str}"
 
     if not data:
         # Write empty file for empty data

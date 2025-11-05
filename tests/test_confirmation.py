@@ -25,26 +25,28 @@ class TestBypassMode:
 
     def test_bypass_with_skip_confirm_true(self):
         """Test bypass when skip_confirm=True."""
-        result = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="test operation",
             target="/test/path",
             skip_confirm=True,
             preview_info="test preview",
         )
-        assert result is True
+        assert confirmed is True
+        assert decline_reason is None
 
     def test_bypass_with_environment_variable(self, monkeypatch):
         """Test bypass when BYPASS_TOOL_CONSENT=true."""
         monkeypatch.setenv("BYPASS_TOOL_CONSENT", "true")
 
         with patch("builtins.print") as mock_print:
-            result = check_user_confirmation(
+            confirmed, decline_reason = check_user_confirmation(
                 operation="test operation",
                 target="/test/path",
                 skip_confirm=False,
             )
 
-        assert result is True
+        assert confirmed is True
+        assert decline_reason is None
         # Should print bypass message
         mock_print.assert_called_once_with(
             "[BYPASS] Confirmation bypassed via BYPASS_TOOL_CONSENT"
@@ -54,13 +56,14 @@ class TestBypassMode:
         """Test BYPASS_TOOL_CONSENT is case-insensitive."""
         monkeypatch.setenv("BYPASS_TOOL_CONSENT", "TRUE")
 
-        result = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="test operation",
             target="/test/path",
             skip_confirm=False,
         )
 
-        assert result is True
+        assert confirmed is True
+        assert decline_reason is None
 
     def test_bypass_environment_variable_false(self, monkeypatch):
         """Test BYPASS_TOOL_CONSENT=false does not bypass."""
@@ -78,13 +81,14 @@ class TestBypassMode:
         """Test skip_confirm=True takes precedence even if env var is false."""
         monkeypatch.setenv("BYPASS_TOOL_CONSENT", "false")
 
-        result = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="test operation",
             target="/test/path",
             skip_confirm=True,
         )
 
-        assert result is True
+        assert confirmed is True
+        assert decline_reason is None
 
 
 class TestInteractiveMode:
@@ -94,13 +98,14 @@ class TestInteractiveMode:
         """Test interactive confirmation with 'y' response."""
         with patch("sys.stdin", StringIO("y\n")):
             with patch("builtins.print") as mock_print:
-                result = _interactive_confirm(
+                confirmed, decline_reason = _interactive_confirm(
                     operation="delete file",
                     target="/test/file.txt",
                     preview_info="1024 bytes",
                 )
 
-        assert result is True
+        assert confirmed is True
+        assert decline_reason is None
         # Check confirmation message was printed
         calls = [str(call) for call in mock_print.call_args_list]
         assert any("Confirmation Required" in str(call) for call in calls)
@@ -110,52 +115,56 @@ class TestInteractiveMode:
         assert any("Confirmed" in str(call) for call in calls)
 
     def test_interactive_confirm_no(self):
-        """Test interactive confirmation with 'n' response."""
-        with patch("sys.stdin", StringIO("n\n")):
+        """Test interactive confirmation with 'n' response and decline reason."""
+        with patch("sys.stdin", StringIO("n\nfile not ready\n")):
             with patch("builtins.print") as mock_print:
-                result = _interactive_confirm(
+                confirmed, decline_reason = _interactive_confirm(
                     operation="delete file",
                     target="/test/file.txt",
                 )
 
-        assert result is False
+        assert confirmed is False
+        assert decline_reason == "file not ready"
         # Check cancelled message was printed
         calls = [str(call) for call in mock_print.call_args_list]
         assert any("Cancelled" in str(call) for call in calls)
 
-    def test_interactive_confirm_empty_defaults_no(self):
-        """Test interactive confirmation with empty input defaults to no."""
+    def test_interactive_confirm_empty_defaults_yes(self):
+        """Test interactive confirmation with empty input defaults to yes."""
         with patch("sys.stdin", StringIO("\n")):
             with patch("builtins.print"):
-                result = _interactive_confirm(
+                confirmed, decline_reason = _interactive_confirm(
                     operation="delete file",
                     target="/test/file.txt",
                 )
 
-        assert result is False
+        assert confirmed is True
+        assert decline_reason is None
 
     def test_interactive_confirm_random_input_defaults_no(self):
-        """Test interactive confirmation with random input defaults to no."""
-        with patch("sys.stdin", StringIO("maybe\n")):
+        """Test interactive confirmation with random input defaults to no and prompts for reason."""
+        with patch("sys.stdin", StringIO("maybe\ntest reason\n")):
             with patch("builtins.print"):
-                result = _interactive_confirm(
+                confirmed, decline_reason = _interactive_confirm(
                     operation="delete file",
                     target="/test/file.txt",
                 )
 
-        assert result is False
+        assert confirmed is False
+        assert decline_reason == "test reason"
 
     def test_interactive_confirm_without_preview(self):
         """Test interactive confirmation without preview info."""
         with patch("sys.stdin", StringIO("y\n")):
             with patch("builtins.print") as mock_print:
-                result = _interactive_confirm(
+                confirmed, decline_reason = _interactive_confirm(
                     operation="delete file",
                     target="/test/file.txt",
                     preview_info=None,
                 )
 
-        assert result is True
+        assert confirmed is True
+        assert decline_reason is None
         # Preview should not be in output
         calls = [str(call) for call in mock_print.call_args_list]
         assert not any("Preview" in str(call) for call in calls)
@@ -164,12 +173,13 @@ class TestInteractiveMode:
         """Test interactive confirmation handles EOF gracefully."""
         with patch("builtins.input", side_effect=EOFError):
             with patch("builtins.print") as mock_print:
-                result = _interactive_confirm(
+                confirmed, decline_reason = _interactive_confirm(
                     operation="delete file",
                     target="/test/file.txt",
                 )
 
-        assert result is False
+        assert confirmed is False
+        assert decline_reason == "interrupted by user"
         calls = [str(call) for call in mock_print.call_args_list]
         assert any("interrupted" in str(call).lower() for call in calls)
 
@@ -177,12 +187,13 @@ class TestInteractiveMode:
         """Test interactive confirmation handles Ctrl+C gracefully."""
         with patch("builtins.input", side_effect=KeyboardInterrupt):
             with patch("builtins.print") as mock_print:
-                result = _interactive_confirm(
+                confirmed, decline_reason = _interactive_confirm(
                     operation="delete file",
                     target="/test/file.txt",
                 )
 
-        assert result is False
+        assert confirmed is False
+        assert decline_reason == "interrupted by user"
         calls = [str(call) for call in mock_print.call_args_list]
         assert any("interrupted" in str(call).lower() for call in calls)
 
@@ -270,13 +281,14 @@ class TestIntegrationScenarios:
 
     def test_file_overwrite_scenario_bypass(self):
         """Test file overwrite scenario with bypass mode."""
-        result = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing file",
             target="/app/config.yml",
             skip_confirm=True,
             preview_info="2048 bytes",
         )
-        assert result is True
+        assert confirmed is True
+        assert decline_reason is None
 
     def test_file_delete_scenario_agent(self):
         """Test file delete scenario in agent mode."""
@@ -302,16 +314,17 @@ class TestIntegrationScenarios:
             "basic_open_agent_tools.confirmation._is_interactive_terminal",
             return_value=True,
         ):
-            with patch("sys.stdin", StringIO("n\n")):
+            with patch("sys.stdin", StringIO("n\nno longer needed\n")):
                 with patch("builtins.print"):
-                    result = check_user_confirmation(
+                    confirmed, decline_reason = check_user_confirmation(
                         operation="delete directory",
                         target="/tmp/old_data",
                         skip_confirm=False,
                         preview_info="50 files",
                     )
 
-        assert result is False
+        assert confirmed is False
+        assert decline_reason == "no longer needed"
 
     def test_ci_environment_bypass(self, monkeypatch):
         """Test CI environment with BYPASS_TOOL_CONSENT."""
@@ -319,13 +332,14 @@ class TestIntegrationScenarios:
         monkeypatch.setenv("CI", "true")
 
         with patch("builtins.print") as mock_print:
-            result = check_user_confirmation(
+            confirmed, decline_reason = check_user_confirmation(
                 operation="overwrite test results",
                 target="/test-results/output.xml",
                 skip_confirm=False,
             )
 
-        assert result is True
+        assert confirmed is True
+        assert decline_reason is None
         mock_print.assert_called_once_with(
             "[BYPASS] Confirmation bypassed via BYPASS_TOOL_CONSENT"
         )
@@ -333,12 +347,13 @@ class TestIntegrationScenarios:
     def test_multiple_confirmations_same_session(self, monkeypatch):
         """Test multiple confirmations in same session."""
         # First with bypass
-        result1 = check_user_confirmation(
+        confirmed1, reason1 = check_user_confirmation(
             operation="write file",
             target="/tmp/file1.txt",
             skip_confirm=True,
         )
-        assert result1 is True
+        assert confirmed1 is True
+        assert reason1 is None
 
         # Then without bypass (should raise in non-TTY)
         with pytest.raises(BasicAgentToolsError):
@@ -350,12 +365,13 @@ class TestIntegrationScenarios:
 
         # Then with env var bypass
         monkeypatch.setenv("BYPASS_TOOL_CONSENT", "true")
-        result3 = check_user_confirmation(
+        confirmed3, reason3 = check_user_confirmation(
             operation="write file",
             target="/tmp/file3.txt",
             skip_confirm=False,
         )
-        assert result3 is True
+        assert confirmed3 is True
+        assert reason3 is None
 
 
 class TestEdgeCases:

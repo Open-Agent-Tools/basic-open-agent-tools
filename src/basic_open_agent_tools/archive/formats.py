@@ -51,7 +51,7 @@ def create_tar(
     if file_existed:
         # Check user confirmation - show preview of NEW archive being created
         preview = _generate_archive_preview(source_paths)
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing TAR archive",
             target=output_path,
             skip_confirm=skip_confirm,
@@ -59,8 +59,9 @@ def create_tar(
         )
 
         if not confirmed:
-            logger.debug(f"TAR creation cancelled by user: {output_path}")
-            return f"Operation cancelled by user: {output_path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(f"TAR creation cancelled by user: {output_path}{reason_msg}")
+            return f"Operation cancelled by user{reason_msg}: {output_path}"
 
     try:
         mode_map = {"none": "w", "gzip": "w:gz", "bzip2": "w:bz2"}

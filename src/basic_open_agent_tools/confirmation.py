@@ -2,8 +2,10 @@
 
 This module provides a hybrid confirmation system that works in three modes:
 1. Bypass mode: BYPASS_TOOL_CONSENT=true environment variable skips all confirmations
-2. Interactive mode: If running in a terminal (TTY), prompts user directly
+2. Interactive mode: If running in a terminal (TTY), prompts user directly (defaults to YES)
 3. Agent mode: If not in TTY, raises error instructing agent to ask user
+
+Interactive mode defaults to YES - users can simply press Enter to confirm, or type 'n' to cancel.
 
 This design allows tools to work seamlessly in terminal environments (with direct
 user prompts) and in agent frameworks (where the LLM asks the user via conversation).
@@ -21,7 +23,7 @@ def check_user_confirmation(
     target: str,
     skip_confirm: bool,
     preview_info: Optional[str] = None,
-) -> bool:
+) -> tuple[bool, Optional[str]]:
     """Check if user confirmation is needed and handle accordingly.
 
     This function supports three operational modes:
@@ -30,7 +32,8 @@ def check_user_confirmation(
        variable is set to "true", confirmation is skipped entirely.
 
     2. **Interactive Mode**: If running in a terminal (stdin/stdout are TTY),
-       displays a confirmation prompt and waits for user input.
+       displays a confirmation prompt and waits for user input. If user declines,
+       prompts for an optional decline reason.
 
     3. **Agent Mode**: If not in a terminal (e.g., running through an LLM agent),
        raises an error instructing the agent to ask the user for permission.
@@ -44,29 +47,34 @@ def check_user_confirmation(
                      (e.g., file size, number of items)
 
     Returns:
-        True if operation should proceed, False if user declined in interactive mode
+        Tuple of (confirmed, decline_reason):
+        - confirmed: True if operation should proceed, False if user declined
+        - decline_reason: None if confirmed, user's reason string if declined (may be empty)
 
     Raises:
         BasicAgentToolsError: In agent mode when confirmation is needed
 
     Examples:
-        >>> # In terminal: prompts user directly
-        >>> check_user_confirmation("overwrite file", "/path/to/file.txt", False)
+        >>> # In terminal: prompts user directly (defaults to YES)
+        >>> confirmed, reason = check_user_confirmation("overwrite file", "/path/to/file.txt", False)
         ⚠️  Confirmation Required
         Operation: overwrite file
         Target: /path/to/file.txt
-        Do you want to proceed? [y/N]: y
+        Do you want to proceed? [Y/n]:
+        >>> confirmed
         True
 
-        >>> # In agent context: raises error with instructions
-        >>> check_user_confirmation("delete file", "/path/to/file.txt", False)
-        BasicAgentToolsError: CONFIRMATION_REQUIRED: delete file - /path/to/file.txt
-        Please ask the user for permission to proceed.
-        If approved, retry with skip_confirm=True.
+        >>> # User declines with reason
+        >>> confirmed, reason = check_user_confirmation("delete file", "/path/to/file.txt", False)
+        Do you want to proceed? [Y/n]: n
+        ✗ Cancelled by user
+        Decline Reason (optional): file still needed for testing
+        >>> confirmed, reason
+        (False, "file still needed for testing")
 
         >>> # With bypass
         >>> check_user_confirmation("overwrite file", "/path/to/file.txt", True)
-        True
+        (True, None)
     """
     # Mode 1: Bypass confirmation if skip_confirm=True or BYPASS_TOOL_CONSENT is set
     bypass_env = os.getenv("BYPASS_TOOL_CONSENT", "false").lower() == "true"
@@ -74,7 +82,7 @@ def check_user_confirmation(
     if skip_confirm or bypass_env:
         if bypass_env:
             print("[BYPASS] Confirmation bypassed via BYPASS_TOOL_CONSENT")
-        return True
+        return (True, None)
 
     # Mode 2: Interactive terminal mode - prompt user directly
     if _is_interactive_terminal():
@@ -95,8 +103,12 @@ def _is_interactive_terminal() -> bool:
 
 def _interactive_confirm(
     operation: str, target: str, preview_info: Optional[str] = None
-) -> bool:
+) -> tuple[bool, Optional[str]]:
     """Display interactive terminal confirmation prompt.
+
+    Defaults to YES - pressing Enter confirms the operation.
+    User must explicitly type 'n' or 'no' to cancel.
+    If user declines, prompts for an optional reason.
 
     Args:
         operation: Description of the operation
@@ -104,7 +116,9 @@ def _interactive_confirm(
         preview_info: Optional preview information
 
     Returns:
-        True if user confirmed (entered 'y'), False otherwise
+        Tuple of (confirmed, decline_reason):
+        - confirmed: True if user confirmed, False if declined
+        - decline_reason: None if confirmed, user's reason string if declined (may be empty)
     """
     print("\n⚠️  Confirmation Required")
     print(f"Operation: {operation}")
@@ -121,18 +135,22 @@ def _interactive_confirm(
             print(f"Preview: {preview_info}")
 
     try:
-        response = input("\nDo you want to proceed? [y/N]: ").strip().lower()
+        response = input("\nDo you want to proceed? [Y/n]: ").strip().lower()
 
-        if response == "y":
+        # Default to Yes (empty response or 'y'/'yes' confirms)
+        if response in ("", "y", "yes"):
             print("✓ Confirmed - proceeding\n")
-            return True
+            return (True, None)
         else:
-            print("✗ Cancelled by user\n")
-            return False
+            print("✗ Cancelled by user")
+            # Prompt for optional decline reason
+            decline_reason = input("Decline Reason (optional): ").strip()
+            print()  # Extra newline for spacing
+            return (False, decline_reason)
     except (EOFError, KeyboardInterrupt):
         # Handle Ctrl+C or EOF gracefully
         print("\n✗ Cancelled by user (interrupted)\n")
-        return False
+        return (False, "interrupted by user")
 
 
 def _raise_agent_confirmation_error(

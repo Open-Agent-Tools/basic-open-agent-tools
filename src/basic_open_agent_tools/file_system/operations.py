@@ -108,7 +108,7 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
         # Check user confirmation (interactive prompt, agent error, or bypass)
         # Show preview of NEW content being written, not old file size
         preview = _generate_content_preview(content)
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing file",
             target=str(path),
             skip_confirm=skip_confirm,
@@ -116,8 +116,9 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
         )
 
         if not confirmed:
-            logger.debug(f"Write cancelled by user: {path}")
-            return f"Operation cancelled by user: {path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(f"Write cancelled by user: {path}{reason_msg}")
+            return f"Operation cancelled by user{reason_msg}: {path}"
 
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -173,7 +174,7 @@ def append_to_file(file_path: str, content: str, skip_confirm: bool) -> str:
         preview += f"\nCurrent file size: {original_size} bytes"
 
     # Check user confirmation
-    confirmed = check_user_confirmation(
+    confirmed, decline_reason = check_user_confirmation(
         operation="append to file",
         target=str(path),
         skip_confirm=skip_confirm,
@@ -181,8 +182,9 @@ def append_to_file(file_path: str, content: str, skip_confirm: bool) -> str:
     )
 
     if not confirmed:
-        logger.debug(f"Append operation cancelled by user: {path}")
-        return f"Operation cancelled by user: {path}"
+        reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+        logger.debug(f"Append operation cancelled by user: {path}{reason_msg}")
+        return f"Operation cancelled by user{reason_msg}: {path}"
 
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -258,7 +260,7 @@ def create_directory(directory_path: str, skip_confirm: bool) -> str:
 
     if already_existed:
         # Check user confirmation (interactive prompt, agent error, or bypass)
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="use existing directory",
             target=str(path),
             skip_confirm=skip_confirm,
@@ -266,7 +268,8 @@ def create_directory(directory_path: str, skip_confirm: bool) -> str:
         )
 
         if not confirmed:
-            return f"Operation cancelled by user: {path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            return f"Operation cancelled by user{reason_msg}: {path}"
 
     try:
         path.mkdir(parents=True, exist_ok=True)
@@ -297,7 +300,7 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
 
     if not path.exists():
         # For non-existent files, check if we need confirmation for the error suppression
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="suppress file-not-found error",
             target=str(path),
             skip_confirm=skip_confirm,
@@ -305,7 +308,8 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
         )
 
         if not confirmed:
-            raise FileSystemError(f"File not found: {path}")
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            raise FileSystemError(f"File not found{reason_msg}: {path}")
 
         return f"File not found (already deleted): {path}"
 
@@ -319,7 +323,7 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
     logger.debug(f"skip_confirm: {skip_confirm}")
 
     # Check user confirmation for deletion
-    confirmed = check_user_confirmation(
+    confirmed, decline_reason = check_user_confirmation(
         operation="delete file",
         target=str(path),
         skip_confirm=skip_confirm,
@@ -327,8 +331,9 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
     )
 
     if not confirmed:
-        logger.debug(f"Deletion cancelled by user: {path}")
-        return f"Operation cancelled by user: {path}"
+        reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+        logger.debug(f"Deletion cancelled by user: {path}{reason_msg}")
+        return f"Operation cancelled by user{reason_msg}: {path}"
 
     try:
         path.unlink()
@@ -360,7 +365,7 @@ def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -
 
     if not path.exists():
         # Check confirmation for error suppression
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="suppress directory-not-found error",
             target=str(path),
             skip_confirm=skip_confirm,
@@ -368,7 +373,8 @@ def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -
         )
 
         if not confirmed:
-            raise FileSystemError(f"Directory not found: {path}")
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            raise FileSystemError(f"Directory not found{reason_msg}: {path}")
 
         return f"Directory not found (already deleted): {path}"
 
@@ -392,7 +398,7 @@ def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -
     if recursive and item_count > 0:
         preview += " (recursive deletion)"
 
-    confirmed = check_user_confirmation(
+    confirmed, decline_reason = check_user_confirmation(
         operation="delete directory",
         target=str(path),
         skip_confirm=skip_confirm,
@@ -400,7 +406,8 @@ def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -
     )
 
     if not confirmed:
-        return f"Operation cancelled by user: {path}"
+        reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+        return f"Operation cancelled by user{reason_msg}: {path}"
 
     try:
         if recursive:
@@ -462,7 +469,7 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
 
     if destination_existed:
         # Check user confirmation for overwrite
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation=f"overwrite existing {item_type} during move",
             target=str(dst_path),
             skip_confirm=skip_confirm,
@@ -470,8 +477,11 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
         )
 
         if not confirmed:
-            logger.debug(f"Move cancelled by user: {src_path} -> {dst_path}")
-            return f"Operation cancelled by user: move from {src_path} to {dst_path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(
+                f"Move cancelled by user: {src_path} -> {dst_path}{reason_msg}"
+            )
+            return f"Operation cancelled by user{reason_msg}: move from {src_path} to {dst_path}"
 
     try:
         dst_path.parent.mkdir(parents=True, exist_ok=True)
@@ -546,7 +556,7 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
 
     if destination_existed:
         # Check user confirmation for overwrite
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation=f"overwrite existing {item_type} during copy",
             target=str(dst_path),
             skip_confirm=skip_confirm,
@@ -554,7 +564,8 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
         )
 
         if not confirmed:
-            return f"Operation cancelled by user: copy from {src_path} to {dst_path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            return f"Operation cancelled by user{reason_msg}: copy from {src_path} to {dst_path}"
 
     try:
         dst_path.parent.mkdir(parents=True, exist_ok=True)
@@ -635,7 +646,7 @@ def replace_in_file(
         preview += "─" * 40
 
         # Check user confirmation
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="replace text in file",
             target=str(path),
             skip_confirm=skip_confirm,
@@ -643,8 +654,9 @@ def replace_in_file(
         )
 
         if not confirmed:
-            logger.debug(f"Replace operation cancelled by user: {path}")
-            return f"Operation cancelled by user: {path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(f"Replace operation cancelled by user: {path}{reason_msg}")
+            return f"Operation cancelled by user{reason_msg}: {path}"
 
         # Perform replacement
         updated_content = content.replace(old_text, new_text, count)
@@ -732,7 +744,7 @@ def insert_at_line(
         preview += "─" * 40
 
         # Check user confirmation
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="insert content in file",
             target=str(path),
             skip_confirm=skip_confirm,
@@ -740,8 +752,9 @@ def insert_at_line(
         )
 
         if not confirmed:
-            logger.debug(f"Insert operation cancelled by user: {path}")
-            return f"Operation cancelled by user: {path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(f"Insert operation cancelled by user: {path}{reason_msg}")
+            return f"Operation cancelled by user{reason_msg}: {path}"
 
         # Perform insertion
         if insert_index >= original_line_count:

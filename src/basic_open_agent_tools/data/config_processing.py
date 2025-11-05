@@ -131,7 +131,7 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     if file_existed:
         # Check user confirmation - show preview of NEW data being written
         preview = _generate_dict_preview(data, "YAML")
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing YAML file",
             target=file_path,
             skip_confirm=skip_confirm,
@@ -139,8 +139,9 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         )
 
         if not confirmed:
-            logger.debug(f"YAML write cancelled by user: {file_path}")
-            return f"Operation cancelled by user: {file_path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(f"YAML write cancelled by user: {file_path}{reason_msg}")
+            return f"Operation cancelled by user{reason_msg}: {file_path}"
 
     try:
         with open(file_path, "w", encoding="utf-8") as f:
@@ -237,7 +238,7 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     if file_existed:
         # Check user confirmation - show preview of NEW data being written
         preview = _generate_dict_preview(data, "TOML")
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing TOML file",
             target=file_path,
             skip_confirm=skip_confirm,
@@ -245,8 +246,9 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         )
 
         if not confirmed:
-            logger.debug(f"TOML write cancelled by user: {file_path}")
-            return f"Operation cancelled by user: {file_path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(f"TOML write cancelled by user: {file_path}{reason_msg}")
+            return f"Operation cancelled by user{reason_msg}: {file_path}"
 
     try:
         with open(file_path, "wb") as f:
@@ -344,7 +346,7 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     if file_existed:
         # Check user confirmation - show preview of NEW data being written
         preview = _generate_dict_preview(data, "INI")
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing INI file",
             target=file_path,
             skip_confirm=skip_confirm,
@@ -352,8 +354,9 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         )
 
         if not confirmed:
-            logger.debug(f"INI write cancelled by user: {file_path}")
-            return f"Operation cancelled by user: {file_path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(f"INI write cancelled by user: {file_path}{reason_msg}")
+            return f"Operation cancelled by user{reason_msg}: {file_path}"
 
     try:
         config = configparser.ConfigParser()

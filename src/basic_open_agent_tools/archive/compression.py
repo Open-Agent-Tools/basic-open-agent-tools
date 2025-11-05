@@ -103,7 +103,7 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
         # Check user confirmation (interactive prompt, agent error, or bypass)
         # Show preview of NEW archive being created, not old file size
         preview = _generate_archive_preview(source_paths)
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing ZIP archive",
             target=output_path,
             skip_confirm=skip_confirm,
@@ -111,8 +111,9 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
         )
 
         if not confirmed:
-            logger.debug(f"ZIP creation cancelled by user: {output_path}")
-            return f"Operation cancelled by user: {output_path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(f"ZIP creation cancelled by user: {output_path}{reason_msg}")
+            return f"Operation cancelled by user{reason_msg}: {output_path}"
 
     try:
         files_added = []
@@ -185,7 +186,7 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
             contents = os.listdir(extract_to) if os.path.exists(extract_to) else []
             if contents:  # Directory exists and has contents
                 # Check user confirmation
-                confirmed = check_user_confirmation(
+                confirmed, decline_reason = check_user_confirmation(
                     operation="extract to non-empty directory",
                     target=extract_to,
                     skip_confirm=skip_confirm,
@@ -193,8 +194,13 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
                 )
 
                 if not confirmed:
-                    logger.debug(f"ZIP extraction cancelled by user: {extract_to}")
-                    return f"Operation cancelled by user: {extract_to}"
+                    reason_msg = (
+                        f" (reason: {decline_reason})" if decline_reason else ""
+                    )
+                    logger.debug(
+                        f"ZIP extraction cancelled by user: {extract_to}{reason_msg}"
+                    )
+                    return f"Operation cancelled by user{reason_msg}: {extract_to}"
         except OSError:
             pass  # Can't read directory, proceed anyway
 
@@ -283,7 +289,7 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
     if file_existed:
         # Check user confirmation - show preview of source file being compressed
         preview = _generate_compression_preview(input_path, "GZIP")
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing GZIP file",
             target=output_path,
             skip_confirm=skip_confirm,
@@ -291,8 +297,11 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
         )
 
         if not confirmed:
-            logger.debug(f"GZIP compression cancelled by user: {output_path}")
-            return f"Operation cancelled by user: {output_path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(
+                f"GZIP compression cancelled by user: {output_path}{reason_msg}"
+            )
+            return f"Operation cancelled by user{reason_msg}: {output_path}"
 
     try:
         with open(input_path, "rb") as f_in:
@@ -423,7 +432,7 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
     if file_existed:
         # Check user confirmation - show preview of source file being compressed
         preview = _generate_compression_preview(input_path, "BZIP2")
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing BZIP2 file",
             target=output_path,
             skip_confirm=skip_confirm,
@@ -431,8 +440,11 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
         )
 
         if not confirmed:
-            logger.debug(f"BZIP2 compression cancelled by user: {output_path}")
-            return f"Operation cancelled by user: {output_path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(
+                f"BZIP2 compression cancelled by user: {output_path}{reason_msg}"
+            )
+            return f"Operation cancelled by user{reason_msg}: {output_path}"
 
     try:
         with open(input_path, "rb") as f_in:
@@ -503,7 +515,7 @@ def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> s
     if file_existed:
         # Check user confirmation - show preview of source file being compressed
         preview = _generate_compression_preview(input_path, "XZ")
-        confirmed = check_user_confirmation(
+        confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing XZ file",
             target=output_path,
             skip_confirm=skip_confirm,
@@ -511,8 +523,9 @@ def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> s
         )
 
         if not confirmed:
-            logger.debug(f"XZ compression cancelled by user: {output_path}")
-            return f"Operation cancelled by user: {output_path}"
+            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+            logger.debug(f"XZ compression cancelled by user: {output_path}{reason_msg}")
+            return f"Operation cancelled by user{reason_msg}: {output_path}"
 
     try:
         with open(input_path, "rb") as f_in:

@@ -381,7 +381,7 @@ def delete_task(task_id: int, skip_confirm: bool) -> str:
         # Check if task is important (e.g., in_progress) and require confirmation
         if task_status == "in_progress":
             # Check user confirmation
-            confirmed = check_user_confirmation(
+            confirmed, decline_reason = check_user_confirmation(
                 operation="delete in-progress task",
                 target=f"Task {task_id}: {task_title}",
                 skip_confirm=skip_confirm,
@@ -389,8 +389,11 @@ def delete_task(task_id: int, skip_confirm: bool) -> str:
             )
 
             if not confirmed:
-                logger.info(f"[TODO] Task deletion cancelled by user: #{task_id}")
-                return f"Operation cancelled by user: Task {task_id}"
+                reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
+                logger.info(
+                    f"[TODO] Task deletion cancelled by user: #{task_id}{reason_msg}"
+                )
+                return f"Operation cancelled by user{reason_msg}: Task {task_id}"
 
         # Remove task
         del _task_storage["tasks"][task_id]
