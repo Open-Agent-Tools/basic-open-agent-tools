@@ -2,6 +2,7 @@
 
 import configparser
 import json
+from typing import Any
 
 from .._logging import get_logger
 from ..confirmation import check_user_confirmation
@@ -512,4 +513,534 @@ def _deep_merge(base: dict, override: dict) -> dict:
         else:
             result[key] = value
 
+    return result
+
+
+# ===== Token-Saving Config Inspection Tools =====
+
+
+def _get_value_at_path(data: dict, path: str) -> tuple[bool, Any]:
+    """Helper to navigate nested dict using dot notation.
+
+    Args:
+        data: Dictionary to navigate
+        path: Dot-separated path (e.g., "database.host")
+
+    Returns:
+        Tuple of (found, value)
+    """
+    keys = path.split(".")
+    current = data
+
+    for key in keys:
+        if not isinstance(current, dict) or key not in current:
+            return False, None
+        current = current[key]
+
+    return True, current
+
+
+def _get_all_paths(data: dict, prefix: str = "") -> list[str]:
+    """Helper to get all dot-notation paths in nested dict.
+
+    Args:
+        data: Dictionary to traverse
+        prefix: Current path prefix
+
+    Returns:
+        List of all paths
+    """
+    paths = []
+
+    for key, value in data.items():
+        current_path = f"{prefix}.{key}" if prefix else key
+        paths.append(current_path)
+
+        if isinstance(value, dict):
+            paths.extend(_get_all_paths(value, current_path))
+
+    return paths
+
+
+def _get_structure(data: Any, max_depth: int = -1, current_depth: int = 0) -> Any:
+    """Helper to get structure without values.
+
+    Args:
+        data: Dictionary to analyze
+        max_depth: Maximum depth to traverse (-1 for unlimited)
+        current_depth: Current recursion depth
+
+    Returns:
+        Structure dict with types instead of values, or type name string
+    """
+    if not isinstance(data, dict):
+        return type(data).__name__
+
+    if max_depth != -1 and current_depth >= max_depth:
+        return "dict"
+
+    structure: dict[str, Any] = {}
+    for key, value in data.items():
+        if isinstance(value, dict):
+            structure[key] = _get_structure(value, max_depth, current_depth + 1)
+        elif isinstance(value, list):
+            if value and isinstance(value[0], dict):
+                structure[key] = [
+                    _get_structure(value[0], max_depth, current_depth + 1)
+                ]
+            else:
+                structure[key] = "list"
+        else:
+            structure[key] = type(value).__name__
+
+    return structure
+
+
+@strands_tool
+def get_config_keys(file_path: str, format_type: str, path: str) -> list[str]:
+    """Get list of keys at specific path in config file without loading values.
+
+    Works with YAML, TOML, and INI configuration files. Returns only the key
+    names at the specified path level, not the actual values.
+
+    Args:
+        file_path: Path to config file
+        format_type: Format of file ("yaml", "toml", or "ini")
+        path: Dot-separated path to location (empty string for root level)
+
+    Returns:
+        List of key names at the specified path
+
+    Raises:
+        ValueError: If format_type is invalid or path not found
+        FileNotFoundError: If file doesn't exist
+        DataError: If file cannot be parsed
+
+    Example:
+        >>> get_config_keys("config.yaml", "yaml", "database")
+        ["host", "port", "username", "password"]
+        >>> get_config_keys("config.toml", "toml", "")
+        ["database", "logging", "features"]
+    """
+    if format_type not in ["yaml", "toml", "ini"]:
+        raise ValueError(
+            f"format_type must be 'yaml', 'toml', or 'ini', got: {format_type}"
+        )
+
+    logger.info(f"Getting config keys: {file_path} at path '{path}'")
+
+    # Load the appropriate config file
+    if format_type == "yaml":
+        data = read_yaml_file(file_path)
+    elif format_type == "toml":
+        data = read_toml_file(file_path)
+    else:  # ini
+        data = read_ini_file(file_path)
+
+    # Navigate to the specified path
+    if path:
+        found, target = _get_value_at_path(data, path)
+        if not found:
+            raise ValueError(f"Path not found in config: {path}")
+        if not isinstance(target, dict):
+            raise ValueError(f"Path does not point to a dictionary: {path}")
+        data = target
+
+    keys = list(data.keys())
+    logger.info(f"Found {len(keys)} keys at path '{path}'")
+    return keys
+
+
+@strands_tool
+def get_config_value_at_path(file_path: str, format_type: str, path: str) -> str:
+    """Get specific value from config file using dot notation path.
+
+    Loads the config file and extracts only the value at the specified path.
+    More efficient than loading entire config when you need a single value.
+
+    Args:
+        file_path: Path to config file
+        format_type: Format of file ("yaml", "toml", or "ini")
+        path: Dot-separated path to value (e.g., "database.host")
+
+    Returns:
+        String representation of the value at path
+
+    Raises:
+        ValueError: If format_type is invalid or path not found
+        FileNotFoundError: If file doesn't exist
+        DataError: If file cannot be parsed
+
+    Example:
+        >>> get_config_value_at_path("config.yaml", "yaml", "database.host")
+        "localhost"
+        >>> get_config_value_at_path("config.toml", "toml", "database.port")
+        "5432"
+    """
+    if format_type not in ["yaml", "toml", "ini"]:
+        raise ValueError(
+            f"format_type must be 'yaml', 'toml', or 'ini', got: {format_type}"
+        )
+
+    if not path:
+        raise ValueError("path cannot be empty")
+
+    logger.info(f"Getting config value: {file_path} at path '{path}'")
+
+    # Load the appropriate config file
+    if format_type == "yaml":
+        data = read_yaml_file(file_path)
+    elif format_type == "toml":
+        data = read_toml_file(file_path)
+    else:  # ini
+        data = read_ini_file(file_path)
+
+    # Navigate to the value
+    found, value = _get_value_at_path(data, path)
+    if not found:
+        raise ValueError(f"Path not found in config: {path}")
+
+    logger.info(f"Found value at path '{path}': {type(value).__name__}")
+    return str(value)
+
+
+@strands_tool
+def get_config_structure(file_path: str, format_type: str, max_depth: int) -> Any:
+    """Get hierarchical structure overview of config file without values.
+
+    Returns the schema/structure showing keys and types at each level, but not
+    the actual values. Useful for understanding config file organization without
+    loading all data.
+
+    Args:
+        file_path: Path to config file
+        format_type: Format of file ("yaml", "toml", or "ini")
+        max_depth: Maximum depth to traverse (-1 for unlimited)
+
+    Returns:
+        Dictionary showing structure with type names instead of values
+
+    Raises:
+        ValueError: If format_type is invalid
+        FileNotFoundError: If file doesn't exist
+        DataError: If file cannot be parsed
+
+    Example:
+        >>> get_config_structure("config.yaml", "yaml", 2)
+        {
+            "database": {
+                "host": "str",
+                "port": "int",
+                "credentials": "dict"
+            },
+            "logging": {
+                "level": "str",
+                "handlers": "list"
+            }
+        }
+    """
+    if format_type not in ["yaml", "toml", "ini"]:
+        raise ValueError(
+            f"format_type must be 'yaml', 'toml', or 'ini', got: {format_type}"
+        )
+
+    logger.info(f"Getting config structure: {file_path} (max_depth={max_depth})")
+
+    # Load the appropriate config file
+    if format_type == "yaml":
+        data = read_yaml_file(file_path)
+    elif format_type == "toml":
+        data = read_toml_file(file_path)
+    else:  # ini
+        data = read_ini_file(file_path)
+
+    structure = _get_structure(data, max_depth)
+    logger.info(
+        f"Generated structure with {len(structure) if isinstance(structure, dict) else 0} top-level keys"
+    )
+    return structure
+
+
+@strands_tool
+def search_config_keys(
+    file_path: str, format_type: str, search_pattern: str
+) -> list[str]:
+    """Find all paths in config file containing keys matching pattern.
+
+    Searches through entire config hierarchy and returns dot-notation paths
+    to all keys that match the search pattern (case-insensitive substring match).
+
+    Args:
+        file_path: Path to config file
+        format_type: Format of file ("yaml", "toml", or "ini")
+        search_pattern: Text pattern to search for in key names
+
+    Returns:
+        List of dot-notation paths to matching keys
+
+    Raises:
+        ValueError: If format_type is invalid
+        FileNotFoundError: If file doesn't exist
+        DataError: If file cannot be parsed
+
+    Example:
+        >>> search_config_keys("config.yaml", "yaml", "host")
+        ["database.host", "cache.redis_host", "api.webhook_host"]
+        >>> search_config_keys("config.toml", "toml", "port")
+        ["database.port", "server.port", "monitoring.metrics_port"]
+    """
+    if format_type not in ["yaml", "toml", "ini"]:
+        raise ValueError(
+            f"format_type must be 'yaml', 'toml', or 'ini', got: {format_type}"
+        )
+
+    logger.info(f"Searching config keys: {file_path} for pattern '{search_pattern}'")
+
+    # Load the appropriate config file
+    if format_type == "yaml":
+        data = read_yaml_file(file_path)
+    elif format_type == "toml":
+        data = read_toml_file(file_path)
+    else:  # ini
+        data = read_ini_file(file_path)
+
+    # Get all paths and filter by pattern
+    all_paths = _get_all_paths(data)
+    pattern_lower = search_pattern.lower()
+
+    matching_paths = [
+        path for path in all_paths if pattern_lower in path.split(".")[-1].lower()
+    ]
+
+    logger.info(f"Found {len(matching_paths)} paths matching '{search_pattern}'")
+    return matching_paths
+
+
+@strands_tool
+def count_config_items(file_path: str, format_type: str, path: str) -> int:
+    """Count number of keys/items at specific path in config file.
+
+    Returns count of direct child keys at the specified path level without
+    loading or counting nested items.
+
+    Args:
+        file_path: Path to config file
+        format_type: Format of file ("yaml", "toml", or "ini")
+        path: Dot-separated path to location (empty string for root level)
+
+    Returns:
+        Count of keys at the specified path
+
+    Raises:
+        ValueError: If format_type is invalid or path not found
+        FileNotFoundError: If file doesn't exist
+        DataError: If file cannot be parsed
+
+    Example:
+        >>> count_config_items("config.yaml", "yaml", "database")
+        4
+        >>> count_config_items("config.toml", "toml", "")
+        3
+    """
+    if format_type not in ["yaml", "toml", "ini"]:
+        raise ValueError(
+            f"format_type must be 'yaml', 'toml', or 'ini', got: {format_type}"
+        )
+
+    logger.info(f"Counting config items: {file_path} at path '{path}'")
+
+    # Load the appropriate config file
+    if format_type == "yaml":
+        data = read_yaml_file(file_path)
+    elif format_type == "toml":
+        data = read_toml_file(file_path)
+    else:  # ini
+        data = read_ini_file(file_path)
+
+    # Navigate to the specified path
+    if path:
+        found, target = _get_value_at_path(data, path)
+        if not found:
+            raise ValueError(f"Path not found in config: {path}")
+        if not isinstance(target, dict):
+            raise ValueError(f"Path does not point to a dictionary: {path}")
+        data = target
+
+    count = len(data)
+    logger.info(f"Found {count} items at path '{path}'")
+    return count
+
+
+@strands_tool
+def select_config_keys(file_path: str, format_type: str, key_paths: list[str]) -> dict:
+    """Extract only specific keys from config file by their paths.
+
+    Loads config and returns a new dictionary containing only the specified
+    key paths. Useful for extracting a subset of configuration values.
+
+    Args:
+        file_path: Path to config file
+        format_type: Format of file ("yaml", "toml", or "ini")
+        key_paths: List of dot-notation paths to extract
+
+    Returns:
+        Dictionary with only the selected keys (preserves structure)
+
+    Raises:
+        ValueError: If format_type is invalid
+        FileNotFoundError: If file doesn't exist
+        DataError: If file cannot be parsed
+
+    Example:
+        >>> select_config_keys("config.yaml", "yaml", ["database.host", "database.port"])
+        {"database": {"host": "localhost", "port": 5432}}
+        >>> select_config_keys("config.toml", "toml", ["server.port", "logging.level"])
+        {"server": {"port": 8080}, "logging": {"level": "INFO"}}
+    """
+    if format_type not in ["yaml", "toml", "ini"]:
+        raise ValueError(
+            f"format_type must be 'yaml', 'toml', or 'ini', got: {format_type}"
+        )
+
+    logger.info(f"Selecting config keys: {file_path} ({len(key_paths)} paths)")
+
+    # Load the appropriate config file
+    if format_type == "yaml":
+        data = read_yaml_file(file_path)
+    elif format_type == "toml":
+        data = read_toml_file(file_path)
+    else:  # ini
+        data = read_ini_file(file_path)
+
+    result: dict[str, Any] = {}
+
+    for path in key_paths:
+        found, value = _get_value_at_path(data, path)
+        if found:
+            # Build nested structure
+            keys = path.split(".")
+            current = result
+
+            for key in keys[:-1]:
+                if key not in current:
+                    current[key] = {}
+                current = current[key]
+
+            current[keys[-1]] = value
+
+    logger.info(f"Selected {len(key_paths)} key paths")
+    return result
+
+
+@strands_tool
+def filter_config_sections(
+    file_path: str, format_type: str, section_pattern: str
+) -> dict:
+    """Get only sections/top-level keys matching pattern from config file.
+
+    Filters config to return only top-level sections whose names match the
+    search pattern (case-insensitive substring match). Particularly useful
+    for INI files with multiple sections.
+
+    Args:
+        file_path: Path to config file
+        format_type: Format of file ("yaml", "toml", or "ini")
+        section_pattern: Text pattern to match section names
+
+    Returns:
+        Dictionary containing only matching sections
+
+    Raises:
+        ValueError: If format_type is invalid
+        FileNotFoundError: If file doesn't exist
+        DataError: If file cannot be parsed
+
+    Example:
+        >>> filter_config_sections("config.ini", "ini", "database")
+        {"database": {"host": "localhost", "port": "5432"}}
+        >>> filter_config_sections("config.yaml", "yaml", "test")
+        {"test_database": {...}, "test_api": {...}}
+    """
+    if format_type not in ["yaml", "toml", "ini"]:
+        raise ValueError(
+            f"format_type must be 'yaml', 'toml', or 'ini', got: {format_type}"
+        )
+
+    logger.info(
+        f"Filtering config sections: {file_path} for pattern '{section_pattern}'"
+    )
+
+    # Load the appropriate config file
+    if format_type == "yaml":
+        data = read_yaml_file(file_path)
+    elif format_type == "toml":
+        data = read_toml_file(file_path)
+    else:  # ini
+        data = read_ini_file(file_path)
+
+    pattern_lower = section_pattern.lower()
+    result = {key: value for key, value in data.items() if pattern_lower in key.lower()}
+
+    logger.info(f"Found {len(result)} sections matching '{section_pattern}'")
+    return result
+
+
+@strands_tool
+def preview_config_section(
+    file_path: str, format_type: str, section_path: str, max_items: int
+) -> dict:
+    """Get first N items from config section without loading entire section.
+
+    Returns a limited preview of items at the specified path. Useful for
+    inspecting large config sections without loading all values.
+
+    Args:
+        file_path: Path to config file
+        format_type: Format of file ("yaml", "toml", or "ini")
+        section_path: Dot-separated path to section (empty string for root)
+        max_items: Maximum number of items to return
+
+    Returns:
+        Dictionary with up to max_items keys from the section
+
+    Raises:
+        ValueError: If format_type is invalid or path not found
+        FileNotFoundError: If file doesn't exist
+        DataError: If file cannot be parsed
+
+    Example:
+        >>> preview_config_section("config.yaml", "yaml", "database", 2)
+        {"host": "localhost", "port": 5432}
+        >>> preview_config_section("config.toml", "toml", "", 3)
+        {"database": {...}, "logging": {...}, "features": {...}}
+    """
+    if format_type not in ["yaml", "toml", "ini"]:
+        raise ValueError(
+            f"format_type must be 'yaml', 'toml', or 'ini', got: {format_type}"
+        )
+
+    logger.info(
+        f"Previewing config section: {file_path} at '{section_path}' (max_items={max_items})"
+    )
+
+    # Load the appropriate config file
+    if format_type == "yaml":
+        data = read_yaml_file(file_path)
+    elif format_type == "toml":
+        data = read_toml_file(file_path)
+    else:  # ini
+        data = read_ini_file(file_path)
+
+    # Navigate to the specified path
+    if section_path:
+        found, target = _get_value_at_path(data, section_path)
+        if not found:
+            raise ValueError(f"Path not found in config: {section_path}")
+        if not isinstance(target, dict):
+            raise ValueError(f"Path does not point to a dictionary: {section_path}")
+        data = target
+
+    # Get first N items
+    result = dict(list(data.items())[:max_items])
+    logger.info(f"Previewed {len(result)} items from section '{section_path}'")
     return result

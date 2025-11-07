@@ -10,10 +10,18 @@ This module provides data processing and manipulation tools organized into logic
 
 # Import all functions from submodules
 from .config_processing import (
+    count_config_items,
+    filter_config_sections,
+    get_config_keys,
+    get_config_structure,
+    get_config_value_at_path,
     merge_config_files,
+    preview_config_section,
     read_ini_file,
     read_toml_file,
     read_yaml_file,
+    search_config_keys,
+    select_config_keys,
     validate_config_schema,
     write_ini_file,
     write_toml_file,
@@ -122,7 +130,7 @@ __all__: list[str] = [
     "validate_data_types_simple",
     "validate_range_simple",
     "create_validation_report",
-    # Configuration processing
+    # Configuration processing (16 functions - 8 read/write + 8 token-saving)
     "read_yaml_file",
     "write_yaml_file",
     "read_toml_file",
@@ -131,4 +139,13 @@ __all__: list[str] = [
     "write_ini_file",
     "validate_config_schema",
     "merge_config_files",
+    # Config token-saving inspection tools
+    "get_config_keys",
+    "get_config_value_at_path",
+    "get_config_structure",
+    "search_config_keys",
+    "count_config_items",
+    "select_config_keys",
+    "filter_config_sections",
+    "preview_config_section",
 ]
