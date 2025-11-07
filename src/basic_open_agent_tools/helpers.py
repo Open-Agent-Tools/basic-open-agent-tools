@@ -116,6 +116,59 @@ def load_all_datetime_tools() -> list[Callable[..., Any]]:
     return tools
 
 
+def load_datetime_essential() -> list[Callable[..., Any]]:
+    """Load essential datetime tools for common date/time operations.
+
+    Returns a curated list of 10 most commonly needed datetime functions for
+    agents that need basic date/time operations without all 40+ datetime tools.
+
+    Includes (10 essential tools):
+    - Current values: get_current_date, get_current_datetime, get_current_time
+    - Date math: add_days, subtract_days, calculate_days_between
+    - Validation: is_valid_iso_date
+    - Formatting: format_date_human_readable, format_duration
+    - Parsing: parse_date_string
+
+    Returns:
+        List of 10 essential datetime tools
+
+    Example:
+        >>> datetime_tools = load_datetime_essential()
+        >>> len(datetime_tools) == 10
+        True
+        >>> # Use for a date-aware agent
+        >>> agent = Agent(
+        ...     tools=load_datetime_essential(),
+        ...     instructions="Help with date and time tasks"
+        ... )
+    """
+    from .datetime import (
+        add_days,
+        calculate_days_between,
+        format_date_human_readable,
+        format_duration,
+        get_current_date,
+        get_current_datetime,
+        get_current_time,
+        is_valid_iso_date,
+        parse_date_string,
+        subtract_days,
+    )
+
+    return [
+        get_current_date,
+        get_current_datetime,
+        get_current_time,
+        add_days,
+        subtract_days,
+        calculate_days_between,
+        is_valid_iso_date,
+        format_date_human_readable,
+        format_duration,
+        parse_date_string,
+    ]
+
+
 def load_all_network_tools() -> list[Callable[..., Any]]:
     """Load all network tools as a list of callable functions.
 
@@ -1333,6 +1386,7 @@ __all__ = [
     "load_office_suite",
     "load_markup_tools",
     "load_essential",
+    "load_datetime_essential",
     # Utility functions
     "merge_tool_lists",
     "get_tool_info",

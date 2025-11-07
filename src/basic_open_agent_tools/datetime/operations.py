@@ -390,3 +390,92 @@ def calculate_time_difference(time1: str, time2: str, unit: str) -> int:
             return 0  # Should never reach here due to validation
     except ValueError as e:
         raise ValueError(f"Invalid ISO time format: {e}")
+
+
+@strands_tool
+def parse_date_string(date_string: str, format_string: str) -> str:
+    """Parse custom format date string to ISO format.
+
+    Converts a date string in a custom format to ISO format (YYYY-MM-DD).
+    Agents can use this to standardize dates from various sources.
+
+    Args:
+        date_string: The date string to parse
+        format_string: The format of the input date (e.g., "%m/%d/%Y", "%d-%b-%Y")
+
+    Returns:
+        Date in ISO format (YYYY-MM-DD)
+
+    Raises:
+        TypeError: If parameters are not strings
+        ValueError: If date_string doesn't match format_string
+
+    Example:
+        >>> result = parse_date_string("12/31/2025", "%m/%d/%Y")
+        >>> result
+        "2025-12-31"
+        >>> result = parse_date_string("31-Dec-2025", "%d-%b-%Y")
+        >>> result
+        "2025-12-31"
+    """
+    if not isinstance(date_string, str):
+        raise TypeError("date_string must be a string")
+    if not isinstance(format_string, str):
+        raise TypeError("format_string must be a string")
+
+    try:
+        parsed_date = datetime.strptime(date_string, format_string).date()
+        return parsed_date.isoformat()
+    except ValueError as e:
+        raise ValueError(
+            f"Date string '{date_string}' does not match format '{format_string}': {e}"
+        )
+
+
+@strands_tool
+def format_date(date_string: str, input_format: str, output_format: str) -> str:
+    """Convert date string between different formats.
+
+    Converts a date string from one format to another format.
+    Agents can use this to transform dates for different display needs.
+
+    Args:
+        date_string: The date string to convert
+        input_format: The format of the input date (e.g., "%m/%d/%Y", "iso")
+        output_format: The desired output format (e.g., "%Y-%m-%d", "%B %d, %Y")
+
+    Returns:
+        Date string in the output format
+
+    Raises:
+        TypeError: If parameters are not strings
+        ValueError: If date_string doesn't match input_format
+
+    Example:
+        >>> result = format_date("12/31/2025", "%m/%d/%Y", "%Y-%m-%d")
+        >>> result
+        "2025-12-31"
+        >>> result = format_date("2025-12-31", "iso", "%B %d, %Y")
+        >>> result
+        "December 31, 2025"
+    """
+    if not isinstance(date_string, str):
+        raise TypeError("date_string must be a string")
+    if not isinstance(input_format, str):
+        raise TypeError("input_format must be a string")
+    if not isinstance(output_format, str):
+        raise TypeError("output_format must be a string")
+
+    try:
+        # Handle "iso" as a special input format
+        if input_format.lower() == "iso":
+            parsed_date = date.fromisoformat(date_string)
+        else:
+            parsed_date = datetime.strptime(date_string, input_format).date()
+
+        # Format the output
+        return parsed_date.strftime(output_format)
+    except ValueError as e:
+        raise ValueError(
+            f"Date string '{date_string}' does not match format '{input_format}': {e}"
+        )

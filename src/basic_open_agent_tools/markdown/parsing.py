@@ -6,6 +6,7 @@ Markdown (.md) files using standard library only.
 
 import os
 import re
+from typing import Any
 
 from ..decorators import strands_tool
 
@@ -1123,3 +1124,388 @@ def extract_markdown_section_range(
         raise
     except Exception as e:
         raise ValueError(f"Failed to extract section range: {e}")
+
+
+# ===== Advanced Parsing Features (Issue #30) =====
+
+
+@strands_tool
+def parse_reference_links(file_path: str) -> list[dict[str, str]]:
+    """Parse reference-style links from Markdown file.
+
+    Reference-style links have two parts:
+    - [link text][ref]
+    - [ref]: http://url.com "optional title"
+
+    Args:
+        file_path: Path to Markdown file
+
+    Returns:
+        List of dicts with keys: ref, url, title, used_by
+
+    Raises:
+        TypeError: If parameters are wrong type
+        FileNotFoundError: If file doesn't exist
+        ValueError: If file too large or cannot be read
+
+    Example:
+        >>> parse_reference_links("doc.md")
+        [{"ref": "1", "url": "http://example.com", "title": "Example", "used_by": "link text"}]
+    """
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Markdown file not found: {file_path}")
+
+    file_size = os.path.getsize(file_path)
+    if file_size > MAX_FILE_SIZE:
+        raise ValueError(
+            f"File too large: {file_size} bytes (max {MAX_FILE_SIZE} bytes)"
+        )
+
+    try:
+        with open(file_path, encoding="utf-8") as f:
+            content = f.read()
+
+        # Find reference definitions: [ref]: url "title"
+        ref_pattern = r'^\[([^\]]+)\]:\s+(\S+)(?:\s+"([^"]*)")?'
+        references: dict[str, dict[str, Any]] = {}
+
+        for match in re.finditer(ref_pattern, content, re.MULTILINE):
+            ref_id = match.group(1)
+            url = match.group(2)
+            title = match.group(3) or ""
+            references[ref_id] = {"url": url, "title": title, "used_by": []}
+
+        # Find usage of references: [text][ref]
+        usage_pattern = r"\[([^\]]+)\]\[([^\]]+)\]"
+
+        for match in re.finditer(usage_pattern, content):
+            text = match.group(1)
+            ref_id = match.group(2)
+            if ref_id in references:
+                references[ref_id]["used_by"].append(text)
+
+        # Convert to list format
+        result = []
+        for ref_id, data in references.items():
+            result.append(
+                {
+                    "ref": ref_id,
+                    "url": data["url"],
+                    "title": data["title"],
+                    "used_by": ", ".join(data["used_by"]) if data["used_by"] else "",
+                }
+            )
+
+        return result
+
+    except FileNotFoundError:
+        raise
+    except Exception as e:
+        raise ValueError(f"Failed to parse reference links: {e}")
+
+
+@strands_tool
+def parse_footnotes(file_path: str) -> list[dict[str, str]]:
+    """Parse footnotes from Markdown file.
+
+    Footnotes have two parts:
+    - Text with footnote reference: text[^1]
+    - Footnote definition: [^1]: footnote content
+
+    Args:
+        file_path: Path to Markdown file
+
+    Returns:
+        List of dicts with keys: id, content, location_line
+
+    Raises:
+        TypeError: If parameters are wrong type
+        FileNotFoundError: If file doesn't exist
+        ValueError: If file too large or cannot be read
+
+    Example:
+        >>> parse_footnotes("doc.md")
+        [{"id": "1", "content": "This is a footnote.", "location_line": "42"}]
+    """
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Markdown file not found: {file_path}")
+
+    file_size = os.path.getsize(file_path)
+    if file_size > MAX_FILE_SIZE:
+        raise ValueError(
+            f"File too large: {file_size} bytes (max {MAX_FILE_SIZE} bytes)"
+        )
+
+    try:
+        footnotes = []
+
+        with open(file_path, encoding="utf-8") as f:
+            for line_num, line in enumerate(f, 1):
+                # Match footnote definition: [^id]: content
+                match = re.match(r"^\[\^([^\]]+)\]:\s+(.+)$", line.strip())
+                if match:
+                    footnote_id = match.group(1)
+                    content = match.group(2)
+                    footnotes.append(
+                        {
+                            "id": footnote_id,
+                            "content": content,
+                            "location_line": str(line_num),
+                        }
+                    )
+
+        return footnotes
+
+    except FileNotFoundError:
+        raise
+    except Exception as e:
+        raise ValueError(f"Failed to parse footnotes: {e}")
+
+
+@strands_tool
+def parse_definition_lists(file_path: str) -> list[dict[str, str]]:
+    """Parse definition lists from Markdown file.
+
+    Definition lists format:
+    Term
+    : Definition
+
+    Args:
+        file_path: Path to Markdown file
+
+    Returns:
+        List of dicts with keys: term, definition, line_number
+
+    Raises:
+        TypeError: If parameters are wrong type
+        FileNotFoundError: If file doesn't exist
+        ValueError: If file too large or cannot be read
+
+    Example:
+        >>> parse_definition_lists("doc.md")
+        [{"term": "Markdown", "definition": "A lightweight markup language", "line_number": "5"}]
+    """
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Markdown file not found: {file_path}")
+
+    file_size = os.path.getsize(file_path)
+    if file_size > MAX_FILE_SIZE:
+        raise ValueError(
+            f"File too large: {file_size} bytes (max {MAX_FILE_SIZE} bytes)"
+        )
+
+    try:
+        definitions = []
+        current_term = ""
+        term_line = 0
+
+        with open(file_path, encoding="utf-8") as f:
+            for line_num, line in enumerate(f, 1):
+                stripped = line.strip()
+
+                # Check for definition marker
+                if stripped.startswith(": "):
+                    if current_term:
+                        definition = stripped[2:].strip()  # Remove ": "
+                        definitions.append(
+                            {
+                                "term": current_term,
+                                "definition": definition,
+                                "line_number": str(term_line),
+                            }
+                        )
+                        current_term = ""
+                elif stripped and not stripped.startswith(": "):
+                    # This could be a term
+                    current_term = stripped
+                    term_line = line_num
+
+        return definitions
+
+    except FileNotFoundError:
+        raise
+    except Exception as e:
+        raise ValueError(f"Failed to parse definition lists: {e}")
+
+
+@strands_tool
+def parse_task_lists(file_path: str) -> list[dict[str, str]]:
+    """Parse task lists with checkboxes from Markdown file.
+
+    Task list format:
+    - [ ] Unchecked task
+    - [x] Checked task
+
+    Args:
+        file_path: Path to Markdown file
+
+    Returns:
+        List of dicts with keys: task, checked, line_number
+
+    Raises:
+        TypeError: If parameters are wrong type
+        FileNotFoundError: If file doesn't exist
+        ValueError: If file too large or cannot be read
+
+    Example:
+        >>> parse_task_lists("todo.md")
+        [{"task": "Write documentation", "checked": "false", "line_number": "3"}]
+    """
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Markdown file not found: {file_path}")
+
+    file_size = os.path.getsize(file_path)
+    if file_size > MAX_FILE_SIZE:
+        raise ValueError(
+            f"File too large: {file_size} bytes (max {MAX_FILE_SIZE} bytes)"
+        )
+
+    try:
+        tasks = []
+
+        with open(file_path, encoding="utf-8") as f:
+            for line_num, line in enumerate(f, 1):
+                stripped = line.strip()
+
+                # Match checked task
+                checked_match = re.match(r"^-\s+\[x\]\s+(.+)$", stripped, re.IGNORECASE)
+                if checked_match:
+                    task_text = checked_match.group(1)
+                    tasks.append(
+                        {
+                            "task": task_text,
+                            "checked": "true",
+                            "line_number": str(line_num),
+                        }
+                    )
+                    continue
+
+                # Match unchecked task
+                unchecked_match = re.match(r"^-\s+\[\s\]\s+(.+)$", stripped)
+                if unchecked_match:
+                    task_text = unchecked_match.group(1)
+                    tasks.append(
+                        {
+                            "task": task_text,
+                            "checked": "false",
+                            "line_number": str(line_num),
+                        }
+                    )
+
+        return tasks
+
+    except FileNotFoundError:
+        raise
+    except Exception as e:
+        raise ValueError(f"Failed to parse task lists: {e}")
+
+
+@strands_tool
+def extract_image_references(file_path: str) -> list[dict[str, str]]:
+    """Extract image references from Markdown file.
+
+    Supports both inline and reference-style images:
+    - ![alt text](image.png "title")
+    - ![alt text][ref]
+      [ref]: image.png "title"
+
+    Args:
+        file_path: Path to Markdown file
+
+    Returns:
+        List of dicts with keys: alt_text, url, title, line_number
+
+    Raises:
+        TypeError: If parameters are wrong type
+        FileNotFoundError: If file doesn't exist
+        ValueError: If file too large or cannot be read
+
+    Example:
+        >>> extract_image_references("doc.md")
+        [{"alt_text": "Logo", "url": "logo.png", "title": "Company Logo", "line_number": "10"}]
+    """
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Markdown file not found: {file_path}")
+
+    file_size = os.path.getsize(file_path)
+    if file_size > MAX_FILE_SIZE:
+        raise ValueError(
+            f"File too large: {file_size} bytes (max {MAX_FILE_SIZE} bytes)"
+        )
+
+    try:
+        with open(file_path, encoding="utf-8") as f:
+            content = f.read()
+
+        images = []
+
+        # Find reference definitions for images first
+        ref_pattern = r'^\[([^\]]+)\]:\s+(\S+)(?:\s+"([^"]*)")?'
+        image_refs = {}
+
+        for match in re.finditer(ref_pattern, content, re.MULTILINE):
+            ref_id = match.group(1)
+            url = match.group(2)
+            title = match.group(3) or ""
+            # Only store if it looks like an image URL
+            if any(
+                url.lower().endswith(ext)
+                for ext in [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"]
+            ):
+                image_refs[ref_id] = {"url": url, "title": title}
+
+        # Find inline images: ![alt](url "title")
+        inline_pattern = r'!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]*)")?\)'
+
+        for line_num, line in enumerate(content.split("\n"), 1):
+            for match in re.finditer(inline_pattern, line):
+                alt_text = match.group(1)
+                url = match.group(2)
+                title = match.group(3) or ""
+                images.append(
+                    {
+                        "alt_text": alt_text,
+                        "url": url,
+                        "title": title,
+                        "line_number": str(line_num),
+                    }
+                )
+
+        # Find reference-style images: ![alt][ref]
+        ref_usage_pattern = r"!\[([^\]]*)\]\[([^\]]+)\]"
+
+        for line_num, line in enumerate(content.split("\n"), 1):
+            for match in re.finditer(ref_usage_pattern, line):
+                alt_text = match.group(1)
+                ref_id = match.group(2)
+                if ref_id in image_refs:
+                    images.append(
+                        {
+                            "alt_text": alt_text,
+                            "url": image_refs[ref_id]["url"],
+                            "title": image_refs[ref_id]["title"],
+                            "line_number": str(line_num),
+                        }
+                    )
+
+        return images
+
+    except FileNotFoundError:
+        raise
+    except Exception as e:
+        raise ValueError(f"Failed to extract image references: {e}")

@@ -291,15 +291,19 @@ def append_to_markdown(file_path: str, content: str, skip_confirm: bool) -> str:
 
 @strands_tool
 def markdown_to_html_string(markdown_text: str) -> str:
-    """Convert Markdown string to HTML string.
+    """Convert Markdown string to HTML string with enhanced features.
 
-    Basic conversion supporting common Markdown elements:
+    Supports extensive Markdown elements:
     - Headings (# to ######)
     - Bold (**text** or __text__)
     - Italic (*text* or _text_)
     - Links [text](url)
     - Code blocks (```language...```)
     - Inline code (`code`)
+    - Blockquotes (> text)
+    - Horizontal rules (--- or ***)
+    - Task lists (- [ ] and - [x])
+    - Tables (| header | header |)
     - Paragraphs
 
     Args:
@@ -315,6 +319,9 @@ def markdown_to_html_string(markdown_text: str) -> str:
         >>> html = markdown_to_html_string("# Hello\\n\\nWorld")
         >>> '<h1>Hello</h1>' in html
         True
+        >>> html = markdown_to_html_string("> Quote")
+        >>> '<blockquote>' in html
+        True
     """
     if not isinstance(markdown_text, str):
         raise TypeError("markdown_text must be a string")
@@ -324,6 +331,10 @@ def markdown_to_html_string(markdown_text: str) -> str:
 
     # Escape HTML entities first
     text = html_module.escape(markdown_text)
+
+    # Convert horizontal rules (before processing other content)
+    text = re.sub(r"^---+$", r"<hr>", text, flags=re.MULTILINE)
+    text = re.sub(r"^\*\*\*+$", r"<hr>", text, flags=re.MULTILINE)
 
     # Convert headings
     for level in range(6, 0, -1):
@@ -355,15 +366,139 @@ def markdown_to_html_string(markdown_text: str) -> str:
     # Convert links
     text = re.sub(r"\[([^\]]+)\]\(([^\)]+)\)", r'<a href="\2">\1</a>', text)
 
+    # Convert task lists (checkboxes)
+    text = re.sub(
+        r"^- \[x\] (.+)$",
+        r'<input type="checkbox" checked disabled> \1<br>',
+        text,
+        flags=re.MULTILINE,
+    )
+    text = re.sub(
+        r"^- \[ \] (.+)$",
+        r'<input type="checkbox" disabled> \1<br>',
+        text,
+        flags=re.MULTILINE,
+    )
+
+    # Convert blockquotes (process line by line)
+    lines = text.split("\n")
+    processed_lines = []
+    in_blockquote = False
+    blockquote_content = []
+
+    for line in lines:
+        if line.strip().startswith("&gt;"):
+            # Remove the escaped > and add to blockquote
+            quote_text = line.strip()[4:].strip()  # Remove &gt; (4 chars)
+            blockquote_content.append(quote_text)
+            in_blockquote = True
+        else:
+            if in_blockquote:
+                # End of blockquote
+                processed_lines.append(
+                    f"<blockquote>{' '.join(blockquote_content)}</blockquote>"
+                )
+                blockquote_content = []
+                in_blockquote = False
+            processed_lines.append(line)
+
+    # Handle blockquote at end of file
+    if in_blockquote:
+        processed_lines.append(
+            f"<blockquote>{' '.join(blockquote_content)}</blockquote>"
+        )
+
+    text = "\n".join(processed_lines)
+
+    # Convert tables
+    # Find table blocks (lines starting with |)
+    lines = text.split("\n")
+    processed_lines = []
+    in_table = False
+    table_lines = []
+
+    for line in lines:
+        if "|" in line and line.strip().startswith("|"):
+            table_lines.append(line)
+            in_table = True
+        else:
+            if in_table:
+                # Process complete table
+                if table_lines:
+                    html_table = _convert_table_to_html(table_lines)
+                    processed_lines.append(html_table)
+                    table_lines = []
+                in_table = False
+            processed_lines.append(line)
+
+    # Handle table at end of file
+    if in_table and table_lines:
+        html_table = _convert_table_to_html(table_lines)
+        processed_lines.append(html_table)
+
+    text = "\n".join(processed_lines)
+
     # Convert paragraphs (split by double newline)
     paragraphs = text.split("\n\n")
     html_paragraphs = []
     for para in paragraphs:
         para = para.strip()
         if para:
-            # Don't wrap if already has HTML tags
+            # Don't wrap if already has HTML tags or is a table/blockquote/hr
             if not para.startswith("<"):
                 para = f"<p>{para}</p>"
             html_paragraphs.append(para)
 
     return "\n".join(html_paragraphs)
+
+
+def _convert_table_to_html(table_lines: list[str]) -> str:
+    """Convert markdown table lines to HTML table.
+
+    Args:
+        table_lines: List of table lines starting with |
+
+    Returns:
+        HTML table string
+    """
+    if not table_lines:
+        return ""
+
+    html = ["<table>"]
+
+    # Check if second line is separator (|---|---|)
+    has_header = False
+    if len(table_lines) > 1 and all(c in "|-: " for c in table_lines[1]):
+        has_header = True
+
+    # Process header row if present
+    if has_header:
+        header_row = table_lines[0]
+        cells = [cell.strip() for cell in header_row.split("|")[1:-1]]
+        html.append("<thead><tr>")
+        for cell in cells:
+            html.append(f"<th>{cell}</th>")
+        html.append("</tr></thead>")
+
+        # Process body rows
+        html.append("<tbody>")
+        for row in table_lines[2:]:  # Skip header and separator
+            cells = [cell.strip() for cell in row.split("|")[1:-1]]
+            html.append("<tr>")
+            for cell in cells:
+                html.append(f"<td>{cell}</td>")
+            html.append("</tr>")
+        html.append("</tbody>")
+    else:
+        # No header, all rows are body
+        html.append("<tbody>")
+        for row in table_lines:
+            cells = [cell.strip() for cell in row.split("|")[1:-1]]
+            html.append("<tr>")
+            for cell in cells:
+                html.append(f"<td>{cell}</td>")
+            html.append("</tr>")
+        html.append("</tbody>")
+
+    html.append("</table>")
+    return "".join(html)
