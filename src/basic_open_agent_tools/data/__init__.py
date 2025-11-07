@@ -40,17 +40,26 @@ from .csv_tools import (
     write_csv_simple,
 )
 from .json_tools import (
+    append_to_json_array,
     count_json_items,
+    deduplicate_json_array,
+    delete_json_key_at_path,
     filter_json_array,
+    flatten_json_object,
     get_json_keys,
     get_json_structure,
     get_json_value_at_path,
+    merge_json_objects,
     read_json_file,
     safe_json_deserialize,
     safe_json_serialize,
     search_json_keys,
     select_json_keys,
     slice_json_array,
+    sort_json_array,
+    transform_json_values,
+    unflatten_json_object,
+    update_json_value_at_path,
     validate_json_string,
     write_json_file,
 )
@@ -64,7 +73,7 @@ from .validation import (
 
 # Re-export all functions at module level for convenience
 __all__: list[str] = [
-    # JSON processing
+    # JSON processing (22 functions - 13 reading + 9 modification)
     "safe_json_serialize",
     "safe_json_deserialize",
     "validate_json_string",
@@ -78,6 +87,16 @@ __all__: list[str] = [
     "get_json_structure",
     "count_json_items",
     "search_json_keys",
+    # JSON modification tools
+    "update_json_value_at_path",
+    "delete_json_key_at_path",
+    "append_to_json_array",
+    "merge_json_objects",
+    "sort_json_array",
+    "flatten_json_object",
+    "unflatten_json_object",
+    "transform_json_values",
+    "deduplicate_json_array",
     # CSV processing
     "read_csv_simple",
     "write_csv_simple",

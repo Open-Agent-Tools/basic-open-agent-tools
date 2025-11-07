@@ -828,3 +828,1020 @@ def search_json_keys(data: dict, key_pattern: str) -> list[str]:
 
     logger.info(f"JSON key search complete: {len(matching_paths)} matches")
     return matching_paths
+
+
+@strands_tool
+def update_json_value_at_path(
+    file_path: str, json_path: str, new_value: str, skip_confirm: bool
+) -> str:
+    """Update single value at JSON path without loading entire structure.
+
+    This function efficiently updates a specific value in a JSON file
+    without requiring the entire structure to be loaded into context.
+
+    Args:
+        file_path: Path to JSON file
+        json_path: Dot-notation path (e.g., "users.0.name")
+        new_value: New value as string (will be parsed as JSON)
+        skip_confirm: If False, requests confirmation for file modification
+
+    Returns:
+        Success message describing the update
+
+    Raises:
+        FileNotFoundError: If file does not exist
+        SerializationError: If file contains invalid JSON or new_value is invalid JSON
+        TypeError: If parameters are wrong type
+        ValueError: If path not found
+
+    Example:
+        >>> result = update_json_value_at_path("/data/config.json", "timeout", "60", True)
+        >>> result
+        'Updated value at path "timeout" in /data/config.json'
+    """
+    from ..confirmation import check_user_confirmation
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(json_path, str):
+        raise TypeError("json_path must be a string")
+
+    if not isinstance(new_value, str):
+        raise TypeError("new_value must be a string")
+
+    if not isinstance(skip_confirm, bool):
+        raise TypeError("skip_confirm must be a boolean")
+
+    # Read existing JSON
+    data = read_json_file(file_path)
+
+    # Parse new value as JSON
+    try:
+        parsed_value = json.loads(new_value)
+    except json.JSONDecodeError as e:
+        raise SerializationError(f"Invalid JSON in new_value: {e}")
+
+    # Navigate to the path and update
+    path_segments = _parse_json_path(json_path)
+    if not path_segments:
+        raise ValueError("json_path cannot be empty")
+
+    # Navigate to parent
+    current: Any = data
+    for segment in path_segments[:-1]:
+        if isinstance(current, dict):
+            if segment not in current:
+                raise ValueError(f"Path not found at segment: {segment}")
+            current = current[segment]
+        elif isinstance(current, list):
+            try:
+                index = int(segment)
+                if index < 0 or index >= len(current):
+                    raise ValueError(f"Index {index} out of range")
+                current = current[index]
+            except ValueError:
+                raise ValueError(f"Invalid array index: {segment}")
+        else:
+            raise ValueError(f"Cannot navigate into {type(current).__name__}")
+
+    # Update the final key/index
+    final_segment = path_segments[-1]
+    if isinstance(current, dict):
+        if final_segment not in current:
+            raise ValueError(f"Key '{final_segment}' not found")
+        current[final_segment] = parsed_value
+    elif isinstance(current, list):
+        try:
+            index = int(final_segment)
+            if index < 0 or index >= len(current):
+                raise ValueError(f"Index {index} out of range")
+            current[index] = parsed_value
+        except ValueError:
+            raise ValueError(f"Invalid array index: {final_segment}")
+    else:
+        raise ValueError(f"Cannot update value in {type(current).__name__}")
+
+    # Check confirmation
+    check_user_confirmation(
+        operation="update value in JSON file",
+        target=file_path,
+        skip_confirm=skip_confirm,
+    )
+
+    # Write back to file
+    write_json_file(data, file_path, 2, True)
+
+    logger.info(f"Updated value at path '{json_path}' in {file_path}")
+    return f'Updated value at path "{json_path}" in {file_path}'
+
+
+@strands_tool
+def delete_json_key_at_path(file_path: str, json_path: str, skip_confirm: bool) -> str:
+    """Remove specific key at JSON path without loading entire structure.
+
+    This function efficiently deletes a key/index from a JSON file
+    without requiring the entire structure to be loaded into context.
+
+    Args:
+        file_path: Path to JSON file
+        json_path: Dot-notation path to key/index to delete (e.g., "users.0")
+        skip_confirm: If False, requests confirmation for file modification
+
+    Returns:
+        Success message describing the deletion
+
+    Raises:
+        FileNotFoundError: If file does not exist
+        SerializationError: If file contains invalid JSON
+        TypeError: If parameters are wrong type
+        ValueError: If path not found
+
+    Example:
+        >>> result = delete_json_key_at_path("/data/config.json", "deprecated_setting", True)
+        >>> result
+        'Deleted key at path "deprecated_setting" from /data/config.json'
+    """
+    from ..confirmation import check_user_confirmation
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(json_path, str):
+        raise TypeError("json_path must be a string")
+
+    if not isinstance(skip_confirm, bool):
+        raise TypeError("skip_confirm must be a boolean")
+
+    # Read existing JSON
+    data = read_json_file(file_path)
+
+    # Navigate to the path and delete
+    path_segments = _parse_json_path(json_path)
+    if not path_segments:
+        raise ValueError("json_path cannot be empty")
+
+    # Navigate to parent
+    current: Any = data
+    for segment in path_segments[:-1]:
+        if isinstance(current, dict):
+            if segment not in current:
+                raise ValueError(f"Path not found at segment: {segment}")
+            current = current[segment]
+        elif isinstance(current, list):
+            try:
+                index = int(segment)
+                if index < 0 or index >= len(current):
+                    raise ValueError(f"Index {index} out of range")
+                current = current[index]
+            except ValueError:
+                raise ValueError(f"Invalid array index: {segment}")
+        else:
+            raise ValueError(f"Cannot navigate into {type(current).__name__}")
+
+    # Delete the final key/index
+    final_segment = path_segments[-1]
+    if isinstance(current, dict):
+        if final_segment not in current:
+            raise ValueError(f"Key '{final_segment}' not found")
+        del current[final_segment]
+    elif isinstance(current, list):
+        try:
+            index = int(final_segment)
+            if index < 0 or index >= len(current):
+                raise ValueError(f"Index {index} out of range")
+            del current[index]
+        except ValueError:
+            raise ValueError(f"Invalid array index: {final_segment}")
+    else:
+        raise ValueError(f"Cannot delete from {type(current).__name__}")
+
+    # Check confirmation
+    check_user_confirmation(
+        operation="delete key from JSON file",
+        target=file_path,
+        skip_confirm=skip_confirm,
+    )
+
+    # Write back to file
+    write_json_file(data, file_path, 2, True)
+
+    logger.info(f"Deleted key at path '{json_path}' from {file_path}")
+    return f'Deleted key at path "{json_path}" from {file_path}'
+
+
+@strands_tool
+def append_to_json_array(
+    file_path: str, array_path: str, item: str, skip_confirm: bool
+) -> str:
+    """Add item to JSON array at path without loading entire structure.
+
+    This function efficiently appends an item to an array in a JSON file
+    without requiring the entire structure to be loaded into context.
+
+    Args:
+        file_path: Path to JSON file
+        array_path: Dot-notation path to array (e.g., "users")
+        item: Item to append as JSON string
+        skip_confirm: If False, requests confirmation for file modification
+
+    Returns:
+        Success message describing the append operation
+
+    Raises:
+        FileNotFoundError: If file does not exist
+        SerializationError: If file contains invalid JSON or item is invalid JSON
+        TypeError: If parameters are wrong type
+        ValueError: If path not found or target is not an array
+
+    Example:
+        >>> result = append_to_json_array("/data/users.json", "users", '{"name": "Alice"}', True)
+        >>> result
+        'Appended item to array at path "users" in /data/users.json'
+    """
+    from ..confirmation import check_user_confirmation
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(array_path, str):
+        raise TypeError("array_path must be a string")
+
+    if not isinstance(item, str):
+        raise TypeError("item must be a string")
+
+    if not isinstance(skip_confirm, bool):
+        raise TypeError("skip_confirm must be a boolean")
+
+    # Read existing JSON
+    data = read_json_file(file_path)
+
+    # Parse item as JSON
+    try:
+        parsed_item = json.loads(item)
+    except json.JSONDecodeError as e:
+        raise SerializationError(f"Invalid JSON in item: {e}")
+
+    # Navigate to the array
+    if not array_path:
+        # Root is the array
+        if not isinstance(data, list):
+            raise ValueError("Root element is not an array")
+        data.append(parsed_item)
+    else:
+        path_segments = _parse_json_path(array_path)
+        current: Any = data
+
+        for segment in path_segments:
+            if isinstance(current, dict):
+                if segment not in current:
+                    raise ValueError(f"Path not found at segment: {segment}")
+                current = current[segment]
+            elif isinstance(current, list):
+                try:
+                    index = int(segment)
+                    if index < 0 or index >= len(current):
+                        raise ValueError(f"Index {index} out of range")
+                    current = current[index]
+                except ValueError:
+                    raise ValueError(f"Invalid array index: {segment}")
+            else:
+                raise ValueError(f"Cannot navigate into {type(current).__name__}")
+
+        # Verify it's an array and append
+        if not isinstance(current, list):
+            raise ValueError(f"Target at path '{array_path}' is not an array")
+
+        current.append(parsed_item)
+
+    # Check confirmation
+    check_user_confirmation(
+        operation="append item to JSON array",
+        target=file_path,
+        skip_confirm=skip_confirm,
+    )
+
+    # Write back to file
+    write_json_file(data, file_path, 2, True)
+
+    logger.info(f"Appended item to array at path '{array_path}' in {file_path}")
+    return f'Appended item to array at path "{array_path}" in {file_path}'
+
+
+@strands_tool
+def merge_json_objects(
+    file_path: str, source_path: str, target_path: str, skip_confirm: bool
+) -> str:
+    """Deep merge two JSON objects without loading entire structure.
+
+    This function efficiently merges two JSON objects in a file,
+    with the source object's values taking precedence. Nested objects
+    are merged recursively.
+
+    Args:
+        file_path: Path to JSON file
+        source_path: Dot-notation path to source object
+        target_path: Dot-notation path to target object (will receive merge)
+        skip_confirm: If False, requests confirmation for file modification
+
+    Returns:
+        Success message describing the merge operation
+
+    Raises:
+        FileNotFoundError: If file does not exist
+        SerializationError: If file contains invalid JSON
+        TypeError: If parameters are wrong type or objects are not dicts
+        ValueError: If paths not found
+
+    Example:
+        >>> result = merge_json_objects("/data/config.json", "defaults", "settings", True)
+        >>> result
+        'Merged object from "defaults" into "settings" in /data/config.json'
+    """
+    from ..confirmation import check_user_confirmation
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(source_path, str):
+        raise TypeError("source_path must be a string")
+
+    if not isinstance(target_path, str):
+        raise TypeError("target_path must be a string")
+
+    if not isinstance(skip_confirm, bool):
+        raise TypeError("skip_confirm must be a boolean")
+
+    # Read existing JSON
+    data = read_json_file(file_path)
+
+    # Helper function for deep merge
+    def deep_merge(source: dict[str, Any], target: dict[str, Any]) -> None:
+        """Deep merge source into target."""
+        for key, value in source.items():
+            if (
+                key in target
+                and isinstance(target[key], dict)
+                and isinstance(value, dict)
+            ):
+                deep_merge(value, target[key])
+            else:
+                target[key] = value
+
+    # Navigate to source object
+    if not source_path:
+        source_obj = data
+    else:
+        source_segments = _parse_json_path(source_path)
+        current: Any = data
+        for segment in source_segments:
+            if isinstance(current, dict):
+                if segment not in current:
+                    raise ValueError(f"Source path not found at segment: {segment}")
+                current = current[segment]
+            elif isinstance(current, list):
+                try:
+                    index = int(segment)
+                    if index < 0 or index >= len(current):
+                        raise ValueError(f"Source index {index} out of range")
+                    current = current[index]
+                except ValueError:
+                    raise ValueError(f"Invalid source array index: {segment}")
+            else:
+                raise ValueError(
+                    f"Cannot navigate source into {type(current).__name__}"
+                )
+        source_obj = current
+
+    # Navigate to target object
+    if not target_path:
+        target_obj = data
+    else:
+        target_segments = _parse_json_path(target_path)
+        current = data
+        for segment in target_segments:
+            if isinstance(current, dict):
+                if segment not in current:
+                    raise ValueError(f"Target path not found at segment: {segment}")
+                current = current[segment]
+            elif isinstance(current, list):
+                try:
+                    index = int(segment)
+                    if index < 0 or index >= len(current):
+                        raise ValueError(f"Target index {index} out of range")
+                    current = current[index]
+                except ValueError:
+                    raise ValueError(f"Invalid target array index: {segment}")
+            else:
+                raise ValueError(
+                    f"Cannot navigate target into {type(current).__name__}"
+                )
+        target_obj = current
+
+    # Verify both are dicts
+    if not isinstance(source_obj, dict):
+        raise TypeError(f"Source at '{source_path}' is not an object")
+
+    if not isinstance(target_obj, dict):
+        raise TypeError(f"Target at '{target_path}' is not an object")
+
+    # Perform deep merge
+    deep_merge(source_obj, target_obj)
+
+    # Check confirmation
+    check_user_confirmation(
+        operation="merge JSON objects",
+        target=file_path,
+        skip_confirm=skip_confirm,
+    )
+
+    # Write back to file
+    write_json_file(data, file_path, 2, True)
+
+    logger.info(
+        f"Merged object from '{source_path}' into '{target_path}' in {file_path}"
+    )
+    return f'Merged object from "{source_path}" into "{target_path}" in {file_path}'
+
+
+@strands_tool
+def sort_json_array(
+    file_path: str, array_path: str, sort_key: str, reverse: bool, skip_confirm: bool
+) -> str:
+    """Sort JSON array by key without loading entire structure.
+
+    This function efficiently sorts an array of objects in a JSON file
+    by a specific key, without requiring the entire structure to be loaded.
+
+    Args:
+        file_path: Path to JSON file
+        array_path: Dot-notation path to array to sort
+        sort_key: Key to sort by (for arrays of objects) or empty for primitive arrays
+        reverse: If True, sort in descending order
+        skip_confirm: If False, requests confirmation for file modification
+
+    Returns:
+        Success message describing the sort operation
+
+    Raises:
+        FileNotFoundError: If file does not exist
+        SerializationError: If file contains invalid JSON
+        TypeError: If parameters are wrong type or target is not an array
+        ValueError: If path not found or sort_key missing in objects
+
+    Example:
+        >>> result = sort_json_array("/data/users.json", "users", "age", False, True)
+        >>> result
+        'Sorted array at path "users" by key "age" in /data/users.json'
+    """
+    from ..confirmation import check_user_confirmation
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(array_path, str):
+        raise TypeError("array_path must be a string")
+
+    if not isinstance(sort_key, str):
+        raise TypeError("sort_key must be a string")
+
+    if not isinstance(reverse, bool):
+        raise TypeError("reverse must be a boolean")
+
+    if not isinstance(skip_confirm, bool):
+        raise TypeError("skip_confirm must be a boolean")
+
+    # Read existing JSON
+    data = read_json_file(file_path)
+
+    # Navigate to the array
+    if not array_path:
+        target_array = data
+    else:
+        path_segments = _parse_json_path(array_path)
+        current: Any = data
+        for segment in path_segments:
+            if isinstance(current, dict):
+                if segment not in current:
+                    raise ValueError(f"Path not found at segment: {segment}")
+                current = current[segment]
+            elif isinstance(current, list):
+                try:
+                    index = int(segment)
+                    if index < 0 or index >= len(current):
+                        raise ValueError(f"Index {index} out of range")
+                    current = current[index]
+                except ValueError:
+                    raise ValueError(f"Invalid array index: {segment}")
+            else:
+                raise ValueError(f"Cannot navigate into {type(current).__name__}")
+        target_array = current
+
+    # Verify it's an array
+    if not isinstance(target_array, list):
+        raise TypeError(f"Target at path '{array_path}' is not an array")
+
+    # Sort the array
+    if sort_key:
+        # Sort array of objects by key
+        def get_sort_value(item: Any) -> Any:
+            if not isinstance(item, dict):
+                raise ValueError(
+                    f"Cannot sort by key '{sort_key}' - array contains non-objects"
+                )
+            if sort_key not in item:
+                raise ValueError(f"Sort key '{sort_key}' not found in array object")
+            return item[sort_key]
+
+        target_array.sort(key=get_sort_value, reverse=reverse)
+    else:
+        # Sort array of primitives
+        target_array.sort(reverse=reverse)
+
+    # Check confirmation
+    check_user_confirmation(
+        operation="sort JSON array",
+        target=file_path,
+        skip_confirm=skip_confirm,
+    )
+
+    # Write back to file
+    write_json_file(data, file_path, 2, True)
+
+    if sort_key:
+        logger.info(
+            f"Sorted array at path '{array_path}' by key '{sort_key}' in {file_path}"
+        )
+        return f'Sorted array at path "{array_path}" by key "{sort_key}" in {file_path}'
+    else:
+        logger.info(f"Sorted array at path '{array_path}' in {file_path}")
+        return f'Sorted array at path "{array_path}" in {file_path}'
+
+
+@strands_tool
+def flatten_json_object(file_path: str, object_path: str) -> dict[str, str]:
+    """Flatten nested JSON object to dot-notation keys without loading entire structure.
+
+    This function efficiently flattens a nested JSON object into a flat
+    dictionary with dot-notation keys, without requiring the entire structure
+    to be loaded into context.
+
+    Args:
+        file_path: Path to JSON file
+        object_path: Dot-notation path to object to flatten (empty for root)
+
+    Returns:
+        Flattened object as dict with dot-notation keys
+
+    Raises:
+        FileNotFoundError: If file does not exist
+        SerializationError: If file contains invalid JSON
+        TypeError: If parameters are wrong type or target is not an object
+        ValueError: If path not found
+
+    Example:
+        >>> result = flatten_json_object("/data/config.json", "settings")
+        >>> result
+        {'database.host': 'localhost', 'database.port': '5432'}
+    """
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(object_path, str):
+        raise TypeError("object_path must be a string")
+
+    # Read existing JSON
+    data = read_json_file(file_path)
+
+    # Navigate to the object
+    if not object_path:
+        target_obj = data
+    else:
+        path_segments = _parse_json_path(object_path)
+        current: Any = data
+        for segment in path_segments:
+            if isinstance(current, dict):
+                if segment not in current:
+                    raise ValueError(f"Path not found at segment: {segment}")
+                current = current[segment]
+            elif isinstance(current, list):
+                try:
+                    index = int(segment)
+                    if index < 0 or index >= len(current):
+                        raise ValueError(f"Index {index} out of range")
+                    current = current[index]
+                except ValueError:
+                    raise ValueError(f"Invalid array index: {segment}")
+            else:
+                raise ValueError(f"Cannot navigate into {type(current).__name__}")
+        target_obj = current
+
+    # Verify it's an object
+    if not isinstance(target_obj, dict):
+        raise TypeError(f"Target at path '{object_path}' is not an object")
+
+    # Flatten the object
+    def flatten(obj: dict[str, Any], prefix: str = "") -> dict[str, str]:
+        """Recursively flatten nested dict."""
+        result: dict[str, str] = {}
+        for key, value in obj.items():
+            new_key = f"{prefix}.{key}" if prefix else key
+            if isinstance(value, dict):
+                result.update(flatten(value, new_key))
+            elif isinstance(value, list):
+                # Convert arrays to indexed keys
+                for i, item in enumerate(value):
+                    indexed_key = f"{new_key}.{i}"
+                    if isinstance(item, dict):
+                        result.update(flatten(item, indexed_key))
+                    else:
+                        result[indexed_key] = (
+                            json.dumps(item) if not isinstance(item, str) else item
+                        )
+            else:
+                result[new_key] = (
+                    json.dumps(value) if not isinstance(value, str) else value
+                )
+        return result
+
+    flattened = flatten(target_obj)
+
+    logger.info(f"Flattened object at path '{object_path}' from {file_path}")
+    return flattened
+
+
+@strands_tool
+def unflatten_json_object(
+    flattened_data: str, file_path: str, skip_confirm: bool
+) -> str:
+    """Unflatten dot-notation keys to nested JSON object and write to file.
+
+    This function efficiently converts a flattened dictionary with dot-notation
+    keys back into a nested JSON structure and writes it to a file.
+
+    Args:
+        flattened_data: JSON string of flattened object with dot-notation keys
+        file_path: Path to write the unflattened JSON file
+        skip_confirm: If False, requests confirmation for file modification
+
+    Returns:
+        Success message describing the unflatten operation
+
+    Raises:
+        SerializationError: If flattened_data is invalid JSON
+        TypeError: If parameters are wrong type or flattened_data is not an object
+        ValueError: If dot-notation keys are invalid
+
+    Example:
+        >>> result = unflatten_json_object('{"db.host": "localhost", "db.port": "5432"}', "/data/config.json", True)
+        >>> result
+        'Unflattened object written to /data/config.json'
+    """
+    from ..confirmation import check_user_confirmation
+
+    if not isinstance(flattened_data, str):
+        raise TypeError("flattened_data must be a string")
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(skip_confirm, bool):
+        raise TypeError("skip_confirm must be a boolean")
+
+    # Parse flattened data
+    try:
+        flattened = json.loads(flattened_data)
+    except json.JSONDecodeError as e:
+        raise SerializationError(f"Invalid JSON in flattened_data: {e}")
+
+    if not isinstance(flattened, dict):
+        raise TypeError("flattened_data must be a JSON object")
+
+    # Unflatten the object
+    result: dict[str, Any] = {}
+    for key, value in flattened.items():
+        parts = key.split(".")
+        current: Any = result
+
+        # Navigate/create nested structure
+        for i, part in enumerate(parts[:-1]):
+            # Check if next part is numeric (array index)
+            next_part = parts[i + 1]
+            is_array = next_part.isdigit()
+
+            if part not in current:
+                current[part] = [] if is_array else {}
+            elif is_array and not isinstance(current[part], list):
+                raise ValueError(f"Conflicting types at key '{part}': expected array")
+            elif not is_array and not isinstance(current[part], dict):
+                raise ValueError(f"Conflicting types at key '{part}': expected object")
+
+            current = current[part]
+
+        # Set the final value
+        final_key = parts[-1]
+        if final_key.isdigit():
+            # Array index
+            index = int(final_key)
+            if not isinstance(current, list):
+                raise ValueError(f"Expected array but got {type(current).__name__}")
+            # Extend array if necessary
+            while len(current) <= index:
+                current.append(None)
+            # Try to parse value as JSON
+            try:
+                current[index] = json.loads(value) if isinstance(value, str) else value
+            except json.JSONDecodeError:
+                current[index] = value
+        else:
+            # Object key
+            if not isinstance(current, dict):
+                raise ValueError(f"Expected object but got {type(current).__name__}")
+            # Try to parse value as JSON
+            try:
+                current[final_key] = (
+                    json.loads(value) if isinstance(value, str) else value
+                )
+            except json.JSONDecodeError:
+                current[final_key] = value
+
+    # Check confirmation
+    check_user_confirmation(
+        operation="write unflattened JSON object",
+        target=file_path,
+        skip_confirm=skip_confirm,
+    )
+
+    # Write to file
+    write_json_file(result, file_path, 2, True)
+
+    logger.info(f"Unflattened object written to {file_path}")
+    return f"Unflattened object written to {file_path}"
+
+
+@strands_tool
+def transform_json_values(
+    file_path: str, path_filter: str, transform_type: str, skip_confirm: bool
+) -> str:
+    """Transform values in JSON structure without loading entire structure.
+
+    This function efficiently applies transformations to values in a JSON file
+    that match a specific path pattern.
+
+    Args:
+        file_path: Path to JSON file
+        path_filter: Path pattern to match (supports wildcards: "*" for any key, "#" for array index)
+        transform_type: Type of transformation ("uppercase", "lowercase", "trim", "string")
+        skip_confirm: If False, requests confirmation for file modification
+
+    Returns:
+        Success message describing the transformation
+
+    Raises:
+        FileNotFoundError: If file does not exist
+        SerializationError: If file contains invalid JSON
+        TypeError: If parameters are wrong type
+        ValueError: If transform_type is not supported
+
+    Example:
+        >>> result = transform_json_values("/data/users.json", "users.*.name", "uppercase", True)
+        >>> result
+        'Transformed 5 values matching "users.*.name" in /data/users.json'
+    """
+    from ..confirmation import check_user_confirmation
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(path_filter, str):
+        raise TypeError("path_filter must be a string")
+
+    if not isinstance(transform_type, str):
+        raise TypeError("transform_type must be a string")
+
+    if not isinstance(skip_confirm, bool):
+        raise TypeError("skip_confirm must be a boolean")
+
+    valid_transforms = ["uppercase", "lowercase", "trim", "string"]
+    if transform_type not in valid_transforms:
+        raise ValueError(
+            f"transform_type must be one of: {', '.join(valid_transforms)}"
+        )
+
+    # Read existing JSON
+    data = read_json_file(file_path)
+
+    transform_count = 0
+
+    # Apply transformation recursively
+    def apply_transform(obj: Any, current_path: str) -> None:
+        nonlocal transform_count
+
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                new_path = f"{current_path}.{key}" if current_path else key
+                if _path_matches_filter(new_path, path_filter):
+                    # Transform this value
+                    if transform_type == "uppercase" and isinstance(value, str):
+                        obj[key] = value.upper()
+                        transform_count += 1
+                    elif transform_type == "lowercase" and isinstance(value, str):
+                        obj[key] = value.lower()
+                        transform_count += 1
+                    elif transform_type == "trim" and isinstance(value, str):
+                        obj[key] = value.strip()
+                        transform_count += 1
+                    elif transform_type == "string":
+                        obj[key] = str(value)
+                        transform_count += 1
+                else:
+                    # Recurse into nested structures
+                    apply_transform(value, new_path)
+        elif isinstance(obj, list):
+            for i, item in enumerate(obj):
+                new_path = f"{current_path}.{i}" if current_path else str(i)
+                if _path_matches_filter(new_path, path_filter):
+                    # Transform this value
+                    if transform_type == "uppercase" and isinstance(item, str):
+                        obj[i] = item.upper()
+                        transform_count += 1
+                    elif transform_type == "lowercase" and isinstance(item, str):
+                        obj[i] = item.lower()
+                        transform_count += 1
+                    elif transform_type == "trim" and isinstance(item, str):
+                        obj[i] = item.strip()
+                        transform_count += 1
+                    elif transform_type == "string":
+                        obj[i] = str(item)
+                        transform_count += 1
+                else:
+                    # Recurse into nested structures
+                    apply_transform(item, new_path)
+
+    def _path_matches_filter(path: str, filter_pattern: str) -> bool:
+        """Check if path matches filter pattern with wildcards."""
+        path_parts = path.split(".")
+        filter_parts = filter_pattern.split(".")
+
+        if len(path_parts) != len(filter_parts):
+            return False
+
+        for path_part, filter_part in zip(path_parts, filter_parts):
+            if filter_part == "*":
+                continue  # Wildcard matches any key
+            elif filter_part == "#":
+                if not path_part.isdigit():
+                    return False  # # should match array indices
+            elif path_part != filter_part:
+                return False
+
+        return True
+
+    apply_transform(data, "")
+
+    # Check confirmation
+    check_user_confirmation(
+        operation="transform JSON values",
+        target=file_path,
+        skip_confirm=skip_confirm,
+    )
+
+    # Write back to file
+    write_json_file(data, file_path, 2, True)
+
+    logger.info(
+        f"Transformed {transform_count} values matching '{path_filter}' in {file_path}"
+    )
+    return (
+        f'Transformed {transform_count} values matching "{path_filter}" in {file_path}'
+    )
+
+
+@strands_tool
+def deduplicate_json_array(
+    file_path: str, array_path: str, unique_key: str, skip_confirm: bool
+) -> str:
+    """Remove duplicate objects from JSON array without loading entire structure.
+
+    This function efficiently removes duplicates from an array in a JSON file,
+    preserving the first occurrence of each unique value.
+
+    Args:
+        file_path: Path to JSON file
+        array_path: Dot-notation path to array to deduplicate
+        unique_key: Key to use for uniqueness (empty for primitive arrays)
+        skip_confirm: If False, requests confirmation for file modification
+
+    Returns:
+        Success message describing the deduplication
+
+    Raises:
+        FileNotFoundError: If file does not exist
+        SerializationError: If file contains invalid JSON
+        TypeError: If parameters are wrong type or target is not an array
+        ValueError: If path not found or unique_key missing in objects
+
+    Example:
+        >>> result = deduplicate_json_array("/data/users.json", "users", "email", True)
+        >>> result
+        'Removed 3 duplicates from array at path "users" in /data/users.json'
+    """
+    from ..confirmation import check_user_confirmation
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(array_path, str):
+        raise TypeError("array_path must be a string")
+
+    if not isinstance(unique_key, str):
+        raise TypeError("unique_key must be a string")
+
+    if not isinstance(skip_confirm, bool):
+        raise TypeError("skip_confirm must be a boolean")
+
+    # Read existing JSON
+    data = read_json_file(file_path)
+
+    # Navigate to the array
+    if not array_path:
+        target_array = data
+    else:
+        path_segments = _parse_json_path(array_path)
+        current: Any = data
+        for segment in path_segments:
+            if isinstance(current, dict):
+                if segment not in current:
+                    raise ValueError(f"Path not found at segment: {segment}")
+                current = current[segment]
+            elif isinstance(current, list):
+                try:
+                    index = int(segment)
+                    if index < 0 or index >= len(current):
+                        raise ValueError(f"Index {index} out of range")
+                    current = current[index]
+                except ValueError:
+                    raise ValueError(f"Invalid array index: {segment}")
+            else:
+                raise ValueError(f"Cannot navigate into {type(current).__name__}")
+        target_array = current
+
+    # Verify it's an array
+    if not isinstance(target_array, list):
+        raise TypeError(f"Target at path '{array_path}' is not an array")
+
+    original_length = len(target_array)
+
+    # Deduplicate the array
+    if unique_key:
+        # Deduplicate array of objects by key
+        seen = set()
+        deduped = []
+        for item in target_array:
+            if not isinstance(item, dict):
+                raise ValueError(
+                    f"Cannot deduplicate by key '{unique_key}' - array contains non-objects"
+                )
+            if unique_key not in item:
+                raise ValueError(f"Unique key '{unique_key}' not found in array object")
+
+            # Convert value to string for hashing
+            value = json.dumps(item[unique_key], sort_keys=True)
+            if value not in seen:
+                seen.add(value)
+                deduped.append(item)
+
+        # Replace array contents
+        target_array.clear()
+        target_array.extend(deduped)
+    else:
+        # Deduplicate array of primitives
+        seen = set()
+        deduped = []
+        for item in target_array:
+            # Convert to string for hashing
+            value = json.dumps(item, sort_keys=True)
+            if value not in seen:
+                seen.add(value)
+                deduped.append(item)
+
+        # Replace array contents
+        target_array.clear()
+        target_array.extend(deduped)
+
+    removed_count = original_length - len(target_array)
+
+    # Check confirmation
+    check_user_confirmation(
+        operation="deduplicate JSON array",
+        target=file_path,
+        skip_confirm=skip_confirm,
+    )
+
+    # Write back to file
+    write_json_file(data, file_path, 2, True)
+
+    logger.info(
+        f"Removed {removed_count} duplicates from array at path '{array_path}' in {file_path}"
+    )
+    return f'Removed {removed_count} duplicates from array at path "{array_path}" in {file_path}'

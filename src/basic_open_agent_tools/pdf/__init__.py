@@ -34,17 +34,27 @@ from .manipulation import (
     watermark_pdf,
 )
 from .parsing import (
+    check_pdf_has_text,
+    count_pdf_text_occurrences,
+    extract_pdf_page_snippets,
     extract_pdf_pages_to_text,
     extract_text_from_page,
     extract_text_from_pdf,
+    filter_pdf_pages_by_text,
     get_pdf_info,
     get_pdf_metadata,
+    get_pdf_outline,
     get_pdf_page_count,
+    get_pdf_page_sizes,
+    get_pdf_page_stats,
+    get_pdf_text_length,
+    preview_pdf_pages,
+    sample_pdf_pages,
     search_pdf_text,
 )
 
 __all__: list[str] = [
-    # Parsing functions (7)
+    # Parsing functions (17 - includes 10 token-saving inspection tools)
     "extract_text_from_pdf",
     "extract_text_from_page",
     "get_pdf_metadata",
@@ -52,6 +62,17 @@ __all__: list[str] = [
     "extract_pdf_pages_to_text",
     "search_pdf_text",
     "get_pdf_info",
+    # Token-saving inspection tools
+    "preview_pdf_pages",
+    "sample_pdf_pages",
+    "get_pdf_page_sizes",
+    "get_pdf_outline",
+    "count_pdf_text_occurrences",
+    "get_pdf_page_stats",
+    "extract_pdf_page_snippets",
+    "filter_pdf_pages_by_text",
+    "get_pdf_text_length",
+    "check_pdf_has_text",
     # Creation functions (6)
     "create_simple_pdf",
     "create_pdf_from_text_list",

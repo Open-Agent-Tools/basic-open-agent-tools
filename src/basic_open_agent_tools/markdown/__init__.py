@@ -25,22 +25,43 @@ from .generation import (
 
 # Parsing functions
 from .parsing import (
+    count_markdown_elements,
     extract_markdown_code_blocks,
     extract_markdown_headings,
     extract_markdown_links,
+    extract_markdown_section_range,
     extract_markdown_tables,
+    filter_headings_by_level,
+    get_markdown_frontmatter,
+    get_markdown_info,
+    get_markdown_section,
+    get_markdown_structure,
+    get_markdown_toc,
     markdown_to_plain_text,
     parse_markdown_to_dict,
+    preview_markdown_lines,
+    search_markdown_headings,
 )
 
 __all__: list[str] = [
-    # Parsing functions (6)
+    # Parsing functions (16 - includes 10 token-saving inspection tools)
     "parse_markdown_to_dict",
     "extract_markdown_headings",
     "extract_markdown_links",
     "extract_markdown_code_blocks",
     "extract_markdown_tables",
     "markdown_to_plain_text",
+    # Token-saving inspection tools
+    "get_markdown_info",
+    "get_markdown_structure",
+    "count_markdown_elements",
+    "get_markdown_section",
+    "search_markdown_headings",
+    "preview_markdown_lines",
+    "get_markdown_toc",
+    "filter_headings_by_level",
+    "get_markdown_frontmatter",
+    "extract_markdown_section_range",
     # Generation functions (6)
     "create_markdown_from_text",
     "create_markdown_with_frontmatter",

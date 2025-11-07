@@ -19,7 +19,7 @@
           "final_response": {
             "parts": [
               {
-                "text": "    count_json_items,\n    filter_json_array,\n    get_json_keys,\n    get_json_structure,\n    get_json_value_at_path,\n    read_json_file,\n    safe_json_deserialize,\n    safe_json_serialize,\n    search_json_keys,\n    select_json_keys,\n    slice_json_array,\n    validate_json_string,\n    write_json_file,"
+                "text": "    append_to_json_array,\n    count_json_items,\n    deduplicate_json_array,\n    delete_json_key_at_path,\n    filter_json_array,\n    flatten_json_object,\n    get_json_keys,\n    get_json_structure,\n    get_json_value_at_path,\n    merge_json_objects,\n    read_json_file,\n    safe_json_deserialize,\n    safe_json_serialize,\n    search_json_keys,\n    select_json_keys,\n    slice_json_array,\n    sort_json_array,\n    transform_json_values,\n    unflatten_json_object,\n    update_json_value_at_path,\n    validate_json_string,\n    write_json_file,"
               }
             ],
             "role": "model"

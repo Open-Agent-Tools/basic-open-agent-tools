@@ -539,3 +539,700 @@ def get_pdf_info(file_path: str) -> dict[str, object]:
 
     except Exception as e:
         raise ValueError(f"Failed to get PDF info from {file_path}: {e}")
+
+
+@strands_tool
+def preview_pdf_pages(file_path: str, num_pages: int) -> list[str]:
+    """Get first N pages of PDF for preview without loading entire document.
+
+    Extracts text from only the first few pages for quick preview.
+
+    Args:
+        file_path: Path to PDF file
+        num_pages: Number of pages to preview from start
+
+    Returns:
+        List of text strings, one per page
+
+    Raises:
+        ImportError: If PyPDF2 is not installed
+        FileNotFoundError: If file does not exist
+        ValueError: If num_pages is negative or file is malformed
+        TypeError: If parameters are wrong type
+
+    Example:
+        >>> pages = preview_pdf_pages("/data/document.pdf", 3)
+        >>> len(pages) <= 3
+        True
+    """
+    if not HAS_PYPDF2:
+        raise ImportError(
+            "PyPDF2 is required for PDF operations. "
+            "Install with: pip install basic-open-agent-tools[pdf]"
+        )
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(num_pages, int):
+        raise TypeError("num_pages must be an integer")
+
+    if num_pages < 0:
+        raise ValueError("num_pages must be non-negative")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"PDF file not found: {file_path}")
+
+    try:
+        reader = PdfReader(file_path)
+        total_pages = len(reader.pages)
+        pages_to_read = min(num_pages, total_pages)
+
+        texts = []
+        for page_num in range(pages_to_read):
+            page = reader.pages[page_num]
+            text = page.extract_text()
+            texts.append(text if text else "")
+
+        return texts
+
+    except Exception as e:
+        raise ValueError(f"Failed to preview PDF pages: {e}")
+
+
+@strands_tool
+def sample_pdf_pages(
+    file_path: str, sample_size: int, method: str
+) -> list[dict[str, str]]:
+    """Get representative sample of PDF pages without loading all pages.
+
+    Samples pages using specified method for efficient document exploration.
+
+    Args:
+        file_path: Path to PDF file
+        sample_size: Number of pages to sample
+        method: Sampling method ("first", "random", "systematic")
+
+    Returns:
+        List of dicts with keys: page_number, text
+
+    Raises:
+        ImportError: If PyPDF2 is not installed
+        FileNotFoundError: If file does not exist
+        ValueError: If parameters invalid or file is malformed
+        TypeError: If parameters are wrong type
+
+    Example:
+        >>> samples = sample_pdf_pages("/data/document.pdf", 5, "systematic")
+        >>> len(samples) <= 5
+        True
+    """
+    if not HAS_PYPDF2:
+        raise ImportError(
+            "PyPDF2 is required for PDF operations. "
+            "Install with: pip install basic-open-agent-tools[pdf]"
+        )
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(sample_size, int):
+        raise TypeError("sample_size must be an integer")
+
+    if not isinstance(method, str):
+        raise TypeError("method must be a string")
+
+    if sample_size < 0:
+        raise ValueError("sample_size must be non-negative")
+
+    valid_methods = ["first", "random", "systematic"]
+    if method not in valid_methods:
+        raise ValueError(f"method must be one of: {', '.join(valid_methods)}")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"PDF file not found: {file_path}")
+
+    try:
+        reader = PdfReader(file_path)
+        total_pages = len(reader.pages)
+
+        if sample_size >= total_pages:
+            # Return all pages if sample size >= total
+            page_indices = list(range(total_pages))
+        elif method == "first":
+            page_indices = list(range(sample_size))
+        elif method == "random":
+            import random
+
+            page_indices = sorted(random.sample(range(total_pages), sample_size))
+        elif method == "systematic":
+            # Evenly spaced pages
+            step = total_pages / sample_size
+            page_indices = [int(i * step) for i in range(sample_size)]
+        else:
+            page_indices = []
+
+        samples = []
+        for page_num in page_indices:
+            page = reader.pages[page_num]
+            text = page.extract_text()
+            samples.append({"page_number": str(page_num), "text": text if text else ""})
+
+        return samples
+
+    except ValueError:
+        raise
+    except Exception as e:
+        raise ValueError(f"Failed to sample PDF pages: {e}")
+
+
+@strands_tool
+def get_pdf_page_sizes(file_path: str) -> list[dict[str, str]]:
+    """Get dimensions of all PDF pages without loading text content.
+
+    Extracts page dimensions efficiently without text extraction.
+
+    Args:
+        file_path: Path to PDF file
+
+    Returns:
+        List of dicts with keys: page_number, width, height (in points)
+
+    Raises:
+        ImportError: If PyPDF2 is not installed
+        FileNotFoundError: If file does not exist
+        ValueError: If file is malformed
+        TypeError: If file_path is not a string
+
+    Example:
+        >>> sizes = get_pdf_page_sizes("/data/document.pdf")
+        >>> sizes[0]['width']
+        '612.0'
+    """
+    if not HAS_PYPDF2:
+        raise ImportError(
+            "PyPDF2 is required for PDF operations. "
+            "Install with: pip install basic-open-agent-tools[pdf]"
+        )
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"PDF file not found: {file_path}")
+
+    try:
+        reader = PdfReader(file_path)
+        sizes = []
+
+        for page_num, page in enumerate(reader.pages):
+            mediabox = page.mediabox
+            width = float(mediabox.width)
+            height = float(mediabox.height)
+
+            sizes.append(
+                {
+                    "page_number": str(page_num),
+                    "width": str(width),
+                    "height": str(height),
+                }
+            )
+
+        return sizes
+
+    except Exception as e:
+        raise ValueError(f"Failed to get PDF page sizes: {e}")
+
+
+@strands_tool
+def get_pdf_outline(file_path: str) -> list[dict[str, str]]:
+    """Extract PDF outline/bookmarks (table of contents) without loading text.
+
+    Gets document structure via bookmarks/outline for navigation.
+
+    Args:
+        file_path: Path to PDF file
+
+    Returns:
+        List of dicts with keys: title, page_number, level
+
+    Raises:
+        ImportError: If PyPDF2 is not installed
+        FileNotFoundError: If file does not exist
+        ValueError: If file is malformed
+        TypeError: If file_path is not a string
+
+    Example:
+        >>> outline = get_pdf_outline("/data/document.pdf")
+        >>> outline[0]['title']
+        'Chapter 1'
+    """
+    if not HAS_PYPDF2:
+        raise ImportError(
+            "PyPDF2 is required for PDF operations. "
+            "Install with: pip install basic-open-agent-tools[pdf]"
+        )
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"PDF file not found: {file_path}")
+
+    try:
+        reader = PdfReader(file_path)
+        outline_items = []
+
+        def extract_outline(items: list, level: int = 0) -> None:
+            """Recursively extract outline items."""
+            for item in items:
+                if isinstance(item, list):
+                    extract_outline(item, level + 1)
+                else:
+                    title = str(item.get("/Title", "Untitled"))
+                    # Try to get page number
+                    page_num = "unknown"
+                    if "/Page" in item:
+                        try:
+                            page = item["/Page"]
+                            if hasattr(page, "page_number"):
+                                page_num = str(page.page_number)
+                        except Exception:
+                            pass
+
+                    outline_items.append(
+                        {
+                            "title": title,
+                            "page_number": page_num,
+                            "level": str(level),
+                        }
+                    )
+
+                    # Check for children
+                    if hasattr(item, "children") and item.children:
+                        extract_outline(item.children, level + 1)
+
+        if reader.outline:
+            extract_outline(reader.outline)
+
+        return outline_items
+
+    except Exception as e:
+        raise ValueError(f"Failed to extract PDF outline: {e}")
+
+
+@strands_tool
+def count_pdf_text_occurrences(
+    file_path: str, search_term: str, case_sensitive: bool
+) -> dict[str, str]:
+    """Count occurrences of text across PDF without loading all text.
+
+    Counts matches efficiently by processing pages one at a time.
+
+    Args:
+        file_path: Path to PDF file
+        search_term: Text to search for
+        case_sensitive: Whether search should be case-sensitive
+
+    Returns:
+        Dict with keys: total_count, pages_with_matches
+
+    Raises:
+        ImportError: If PyPDF2 is not installed
+        FileNotFoundError: If file does not exist
+        ValueError: If search_term is empty or file is malformed
+        TypeError: If parameters are wrong type
+
+    Example:
+        >>> result = count_pdf_text_occurrences("/data/document.pdf", "Python", False)
+        >>> int(result['total_count']) >= 0
+        True
+    """
+    if not HAS_PYPDF2:
+        raise ImportError(
+            "PyPDF2 is required for PDF operations. "
+            "Install with: pip install basic-open-agent-tools[pdf]"
+        )
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(search_term, str):
+        raise TypeError("search_term must be a string")
+
+    if not isinstance(case_sensitive, bool):
+        raise TypeError("case_sensitive must be a boolean")
+
+    if not search_term.strip():
+        raise ValueError("search_term cannot be empty")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"PDF file not found: {file_path}")
+
+    try:
+        reader = PdfReader(file_path)
+        total_count = 0
+        pages_with_matches = 0
+
+        search_for = search_term if case_sensitive else search_term.lower()
+
+        for page in reader.pages:
+            text = page.extract_text()
+            if not text:
+                continue
+
+            search_text = text if case_sensitive else text.lower()
+            page_count = search_text.count(search_for)
+
+            if page_count > 0:
+                total_count += page_count
+                pages_with_matches += 1
+
+        return {
+            "total_count": str(total_count),
+            "pages_with_matches": str(pages_with_matches),
+        }
+
+    except Exception as e:
+        raise ValueError(f"Failed to count text occurrences: {e}")
+
+
+@strands_tool
+def get_pdf_page_stats(file_path: str, page_number: int) -> dict[str, str]:
+    """Get statistics for specific PDF page without loading full document.
+
+    Extracts stats for single page efficiently.
+
+    Args:
+        file_path: Path to PDF file
+        page_number: Page number to analyze (0-indexed)
+
+    Returns:
+        Dict with keys: page_number, char_count, word_count, line_count
+
+    Raises:
+        ImportError: If PyPDF2 is not installed
+        FileNotFoundError: If file does not exist
+        ValueError: If page_number invalid or file is malformed
+        TypeError: If parameters are wrong type
+
+    Example:
+        >>> stats = get_pdf_page_stats("/data/document.pdf", 0)
+        >>> int(stats['word_count']) >= 0
+        True
+    """
+    if not HAS_PYPDF2:
+        raise ImportError(
+            "PyPDF2 is required for PDF operations. "
+            "Install with: pip install basic-open-agent-tools[pdf]"
+        )
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(page_number, int):
+        raise TypeError("page_number must be an integer")
+
+    if page_number < 0:
+        raise ValueError("page_number must be non-negative")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"PDF file not found: {file_path}")
+
+    try:
+        reader = PdfReader(file_path)
+
+        if page_number >= len(reader.pages):
+            raise ValueError(
+                f"Page number {page_number} out of range (PDF has {len(reader.pages)} pages)"
+            )
+
+        page = reader.pages[page_number]
+        text = page.extract_text()
+
+        if not text:
+            return {
+                "page_number": str(page_number),
+                "char_count": "0",
+                "word_count": "0",
+                "line_count": "0",
+            }
+
+        char_count = len(text)
+        word_count = len(text.split())
+        line_count = len(text.split("\n"))
+
+        return {
+            "page_number": str(page_number),
+            "char_count": str(char_count),
+            "word_count": str(word_count),
+            "line_count": str(line_count),
+        }
+
+    except ValueError:
+        raise
+    except Exception as e:
+        raise ValueError(f"Failed to get page stats: {e}")
+
+
+@strands_tool
+def extract_pdf_page_snippets(
+    file_path: str, page_number: int, snippet_length: int
+) -> list[str]:
+    """Extract small text snippets from PDF page for preview.
+
+    Gets first N characters from page without loading full document.
+
+    Args:
+        file_path: Path to PDF file
+        page_number: Page number to extract from (0-indexed)
+        snippet_length: Maximum characters to extract
+
+    Returns:
+        List with single snippet string (truncated if longer than snippet_length)
+
+    Raises:
+        ImportError: If PyPDF2 is not installed
+        FileNotFoundError: If file does not exist
+        ValueError: If parameters invalid or file is malformed
+        TypeError: If parameters are wrong type
+
+    Example:
+        >>> snippets = extract_pdf_page_snippets("/data/document.pdf", 0, 100)
+        >>> len(snippets[0]) <= 100
+        True
+    """
+    if not HAS_PYPDF2:
+        raise ImportError(
+            "PyPDF2 is required for PDF operations. "
+            "Install with: pip install basic-open-agent-tools[pdf]"
+        )
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(page_number, int):
+        raise TypeError("page_number must be an integer")
+
+    if not isinstance(snippet_length, int):
+        raise TypeError("snippet_length must be an integer")
+
+    if page_number < 0:
+        raise ValueError("page_number must be non-negative")
+
+    if snippet_length < 0:
+        raise ValueError("snippet_length must be non-negative")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"PDF file not found: {file_path}")
+
+    try:
+        reader = PdfReader(file_path)
+
+        if page_number >= len(reader.pages):
+            raise ValueError(
+                f"Page number {page_number} out of range (PDF has {len(reader.pages)} pages)"
+            )
+
+        page = reader.pages[page_number]
+        text = page.extract_text()
+
+        if not text:
+            return [""]
+
+        snippet = text[:snippet_length]
+        if len(text) > snippet_length:
+            snippet += "..."
+
+        return [snippet]
+
+    except ValueError:
+        raise
+    except Exception as e:
+        raise ValueError(f"Failed to extract page snippet: {e}")
+
+
+@strands_tool
+def filter_pdf_pages_by_text(
+    file_path: str, search_term: str, case_sensitive: bool
+) -> list[int]:
+    """Find page numbers containing text without loading all page content.
+
+    Efficiently identifies pages with matching text.
+
+    Args:
+        file_path: Path to PDF file
+        search_term: Text to search for
+        case_sensitive: Whether search should be case-sensitive
+
+    Returns:
+        List of page numbers (0-indexed) containing the search term
+
+    Raises:
+        ImportError: If PyPDF2 is not installed
+        FileNotFoundError: If file does not exist
+        ValueError: If search_term is empty or file is malformed
+        TypeError: If parameters are wrong type
+
+    Example:
+        >>> pages = filter_pdf_pages_by_text("/data/document.pdf", "Python", False)
+        >>> all(isinstance(p, int) for p in pages)
+        True
+    """
+    if not HAS_PYPDF2:
+        raise ImportError(
+            "PyPDF2 is required for PDF operations. "
+            "Install with: pip install basic-open-agent-tools[pdf]"
+        )
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not isinstance(search_term, str):
+        raise TypeError("search_term must be a string")
+
+    if not isinstance(case_sensitive, bool):
+        raise TypeError("case_sensitive must be a boolean")
+
+    if not search_term.strip():
+        raise ValueError("search_term cannot be empty")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"PDF file not found: {file_path}")
+
+    try:
+        reader = PdfReader(file_path)
+        matching_pages = []
+
+        search_for = search_term if case_sensitive else search_term.lower()
+
+        for page_num, page in enumerate(reader.pages):
+            text = page.extract_text()
+            if not text:
+                continue
+
+            search_text = text if case_sensitive else text.lower()
+            if search_for in search_text:
+                matching_pages.append(page_num)
+
+        return matching_pages
+
+    except Exception as e:
+        raise ValueError(f"Failed to filter PDF pages: {e}")
+
+
+@strands_tool
+def get_pdf_text_length(file_path: str) -> dict[str, str]:
+    """Get total text length across all pages without loading all text.
+
+    Calculates length by processing pages one at a time.
+
+    Args:
+        file_path: Path to PDF file
+
+    Returns:
+        Dict with keys: total_chars, total_words, total_pages
+
+    Raises:
+        ImportError: If PyPDF2 is not installed
+        FileNotFoundError: If file does not exist
+        ValueError: If file is malformed
+        TypeError: If file_path is not a string
+
+    Example:
+        >>> result = get_pdf_text_length("/data/document.pdf")
+        >>> int(result['total_chars']) >= 0
+        True
+    """
+    if not HAS_PYPDF2:
+        raise ImportError(
+            "PyPDF2 is required for PDF operations. "
+            "Install with: pip install basic-open-agent-tools[pdf]"
+        )
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"PDF file not found: {file_path}")
+
+    try:
+        reader = PdfReader(file_path)
+        total_chars = 0
+        total_words = 0
+
+        for page in reader.pages:
+            text = page.extract_text()
+            if text:
+                total_chars += len(text)
+                total_words += len(text.split())
+
+        return {
+            "total_chars": str(total_chars),
+            "total_words": str(total_words),
+            "total_pages": str(len(reader.pages)),
+        }
+
+    except Exception as e:
+        raise ValueError(f"Failed to get PDF text length: {e}")
+
+
+@strands_tool
+def check_pdf_has_text(file_path: str) -> dict[str, str]:
+    """Check if PDF has extractable text vs image-only without loading all pages.
+
+    Samples pages to determine if text is extractable.
+
+    Args:
+        file_path: Path to PDF file
+
+    Returns:
+        Dict with keys: has_text, pages_checked, pages_with_text
+
+    Raises:
+        ImportError: If PyPDF2 is not installed
+        FileNotFoundError: If file does not exist
+        ValueError: If file is malformed
+        TypeError: If file_path is not a string
+
+    Example:
+        >>> result = check_pdf_has_text("/data/document.pdf")
+        >>> result['has_text'] in ['True', 'False']
+        True
+    """
+    if not HAS_PYPDF2:
+        raise ImportError(
+            "PyPDF2 is required for PDF operations. "
+            "Install with: pip install basic-open-agent-tools[pdf]"
+        )
+
+    if not isinstance(file_path, str):
+        raise TypeError("file_path must be a string")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"PDF file not found: {file_path}")
+
+    try:
+        reader = PdfReader(file_path)
+        total_pages = len(reader.pages)
+
+        # Check first 5 pages or all pages if less than 5
+        pages_to_check = min(5, total_pages)
+        pages_with_text = 0
+
+        for page_num in range(pages_to_check):
+            page = reader.pages[page_num]
+            text = page.extract_text()
+            if text and text.strip():
+                pages_with_text += 1
+
+        has_text = pages_with_text > 0
+
+        return {
+            "has_text": str(has_text),
+            "pages_checked": str(pages_to_check),
+            "pages_with_text": str(pages_with_text),
+        }
+
+    except Exception as e:
+        raise ValueError(f"Failed to check PDF text: {e}")
