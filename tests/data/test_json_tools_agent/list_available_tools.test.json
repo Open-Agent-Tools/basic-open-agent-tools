@@ -19,7 +19,7 @@
           "final_response": {
             "parts": [
               {
-                "text": "I can list the available tools for you. They are: `safe_json_deserialize`, `safe_json_serialize`, and `validate_json_string`."
+                "text": "    count_json_items,\n    filter_json_array,\n    get_json_keys,\n    get_json_structure,\n    get_json_value_at_path,\n    read_json_file,\n    safe_json_deserialize,\n    safe_json_serialize,\n    search_json_keys,\n    select_json_keys,\n    slice_json_array,\n    validate_json_string,\n    write_json_file,"
               }
             ],
             "role": "model"

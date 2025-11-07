@@ -19,7 +19,7 @@
           "final_response": {
             "parts": [
               {
-                "text": "    clean_csv_data,\n    csv_to_dict_list,\n    detect_csv_delimiter,\n    dict_list_to_csv,\n    read_csv_simple,\n    validate_csv_structure,\n    write_csv_simple,"
+                "text": "    clean_csv_data,\n    count_csv_rows,\n    csv_to_dict_list,\n    detect_csv_delimiter,\n    dict_list_to_csv,\n    filter_csv_rows,\n    get_csv_column_stats,\n    get_csv_header,\n    get_csv_info,\n    get_csv_row_range,\n    get_csv_schema,\n    get_csv_value_counts,\n    preview_csv_rows,\n    read_csv_simple,\n    sample_csv_rows,\n    select_csv_columns,\n    validate_csv_structure,\n    write_csv_simple,"
               }
             ],
             "role": "model"

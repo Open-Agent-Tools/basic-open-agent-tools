@@ -19,12 +19,24 @@ from .authoring import (
     xml_from_csv,
 )
 from .parsing import (
+    count_xml_elements,
     extract_xml_elements_by_tag,
+    filter_xml_elements,
+    get_xml_attributes,
+    get_xml_element_at_path,
     get_xml_element_attribute,
+    get_xml_element_stats,
     get_xml_element_text,
+    get_xml_namespace_info,
+    get_xml_structure,
     list_xml_element_tags,
     parse_xml_string,
+    preview_xml_elements,
     read_xml_file,
+    search_xml_tags,
+    select_xml_elements,
+    slice_xml_elements,
+    validate_xml_structure_simple,
 )
 from .transformation import (
     extract_xml_to_csv,
@@ -44,13 +56,26 @@ from .validation import (
 
 # Re-export all functions at module level for convenience
 __all__: list[str] = [
-    # Parsing functions
+    # Parsing functions (18 - includes 12 token-saving inspection tools)
     "read_xml_file",
     "parse_xml_string",
     "extract_xml_elements_by_tag",
     "get_xml_element_text",
     "get_xml_element_attribute",
     "list_xml_element_tags",
+    # Token-saving inspection tools
+    "get_xml_structure",
+    "count_xml_elements",
+    "get_xml_element_at_path",
+    "get_xml_attributes",
+    "search_xml_tags",
+    "select_xml_elements",
+    "filter_xml_elements",
+    "preview_xml_elements",
+    "slice_xml_elements",
+    "get_xml_namespace_info",
+    "get_xml_element_stats",
+    "validate_xml_structure_simple",
     # Authoring functions
     "create_xml_from_dict",
     "write_xml_file",
