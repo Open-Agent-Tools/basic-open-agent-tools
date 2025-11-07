@@ -119,22 +119,23 @@ def load_all_datetime_tools() -> list[Callable[..., Any]]:
 def load_datetime_essential() -> list[Callable[..., Any]]:
     """Load essential datetime tools for common date/time operations.
 
-    Returns a curated list of 10 most commonly needed datetime functions for
+    Returns a curated list of 13 most commonly needed datetime functions for
     agents that need basic date/time operations without all 40+ datetime tools.
 
-    Includes (10 essential tools):
+    Includes (13 essential tools):
     - Current values: get_current_date, get_current_datetime, get_current_time
-    - Date math: add_days, subtract_days, calculate_days_between
+    - Date math: add_days, add_hours, subtract_days, calculate_days_between
     - Validation: is_valid_iso_date
-    - Formatting: format_date_human_readable, format_duration
+    - Formatting: format_date_human_readable, format_time_human_readable, format_duration
     - Parsing: parse_date_string
+    - Timezone: convert_timezone
 
     Returns:
-        List of 10 essential datetime tools
+        List of 13 essential datetime tools
 
     Example:
         >>> datetime_tools = load_datetime_essential()
-        >>> len(datetime_tools) == 10
+        >>> len(datetime_tools) == 13
         True
         >>> # Use for a date-aware agent
         >>> agent = Agent(
@@ -144,9 +145,12 @@ def load_datetime_essential() -> list[Callable[..., Any]]:
     """
     from .datetime import (
         add_days,
+        add_hours,
         calculate_days_between,
+        convert_timezone,
         format_date_human_readable,
         format_duration,
+        format_time_human_readable,
         get_current_date,
         get_current_datetime,
         get_current_time,
@@ -160,12 +164,15 @@ def load_datetime_essential() -> list[Callable[..., Any]]:
         get_current_datetime,
         get_current_time,
         add_days,
+        add_hours,
         subtract_days,
         calculate_days_between,
         is_valid_iso_date,
         format_date_human_readable,
+        format_time_human_readable,
         format_duration,
         parse_date_string,
+        convert_timezone,
     ]
 
 
