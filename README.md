@@ -2,21 +2,23 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions.
 
-## 🆕 What's New in v0.14.0
+## 🆕 What's New in v1.2.0
 
-🎯 **New Helper Functions**: Added 10 use-case focused tool loaders for targeted agent capabilities
+📝 **Markdown Enhancements**: Advanced HTML conversion with blockquotes, tables, task lists, and 5 new parsing functions
 
-✨ **Enhanced Helpers**: `load_essential()`, `load_converters()`, `load_document_readers()`, `load_writers()`, `load_analyst_tools()`, `load_web_tools()`, `load_devtools()`, `load_structured_data_tools()`, `load_office_suite()`, `load_markup_tools()`
+📅 **DateTime Improvements**: 6 new formatting/parsing functions for human-readable dates, times, and durations
+
+🔧 **Helper Function**: `load_datetime_essential()` provides 13 curated datetime tools for common agent workflows
 
 ### Recent Updates
+
+**v1.1.0** - New helper functions: Added 10 use-case focused tool loaders for targeted agent capabilities
 
 **v0.13.6** - Enhanced confirmation dialogs with content previews for better decision-making
 
 **v0.13.3** - Added structured logging with `BOAT_LOG_LEVEL` environment variable control
 
 **v0.13.2** - Smart confirmation system that adapts to interactive, agent, or automation contexts
-
-**v0.13.1** - Focused toolkit scope; coding tools migrated to [coding-open-agent-tools](https://github.com/open-agent-tools/coding-open-agent-tools)
 
 ## Installation
 
@@ -51,7 +53,7 @@ pip install basic-open-agent-tools[image]       # Image processing
 import basic_open_agent_tools as boat
 
 # Load all tools
-all_tools = boat.load_all_tools()  # 326 functions
+all_tools = boat.load_all_tools()  # 337 functions
 
 # Or load specific categories
 fs_tools = boat.load_all_filesystem_tools()
@@ -68,7 +70,7 @@ agent = Agent(tools=all_tools)
 
 ## Available Modules
 
-**21 modules** with **326 total functions** — all with `@strands_tool` decorator and Google ADK compatible signatures.
+**21 modules** with **337 total functions** — all with `@strands_tool` decorator and Google ADK compatible signatures.
 
 ### 📊 Complete Module Breakdown
 
@@ -78,7 +80,7 @@ agent = Agent(tools=all_tools)
 | `file_system` | 19 | File and directory operations, tree generation |
 | `text` | 10 | Text processing, case conversion, formatting |
 | `data` | 23 | JSON, CSV, YAML, TOML processing and validation |
-| `datetime` | 40 | Date/time operations, timezones, business days |
+| `datetime` | 46 | Date/time operations, timezones, formatting, parsing |
 | **Document Processing** | | |
 | `excel` | 24 | Spreadsheet reading, writing, formatting, charts |
 | `xml` | 24 | XML parsing, authoring, validation, transformation |
@@ -86,7 +88,7 @@ agent = Agent(tools=all_tools)
 | `word` | 18 | Word document operations and formatting |
 | `html` | 17 | HTML generation and parsing |
 | `diagrams` | 16 | Mermaid and PlantUML diagram generation |
-| `markdown` | 12 | Markdown generation and parsing |
+| `markdown` | 17 | Markdown generation, parsing, HTML conversion |
 | `powerpoint` | 10 | PowerPoint presentation operations |
 | **System & Network** | | |
 | `system` | 19 | Shell commands, process management, environment |
@@ -100,7 +102,7 @@ agent = Agent(tools=all_tools)
 | **Task Management** | | |
 | `todo` | 8 | Task creation, validation, management |
 | `logging` | 5 | Structured logging and log rotation |
-| **TOTAL** | **326** | |
+| **TOTAL** | **337** | |
 
 ## Key Features
 
@@ -168,7 +170,7 @@ os.environ['BYPASS_TOOL_CONSENT'] = 'true'
 import basic_open_agent_tools as boat
 
 # Master loader
-boat.load_all_tools()  # Load all 326 functions
+boat.load_all_tools()  # Load all 337 functions
 
 # Category loaders (21 total)
 boat.load_all_filesystem_tools()

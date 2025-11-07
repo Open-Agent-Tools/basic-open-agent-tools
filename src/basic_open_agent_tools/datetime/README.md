@@ -134,7 +134,8 @@ future_date = add_days(today, 30)
 ```
 
 ## Module Structure
-- **operations.py** - Core date/time operations and validation (13 functions)
+- **operations.py** - Core date/time operations, validation, and parsing (15 functions)
+- **formatting.py** - Human-readable date/time formatting (4 functions)
 - **info.py** - Date/time information extraction (6 functions)
 - **ranges.py** - Date range operations and calculations (10 functions)
 - **business.py** - Business day operations (2 functions)

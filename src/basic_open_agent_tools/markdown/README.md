@@ -15,10 +15,12 @@ pip install basic-open-agent-tools
 
 ## Features
 
-### Parsing & Extraction (6 functions)
+### Parsing & Extraction (11 functions)
 
 - Parse Markdown structure (frontmatter, headings, sections)
-- Extract headings, links, code blocks, and tables
+- Extract headings, links, code blocks, tables, and images
+- Parse reference-style links, footnotes, and definition lists
+- Extract task lists with checkbox states
 - Convert Markdown to plain text
 
 ### Generation & Creation (6 functions)
@@ -26,7 +28,7 @@ pip install basic-open-agent-tools
 - Create Markdown files with or without frontmatter
 - Generate tables and lists as Markdown strings
 - Append content to existing files
-- Convert Markdown to HTML
+- Convert Markdown to HTML with enhanced features (blockquotes, tables, task lists)
 
 ## Usage Examples
 
