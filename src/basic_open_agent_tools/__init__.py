@@ -4,7 +4,7 @@ An open foundational toolkit providing essential components for building AI agen
 with minimal dependencies for local (non-HTTP/API) actions.
 """
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 
 # Modular structure
 from . import (
