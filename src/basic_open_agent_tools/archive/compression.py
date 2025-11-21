@@ -6,7 +6,7 @@ import lzma
 import os
 import shutil
 import zipfile
-from typing import Union
+from typing import Any, Union
 
 from .._logging import get_logger
 from ..confirmation import check_user_confirmation
@@ -242,15 +242,23 @@ def compress_files(file_paths: list[str], output_path: str, skip_confirm: bool) 
     return create_zip(file_paths, output_path, skip_confirm)  # type: ignore[no-any-return]
 
 
-@strands_tool
-def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) -> str:
-    """
-    Compress a file using gzip compression with permission checking.
+def _compress_file_generic(
+    input_path: str,
+    output_path: str,
+    skip_confirm: bool,
+    compression_type: str,
+    open_func: Any,
+) -> str:
+    """Generic file compression with permission checking.
+
+    This internal helper consolidates the common logic for gzip, bzip2, and xz compression.
 
     Args:
         input_path: Path to input file
-        output_path: Path for compressed file (e.g., 'file.txt.gz')
-        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
+        output_path: Path for compressed file
+        skip_confirm: If True, skip confirmation and overwrite existing files
+        compression_type: Name of compression type for logging (e.g., "GZIP", "BZIP2", "XZ")
+        open_func: Compression file open function or class (e.g., gzip.open, bz2.BZ2File, lzma.LZMAFile)
 
     Returns:
         String describing the operation result
@@ -282,15 +290,15 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
     input_size = os.path.getsize(input_path)
 
     logger.info(
-        f"Compressing with GZIP: {input_path} → {output_path} ({input_size} bytes)"
+        f"Compressing with {compression_type}: {input_path} → {output_path} ({input_size} bytes)"
     )
     logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
 
     if file_existed:
         # Check user confirmation - show preview of source file being compressed
-        preview = _generate_compression_preview(input_path, "GZIP")
+        preview = _generate_compression_preview(input_path, compression_type)
         confirmed, decline_reason = check_user_confirmation(
-            operation="overwrite existing GZIP file",
+            operation=f"overwrite existing {compression_type} file",
             target=output_path,
             skip_confirm=skip_confirm,
             preview_info=preview,
@@ -299,13 +307,13 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
         if not confirmed:
             reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
             logger.debug(
-                f"GZIP compression cancelled by user: {output_path}{reason_msg}"
+                f"{compression_type} compression cancelled by user: {output_path}{reason_msg}"
             )
             return f"Operation cancelled by user{reason_msg}: {output_path}"
 
     try:
         with open(input_path, "rb") as f_in:
-            with gzip.open(output_path, "wb") as f_out:
+            with open_func(output_path, "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
 
         output_size = os.path.getsize(output_path)
@@ -313,16 +321,39 @@ def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) ->
         compression_percent = round((1 - compression_ratio) * 100, 1)
 
         action = "Overwrote" if file_existed else "Created"
-        result = f"{action} GZIP compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
+        result = f"{action} {compression_type} compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
         logger.info(
-            f"GZIP compression completed: {input_size} → {output_size} bytes ({compression_percent}% reduction)"
+            f"{compression_type} compression completed: {input_size} → {output_size} bytes ({compression_percent}% reduction)"
         )
         logger.debug(f"{result}")
         return result
 
     except Exception as e:
-        logger.error(f"GZIP compression failed: {e}")
-        raise BasicAgentToolsError(f"Failed to compress file with gzip: {str(e)}")
+        logger.error(f"{compression_type} compression failed: {e}")
+        raise BasicAgentToolsError(
+            f"Failed to compress file with {compression_type.lower()}: {str(e)}"
+        )
+
+
+@strands_tool
+def compress_file_gzip(input_path: str, output_path: str, skip_confirm: bool) -> str:
+    """
+    Compress a file using gzip compression with permission checking.
+
+    Args:
+        input_path: Path to input file
+        output_path: Path for compressed file (e.g., 'file.txt.gz')
+        skip_confirm: If True, skip confirmation and overwrite existing files. IMPORTANT: Agents should default to skip_confirm=False for safety.
+
+    Returns:
+        String describing the operation result
+
+    Raises:
+        BasicAgentToolsError: If compression fails or output exists without skip_confirm
+    """
+    return _compress_file_generic(
+        input_path, output_path, skip_confirm, "GZIP", gzip.open
+    )
 
 
 @strands_tool
@@ -401,71 +432,9 @@ def compress_file_bzip2(input_path: str, output_path: str, skip_confirm: bool) -
     Raises:
         BasicAgentToolsError: If compression fails or output exists without skip_confirm
     """
-    if not isinstance(input_path, str) or not input_path.strip():
-        raise BasicAgentToolsError("Input path must be a non-empty string")
-
-    input_path = input_path.strip()
-
-    if not os.path.exists(input_path):
-        raise BasicAgentToolsError(f"Input file not found: {input_path}")
-
-    if not os.path.isfile(input_path):
-        raise BasicAgentToolsError(f"Input path is not a file: {input_path}")
-
-    if not isinstance(output_path, str) or not output_path.strip():
-        raise BasicAgentToolsError("Output path must be a non-empty string")
-
-    output_path = output_path.strip()
-
-    if not isinstance(skip_confirm, bool):
-        raise BasicAgentToolsError("skip_confirm must be a boolean")
-
-    # Check if output file exists
-    file_existed = os.path.exists(output_path)
-    input_size = os.path.getsize(input_path)
-
-    logger.info(
-        f"Compressing with BZIP2: {input_path} → {output_path} ({input_size} bytes)"
+    return _compress_file_generic(
+        input_path, output_path, skip_confirm, "BZIP2", bz2.BZ2File
     )
-    logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
-
-    if file_existed:
-        # Check user confirmation - show preview of source file being compressed
-        preview = _generate_compression_preview(input_path, "BZIP2")
-        confirmed, decline_reason = check_user_confirmation(
-            operation="overwrite existing BZIP2 file",
-            target=output_path,
-            skip_confirm=skip_confirm,
-            preview_info=preview,
-        )
-
-        if not confirmed:
-            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
-            logger.debug(
-                f"BZIP2 compression cancelled by user: {output_path}{reason_msg}"
-            )
-            return f"Operation cancelled by user{reason_msg}: {output_path}"
-
-    try:
-        with open(input_path, "rb") as f_in:
-            with bz2.BZ2File(output_path, "wb") as f_out:
-                shutil.copyfileobj(f_in, f_out)
-
-        output_size = os.path.getsize(output_path)
-        compression_ratio = output_size / input_size if input_size > 0 else 0
-        compression_percent = round((1 - compression_ratio) * 100, 1)
-
-        action = "Overwrote" if file_existed else "Created"
-        result = f"{action} BZIP2 compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
-        logger.info(
-            f"BZIP2 compression completed: {input_size} → {output_size} bytes ({compression_percent}% reduction)"
-        )
-        logger.debug(f"{result}")
-        return result
-
-    except Exception as e:
-        logger.error(f"BZIP2 compression failed: {e}")
-        raise BasicAgentToolsError(f"Failed to compress file with bzip2: {str(e)}")
 
 
 @strands_tool
@@ -484,66 +453,6 @@ def compress_file_xz(input_path: str, output_path: str, skip_confirm: bool) -> s
     Raises:
         BasicAgentToolsError: If compression fails or output exists without skip_confirm
     """
-    if not isinstance(input_path, str) or not input_path.strip():
-        raise BasicAgentToolsError("Input path must be a non-empty string")
-
-    input_path = input_path.strip()
-
-    if not os.path.exists(input_path):
-        raise BasicAgentToolsError(f"Input file not found: {input_path}")
-
-    if not os.path.isfile(input_path):
-        raise BasicAgentToolsError(f"Input path is not a file: {input_path}")
-
-    if not isinstance(output_path, str) or not output_path.strip():
-        raise BasicAgentToolsError("Output path must be a non-empty string")
-
-    output_path = output_path.strip()
-
-    if not isinstance(skip_confirm, bool):
-        raise BasicAgentToolsError("skip_confirm must be a boolean")
-
-    # Check if output file exists
-    file_existed = os.path.exists(output_path)
-    input_size = os.path.getsize(input_path)
-
-    logger.info(
-        f"Compressing with XZ: {input_path} → {output_path} ({input_size} bytes)"
+    return _compress_file_generic(
+        input_path, output_path, skip_confirm, "XZ", lzma.LZMAFile
     )
-    logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
-
-    if file_existed:
-        # Check user confirmation - show preview of source file being compressed
-        preview = _generate_compression_preview(input_path, "XZ")
-        confirmed, decline_reason = check_user_confirmation(
-            operation="overwrite existing XZ file",
-            target=output_path,
-            skip_confirm=skip_confirm,
-            preview_info=preview,
-        )
-
-        if not confirmed:
-            reason_msg = f" (reason: {decline_reason})" if decline_reason else ""
-            logger.debug(f"XZ compression cancelled by user: {output_path}{reason_msg}")
-            return f"Operation cancelled by user{reason_msg}: {output_path}"
-
-    try:
-        with open(input_path, "rb") as f_in:
-            with lzma.LZMAFile(output_path, "wb") as f_out:
-                shutil.copyfileobj(f_in, f_out)
-
-        output_size = os.path.getsize(output_path)
-        compression_ratio = output_size / input_size if input_size > 0 else 0
-        compression_percent = round((1 - compression_ratio) * 100, 1)
-
-        action = "Overwrote" if file_existed else "Created"
-        result = f"{action} XZ compressed file {output_path} from {input_path} ({input_size} → {output_size} bytes, {compression_percent}% reduction)"
-        logger.info(
-            f"XZ compression completed: {input_size} → {output_size} bytes ({compression_percent}% reduction)"
-        )
-        logger.debug(f"{result}")
-        return result
-
-    except Exception as e:
-        logger.error(f"XZ compression failed: {e}")
-        raise BasicAgentToolsError(f"Failed to compress file with XZ: {str(e)}")

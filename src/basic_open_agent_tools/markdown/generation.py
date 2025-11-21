@@ -4,6 +4,7 @@ This module provides functions for creating and generating Markdown (.md) files.
 """
 
 import os
+from typing import cast
 
 from ..decorators import strands_tool
 
@@ -119,7 +120,7 @@ def create_markdown_with_frontmatter(
 
     full_content = "\n".join(frontmatter_lines) + content
 
-    return create_markdown_from_text(file_path, full_content, skip_confirm)
+    return cast(str, create_markdown_from_text(file_path, full_content, skip_confirm))
 
 
 @strands_tool

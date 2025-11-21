@@ -12,6 +12,7 @@ try:
     from docx import Document  # type: ignore[import-untyped, import-not-found]
     from docx.enum.text import (  # type: ignore[import-untyped, import-not-found]
         WD_ALIGN_PARAGRAPH,
+        WD_BREAK_TYPE,
     )
 
     HAS_PYTHON_DOCX = True
@@ -339,7 +340,7 @@ def add_page_break(file_path: str, after_paragraph: int, skip_confirm: bool) -> 
         # Get paragraph and add page break
         paragraph = doc.paragraphs[after_paragraph]
         run = paragraph.add_run()
-        run.add_break(type=1)  # type=1 is page break
+        run.add_break(break_type=WD_BREAK_TYPE.PAGE)
 
         # Save document
         doc.save(file_path)

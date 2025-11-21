@@ -5,6 +5,7 @@ This module provides functions for creating and modifying Excel (.xlsx) spreadsh
 
 import csv
 import os
+from typing import cast
 
 from ..decorators import strands_tool
 
@@ -163,7 +164,7 @@ def create_excel_with_headers(
     # Combine headers and data
     combined_data = [headers] + data
 
-    return create_simple_excel(file_path, combined_data, skip_confirm)
+    return cast(str, create_simple_excel(file_path, combined_data, skip_confirm))
 
 
 @strands_tool
@@ -227,7 +228,7 @@ def create_excel_from_dicts(
         row = [item.get(key, "") for key in headers]
         rows.append(row)
 
-    return create_excel_with_headers(file_path, headers, rows, skip_confirm)
+    return cast(str, create_excel_with_headers(file_path, headers, rows, skip_confirm))
 
 
 @strands_tool

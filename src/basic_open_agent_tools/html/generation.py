@@ -2,6 +2,7 @@
 
 import os
 import re
+from typing import cast
 
 from ..decorators import strands_tool
 
@@ -386,7 +387,7 @@ def markdown_to_html_file(md_path: str, html_path: str, skip_confirm: bool) -> s
 
         html_body = markdown_to_html_string(md_content)
 
-        return create_simple_html(html_path, title, html_body, skip_confirm)
+        return cast(str, create_simple_html(html_path, title, html_body, skip_confirm))
 
     except Exception as e:
         raise ValueError(f"Failed to convert Markdown to HTML: {e}")

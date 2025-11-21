@@ -6,7 +6,7 @@ from simple dictionary structures.
 
 import os
 import xml.etree.ElementTree as ET
-from typing import Optional
+from typing import Optional, cast
 
 from ..decorators import strands_tool
 
@@ -112,7 +112,7 @@ def create_xml_from_dict(data: dict, root_tag: str, encoding: str, indent: bool)
 
     # Use ET.tostring for proper encoding support
     xml_bytes_result = ET.tostring(root, encoding=encoding, xml_declaration=True)
-    decoded_str = xml_bytes_result.decode(encoding)
+    decoded_str: str = xml_bytes_result.decode(encoding)
     if not isinstance(decoded_str, str):
         raise TypeError(
             f"XML decoding produced {type(decoded_str).__name__}, expected str"
@@ -404,7 +404,7 @@ def build_simple_xml(root_tag: str, elements: list[dict]) -> str:
         "children": elements,
     }
 
-    return create_xml_from_dict(root_data, root_tag, "UTF-8", indent=True)
+    return cast(str, create_xml_from_dict(root_data, root_tag, "UTF-8", indent=True))
 
 
 @strands_tool
@@ -468,4 +468,4 @@ def xml_from_csv(csv_data: list[dict], root_tag: str, row_tag: str) -> str:
         element = create_xml_element(row_tag, "", row)
         elements.append(element)
 
-    return build_simple_xml(root_tag, elements)
+    return cast(str, build_simple_xml(root_tag, elements))

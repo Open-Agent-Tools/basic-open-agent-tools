@@ -1,5 +1,7 @@
 """File and directory information utilities."""
 
+from typing import cast
+
 from ..decorators import strands_tool
 from ..exceptions import FileSystemError
 from .validation import validate_path
@@ -53,7 +55,7 @@ def file_exists(file_path: str) -> bool:
     """
     try:
         path = validate_path(file_path, "check file existence")
-        return path.is_file()
+        return cast(bool, path.is_file())
     except FileSystemError:
         return False
 
@@ -70,7 +72,7 @@ def directory_exists(directory_path: str) -> bool:
     """
     try:
         path = validate_path(directory_path, "check directory existence")
-        return path.is_dir()
+        return cast(bool, path.is_dir())
     except FileSystemError:
         return False
 
@@ -94,7 +96,7 @@ def get_file_size(file_path: str) -> int:
         raise FileSystemError(f"File not found: {path}")
 
     try:
-        return path.stat().st_size
+        return cast(int, path.stat().st_size)
     except OSError as e:
         raise FileSystemError(f"Failed to get size for {path}: {e}")
 

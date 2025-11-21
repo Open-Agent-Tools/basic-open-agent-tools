@@ -651,7 +651,7 @@ def load_core_readonly() -> list[Callable[..., Any]]:
     """
     from .data import config_processing, csv_tools, json_tools
 
-    tools = []
+    tools: list[Callable[..., Any]] = []
 
     # File system read operations (9 tools)
     from .file_system import (
@@ -728,7 +728,7 @@ def load_converters() -> list[Callable[..., Any]]:
         ...     instructions="Transform and convert data formats"
         ... )
     """
-    tools = []
+    tools: list[Callable[..., Any]] = []
 
     # All text processing (10 tools - all pure transformations)
     tools.extend(load_all_text_tools())
@@ -795,7 +795,7 @@ def load_document_readers() -> list[Callable[..., Any]]:
         get_docx_paragraphs,
     )
 
-    tools = []
+    tools: list[Callable[..., Any]] = []
 
     # PDF reading (4 core extraction tools)
     tools.extend(
@@ -882,7 +882,7 @@ def load_writers() -> list[Callable[..., Any]]:
         write_file_from_string,
     )
 
-    tools = []
+    tools: list[Callable[..., Any]] = []
 
     # File system write operations (9 tools)
     tools.extend(
@@ -1201,7 +1201,7 @@ def load_essential() -> list[Callable[..., Any]]:
     from .network import http_request
     from .text import clean_whitespace
 
-    tools = []
+    tools: list[Callable[..., Any]] = []
 
     # Core file operations (7 tools)
     tools.extend(
