@@ -19,6 +19,92 @@ except ImportError:
 MAX_FILE_SIZE = 100 * 1024 * 1024
 
 
+def _check_openpyxl_installed() -> None:
+    """Check if openpyxl is installed and raise error if not.
+
+    Raises:
+        ImportError: If openpyxl not available
+    """
+    if not HAS_OPENPYXL:
+        raise ImportError(
+            "openpyxl is required for Excel operations. "
+            "Install with: pip install basic-open-agent-tools[excel]"
+        )
+
+
+def _validate_excel_file(file_path: str) -> None:
+    """Validate Excel file exists and is not too large.
+
+    Args:
+        file_path: Path to Excel file
+
+    Raises:
+        FileNotFoundError: If file doesn't exist
+        ValueError: If file too large
+    """
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Excel file not found: {file_path}")
+
+    file_size = os.path.getsize(file_path)
+    if file_size > MAX_FILE_SIZE:
+        raise ValueError(
+            f"File too large: {file_size} bytes (max {MAX_FILE_SIZE} bytes)"
+        )
+
+
+def _load_excel_sheet(file_path: str, sheet_name: str):  # type: ignore[no-untyped-def]
+    """Load Excel workbook and get specified sheet.
+
+    Args:
+        file_path: Path to Excel file
+        sheet_name: Name of sheet to load
+
+    Returns:
+        Tuple of (workbook, sheet)
+
+    Raises:
+        ValueError: If sheet doesn't exist
+    """
+    wb = load_workbook(filename=file_path, read_only=True, data_only=True)
+
+    if sheet_name not in wb.sheetnames:
+        raise ValueError(f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}")
+
+    return wb, wb[sheet_name]
+
+
+def _get_sheet_headers(sheet):  # type: ignore[no-untyped-def]
+    """Extract headers from first row of sheet.
+
+    Args:
+        sheet: openpyxl worksheet object
+
+    Returns:
+        List of header strings
+    """
+    headers = []
+    for cell in next(sheet.iter_rows(min_row=1, max_row=1, values_only=True)):
+        headers.append(str(cell) if cell is not None else "")
+    return headers
+
+
+def _row_to_dict(row, headers: list[str]) -> dict[str, str]:  # type: ignore[no-untyped-def]
+    """Convert row tuple to dictionary using headers.
+
+    Args:
+        row: Row tuple from openpyxl
+        headers: List of column headers
+
+    Returns:
+        Dictionary mapping headers to cell values
+    """
+    row_dict = {}
+    for idx, header in enumerate(headers):
+        value = row[idx] if idx < len(row) and row[idx] is not None else ""
+        row_dict[header] = str(value)
+    return row_dict
+
+
 @strands_tool
 def read_excel_sheet(file_path: str, sheet_name: str) -> list[list[str]]:
     """Read Excel sheet as 2D list of strings.
