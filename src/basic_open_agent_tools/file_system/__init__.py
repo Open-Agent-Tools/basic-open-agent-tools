@@ -40,11 +40,7 @@ from .tree import (
     list_all_directory_contents,
 )
 
-# validation functions are internal utilities, not agent tools
-# from .validation import (
-#     validate_file_content,
-#     validate_path,
-# )
+# Note: validation functions are internal utilities, not exported as agent tools
 
 # Re-export all functions at module level for convenience
 __all__ = [
