@@ -278,7 +278,7 @@ def test_validate_task_file_invalid_dependency(temp_dir):
                 "1": {
                     "id": 1,
                     "title": "Test",
-                    "status": "pending",
+                    "status": "open",
                     "priority": 1,
                     "created_at": "2025-01-01T00:00:00",
                     "updated_at": "2025-01-01T00:00:00",
@@ -312,7 +312,7 @@ def test_validate_task_file_circular_dependency(temp_dir):
                 "1": {
                     "id": 1,
                     "title": "Task 1",
-                    "status": "pending",
+                    "status": "open",
                     "priority": 1,
                     "created_at": "2025-01-01T00:00:00",
                     "updated_at": "2025-01-01T00:00:00",
@@ -324,7 +324,7 @@ def test_validate_task_file_circular_dependency(temp_dir):
                 "2": {
                     "id": 2,
                     "title": "Task 2",
-                    "status": "pending",
+                    "status": "open",
                     "priority": 1,
                     "created_at": "2025-01-01T00:00:00",
                     "updated_at": "2025-01-01T00:00:00",
@@ -665,8 +665,8 @@ def test_roundtrip_save_and_load(temp_dir, sample_tasks):
     final_stats = get_task_stats()
     assert final_stats["total_tasks"] == initial_stats["total_tasks"]
     assert (
-        final_stats["status_counts"]["pending"]
-        == initial_stats["status_counts"]["pending"]
+        final_stats["status_counts"]["open"]
+        == initial_stats["status_counts"]["open"]
     )
 
 
@@ -713,7 +713,7 @@ def test_roundtrip_preserves_completed_tasks(temp_dir):
     task_2 = get_task(2)
 
     assert task_1["status"] == "completed"
-    assert task_2["status"] == "pending"
+    assert task_2["status"] == "open"
 
 
 # === EDGE CASES ===
