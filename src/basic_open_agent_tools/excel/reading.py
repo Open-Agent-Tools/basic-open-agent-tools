@@ -1110,11 +1110,8 @@ def filter_sheet_rows(
         >>> rows[0]
         {'Name': 'Bob', 'Age': '35', 'City': 'LA'}
     """
-    if not HAS_OPENPYXL:
-        raise ImportError(
-            "openpyxl is required for Excel operations. "
-            "Install with: pip install basic-open-agent-tools[excel]"
-        )
+    # Validate inputs
+    _check_openpyxl_installed()
 
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
@@ -1142,32 +1139,12 @@ def filter_sheet_rows(
     if operator not in valid_operators:
         raise ValueError(f"operator must be one of: {valid_operators}")
 
-    # Check file exists
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Excel file not found: {file_path}")
-
-    # Check file size
-    file_size = os.path.getsize(file_path)
-    if file_size > MAX_FILE_SIZE:
-        raise ValueError(
-            f"File too large: {file_size} bytes (max {MAX_FILE_SIZE} bytes)"
-        )
+    # Validate file and load sheet
+    _validate_excel_file(file_path)
 
     try:
-        wb = load_workbook(filename=file_path, read_only=True, data_only=True)
-
-        # Check sheet exists
-        if sheet_name not in wb.sheetnames:
-            raise ValueError(
-                f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
-            )
-
-        ws = wb[sheet_name]
-
-        # Get headers
-        headers = []
-        for cell in next(ws.iter_rows(min_row=1, max_row=1, values_only=True)):
-            headers.append(str(cell) if cell is not None else "")
+        wb, ws = _load_excel_sheet(file_path, sheet_name)
+        headers = _get_sheet_headers(ws)
 
         # Find column index
         try:
@@ -1208,13 +1185,7 @@ def filter_sheet_rows(
                     matches = False
 
             if matches:
-                row_dict = {}
-                for idx, header in enumerate(headers):
-                    row_value = (
-                        row[idx] if idx < len(row) and row[idx] is not None else ""
-                    )
-                    row_dict[header] = str(row_value)
-                result.append(row_dict)
+                result.append(_row_to_dict(row, headers))
 
         wb.close()
         return result
@@ -1352,11 +1323,8 @@ def sample_sheet_rows(
         >>> len(rows)
         100
     """
-    if not HAS_OPENPYXL:
-        raise ImportError(
-            "openpyxl is required for Excel operations. "
-            "Install with: pip install basic-open-agent-tools[excel]"
-        )
+    # Validate inputs
+    _check_openpyxl_installed()
 
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
@@ -1381,32 +1349,12 @@ def sample_sheet_rows(
         )
         return result_preview
 
-    # Check file exists
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Excel file not found: {file_path}")
-
-    # Check file size
-    file_size = os.path.getsize(file_path)
-    if file_size > MAX_FILE_SIZE:
-        raise ValueError(
-            f"File too large: {file_size} bytes (max {MAX_FILE_SIZE} bytes)"
-        )
+    # Validate file and load sheet
+    _validate_excel_file(file_path)
 
     try:
-        wb = load_workbook(filename=file_path, read_only=True, data_only=True)
-
-        # Check sheet exists
-        if sheet_name not in wb.sheetnames:
-            raise ValueError(
-                f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
-            )
-
-        ws = wb[sheet_name]
-
-        # Get headers
-        headers = []
-        for cell in next(ws.iter_rows(min_row=1, max_row=1, values_only=True)):
-            headers.append(str(cell) if cell is not None else "")
+        wb, ws = _load_excel_sheet(file_path, sheet_name)
+        headers = _get_sheet_headers(ws)
 
         if method == "random":
             # Reservoir sampling
@@ -1416,10 +1364,7 @@ def sample_sheet_rows(
             row_num = 0
 
             for row in ws.iter_rows(min_row=2, values_only=True):
-                row_dict = {}
-                for idx, header in enumerate(headers):
-                    value = row[idx] if idx < len(row) and row[idx] is not None else ""
-                    row_dict[header] = str(value)
+                row_dict = _row_to_dict(row, headers)
 
                 if row_num < sample_size:
                     result.append(row_dict)
@@ -1441,13 +1386,7 @@ def sample_sheet_rows(
                 # Return all rows if total is less than sample size
                 result_all = []
                 for row in ws.iter_rows(min_row=2, values_only=True):
-                    row_dict = {}
-                    for idx, header in enumerate(headers):
-                        value = (
-                            row[idx] if idx < len(row) and row[idx] is not None else ""
-                        )
-                        row_dict[header] = str(value)
-                    result_all.append(row_dict)
+                    result_all.append(_row_to_dict(row, headers))
                 wb.close()
                 return result_all
 
@@ -1460,13 +1399,7 @@ def sample_sheet_rows(
 
             for row in ws.iter_rows(min_row=2, values_only=True):
                 if row_num == next_sample:
-                    row_dict = {}
-                    for idx, header in enumerate(headers):
-                        value = (
-                            row[idx] if idx < len(row) and row[idx] is not None else ""
-                        )
-                        row_dict[header] = str(value)
-                    result_systematic.append(row_dict)
+                    result_systematic.append(_row_to_dict(row, headers))
                     next_sample += step
 
                     if len(result_systematic) >= sample_size:
