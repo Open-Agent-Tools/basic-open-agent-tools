@@ -130,8 +130,8 @@ class TestLoadAllDataTools:
     def test_load_data_tools_expected_count(self) -> None:
         """Test that expected number of tools are loaded."""
         tools = load_all_data_tools()
-        # Expected: 23 data processing functions
-        assert len(tools) == 23
+        # Expected: 61 data processing functions (22 JSON + 18 CSV + 5 validation + 16 config)
+        assert len(tools) == 61
 
     def test_load_data_tools_function_names(self) -> None:
         """Test that expected function names are present."""
@@ -524,7 +524,7 @@ class TestListAllAvailableTools:
         tools = list_all_available_tools()
 
         data_tools = tools["data"]
-        assert len(data_tools) == 23
+        assert len(data_tools) == 61
 
     def test_list_tools_function_names(self) -> None:
         """Test that expected function names are present in categories."""
@@ -584,9 +584,17 @@ class TestHelpersIntegration:
             json_tools, csv_tools, validation_tools, config_tools
         )
 
-        # Should equal the count from load_all_data_tools
+        # Verify subcategories merge correctly (3 + 7 + 5 + 8 = 23)
+        assert len(specific_data_tools) == 23
+
+        # Verify subcategories are a subset of all data tools
         all_data_tools = load_all_data_tools()
-        assert len(specific_data_tools) == len(all_data_tools)
+        assert len(specific_data_tools) < len(all_data_tools)
+
+        # Verify all subcategory tool names are present in all_data_tools
+        specific_names = {tool.__name__ for tool in specific_data_tools}
+        all_names = {tool.__name__ for tool in all_data_tools}
+        assert specific_names.issubset(all_names)
 
     def test_list_and_get_tool_info_consistency(self) -> None:
         """Test consistency between list_all_available_tools and get_tool_info."""
