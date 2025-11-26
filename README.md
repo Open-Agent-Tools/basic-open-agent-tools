@@ -2,15 +2,17 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions.
 
-## 🆕 What's New in v1.2.0
+## 🆕 What's New in v1.2.1
+
+🎯 **NEW: Loadouts** - 6 pre-configured tool bundles for specific use cases (coder, docs writer, data analyst, web publisher, visual designer, office suite)
 
 📝 **Markdown Enhancements**: Advanced HTML conversion with blockquotes, tables, task lists, and 5 new parsing functions
 
 📅 **DateTime Improvements**: 6 new formatting/parsing functions for human-readable dates, times, and durations
 
-🔧 **Helper Function**: `load_datetime_essential()` provides 13 curated datetime tools for common agent workflows
-
 ### Recent Updates
+
+**v1.2.0** - Markdown and datetime enhancements, datetime essentials helper
 
 **v1.1.0** - New helper functions: Added 10 use-case focused tool loaders for targeted agent capabilities
 
@@ -52,10 +54,18 @@ pip install basic-open-agent-tools[image]       # Image processing
 ```python
 import basic_open_agent_tools as boat
 
-# Load all tools
-all_tools = boat.load_all_tools()  # 337 functions
+# Option 1: Load all tools (337 functions)
+all_tools = boat.load_all_tools()
 
-# Or load specific categories
+# Option 2: Use pre-configured loadouts for specific use cases
+coder_tools = boat.load_coder_loadout()              # ~105 tools for development
+docs_tools = boat.load_docs_loadout()                # ~130 tools for documentation
+analyst_tools = boat.load_data_analyst_loadout()     # ~115 tools for data analysis
+web_tools = boat.load_web_publisher_loadout()        # ~90 tools for web content
+designer_tools = boat.load_visual_designer_loadout() # ~60 tools for graphics
+office_tools = boat.load_office_suite_loadout()      # ~80 tools for Office work
+
+# Option 3: Load specific categories
 fs_tools = boat.load_all_filesystem_tools()
 text_tools = boat.load_all_text_tools()
 data_tools = boat.load_all_data_tools()
@@ -65,7 +75,15 @@ custom_tools = boat.merge_tool_lists(fs_tools, text_tools, data_tools)
 
 # Use with any agent framework
 from google.adk.agents import Agent
+
+# General-purpose agent
 agent = Agent(tools=all_tools)
+
+# Specialized developer agent
+dev_agent = Agent(tools=boat.load_coder_loadout())
+
+# Documentation writer agent
+docs_agent = Agent(tools=boat.load_docs_loadout())
 ```
 
 ## Available Modules
@@ -115,6 +133,66 @@ agent = Agent(tools=all_tools)
 🤝 **Multi-Framework**: Works with Google ADK (signature-based), LangChain, Strands Agents (@strands_tool decorator), custom frameworks
 
 🔍 **Enhanced Feedback**: Detailed operation confirmations with `skip_confirm` safety parameter
+
+🎯 **Pre-configured Loadouts**: 6 curated tool bundles optimized for specific use cases with minimal overlap
+
+## Loadouts - Pre-configured Tool Bundles
+
+Choose the right loadout for your agent's role to minimize token usage and maximize relevance:
+
+### 1. `load_coder_loadout()` (~105 tools)
+**For**: Software developers, DevOps engineers, automation scripts
+
+**Includes**: File system, system operations, network, logging, crypto, archive, config files (YAML, TOML, JSON, INI)
+
+**Example Agents**:
+- DevOps agent managing deployments and server configs
+- Project setup agent scaffolding new projects
+
+### 2. `load_docs_loadout()` (~130 tools)
+**For**: Technical writers, documentation creators, report generators
+
+**Includes**: Word, PDF, Markdown, HTML, diagrams, images, text processing
+
+**Example Agents**:
+- Technical writer creating API documentation
+- Report generator compiling findings into formatted documents
+
+### 3. `load_data_analyst_loadout()` (~115 tools)
+**For**: Data analysts, financial analysts, business intelligence
+
+**Includes**: Excel, CSV, data validation, diagrams, structured data formats (JSON, YAML, XML)
+
+**Example Agents**:
+- Financial analyst processing budgets and creating reports
+- BI agent generating dashboards and analytics
+
+### 4. `load_web_publisher_loadout()` (~90 tools)
+**For**: Web developers, content managers, blog publishers
+
+**Includes**: HTML, XML, Markdown, network operations, text processing
+
+**Example Agents**:
+- Blog publisher converting drafts to HTML
+- Documentation site generator creating static websites
+
+### 5. `load_visual_designer_loadout()` (~60 tools)
+**For**: Graphic designers, infographic creators, visual content producers
+
+**Includes**: Image processing, diagrams, color tools, file operations
+
+**Example Agents**:
+- Infographic generator creating data visualizations
+- Brand asset manager processing images and color palettes
+
+### 6. `load_office_suite_loadout()` (~80 tools)
+**For**: Office workers, business users, administrative assistants
+
+**Includes**: Excel, Word, PowerPoint, file operations, datetime essentials
+
+**Example Agents**:
+- Office assistant creating business reports and presentations
+- Administrative agent managing documents and schedules
 
 ## Safety Features
 
@@ -166,9 +244,27 @@ os.environ['BYPASS_TOOL_CONSENT'] = 'true'
 
 ## Helper Functions
 
+### Rapid Loaders - Pre-configured Loadouts (6 total)
+
+Optimized tool bundles for specific roles and use cases - minimal overlap, maximum relevance:
+
 ```python
 import basic_open_agent_tools as boat
 
+# Loadouts - Choose the one that matches your agent's role
+boat.load_coder_loadout()           # ~105 tools - Development, DevOps, automation
+boat.load_docs_loadout()            # ~130 tools - Document creation (Word, PDF, Markdown, HTML)
+boat.load_data_analyst_loadout()    # ~115 tools - Data analysis (Excel, CSV, validation)
+boat.load_web_publisher_loadout()   # ~90 tools - Web content (HTML, XML, Markdown)
+boat.load_visual_designer_loadout() # ~60 tools - Graphics (Images, Diagrams, Color)
+boat.load_office_suite_loadout()    # ~80 tools - Office productivity (Excel, Word, PowerPoint)
+```
+
+### Generic Loaders
+
+Build custom tool sets by combining modules:
+
+```python
 # Master loader
 boat.load_all_tools()  # Load all 337 functions
 

@@ -1248,6 +1248,282 @@ def load_essential() -> list[Callable[..., Any]]:
     return tools
 
 
+def load_coder_loadout() -> list[Callable[..., Any]]:
+    """Load tools optimized for software development, DevOps, and automation tasks.
+
+    Perfect for agents that write code, manage configurations, automate deployments,
+    or handle development workflows. Includes all tools needed for technical work.
+
+    Includes (~105 tools):
+    - File system: All operations (18 tools)
+    - System: Process, environment, platform operations (20 tools)
+    - Network: HTTP requests, DNS, connectivity (3 tools)
+    - Data config: YAML, TOML, JSON, INI parsing (11 tools)
+    - Text processing: String manipulation (10 tools)
+    - Utilities: Timing, debugging, performance (8 tools)
+    - Logging: Structured logging with rotation (5 tools)
+    - Crypto: Hashing, UUIDs, encoding (13 tools)
+    - Archive: Compression, extraction (5 tools)
+    - Datetime: Date/time essentials (13 tools)
+
+    Returns:
+        List of development-focused tools
+
+    Example:
+        >>> coder_tools = load_coder_loadout()
+        >>> len(coder_tools) >= 100
+        True
+        >>> # Use for a DevOps agent
+        >>> from google.adk.agents import Agent
+        >>> agent = Agent(
+        ...     tools=load_coder_loadout(),
+        ...     name="DevOpsAssistant",
+        ...     instruction="Manage deployments and server configurations"
+        ... )
+    """
+    tools = []
+
+    # Core development tools
+    tools.extend(load_all_filesystem_tools())  # 18
+    tools.extend(load_all_system_tools())  # 20
+    tools.extend(load_all_network_tools())  # 3
+    tools.extend(load_all_utilities_tools())  # 8
+    tools.extend(load_all_logging_tools())  # 5
+    tools.extend(load_all_crypto_tools())  # 13
+    tools.extend(load_all_archive_tools())  # 5
+    tools.extend(load_all_text_tools())  # 10
+    tools.extend(load_datetime_essential())  # 13
+    tools.extend(load_data_config_tools())  # 8
+
+    return tools
+
+
+def load_docs_loadout() -> list[Callable[..., Any]]:
+    """Load tools for document creation across all formats.
+
+    Perfect for agents that create technical documentation, reports, research papers,
+    user guides, or any written content. Covers all major document formats.
+
+    Includes (~130 tools):
+    - Word: Document creation and formatting (18 tools)
+    - PDF: Generation, manipulation, reading (20 tools)
+    - Markdown: Parsing, generation, conversion (12 tools)
+    - HTML: Generation and manipulation (17 tools)
+    - File system: All operations (18 tools)
+    - Text processing: String manipulation (10 tools)
+    - Diagrams: Flowcharts, graphs, visualizations (16 tools)
+    - Datetime: Date/time essentials (13 tools)
+    - Image: Basic image operations (12 tools)
+
+    Returns:
+        List of document creation tools
+
+    Example:
+        >>> docs_tools = load_docs_loadout()
+        >>> len(docs_tools) >= 125
+        True
+        >>> # Use for a technical writer agent
+        >>> from google.adk.agents import Agent
+        >>> agent = Agent(
+        ...     tools=load_docs_loadout(),
+        ...     name="TechnicalWriter",
+        ...     instruction="Create comprehensive API documentation"
+        ... )
+    """
+    tools = []
+
+    # Document formats
+    tools.extend(load_all_word_tools())  # 18
+    tools.extend(load_all_pdf_tools())  # 20
+    tools.extend(load_all_markdown_tools())  # 12
+    tools.extend(load_all_html_tools())  # 17
+
+    # Supporting tools
+    tools.extend(load_all_filesystem_tools())  # 18
+    tools.extend(load_all_text_tools())  # 10
+    tools.extend(load_all_diagrams_tools())  # 16
+    tools.extend(load_datetime_essential())  # 13
+    tools.extend(load_all_image_tools())  # 12
+
+    return tools
+
+
+def load_data_analyst_loadout() -> list[Callable[..., Any]]:
+    """Load tools for data analysis, validation, and Excel operations.
+
+    Perfect for agents that analyze datasets, create financial models, validate data,
+    or generate analytical visualizations. Excel and CSV focused.
+
+    Includes (~115 tools):
+    - Excel: Spreadsheet operations, formulas, charts (24 tools)
+    - CSV: Reading, writing, validation (7 tools)
+    - Data validation: Schema checking, type validation (5 tools)
+    - Diagrams: Charts, graphs, visualizations (16 tools)
+    - Structured data: JSON, YAML, TOML, XML (42 tools)
+    - File system: All operations (18 tools)
+    - Datetime: Date/time essentials (13 tools)
+
+    Returns:
+        List of data analysis tools
+
+    Example:
+        >>> analyst_tools = load_data_analyst_loadout()
+        >>> len(analyst_tools) >= 110
+        True
+        >>> # Use for a financial analysis agent
+        >>> from google.adk.agents import Agent
+        >>> agent = Agent(
+        ...     tools=load_data_analyst_loadout(),
+        ...     name="FinancialAnalyst",
+        ...     instruction="Analyze quarterly financial data and create reports"
+        ... )
+    """
+    tools = []
+
+    # Data analysis tools
+    tools.extend(load_all_excel_tools())  # 24
+    tools.extend(load_data_csv_tools())  # 7
+    tools.extend(load_data_validation_tools())  # 5
+    tools.extend(load_all_diagrams_tools())  # 16
+
+    # Structured data
+    tools.extend(load_structured_data_tools())  # 42
+
+    # Supporting tools
+    tools.extend(load_all_filesystem_tools())  # 18
+    tools.extend(load_datetime_essential())  # 13
+
+    return tools
+
+
+def load_web_publisher_loadout() -> list[Callable[..., Any]]:
+    """Load tools for web content creation and publishing.
+
+    Perfect for agents that create websites, blogs, manage HTML/XML content,
+    or work with static site generators. Web-focused markup languages.
+
+    Includes (~90 tools):
+    - HTML: Generation, parsing, manipulation (17 tools)
+    - XML: Parsing, generation, validation, XSLT (24 tools)
+    - Markdown: Parsing, generation, conversion (12 tools)
+    - Network: HTTP requests, connectivity (3 tools)
+    - File system: All operations (18 tools)
+    - Text processing: String manipulation (10 tools)
+    - Datetime: Date/time essentials (13 tools)
+
+    Returns:
+        List of web publishing tools
+
+    Example:
+        >>> web_tools = load_web_publisher_loadout()
+        >>> len(web_tools) >= 85
+        True
+        >>> # Use for a blog publisher agent
+        >>> from google.adk.agents import Agent
+        >>> agent = Agent(
+        ...     tools=load_web_publisher_loadout(),
+        ...     name="BlogPublisher",
+        ...     instruction="Convert markdown drafts to HTML and publish"
+        ... )
+    """
+    tools = []
+
+    # Web formats
+    tools.extend(load_all_html_tools())  # 17
+    tools.extend(load_all_xml_tools())  # 24
+    tools.extend(load_all_markdown_tools())  # 12
+
+    # Supporting tools
+    tools.extend(load_all_network_tools())  # 3
+    tools.extend(load_all_filesystem_tools())  # 18
+    tools.extend(load_all_text_tools())  # 10
+    tools.extend(load_datetime_essential())  # 13
+
+    return tools
+
+
+def load_visual_designer_loadout() -> list[Callable[..., Any]]:
+    """Load tools for visual design, graphics, and color work.
+
+    Perfect for agents that create infographics, manage color palettes,
+    process images, or generate diagrams and visualizations.
+
+    Includes (~60 tools):
+    - Image: Processing, metadata, transformations (12 tools)
+    - Diagrams: Flowcharts, graphs, charts (16 tools)
+    - Color: Palettes, conversions, analysis (14 tools)
+    - File system: All operations (18 tools)
+
+    Returns:
+        List of visual design tools
+
+    Example:
+        >>> designer_tools = load_visual_designer_loadout()
+        >>> len(designer_tools) >= 55
+        True
+        >>> # Use for an infographic creator agent
+        >>> from google.adk.agents import Agent
+        >>> agent = Agent(
+        ...     tools=load_visual_designer_loadout(),
+        ...     name="InfographicCreator",
+        ...     instruction="Create data visualizations and color schemes"
+        ... )
+    """
+    tools = []
+
+    # Visual tools
+    tools.extend(load_all_image_tools())  # 12
+    tools.extend(load_all_diagrams_tools())  # 16
+    tools.extend(load_all_color_tools())  # 14
+
+    # Supporting tools
+    tools.extend(load_all_filesystem_tools())  # 18
+
+    return tools
+
+
+def load_office_suite_loadout() -> list[Callable[..., Any]]:
+    """Load Microsoft Office suite tools for business productivity.
+
+    Perfect for agents that work with business documents across Excel, Word,
+    and PowerPoint. Comprehensive Office productivity tools.
+
+    Includes (~80 tools):
+    - Excel: Spreadsheet operations, formulas, charts (24 tools)
+    - Word: Document creation and formatting (18 tools)
+    - PowerPoint: Presentation creation and management (10 tools)
+    - File system: All operations (18 tools)
+    - Datetime: Date/time essentials (13 tools)
+
+    Returns:
+        List of Office suite tools
+
+    Example:
+        >>> office_tools = load_office_suite_loadout()
+        >>> len(office_tools) >= 75
+        True
+        >>> # Use for a business productivity agent
+        >>> from google.adk.agents import Agent
+        >>> agent = Agent(
+        ...     tools=load_office_suite_loadout(),
+        ...     name="OfficeAssistant",
+        ...     instruction="Create business reports and presentations"
+        ... )
+    """
+    tools = []
+
+    # Office suite
+    tools.extend(load_all_excel_tools())  # 24
+    tools.extend(load_all_word_tools())  # 18
+    tools.extend(load_all_powerpoint_tools())  # 10
+
+    # Supporting tools
+    tools.extend(load_all_filesystem_tools())  # 18
+    tools.extend(load_datetime_essential())  # 13
+
+    return tools
+
+
 def merge_tool_lists(
     *args: Union[list[Callable[..., Any]], Callable[..., Any]],
 ) -> list[Callable[..., Any]]:
@@ -1394,6 +1670,13 @@ __all__ = [
     "load_markup_tools",
     "load_essential",
     "load_datetime_essential",
+    # Loadouts (use-case focused tool bundles)
+    "load_coder_loadout",
+    "load_docs_loadout",
+    "load_data_analyst_loadout",
+    "load_web_publisher_loadout",
+    "load_visual_designer_loadout",
+    "load_office_suite_loadout",
     # Utility functions
     "merge_tool_lists",
     "get_tool_info",

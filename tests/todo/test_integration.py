@@ -66,8 +66,8 @@ class TestTodoModuleIntegration:
 
         todo_tools = load_all_todo_tools()
 
-        # Should have 8 functions
-        assert len(todo_tools) == 8
+        # Should have 11 functions
+        assert len(todo_tools) == 11
 
         # All should be callable
         for tool in todo_tools:
@@ -84,6 +84,9 @@ class TestTodoModuleIntegration:
             "complete_task",
             "get_task_stats",
             "clear_all_tasks",
+            "save_tasks_to_file",
+            "load_tasks_from_file",
+            "validate_task_file",
         ]
 
         for expected in expected_functions:
