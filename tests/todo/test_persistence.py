@@ -665,8 +665,7 @@ def test_roundtrip_save_and_load(temp_dir, sample_tasks):
     final_stats = get_task_stats()
     assert final_stats["total_tasks"] == initial_stats["total_tasks"]
     assert (
-        final_stats["status_counts"]["open"]
-        == initial_stats["status_counts"]["open"]
+        final_stats["status_counts"]["open"] == initial_stats["status_counts"]["open"]
     )
 
 
