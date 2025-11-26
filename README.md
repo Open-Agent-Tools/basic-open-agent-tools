@@ -2,7 +2,7 @@
 
 An open foundational toolkit providing essential components for building AI agents with minimal dependencies for local (non-HTTP/API) actions.
 
-## 🆕 What's New in v1.2.1
+## 🆕 What's New in v1.3.0
 
 🎯 **NEW: Loadouts** - 6 pre-configured tool bundles for specific use cases (coder, docs writer, data analyst, web publisher, visual designer, office suite)
 
