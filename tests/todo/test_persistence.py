@@ -114,18 +114,23 @@ def test_save_tasks_overwrite_existing(temp_dir, sample_tasks):
 
 def test_save_tasks_permission_error(temp_dir, sample_tasks):
     """Test save with permission denied."""
-    file_path = os.path.join(temp_dir, "readonly.json")
+    # Create a subdirectory and make it read-only
+    readonly_dir = os.path.join(temp_dir, "readonly_dir")
+    os.makedirs(readonly_dir)
+    file_path = os.path.join(readonly_dir, "tasks.json")
 
-    # Create file and make it readonly
+    # Create the file first
     Path(file_path).touch()
-    os.chmod(file_path, 0o444)
+
+    # Make the directory read-only (this prevents writing/replacing files)
+    os.chmod(readonly_dir, 0o555)
 
     try:
         with pytest.raises(BasicAgentToolsError, match="Permission denied"):
             save_tasks_to_file(file_path, skip_confirm=True)
     finally:
-        # Clean up
-        os.chmod(file_path, 0o644)
+        # Clean up - restore write permissions
+        os.chmod(readonly_dir, 0o755)
 
 
 def test_save_tasks_preserves_all_fields(temp_dir):
@@ -489,14 +494,14 @@ def test_load_tasks_merge_mode_partial_conflicts(temp_dir):
 
 
 def test_load_tasks_merge_renumber_no_conflicts(temp_dir):
-    """Test merge_renumber mode with no conflicts."""
-    # Create file with tasks 1, 2, 3
+    """Test merge_renumber mode with minimal conflicts."""
+    # Create file with tasks 1, 2
     add_task("Task 1", "low", "", [], "", [])
     add_task("Task 2", "low", "", [], "", [])
     file_path = os.path.join(temp_dir, "tasks.json")
     save_tasks_to_file(file_path, skip_confirm=True)
 
-    # Clear and add different tasks
+    # Clear and add different task at ID 1
     clear_all_tasks()
     add_task("Task 10", "low", "", [], "", [])
 
@@ -505,7 +510,11 @@ def test_load_tasks_merge_renumber_no_conflicts(temp_dir):
 
     assert result["success"] is True
     assert result["tasks_loaded"] == 2
-    assert len(result["tasks_renumbered"]) == 0  # No conflicts
+    # File task 1 conflicts with current task 1, so it gets renumbered to 3
+    # File task 2 doesn't conflict, keeps ID 2
+    assert len(result["tasks_renumbered"]) == 1  # Task 1 renumbered
+    assert result["tasks_renumbered"][0]["old_id"] == 1
+    assert result["tasks_renumbered"][0]["new_id"] == 3
 
     from basic_open_agent_tools.todo import list_tasks
 
@@ -516,7 +525,7 @@ def test_load_tasks_merge_renumber_no_conflicts(temp_dir):
 
 def test_load_tasks_merge_renumber_with_conflicts(temp_dir):
     """Test merge_renumber mode with ID conflicts."""
-    # Create file with tasks 1, 2, 3 (2 depends on 1)
+    # Create file with tasks 1, 2, 3 (2 depends on 1, 3 depends on 2)
     add_task("File Task 1", "low", "", [], "", [])
     add_task("File Task 2", "low", "", [], "", [1])
     add_task("File Task 3", "low", "", [], "", [2])
@@ -546,18 +555,21 @@ def test_load_tasks_merge_renumber_with_conflicts(temp_dir):
     new_id = renumbered["new_id"]
 
     assert old_id == 1
-    assert new_id == 2  # Should be renumbered to 2 (next available ID)
+    # File task 1 conflicts with current task 1
+    # File tasks 2 and 3 don't conflict, so they keep their IDs
+    # Therefore file task 1 gets renumbered to 4 (first available after 1, 2, 3)
+    assert new_id == 4
 
     # Verify task exists with new ID
-    renumbered_task = get_task(new_id)
+    renumbered_task = get_task(new_id)["task"]
     assert renumbered_task["title"] == "File Task 1"
 
     # Verify dependencies were updated
-    task_3_id = next(
+    task_2_id = next(
         (t["id"] for t in tasks if t["title"] == "File Task 2"), None
-    )  # Was task 2, depends on what's now task 2
-    task_3 = get_task(task_3_id)
-    assert new_id in task_3["dependencies"]  # Should depend on renumbered task
+    )  # Was task 2, depends on what's now task 4 (renumbered task 1)
+    task_2 = get_task(task_2_id)["task"]
+    assert new_id in task_2["dependencies"]  # Should depend on renumbered task
 
 
 def test_load_tasks_merge_renumber_dependency_remapping(temp_dir):
@@ -575,7 +587,8 @@ def test_load_tasks_merge_renumber_dependency_remapping(temp_dir):
     add_task("Current Task 2", "low", "", [], "", [1])
 
     # Now we have IDs 1, 2 in current storage
-    # Loading should renumber file's 1 -> 3, 2 -> 4, 3 -> 5 (or similar)
+    # File task 3 doesn't conflict, keeps ID 3
+    # File tasks 1 and 2 conflict, get renumbered to 4 and 5
 
     result = load_tasks_from_file(file_path, merge_mode="merge_renumber")
 
@@ -594,13 +607,13 @@ def test_load_tasks_merge_renumber_dependency_remapping(temp_dir):
 
     # File task 1 was renumbered
     new_task_1_id = id_map[1]
-    task_1 = get_task(new_task_1_id)
+    task_1 = get_task(new_task_1_id)["task"]
     assert task_1["title"] == "Task 1"
     assert task_1["dependencies"] == []
 
     # File task 2 was renumbered and should depend on renumbered task 1
     new_task_2_id = id_map[2]
-    task_2 = get_task(new_task_2_id)
+    task_2 = get_task(new_task_2_id)["task"]
     assert task_2["title"] == "Task 2"
     assert task_2["dependencies"] == [new_task_1_id]
 
@@ -682,14 +695,14 @@ def test_roundtrip_preserves_dependencies(temp_dir):
     from basic_open_agent_tools.todo import get_task
 
     # Get original task 3
-    original_task_3 = get_task(3)
+    original_task_3 = get_task(3)["task"]
 
     # Clear and reload
     clear_all_tasks()
     load_tasks_from_file(file_path, merge_mode="replace")
 
     # Verify dependencies preserved
-    loaded_task_3 = get_task(3)
+    loaded_task_3 = get_task(3)["task"]
     assert loaded_task_3["dependencies"] == original_task_3["dependencies"]
     assert loaded_task_3["dependencies"] == [1, 2]
 
@@ -708,8 +721,8 @@ def test_roundtrip_preserves_completed_tasks(temp_dir):
 
     from basic_open_agent_tools.todo import get_task
 
-    task_1 = get_task(1)
-    task_2 = get_task(2)
+    task_1 = get_task(1)["task"]
+    task_2 = get_task(2)["task"]
 
     assert task_1["status"] == "completed"
     assert task_2["status"] == "open"
@@ -773,6 +786,6 @@ def test_save_load_long_notes(temp_dir):
 
     from basic_open_agent_tools.todo import get_task
 
-    task = get_task(1)
+    task = get_task(1)["task"]
     assert len(task["notes"]) == 2000
     assert task["notes"] == long_notes

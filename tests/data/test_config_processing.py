@@ -39,7 +39,9 @@ app:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 result = read_yaml_file(str(yaml_file))
 
         expected = {
@@ -56,7 +58,9 @@ app:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 result = read_yaml_file(str(yaml_file))
 
         assert result == {}
@@ -80,7 +84,9 @@ list_value:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 result = read_yaml_file(str(yaml_file))
 
         expected = {
@@ -107,7 +113,9 @@ emoji: "🚀"
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 result = read_yaml_file(str(yaml_file))
 
         expected = {
@@ -137,7 +145,9 @@ invalid: yaml
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 with pytest.raises(ValueError, match="Failed to parse YAML file"):
                     read_yaml_file(str(yaml_file))
 
@@ -155,7 +165,9 @@ invalid: yaml
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 with patch(
                     "builtins.open", side_effect=PermissionError("Permission denied")
                 ):
@@ -177,7 +189,9 @@ class TestWriteYamlFile:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 write_yaml_file(data, str(yaml_file), skip_confirm=True)
 
         # Verify file was created and contains expected content
@@ -195,7 +209,9 @@ class TestWriteYamlFile:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 write_yaml_file(data, str(yaml_file), skip_confirm=True)
 
         assert yaml_file.exists()
@@ -220,7 +236,9 @@ class TestWriteYamlFile:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 write_yaml_file(data, str(yaml_file), skip_confirm=True)
 
         assert yaml_file.exists()
@@ -236,7 +254,9 @@ class TestWriteYamlFile:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 write_yaml_file(data, str(yaml_file), skip_confirm=True)
 
         assert yaml_file.exists()
@@ -256,7 +276,9 @@ class TestWriteYamlFile:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 with patch(
                     "builtins.open", side_effect=PermissionError("Permission denied")
                 ):
@@ -287,7 +309,11 @@ version = 1.2
         with patch("basic_open_agent_tools.data.config_processing.HAS_TOML", True):
             import tomli
 
-            with patch("basic_open_agent_tools.data.config_processing.tomli", tomli):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.tomli",
+                tomli,
+                create=True,
+            ):
                 result = read_toml_file(str(toml_file))
 
         expected = {
@@ -318,7 +344,11 @@ sku = 284758393
         with patch("basic_open_agent_tools.data.config_processing.HAS_TOML", True):
             import tomli
 
-            with patch("basic_open_agent_tools.data.config_processing.tomli", tomli):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.tomli",
+                tomli,
+                create=True,
+            ):
                 result = read_toml_file(str(toml_file))
 
         assert "servers" in result
@@ -340,7 +370,11 @@ emoji = "🚀"
         with patch("basic_open_agent_tools.data.config_processing.HAS_TOML", True):
             import tomli
 
-            with patch("basic_open_agent_tools.data.config_processing.tomli", tomli):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.tomli",
+                tomli,
+                create=True,
+            ):
                 result = read_toml_file(str(toml_file))
 
         expected = {
@@ -359,7 +393,11 @@ emoji = "🚀"
         with patch("basic_open_agent_tools.data.config_processing.HAS_TOML", True):
             import tomli
 
-            with patch("basic_open_agent_tools.data.config_processing.tomli", tomli):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.tomli",
+                tomli,
+                create=True,
+            ):
                 result = read_toml_file(str(toml_file))
 
         assert result == {}
@@ -382,7 +420,11 @@ host = "localhost"  # Missing closing bracket
         with patch("basic_open_agent_tools.data.config_processing.HAS_TOML", True):
             import tomli
 
-            with patch("basic_open_agent_tools.data.config_processing.tomli", tomli):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.tomli",
+                tomli,
+                create=True,
+            ):
                 with pytest.raises(ValueError, match="Failed to parse TOML file"):
                     read_toml_file(str(toml_file))
 
@@ -400,7 +442,11 @@ host = "localhost"  # Missing closing bracket
         with patch("basic_open_agent_tools.data.config_processing.HAS_TOML", True):
             import tomli
 
-            with patch("basic_open_agent_tools.data.config_processing.tomli", tomli):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.tomli",
+                tomli,
+                create=True,
+            ):
                 with patch(
                     "builtins.open", side_effect=PermissionError("Permission denied")
                 ):
@@ -423,7 +469,9 @@ class TestWriteTomlFile:
             import tomli_w
 
             with patch(
-                "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
+                "basic_open_agent_tools.data.config_processing.tomli_w",
+                tomli_w,
+                create=True,
             ):
                 write_toml_file(data, str(toml_file), skip_confirm=True)
 
@@ -442,7 +490,9 @@ class TestWriteTomlFile:
             import tomli_w
 
             with patch(
-                "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
+                "basic_open_agent_tools.data.config_processing.tomli_w",
+                tomli_w,
+                create=True,
             ):
                 write_toml_file(data, str(toml_file), skip_confirm=True)
 
@@ -460,7 +510,9 @@ class TestWriteTomlFile:
             import tomli_w
 
             with patch(
-                "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
+                "basic_open_agent_tools.data.config_processing.tomli_w",
+                tomli_w,
+                create=True,
             ):
                 write_toml_file(data, str(toml_file), skip_confirm=True)
 
@@ -475,7 +527,9 @@ class TestWriteTomlFile:
             import tomli_w
 
             with patch(
-                "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
+                "basic_open_agent_tools.data.config_processing.tomli_w",
+                tomli_w,
+                create=True,
             ):
                 write_toml_file(data, str(toml_file), skip_confirm=True)
 
@@ -495,7 +549,9 @@ class TestWriteTomlFile:
             import tomli_w
 
             with patch(
-                "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
+                "basic_open_agent_tools.data.config_processing.tomli_w",
+                tomli_w,
+                create=True,
             ):
                 with patch(
                     "builtins.open", side_effect=PermissionError("Permission denied")
@@ -917,7 +973,9 @@ app:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 result = merge_config_files([str(yaml_file)], "yaml")
 
         expected = {
@@ -956,7 +1014,9 @@ logging:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 result = merge_config_files(
                     [str(base_file), str(override_file)], "yaml"
                 )
@@ -1009,7 +1069,11 @@ enabled = true
         with patch("basic_open_agent_tools.data.config_processing.HAS_TOML", True):
             import tomli
 
-            with patch("basic_open_agent_tools.data.config_processing.tomli", tomli):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.tomli",
+                tomli,
+                create=True,
+            ):
                 result = merge_config_files([str(toml_file1), str(toml_file2)], "toml")
 
         expected = {
@@ -1149,7 +1213,9 @@ class TestConfigProcessingIntegration:
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 # Write then read back
                 write_yaml_file(original_data, str(yaml_file), skip_confirm=True)
                 result = read_yaml_file(str(yaml_file))
@@ -1168,9 +1234,15 @@ class TestConfigProcessingIntegration:
             import tomli
             import tomli_w
 
-            with patch("basic_open_agent_tools.data.config_processing.tomli", tomli):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.tomli",
+                tomli,
+                create=True,
+            ):
                 with patch(
-                    "basic_open_agent_tools.data.config_processing.tomli_w", tomli_w
+                    "basic_open_agent_tools.data.config_processing.tomli_w",
+                    tomli_w,
+                    create=True,
                 ):
                     # Write then read back
                     write_toml_file(original_data, str(toml_file), skip_confirm=True)
@@ -1254,7 +1326,9 @@ app_debug = false
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
-            with patch("basic_open_agent_tools.data.config_processing.yaml", yaml):
+            with patch(
+                "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
+            ):
                 yaml_config = read_yaml_file(str(yaml_file))
                 yaml_errors = validate_config_schema(yaml_config, schema)
                 assert yaml_errors == []

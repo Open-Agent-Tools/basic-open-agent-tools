@@ -1,7 +1,7 @@
 """Tests for basic_open_agent_tools.word.reading module."""
 
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -24,8 +24,6 @@ class TestExtractTextFromDocx:
         docx_file.touch()
 
         with patch("basic_open_agent_tools.word.reading.HAS_PYTHON_DOCX", True):
-            from docx import Document
-
             # Mock Document
             mock_doc = Mock()
             mock_para1 = Mock()

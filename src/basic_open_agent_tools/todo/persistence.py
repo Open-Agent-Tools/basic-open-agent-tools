@@ -242,6 +242,9 @@ def _build_id_mapping(
 ) -> dict[int, int]:
     """Build mapping of old IDs to new IDs for renumbering.
 
+    Only renumber tasks that have ID conflicts with current tasks.
+    Non-conflicting tasks keep their original IDs.
+
     Args:
         file_tasks: Tasks from file (keyed by task ID)
         current_tasks: Current tasks in memory (keyed by task ID)
@@ -251,20 +254,26 @@ def _build_id_mapping(
         Dictionary mapping old_id -> new_id
     """
     id_mapping = {}
-    current_next_id = next_id
 
-    # Sort file tasks by ID for consistent numbering
+    # Assign IDs: conflicts get new IDs, non-conflicts keep original
     for old_id in sorted(file_tasks.keys()):
-        if old_id in current_tasks:
-            # Conflict - assign new ID
-            id_mapping[old_id] = current_next_id
-            current_next_id += 1
-        else:
+        if old_id not in current_tasks:
             # No conflict - keep original ID
             id_mapping[old_id] = old_id
-            # Update next_id if we're using a higher ID
-            if old_id >= current_next_id:
-                current_next_id = old_id + 1
+        # Conflicts will be handled in the next loop
+
+    # Now handle conflicts by assigning sequential IDs
+    used_ids = set(current_tasks.keys()) | set(id_mapping.values())
+    new_id = next_id
+
+    for old_id in sorted(file_tasks.keys()):
+        if old_id in current_tasks:
+            # Conflict - find next available ID
+            while new_id in used_ids:
+                new_id += 1
+            id_mapping[old_id] = new_id
+            used_ids.add(new_id)
+            new_id += 1
 
     return id_mapping
 
