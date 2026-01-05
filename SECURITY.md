@@ -6,9 +6,9 @@ The following versions of basic-open-agent-tools are currently supported with se
 
 | Version | Supported          | Notes |
 | ------- | ------------------ | ----- |
-| 0.13.x  | :white_check_mark: | Current stable release |
-| 0.12.x  | :white_check_mark: | Previous stable release |
-| < 0.12  | :x:                | Legacy versions, please upgrade |
+| 1.3.x   | :white_check_mark: | Current stable release |
+| 1.2.x   | :white_check_mark: | Previous stable release |
+| < 1.2   | :x:                | Legacy versions, please upgrade |
 
 ## Security Considerations for AI Agent Tools
 
@@ -38,6 +38,39 @@ This toolkit is designed for AI agent frameworks and includes security considera
 3. **Monitor Usage**: Log and monitor agent tool usage in production
 4. **Sandbox Environment**: Consider running agents in sandboxed environments
 5. **Regular Updates**: Keep the toolkit updated to receive security patches
+
+## Known Vulnerabilities in Development Dependencies
+
+### CVE-2025-53000: nbconvert Arbitrary Code Execution (Windows)
+
+**Status**: Open - No patch available yet
+**Severity**: HIGH (CVSS 8.5)
+**Affected**: Windows users only
+**Risk Level**: LOW (development-only dependency)
+
+**Details**:
+- **Vulnerability**: Uncontrolled search path in nbconvert allows arbitrary code execution via malicious `inkscape.bat` file
+- **Attack Vector**: Only triggered when converting Jupyter notebooks with SVG output to PDF on Windows
+- **Dependency Chain**: requirements.txt → jupyter/notebook → nbconvert (transitive)
+- **Production Impact**: None (not a production dependency, not in pyproject.toml)
+- **Development Impact**: Limited to Windows developers using `jupyter nbconvert --to pdf`
+
+**Mitigation**:
+- Avoid running `jupyter nbconvert --to pdf` on untrusted notebooks on Windows
+- Use Linux/macOS for notebook conversion workflows
+- Wait for upstream patch release from Jupyter project
+
+**Monitoring**:
+- GitHub Advisory: https://github.com/advisories/GHSA-xm59-rqc7-hhvf
+- Project Alert: https://github.com/Open-Agent-Tools/basic-open-agent-tools/security/dependabot/12
+
+**Why We're Not Removing Jupyter**:
+- Development convenience for experimentation
+- Clearly marked as optional in requirements.txt
+- Not included in production dependencies
+- Low risk given limited scope
+
+We monitor this advisory and will update when a patch becomes available.
 
 ## Reporting a Vulnerability
 

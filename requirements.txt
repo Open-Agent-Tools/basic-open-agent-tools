@@ -76,6 +76,14 @@ pip-tools
 setuptools
 
 # Optional: Jupyter for experimentation and learning
+# ⚠️  SECURITY WARNING (Windows users only):
+# nbconvert (transitive dependency of jupyter/notebook) has a HIGH severity vulnerability
+# CVE-2025-53000 / GHSA-xm59-rqc7-hhvf (CVSS 8.5)
+# Affects: Windows users converting notebooks with SVG to PDF
+# Status: No patch available yet (affects all versions <= 7.16.6)
+# Mitigation: Avoid running "jupyter nbconvert --to pdf" on untrusted notebooks
+# Risk: LOW (development-only dependency, not in production)
+# Monitor: https://github.com/Open-Agent-Tools/basic-open-agent-tools/security/dependabot/12
 jupyter
 ipykernel
 notebook
