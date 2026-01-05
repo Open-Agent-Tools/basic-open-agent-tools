@@ -193,7 +193,7 @@ class TestSetExcelColumnWidth:
                     str(test_file), "Sheet1", "A", 20, True
                 )
 
-                assert "Set column width" in result
+                assert "Set column A width to 20" in result
                 assert mock_col_dim.width == 20
                 mock_wb.save.assert_called_once()
 
@@ -258,7 +258,7 @@ class TestSetExcelRowHeight:
                     str(test_file), "Sheet1", 1, 30, True
                 )
 
-                assert "Set row height" in result
+                assert "Set row 1 height to 30" in result
                 assert mock_row_dim.height == 30
                 mock_wb.save.assert_called_once()
 

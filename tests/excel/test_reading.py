@@ -399,8 +399,8 @@ class TestGetSheetSchema:
             with patch.object(reading, "load_workbook") as mock_wb:
                 mock_sheet = MagicMock()
                 mock_sheet.iter_rows.side_effect = [
-                    [("Name", "Age", "Active")],  # First call for headers
-                    [("Alice", 30, True), ("Bob", 25, False)],  # Second call for data
+                    iter([("Name", "Age", "Active")]),  # First call for headers
+                    iter([("Alice", 30, True), ("Bob", 25, False)]),  # Second call for data
                 ]
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]
@@ -427,8 +427,8 @@ class TestPreviewSheetRows:
             with patch.object(reading, "load_workbook") as mock_wb:
                 mock_sheet = MagicMock()
                 mock_sheet.iter_rows.side_effect = [
-                    [("Name", "Age")],
-                    [("Alice", 30), ("Bob", 25)],
+                    iter([("Name", "Age")]),
+                    iter([("Alice", 30), ("Bob", 25)]),
                 ]
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]
@@ -453,8 +453,8 @@ class TestSelectSheetColumns:
             with patch.object(reading, "load_workbook") as mock_wb:
                 mock_sheet = MagicMock()
                 mock_sheet.iter_rows.side_effect = [
-                    [("Name", "Age", "City")],
-                    [("Alice", 30, "NYC"), ("Bob", 25, "LA")],
+                    iter([("Name", "Age", "City")]),
+                    iter([("Alice", 30, "NYC"), ("Bob", 25, "LA")]),
                 ]
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]
@@ -517,13 +517,13 @@ class TestGetSheetRowRange:
             with patch.object(reading, "load_workbook") as mock_wb:
                 mock_sheet = MagicMock()
                 mock_sheet.iter_rows.side_effect = [
-                    [("Name", "Age")],
-                    [
+                    iter([("Name", "Age")]),
+                    iter([
                         ("Alice", 30),
                         ("Bob", 25),
                         ("Charlie", 35),
                         ("Dana", 28),
-                    ],
+                    ]),
                 ]
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]
@@ -568,12 +568,12 @@ class TestGetSheetColumnStats:
                 mock_sheet = MagicMock()
                 mock_sheet.max_row = 1000
                 mock_sheet.iter_rows.side_effect = [
-                    [("Name", "Age", "City")],
-                    [
+                    iter([("Name", "Age", "City")]),
+                    iter([
                         ("Alice", 30, "NYC"),
                         ("Bob", 25, "LA"),
                         ("Charlie", 30, "NYC"),
-                    ],
+                    ]),
                 ]
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]
@@ -623,14 +623,14 @@ class TestGetSheetValueCounts:
             with patch.object(reading, "load_workbook") as mock_wb:
                 mock_sheet = MagicMock()
                 mock_sheet.iter_rows.side_effect = [
-                    [("Name", "City")],
-                    [
+                    iter([("Name", "City")]),
+                    iter([
                         ("Alice", "NYC"),
                         ("Bob", "LA"),
                         ("Charlie", "NYC"),
                         ("Dana", "NYC"),
                         ("Eve", "SF"),
-                    ],
+                    ]),
                 ]
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]
