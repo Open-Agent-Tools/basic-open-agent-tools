@@ -1163,8 +1163,9 @@ def load_essential() -> list[Callable[..., Any]]:
     Perfect for agents that need basic file operations, data processing,
     and common utilities without overwhelming them with specialized tools.
 
-    Includes (~23 essential tools):
+    Includes (~24 essential tools):
     - File I/O: read, write, list, check existence, cwd (8 tools)
+    - Shell: execute shell commands (1 tool)
     - Data: JSON/CSV/YAML read/write (6 tools)
     - Text: whitespace cleaning (1 tool)
     - Time: current date and datetime (2 tools)
@@ -1178,7 +1179,7 @@ def load_essential() -> list[Callable[..., Any]]:
 
     Example:
         >>> essential_tools = load_essential()
-        >>> len(essential_tools) >= 21
+        >>> len(essential_tools) >= 22
         True
         >>> # Use for a general-purpose agent
         >>> agent = Agent(
@@ -1199,7 +1200,7 @@ def load_essential() -> list[Callable[..., Any]]:
         write_file_from_string,
     )
     from .network import http_request
-    from .system import get_current_directory
+    from .system import execute_shell_command, get_current_directory
     from .text import clean_whitespace
 
     tools: list[Callable[..., Any]] = []
@@ -1238,6 +1239,9 @@ def load_essential() -> list[Callable[..., Any]]:
 
     # Crypto utilities (2 tools)
     tools.extend([hash_sha256, generate_uuid])
+
+    # Shell (1 tool)
+    tools.append(execute_shell_command)
 
     # Network (1 tool)
     tools.append(http_request)
