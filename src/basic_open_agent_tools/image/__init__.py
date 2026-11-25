@@ -18,14 +18,12 @@ from .reading import (
 )
 
 __all__: list[str] = [
-    # Reading functions (6)
     "get_image_info",
     "get_image_size",
     "get_image_format",
     "extract_image_exif",
     "get_image_colors",
     "verify_image_file",
-    # Manipulation functions (6)
     "resize_image",
     "crop_image",
     "rotate_image",

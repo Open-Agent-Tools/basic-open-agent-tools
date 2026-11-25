@@ -92,7 +92,6 @@ def get_quarter_dates(year: int, quarter: int) -> dict[str, str]:
     start_month, end_month = quarter_months[quarter]
     start_date = date(year, start_month, 1)
 
-    # Get last day of end month
     if end_month == 12:
         end_date = date(year + 1, 1, 1) - timedelta(days=1)
     else:
@@ -212,20 +211,16 @@ def get_months_ago(months: int, reference_date: str) -> str:
     except ValueError as e:
         raise ValueError(f"Invalid ISO date format: {e}")
 
-    # Calculate target year and month
     target_year = ref_date.year
     target_month = ref_date.month - months
 
-    # Handle year rollover
     while target_month <= 0:
         target_month += 12
         target_year -= 1
 
-    # Handle day overflow (e.g., Jan 31 -> Feb 31 doesn't exist)
     try:
         target_date = date(target_year, target_month, ref_date.day)
     except ValueError:
-        # If day doesn't exist in target month, use last day of target month
         if target_month == 12:
             target_date = date(target_year + 1, 1, 1) - timedelta(days=1)
         else:
@@ -264,9 +259,8 @@ def get_last_business_day(reference_date: str) -> str:
     except ValueError as e:
         raise ValueError(f"Invalid ISO date format: {e}")
 
-    # Find the last business day (Monday=0, Sunday=6)
     current_date = ref_date
-    while current_date.weekday() > 4:  # Saturday=5, Sunday=6
+    while current_date.weekday() > 4:
         current_date -= timedelta(days=1)
 
     return current_date.isoformat()
@@ -346,7 +340,6 @@ def get_month_range(year: int, month: int) -> dict[str, str]:
 
     start_date = date(year, month, 1)
 
-    # Get last day of month
     if month == 12:
         end_date = date(year + 1, 1, 1) - timedelta(days=1)
     else:
@@ -433,7 +426,7 @@ def get_business_days_in_range(start_date: str, end_date: str) -> int:
     current = start
 
     while current <= end:
-        if current.weekday() < 5:  # Monday=0, Friday=4
+        if current.weekday() < 5:
             business_days += 1
         current += timedelta(days=1)
 

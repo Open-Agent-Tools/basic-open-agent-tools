@@ -79,7 +79,7 @@ class TestReadFileToString:
     def test_read_file_unicode_decode_error(self, tmp_path: Path) -> None:
         """Test reading a file with Unicode decode error."""
         test_file = tmp_path / "binary.txt"
-        test_file.write_bytes(b"\xff\xfe\x00\x00")  # Invalid UTF-8
+        test_file.write_bytes(b"\xff\xfe\x00\x00")
 
         with pytest.raises(FileSystemError, match="Failed to read file"):
             read_file_to_string(str(test_file))
@@ -220,10 +220,8 @@ class TestAppendToFile:
         test_file = tmp_path / "test.txt"
         test_file.write_text("Initial content")
 
-        # Simulate non-TTY environment (agent mode)
         monkeypatch.setattr("sys.stdin.isatty", lambda: False)
 
-        # Should raise error asking for confirmation
         with pytest.raises(Exception, match="CONFIRMATION_REQUIRED"):
             append_to_file(str(test_file), "More content", skip_confirm=False)
 
@@ -358,7 +356,7 @@ class TestDeleteFile:
         nonexistent_file = tmp_path / "nonexistent.txt"
 
         result = delete_file(str(nonexistent_file), skip_confirm=True)
-        assert isinstance(result, str)  # Should succeed with missing_ok=True
+        assert isinstance(result, str)
 
     def test_delete_file_permission_denied(self, tmp_path: Path) -> None:
         """Test deleting a file with permission denied."""
@@ -416,7 +414,7 @@ class TestDeleteDirectory:
         nonexistent_dir = tmp_path / "nonexistent"
 
         result = delete_directory(str(nonexistent_dir), True, skip_confirm=True)
-        assert isinstance(result, str)  # Should succeed if directory doesn't exist
+        assert isinstance(result, str)
 
     def test_delete_directory_permission_denied(self, tmp_path: Path) -> None:
         """Test deleting a directory with permission denied."""
@@ -511,7 +509,7 @@ class TestCopyFile:
 
         result = copy_file(str(source_file), str(dest_file), skip_confirm=True)
         assert isinstance(result, str) and result
-        assert source_file.read_text() == test_content  # Original still exists
+        assert source_file.read_text() == test_content
         assert dest_file.read_text() == test_content
 
     def test_copy_directory(self, tmp_path: Path) -> None:
@@ -525,7 +523,7 @@ class TestCopyFile:
 
         result = copy_file(str(source_dir), str(dest_dir), skip_confirm=True)
         assert isinstance(result, str) and result
-        assert source_dir.exists()  # Original still exists
+        assert source_dir.exists()
         assert (dest_dir / "file.txt").read_text() == "content"
         assert (dest_dir / "subdir" / "nested.txt").read_text() == "nested"
 
@@ -546,7 +544,7 @@ class TestCopyFile:
 
         result = copy_file(str(source_file), str(dest_file), skip_confirm=True)
         assert isinstance(result, str) and result
-        assert source_file.read_text() == test_content  # Original still exists
+        assert source_file.read_text() == test_content
         assert dest_file.read_text() == test_content
 
     def test_copy_file_permission_denied(self, tmp_path: Path) -> None:
@@ -603,7 +601,7 @@ class TestReplaceInFile:
 
         result = replace_in_file(str(test_file), "xyz", "abc", 1, skip_confirm=True)
         assert isinstance(result, str) and result
-        assert test_file.read_text() == original_content  # Unchanged
+        assert test_file.read_text() == original_content
 
     def test_replace_empty_old_text(self, tmp_path: Path) -> None:
         """Test replacing with empty old_text."""
@@ -650,10 +648,8 @@ class TestReplaceInFile:
         test_file = tmp_path / "test.txt"
         test_file.write_text("Hello world!")
 
-        # Simulate non-TTY environment (agent mode)
         monkeypatch.setattr("sys.stdin.isatty", lambda: False)
 
-        # Should raise error asking for confirmation
         with pytest.raises(Exception, match="CONFIRMATION_REQUIRED"):
             replace_in_file(str(test_file), "world", "universe", 1, skip_confirm=False)
 
@@ -763,15 +759,12 @@ class TestInsertAtLine:
         test_file = tmp_path / "test.txt"
         test_file.write_text("Line 1\nLine 2")
 
-        # Simulate non-TTY environment (agent mode)
         monkeypatch.setattr("sys.stdin.isatty", lambda: False)
 
-        # Should raise error asking for confirmation
         with pytest.raises(Exception, match="CONFIRMATION_REQUIRED"):
             insert_at_line(str(test_file), 2, "Inserted", skip_confirm=False)
 
 
-# Integration tests
 class TestOperationsIntegration:
     """Integration tests for multiple operations working together."""
 
@@ -795,17 +788,14 @@ class TestOperationsIntegration:
         original_content = "Original content"
         source_file.write_text(original_content)
 
-        # Copy file
         copy_result = copy_file(str(source_file), str(dest_file), skip_confirm=True)
         assert isinstance(copy_result, str) and copy_result
 
-        # Modify copy
         replace_result = replace_in_file(
             str(dest_file), "Original", "Modified", 1, skip_confirm=True
         )
         assert isinstance(replace_result, str) and replace_result
 
-        # Verify both files
         assert source_file.read_text() == original_content
         assert dest_file.read_text() == "Modified content"
 
@@ -813,19 +803,15 @@ class TestOperationsIntegration:
         """Test creating, listing, and deleting directory operations."""
         test_dir = tmp_path / "test_workflow"
 
-        # Create directory
         create_result = create_directory(str(test_dir), skip_confirm=True)
         assert isinstance(create_result, str) and create_result
 
-        # Add some files
         (test_dir / "file1.txt").write_text("content1")
         (test_dir / "file2.txt").write_text("content2")
 
-        # List contents
         contents = list_directory_contents(str(test_dir), True)
         assert sorted(contents) == ["file1.txt", "file2.txt"]
 
-        # Delete directory
         delete_result = delete_directory(str(test_dir), True, skip_confirm=True)
         assert isinstance(delete_result, str) and delete_result
         assert not test_dir.exists()

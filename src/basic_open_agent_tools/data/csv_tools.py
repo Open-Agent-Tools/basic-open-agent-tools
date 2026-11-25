@@ -29,7 +29,6 @@ def _generate_csv_preview(data: list[dict[str, str]], delimiter: str = ",") -> s
 
     preview = f"Writing {row_count} rows, {col_count} columns\n"
 
-    # Show first 5 rows as preview
     sample_rows = min(5, len(data))
     if sample_rows > 0:
         preview += f"\nFirst {sample_rows} row(s):\n"
@@ -86,7 +85,6 @@ def read_csv_simple(
                 dict_reader = csv.DictReader(csvfile, delimiter=delimiter)
                 result = [dict(row) for row in dict_reader]
             else:
-                # If no headers, use col_N as keys
                 csv_reader = csv.reader(csvfile, delimiter=delimiter)
                 data = list(csv_reader)
                 if not data:
@@ -142,7 +140,6 @@ def write_csv_simple(
         >>> write_csv_simple(data, "output.csv", ",", True, skip_confirm=True)
         "Created CSV file output.csv with 2 rows and 2 columns"
     """
-    # Check if data is a list
     if not isinstance(data, list):
         raise TypeError("data must be a list")
 
@@ -160,7 +157,6 @@ def write_csv_simple(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Check if file exists
     import os
 
     file_existed = os.path.exists(file_path_str)
@@ -171,7 +167,6 @@ def write_csv_simple(
     )
 
     if file_existed:
-        # Check user confirmation - show preview of NEW data being written
         preview = _generate_csv_preview(data, delimiter)
         confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing CSV file",
@@ -186,7 +181,6 @@ def write_csv_simple(
             return f"Operation cancelled by user{reason_msg}: {file_path_str}"
 
     if not data:
-        # Write empty file for empty data
         try:
             with open(file_path_str, "w", encoding="utf-8") as f:
                 f.write("")
@@ -196,12 +190,10 @@ def write_csv_simple(
             raise DataError(f"Failed to write CSV file {file_path_str}: {e}")
 
     try:
-        # Validate all items are dictionaries
         for item in data:
             if not isinstance(item, dict):
                 raise TypeError("All items in data must be dictionaries")
 
-        # Get all unique fieldnames from all dictionaries
         fieldnames = []
         for item in data:
             for key in item.keys():
@@ -214,12 +206,10 @@ def write_csv_simple(
                 writer.writeheader()
             writer.writerows(data)
 
-        # Calculate stats for feedback
         row_count = len(data)
         col_count = len(fieldnames)
         action = "Overwrote" if file_existed else "Created"
 
-        # Get file size
         file_size = os.path.getsize(file_path_str)
 
         result = f"{action} CSV file {file_path_str} with {row_count} rows and {col_count} columns ({file_size} bytes)"
@@ -296,12 +286,10 @@ def dict_list_to_csv(data: list[dict[str, str]], delimiter: str) -> str:
     if not data:
         return ""
 
-    # Validate all items are dictionaries
     for item in data:
         if not isinstance(item, dict):
             raise TypeError("All items in data must be dictionaries")
 
-    # Get all unique fieldnames
     fieldnames = []
     for item in data:
         for key in item.keys():
@@ -392,22 +380,19 @@ def validate_csv_structure(file_path: str, expected_columns: list[str]) -> bool:
         raise TypeError("expected_columns must be a list")
 
     try:
-        # Check if file is empty first
         import os
 
         try:
             if os.path.getsize(file_path_str) == 0:
-                return True  # Empty file is considered valid
+                return True
         except FileNotFoundError:
             raise DataError(f"CSV file not found: {file_path_str}")
 
-        # Read first few rows to validate structure
         data = read_csv_simple(file_path_str, ",", True)
 
         if not data:
-            return True  # Empty file is considered valid
+            return True
 
-        # Check if expected columns are present
         if expected_columns:
             first_row = data[0]
             actual_columns = set(first_row.keys())
@@ -419,7 +404,6 @@ def validate_csv_structure(file_path: str, expected_columns: list[str]) -> bool:
 
         return True
     except DataError:
-        # Re-raise DataError as-is
         raise
     except Exception as e:
         raise DataError(f"Invalid CSV structure in {file_path_str}: {e}")
@@ -456,14 +440,12 @@ def clean_csv_data(
     if not data:
         return data
 
-    # Default cleaning rules
     default_rules = {
         "strip_whitespace": True,
         "remove_empty": False,
         "na_values": ["N/A", "n/a", "NA", "null", "NULL", "None"],
     }
 
-    # Merge with provided rules
     default_rules.update(rules)
 
     cleaned_data = []
@@ -475,20 +457,16 @@ def clean_csv_data(
         cleaned_row = {}
 
         for key, value in row.items():
-            # Convert to string for processing (defensive against mixed types)
             if not isinstance(value, str):
                 value = str(value) if value is not None else ""  # type: ignore[unreachable]
 
-            # Strip whitespace
             if default_rules.get("strip_whitespace", False):
                 value = value.strip()
 
-            # Handle NA values
             na_values = default_rules.get("na_values", [])
             if isinstance(na_values, list) and value in na_values:
                 value = ""
 
-            # Remove empty fields if requested
             if default_rules.get("remove_empty", False):
                 if value == "":
                     continue
@@ -666,32 +644,27 @@ def get_csv_schema(file_path: str, delimiter: str, sample_rows: int) -> dict[str
     logger.info(f"Getting CSV schema: {file_path} (sampling {sample_rows} rows)")
     logger.debug(f"delimiter: '{delimiter}'")
 
-    # Get sample data
     sample_data = preview_csv_rows(file_path, delimiter, sample_rows)
 
     if not sample_data:
         logger.debug("CSV file is empty, returning empty schema")
         return {}
 
-    # Initialize type tracking
     schema: dict[str, str] = {}
     column_values: dict[str, list[str]] = {}
 
-    # Collect all non-empty values for each column
     for row in sample_data:
         for col, value in row.items():
             if col not in column_values:
                 column_values[col] = []
-            if value.strip():  # Only non-empty values
+            if value.strip():
                 column_values[col].append(value.strip())
 
-    # Infer type for each column
     for col, values in column_values.items():
         if not values:
             schema[col] = "string"
             continue
 
-        # Check if all values are integers
         all_int = True
         for val in values:
             try:
@@ -704,7 +677,6 @@ def get_csv_schema(file_path: str, delimiter: str, sample_rows: int) -> dict[str
             schema[col] = "integer"
             continue
 
-        # Check if all values are floats
         all_float = True
         for val in values:
             try:
@@ -717,7 +689,6 @@ def get_csv_schema(file_path: str, delimiter: str, sample_rows: int) -> dict[str
             schema[col] = "float"
             continue
 
-        # Check if all values are boolean
         boolean_values = {"true", "false", "yes", "no", "1", "0", "t", "f", "y", "n"}
         all_bool = all(val.lower() in boolean_values for val in values)
 
@@ -725,10 +696,8 @@ def get_csv_schema(file_path: str, delimiter: str, sample_rows: int) -> dict[str
             schema[col] = "boolean"
             continue
 
-        # Default to string
         schema[col] = "string"
 
-    # Add columns with no non-empty values as string
     for row in sample_data:
         for col in row.keys():
             if col not in schema:
@@ -785,16 +754,13 @@ def get_csv_info(file_path: str, delimiter: str) -> dict[str, str]:
     try:
         import os
 
-        # Get file size
         file_size = os.path.getsize(file_path)
 
-        # Get header
         header = get_csv_header(file_path, delimiter)
 
-        # Count rows efficiently without loading entire file
         with open(file_path, encoding="utf-8", newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=delimiter)
-            next(reader)  # Skip header
+            next(reader)
             row_count = sum(1 for _ in reader)
 
         info = {
@@ -867,7 +833,6 @@ def select_csv_columns(
         with open(file_path, encoding="utf-8", newline="") as csvfile:
             dict_reader = csv.DictReader(csvfile, delimiter=delimiter)
 
-            # Check if requested columns exist
             if dict_reader.fieldnames:
                 missing_columns = [
                     col for col in columns if col not in dict_reader.fieldnames
@@ -879,7 +844,6 @@ def select_csv_columns(
 
             result = []
             for row in dict_reader:
-                # Only include selected columns
                 selected_row = {col: row[col] for col in columns if col in row}
                 result.append(selected_row)
 
@@ -973,7 +937,6 @@ def filter_csv_rows(
         with open(file_path, encoding="utf-8", newline="") as csvfile:
             dict_reader = csv.DictReader(csvfile, delimiter=delimiter)
 
-            # Check if column exists
             if dict_reader.fieldnames and column not in dict_reader.fieldnames:
                 raise DataError(
                     f"Column '{column}' not found in CSV. Available columns: {list(dict_reader.fieldnames)}"
@@ -983,7 +946,6 @@ def filter_csv_rows(
             for row in dict_reader:
                 row_value = row.get(column, "")
 
-                # Apply filter based on operator
                 matches = False
                 if operator == "equals":
                     matches = row_value == value
@@ -1079,13 +1041,11 @@ def get_csv_column_stats(
     logger.debug(f"delimiter: '{delimiter}'")
 
     try:
-        # First, count total rows
         with open(file_path, encoding="utf-8", newline="") as csvfile:
             reader = csv.reader(csvfile, delimiter=delimiter)
-            next(reader)  # Skip header
+            next(reader)
             total_rows = sum(1 for _ in reader)
 
-        # Now sample for statistics
         sample_data = preview_csv_rows(file_path, delimiter, sample_size)
 
         if not sample_data:
@@ -1098,25 +1058,20 @@ def get_csv_column_stats(
                 "max_value": "N/A",
             }
 
-        # Check if column exists
         if column not in sample_data[0]:
             available_columns = list(sample_data[0].keys())
             raise DataError(
                 f"Column '{column}' not found in CSV. Available columns: {available_columns}"
             )
 
-        # Collect values
         values = [row[column] for row in sample_data]
         non_null_values = [v for v in values if v.strip()]
 
-        # Calculate statistics
         unique_values = list(set(non_null_values))
         null_count = len(values) - len(non_null_values)
 
-        # Sample values (up to 10)
         sample_values_str = ",".join(unique_values[:10])
 
-        # Try numeric stats
         min_value = "N/A"
         max_value = "N/A"
         try:
@@ -1125,7 +1080,7 @@ def get_csv_column_stats(
                 min_value = str(min(numeric_values))
                 max_value = str(max(numeric_values))
         except ValueError:
-            pass  # Not numeric
+            pass
 
         stats = {
             "total_rows": str(total_rows),
@@ -1209,14 +1164,12 @@ def sample_csv_rows(
 
     try:
         if method == "first":
-            # Use existing preview function
             result_preview: list[dict[str, str]] = preview_csv_rows(
                 file_path, delimiter, sample_size
             )
             return result_preview
 
         elif method == "random":
-            # Reservoir sampling for random selection
             import random
 
             with open(file_path, encoding="utf-8", newline="") as csvfile:
@@ -1227,7 +1180,6 @@ def sample_csv_rows(
                     if i < sample_size:
                         reservoir.append(dict(row))
                     else:
-                        # Randomly replace elements with decreasing probability
                         j = random.randint(0, i)
                         if j < sample_size:
                             reservoir[j] = dict(row)
@@ -1235,20 +1187,17 @@ def sample_csv_rows(
                 logger.info(f"CSV random sample retrieved: {len(reservoir)} rows")
                 return reservoir
 
-        else:  # systematic
-            # Count total rows first
+        else:
             with open(file_path, encoding="utf-8", newline="") as csvfile:
                 reader = csv.reader(csvfile, delimiter=delimiter)
-                next(reader)  # Skip header
+                next(reader)
                 total_rows = sum(1 for _ in reader)
 
             if total_rows == 0:
                 return []
 
-            # Calculate interval
             interval = max(1, total_rows // sample_size)
 
-            # Sample every Kth row
             with open(file_path, encoding="utf-8", newline="") as csvfile:
                 dict_reader = csv.DictReader(csvfile, delimiter=delimiter)
                 result: list[dict[str, str]] = []
@@ -1398,15 +1347,12 @@ def count_csv_rows(
     try:
         with open(file_path, encoding="utf-8", newline="") as csvfile:
             if not filter_column:
-                # No filter - just count all rows
                 reader = csv.reader(csvfile, delimiter=delimiter)
-                next(reader)  # Skip header
+                next(reader)
                 count = sum(1 for _ in reader)
             else:
-                # Filter and count
                 dict_reader = csv.DictReader(csvfile, delimiter=delimiter)
 
-                # Check if column exists
                 if (
                     dict_reader.fieldnames
                     and filter_column not in dict_reader.fieldnames
@@ -1487,17 +1433,14 @@ def get_csv_value_counts(
         with open(file_path, encoding="utf-8", newline="") as csvfile:
             dict_reader = csv.DictReader(csvfile, delimiter=delimiter)
 
-            # Check if column exists
             if dict_reader.fieldnames and column not in dict_reader.fieldnames:
                 raise DataError(
                     f"Column '{column}' not found in CSV. Available columns: {list(dict_reader.fieldnames)}"
                 )
 
-            # Count values
             values = [row.get(column, "") for row in dict_reader]
             counter = Counter(values)
 
-            # Get top N
             top_values = counter.most_common(top_n)
             result = {value: str(count) for value, count in top_values}
 

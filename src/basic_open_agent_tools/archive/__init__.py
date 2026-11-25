@@ -12,14 +12,11 @@ from .compression import (
 from .formats import create_tar, extract_tar
 
 __all__ = [
-    # ZIP operations
     "create_zip",
     "extract_zip",
     "compress_files",
-    # TAR operations
     "create_tar",
     "extract_tar",
-    # Individual file compression
     "compress_file_gzip",
     "decompress_file_gzip",
     "compress_file_bzip2",

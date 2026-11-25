@@ -30,19 +30,16 @@ from .generation import (
 )
 
 __all__ = [
-    # Conversion functions
     "rgb_to_hex",
     "hex_to_rgb",
     "rgb_to_hsl",
     "hsl_to_rgb",
     "rgb_to_cmyk",
     "cmyk_to_rgb",
-    # Analysis functions
     "calculate_luminance",
     "calculate_contrast_ratio",
     "check_wcag_compliance",
     "get_complementary_color",
-    # Generation functions
     "generate_palette",
     "lighten_color",
     "darken_color",

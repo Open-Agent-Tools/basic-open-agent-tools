@@ -71,20 +71,16 @@ def hex_to_rgb(hex_color: str) -> dict[str, int]:
     if not isinstance(hex_color, str):
         raise BasicAgentToolsError("Hex color must be a string")
 
-    # Remove # if present
     hex_color = hex_color.strip()
     if hex_color.startswith("#"):
         hex_color = hex_color[1:]
 
-    # Validate length
     if len(hex_color) not in (3, 6):
         raise BasicAgentToolsError("Hex color must be 3 or 6 characters (excluding #)")
 
-    # Expand 3-character format to 6
     if len(hex_color) == 3:
         hex_color = "".join([c * 2 for c in hex_color])
 
-    # Validate hex characters
     try:
         r = int(hex_color[0:2], 16)
         g = int(hex_color[2:4], 16)
@@ -118,7 +114,6 @@ def rgb_to_hsl(r: int, g: int, b: int) -> dict[str, int]:
     if not (0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
         raise BasicAgentToolsError("RGB values must be between 0 and 255")
 
-    # Normalize RGB values to 0-1
     r_norm = r / 255.0
     g_norm = g / 255.0
     b_norm = b / 255.0
@@ -127,10 +122,8 @@ def rgb_to_hsl(r: int, g: int, b: int) -> dict[str, int]:
     min_val = min(r_norm, g_norm, b_norm)
     diff = max_val - min_val
 
-    # Calculate lightness
     lightness_value = (max_val + min_val) / 2.0
 
-    # Calculate saturation
     h_value: float
     s_value: float
 
@@ -138,13 +131,11 @@ def rgb_to_hsl(r: int, g: int, b: int) -> dict[str, int]:
         h_value = 0.0
         s_value = 0.0
     else:
-        # Calculate saturation
         if lightness_value < 0.5:
             s_value = diff / (max_val + min_val)
         else:
             s_value = diff / (2.0 - max_val - min_val)
 
-        # Calculate hue
         if max_val == r_norm:
             h_value = ((g_norm - b_norm) / diff) % 6
         elif max_val == g_norm:
@@ -189,12 +180,10 @@ def hsl_to_rgb(h: int, s: int, lightness: int) -> dict[str, int]:
     if not (0 <= s <= 100 and 0 <= lightness <= 100):
         raise BasicAgentToolsError("Saturation and Lightness must be between 0 and 100")
 
-    # Normalize s and lightness to 0-1
     s_norm = s / 100.0
     l_norm = lightness / 100.0
 
     if s == 0:
-        # Achromatic (gray)
         r = g = b = int(round(l_norm * 255))
     else:
         if l_norm < 0.5:
@@ -232,19 +221,15 @@ def rgb_to_cmyk(r: int, g: int, b: int) -> dict[str, int]:
     if not (0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255):
         raise BasicAgentToolsError("RGB values must be between 0 and 255")
 
-    # Handle black specially
     if r == 0 and g == 0 and b == 0:
         return {"c": 0, "m": 0, "y": 0, "k": 100}
 
-    # Normalize RGB to 0-1
     r_norm = r / 255.0
     g_norm = g / 255.0
     b_norm = b / 255.0
 
-    # Calculate K (black)
     k = 1 - max(r_norm, g_norm, b_norm)
 
-    # Calculate CMY
     c = (1 - r_norm - k) / (1 - k)
     m = (1 - g_norm - k) / (1 - k)
     y = (1 - b_norm - k) / (1 - k)
@@ -284,13 +269,11 @@ def cmyk_to_rgb(c: int, m: int, y: int, k: int) -> dict[str, int]:
     if not (0 <= c <= 100 and 0 <= m <= 100 and 0 <= y <= 100 and 0 <= k <= 100):
         raise BasicAgentToolsError("CMYK values must be between 0 and 100")
 
-    # Normalize to 0-1
     c_norm = c / 100.0
     m_norm = m / 100.0
     y_norm = y / 100.0
     k_norm = k / 100.0
 
-    # Convert to RGB
     r = int(round(255 * (1 - c_norm) * (1 - k_norm)))
     g = int(round(255 * (1 - m_norm) * (1 - k_norm)))
     b = int(round(255 * (1 - y_norm) * (1 - k_norm)))

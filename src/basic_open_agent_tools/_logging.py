@@ -29,7 +29,6 @@ import os
 import sys
 from typing import Optional
 
-# Global flag to track if logging has been configured
 _logging_configured = False
 
 
@@ -51,21 +50,16 @@ def _configure_logging() -> None:
     if _logging_configured:
         return
 
-    # Get log level from environment variable, or use TTY-aware default
     log_level_str = os.environ.get("BOAT_LOG_LEVEL", None)
 
     if log_level_str is None:
-        # No explicit log level set - use TTY-aware default
         if sys.stdout.isatty():
-            # Interactive terminal - show execution messages
             log_level_str = "INFO"
         else:
-            # Agent/automation - silent operation
             log_level_str = "WARNING"
     else:
         log_level_str = log_level_str.upper()
 
-    # Map string to logging level
     level_map = {
         "DEBUG": logging.DEBUG,
         "INFO": logging.INFO,
@@ -76,21 +70,16 @@ def _configure_logging() -> None:
 
     log_level = level_map.get(log_level_str, logging.WARNING)
 
-    # Configure root logger
     root_logger = logging.getLogger("basic_open_agent_tools")
     root_logger.setLevel(log_level)
 
-    # Remove existing handlers to avoid duplicates
     root_logger.handlers.clear()
 
-    # Create console handler
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(log_level)
 
-    # Detect if we should use colored output (TTY and not disabled)
     use_color = sys.stdout.isatty() and os.environ.get("NO_COLOR") is None
 
-    # Create custom formatter that strips package prefix for cleaner output
     class ShortNameFormatter(logging.Formatter):
         """Formatter that displays only module names without package prefix.
 
@@ -101,21 +90,16 @@ def _configure_logging() -> None:
         def __init__(self, fmt: str, use_color: bool = False):
             super().__init__(fmt)
             self.use_color = use_color
-            # ANSI color codes
             self.cyan = "\033[36m"
             self.reset = "\033[0m"
 
         def format(self, record: logging.LogRecord) -> str:
-            # Strip 'basic_open_agent_tools.' prefix for cleaner display
             if record.name.startswith("basic_open_agent_tools."):
                 record.name = record.name[len("basic_open_agent_tools.") :]
 
-            # Format the record
             formatted = super().format(record)
 
-            # Add color to [module] prefix if enabled
             if self.use_color and "[" in formatted:
-                # Color just the [module] part
                 bracket_end = formatted.find("]")
                 if bracket_end != -1:
                     module_part = formatted[: bracket_end + 1]
@@ -124,14 +108,11 @@ def _configure_logging() -> None:
 
             return formatted
 
-    # Create formatter matching existing [MODULE] pattern
     formatter = ShortNameFormatter("[%(name)s] %(message)s", use_color=use_color)
     handler.setFormatter(formatter)
 
-    # Add handler to root logger
     root_logger.addHandler(handler)
 
-    # Prevent propagation to avoid duplicate messages
     root_logger.propagate = False
 
     _logging_configured = True
@@ -158,10 +139,8 @@ def get_logger(module_name: Optional[str] = None) -> logging.Logger:
         >>> logger.info('Operation completed')
         [file_system] Operation completed
     """
-    # Configure logging on first use
     _configure_logging()
 
-    # Build logger name
     if module_name:
         logger_name = f"basic_open_agent_tools.{module_name}"
     else:
@@ -170,7 +149,6 @@ def get_logger(module_name: Optional[str] = None) -> logging.Logger:
     return logging.getLogger(logger_name)
 
 
-# Convenience function for quick logging without getting logger first
 def log_info(module_name: str, message: str) -> None:
     """Log an info message for a specific module.
 

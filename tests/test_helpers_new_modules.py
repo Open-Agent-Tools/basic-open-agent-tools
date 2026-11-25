@@ -32,7 +32,6 @@ class TestNetworkToolsLoader:
         """Test that network tools have the expected function signatures."""
         tools = load_all_network_tools()
 
-        # Find http_request function
         http_request_func = None
         for tool in tools:
             if tool.__name__ == "http_request":
@@ -66,7 +65,6 @@ class TestUtilitiesToolsLoader:
         """Test that utilities tools have the expected function signatures."""
         tools = load_all_utilities_tools()
 
-        # Find sleep_seconds function
         sleep_seconds_func = None
         for tool in tools:
             if tool.__name__ == "sleep_seconds":
@@ -95,7 +93,6 @@ class TestToolMerging:
         """Test that merge_tool_lists handles duplicate functions."""
         network_tools = load_all_network_tools()
 
-        # Try to merge with itself (should deduplicate)
         merged_tools = merge_tool_lists(network_tools, network_tools)
 
         assert len(merged_tools) == len(network_tools)

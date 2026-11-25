@@ -372,7 +372,6 @@ def calculate_time_difference(time1: str, time2: str, unit: str) -> int:
         t1 = time.fromisoformat(time1)
         t2 = time.fromisoformat(time2)
 
-        # Convert to datetime objects for timedelta calculation
         base_date = date.today()
         dt1 = datetime.combine(base_date, t1)
         dt2 = datetime.combine(base_date, t2)
@@ -387,7 +386,7 @@ def calculate_time_difference(time1: str, time2: str, unit: str) -> int:
         elif unit == "hours":
             return total_seconds // 3600
         else:
-            return 0  # Should never reach here due to validation
+            return 0
     except ValueError as e:
         raise ValueError(f"Invalid ISO time format: {e}")
 
@@ -467,13 +466,11 @@ def format_date(date_string: str, input_format: str, output_format: str) -> str:
         raise TypeError("output_format must be a string")
 
     try:
-        # Handle "iso" as a special input format
         if input_format.lower() == "iso":
             parsed_date = date.fromisoformat(date_string)
         else:
             parsed_date = datetime.strptime(date_string, input_format).date()
 
-        # Format the output
         return parsed_date.strftime(output_format)
     except ValueError as e:
         raise ValueError(

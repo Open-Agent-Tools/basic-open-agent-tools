@@ -22,7 +22,6 @@ Modules to update (27 remaining functions across 12 modules):
 import subprocess
 from pathlib import Path
 
-# Modules with skip_confirm functions (count)
 MODULES = {
     "archive/compression.py": 6,
     "pdf/manipulation.py": 3,
@@ -53,7 +52,6 @@ def list_functions_in_module(module_path: str) -> list[str]:
     functions = []
     for line in result.stdout.strip().split("\n"):
         if ":" in line:
-            # Extract function name
             func_def = line.split(":", 1)[1].strip()
             func_name = func_def.split("(")[0].replace("def ", "")
             functions.append(func_name)

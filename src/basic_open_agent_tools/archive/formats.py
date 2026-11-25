@@ -40,7 +40,6 @@ def create_tar(
     if not isinstance(skip_confirm, bool):
         raise BasicAgentToolsError("skip_confirm must be a boolean")
 
-    # Check if output file exists
     file_existed = os.path.exists(output_path)
 
     logger.info(
@@ -49,7 +48,6 @@ def create_tar(
     logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
 
     if file_existed:
-        # Check user confirmation - show preview of NEW archive being created
         preview = _generate_archive_preview(source_paths)
         confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing TAR archive",
@@ -73,7 +71,6 @@ def create_tar(
                 tf.add(source_path, arcname=os.path.basename(source_path))
                 files_added += 1
 
-        # Calculate stats for feedback
         file_size = os.path.getsize(output_path)
         action = "Overwrote" if file_existed else "Created"
 

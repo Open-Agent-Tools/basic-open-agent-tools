@@ -34,7 +34,6 @@ except ImportError:
     HAS_REPORTLAB = False
 
 
-# Maximum file size for safety
 MAX_PDF_FILE_SIZE = 100 * 1024 * 1024
 
 
@@ -85,23 +84,19 @@ def merge_pdfs(input_paths: list[str], output_path: str, skip_confirm: bool) -> 
     if not output_path.strip():
         raise ValueError("output_path cannot be empty")
 
-    # Validate all input paths are strings
     for i, path in enumerate(input_paths):
         if not isinstance(path, str):
             raise TypeError(f"Input path at index {i} must be a string")
 
-    # Check all input files exist
     for path in input_paths:
         if not os.path.exists(path):
             raise FileNotFoundError(f"Input PDF not found: {path}")
 
-    # Check if output exists
     if os.path.exists(output_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {output_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(output_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -113,14 +108,12 @@ def merge_pdfs(input_paths: list[str], output_path: str, skip_confirm: bool) -> 
         writer = PdfWriter()
         total_pages = 0
 
-        # Add all pages from each input PDF
         for input_path in input_paths:
             reader = PdfReader(input_path)
             for page in reader.pages:
                 writer.add_page(page)
                 total_pages += 1
 
-        # Write merged PDF
         with open(output_path, "wb") as output_file:
             writer.write(output_file)
 
@@ -177,11 +170,9 @@ def split_pdf(input_path: str, output_dir: str, skip_confirm: bool) -> str:
     if not output_dir.strip():
         raise ValueError("output_dir cannot be empty")
 
-    # Check input file exists
     if not os.path.exists(input_path):
         raise FileNotFoundError(f"Input PDF not found: {input_path}")
 
-    # Check output directory exists
     if not os.path.exists(output_dir):
         raise FileNotFoundError(f"Output directory does not exist: {output_dir}")
 
@@ -192,7 +183,6 @@ def split_pdf(input_path: str, output_dir: str, skip_confirm: bool) -> str:
         reader = PdfReader(input_path)
         page_count = len(reader.pages)
 
-        # Check if any output files would exist
         if not skip_confirm:
             for i in range(page_count):
                 output_file = os.path.join(output_dir, f"page_{i + 1:03d}.pdf")
@@ -202,7 +192,6 @@ def split_pdf(input_path: str, output_dir: str, skip_confirm: bool) -> str:
                         "Set skip_confirm=True to overwrite."
                     )
 
-        # Split into individual pages
         for i, page in enumerate(reader.pages):
             writer = PdfWriter()
             writer.add_page(page)
@@ -275,24 +264,20 @@ def extract_pdf_pages(
     if not page_numbers:
         raise ValueError("page_numbers cannot be empty")
 
-    # Validate all page numbers are integers
     for i, page_num in enumerate(page_numbers):
         if not isinstance(page_num, int):
             raise TypeError(f"Page number at index {i} must be an integer")
         if page_num < 0:
             raise ValueError(f"Page number at index {i} must be non-negative")
 
-    # Check input file exists
     if not os.path.exists(input_path):
         raise FileNotFoundError(f"Input PDF not found: {input_path}")
 
-    # Check if output exists
     if os.path.exists(output_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {output_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(output_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -304,7 +289,6 @@ def extract_pdf_pages(
         reader = PdfReader(input_path)
         writer = PdfWriter()
 
-        # Validate page numbers are in range
         for page_num in page_numbers:
             if page_num >= len(reader.pages):
                 raise ValueError(
@@ -312,11 +296,9 @@ def extract_pdf_pages(
                     f"(PDF has {len(reader.pages)} pages)"
                 )
 
-        # Extract specified pages
         for page_num in page_numbers:
             writer.add_page(reader.pages[page_num])
 
-        # Write output
         with open(output_path, "wb") as output_file:
             writer.write(output_file)
 
@@ -388,24 +370,20 @@ def rotate_pdf_pages(
     if not page_numbers:
         raise ValueError("page_numbers cannot be empty")
 
-    # Validate page numbers
     for i, page_num in enumerate(page_numbers):
         if not isinstance(page_num, int):
             raise TypeError(f"Page number at index {i} must be an integer")
         if page_num < 0:
             raise ValueError(f"Page number at index {i} must be non-negative")
 
-    # Check input file exists
     if not os.path.exists(input_path):
         raise FileNotFoundError(f"Input PDF not found: {input_path}")
 
-    # Check if output exists
     if os.path.exists(output_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {output_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(output_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -414,7 +392,6 @@ def rotate_pdf_pages(
         reader = PdfReader(input_path)
         writer = PdfWriter()
 
-        # Validate page numbers
         for page_num in page_numbers:
             if page_num >= len(reader.pages):
                 raise ValueError(
@@ -422,15 +399,12 @@ def rotate_pdf_pages(
                     f"(PDF has {len(reader.pages)} pages)"
                 )
 
-        # Process all pages
         pages_to_rotate = set(page_numbers)
         for i, page in enumerate(reader.pages):
             if i in pages_to_rotate:
-                # Rotate this page
                 page.rotate(rotation)
             writer.add_page(page)
 
-        # Write output
         with open(output_path, "wb") as output_file:
             writer.write(output_file)
 
@@ -492,24 +466,20 @@ def remove_pdf_pages(
     if not page_numbers:
         raise ValueError("page_numbers cannot be empty")
 
-    # Validate page numbers
     for i, page_num in enumerate(page_numbers):
         if not isinstance(page_num, int):
             raise TypeError(f"Page number at index {i} must be an integer")
         if page_num < 0:
             raise ValueError(f"Page number at index {i} must be non-negative")
 
-    # Check input file exists
     if not os.path.exists(input_path):
         raise FileNotFoundError(f"Input PDF not found: {input_path}")
 
-    # Check if output exists
     if os.path.exists(output_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {output_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(output_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -518,7 +488,6 @@ def remove_pdf_pages(
         reader = PdfReader(input_path)
         writer = PdfWriter()
 
-        # Validate page numbers
         for page_num in page_numbers:
             if page_num >= len(reader.pages):
                 raise ValueError(
@@ -526,13 +495,11 @@ def remove_pdf_pages(
                     f"(PDF has {len(reader.pages)} pages)"
                 )
 
-        # Add all pages except removed ones
         pages_to_remove = set(page_numbers)
         for i, page in enumerate(reader.pages):
             if i not in pages_to_remove:
                 writer.add_page(page)
 
-        # Write output
         with open(output_path, "wb") as output_file:
             writer.write(output_file)
 
@@ -592,17 +559,14 @@ def add_page_numbers(input_path: str, output_path: str, skip_confirm: bool) -> s
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Check input file exists
     if not os.path.exists(input_path):
         raise FileNotFoundError(f"Input PDF not found: {input_path}")
 
-    # Check if output exists
     if os.path.exists(output_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {output_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(output_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -615,22 +579,18 @@ def add_page_numbers(input_path: str, output_path: str, skip_confirm: bool) -> s
         total_pages = len(reader.pages)
 
         for i, page in enumerate(reader.pages):
-            # Create page number overlay
             packet = io.BytesIO()
             can = canvas.Canvas(packet, pagesize=letter)
 
-            # Add page number at bottom center
             page_text = f"Page {i + 1} of {total_pages}"
             can.drawCentredString(letter[0] / 2, 0.5 * inch, page_text)
             can.save()
 
-            # Merge overlay with original page
             packet.seek(0)
             overlay = PdfReader(packet)
             page.merge_page(overlay.pages[0])
             writer.add_page(page)
 
-        # Write output
         with open(output_path, "wb") as output_file:
             writer.write(output_file)
 
@@ -696,17 +656,14 @@ def watermark_pdf(
     if not watermark_text.strip():
         raise ValueError("watermark_text cannot be empty")
 
-    # Check input file exists
     if not os.path.exists(input_path):
         raise FileNotFoundError(f"Input PDF not found: {input_path}")
 
-    # Check if output exists
     if os.path.exists(output_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {output_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(output_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -720,15 +677,12 @@ def watermark_pdf(
         writer = PdfWriter()
 
         for page in reader.pages:
-            # Create watermark overlay
             packet = io.BytesIO()
             can = canvas.Canvas(packet, pagesize=letter)
 
-            # Set watermark properties
             can.setFont("Helvetica-Bold", 60)
             can.setFillColor(grey, alpha=0.3)
 
-            # Draw watermark diagonally across page
             can.saveState()
             can.translate(letter[0] / 2, letter[1] / 2)
             can.rotate(45)
@@ -737,13 +691,11 @@ def watermark_pdf(
 
             can.save()
 
-            # Merge watermark with page
             packet.seek(0)
             overlay = PdfReader(packet)
             page.merge_page(overlay.pages[0])
             writer.add_page(page)
 
-        # Write output
         with open(output_path, "wb") as output_file:
             writer.write(output_file)
 

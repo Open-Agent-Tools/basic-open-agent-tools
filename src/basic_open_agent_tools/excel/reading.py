@@ -15,7 +15,6 @@ try:
 except ImportError:
     HAS_OPENPYXL = False
 
-# Maximum file size: 100MB
 MAX_FILE_SIZE = 100 * 1024 * 1024
 
 
@@ -142,11 +141,9 @@ def read_excel_sheet(file_path: str, sheet_name: str) -> list[list[str]]:
     if not isinstance(sheet_name, str):
         raise TypeError("sheet_name must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -154,22 +151,17 @@ def read_excel_sheet(file_path: str, sheet_name: str) -> list[list[str]]:
         )
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
             )
 
-        # Get sheet
         ws = wb[sheet_name]
 
-        # Extract all data
         data = []
         for row in ws.iter_rows(values_only=True):
-            # Convert row to strings, handling None values
             str_row = [str(cell) if cell is not None else "" for cell in row]
             data.append(str_row)
 
@@ -210,11 +202,9 @@ def get_excel_sheet_names(file_path: str) -> list[str]:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -223,7 +213,7 @@ def get_excel_sheet_names(file_path: str) -> list[str]:
 
     try:
         wb = load_workbook(filename=file_path, read_only=True)
-        sheet_names = list(wb.sheetnames)  # Cast to list[str] for type safety
+        sheet_names = list(wb.sheetnames)
         wb.close()
         return sheet_names
 
@@ -277,7 +267,6 @@ def read_excel_as_dicts(
     if header_row < 1:
         raise ValueError("header_row must be >= 1 (1-indexed)")
 
-    # Read sheet data
     data = read_excel_sheet(file_path, sheet_name)
 
     if len(data) < header_row:
@@ -285,23 +274,19 @@ def read_excel_as_dicts(
             f"header_row {header_row} out of range (sheet has {len(data)} rows)"
         )
 
-    # Extract headers (convert to 0-indexed)
     headers = data[header_row - 1]
 
-    # Convert rows to dicts, skipping header row
     result = []
     for i, row in enumerate(data):
         if i < header_row:
-            continue  # Skip rows before and including header
+            continue
 
-        # Create dict with headers as keys
         row_dict = {}
         for j, cell in enumerate(row):
             if j < len(headers):
                 key = headers[j] if headers[j] else f"Column{j + 1}"
                 row_dict[key] = cell
             else:
-                # Handle extra cells beyond headers
                 row_dict[f"Column{j + 1}"] = cell
 
         result.append(row_dict)
@@ -347,11 +332,9 @@ def get_excel_cell_value(file_path: str, sheet_name: str, cell_reference: str) -
     if not isinstance(cell_reference, str):
         raise TypeError("cell_reference must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -361,7 +344,6 @@ def get_excel_cell_value(file_path: str, sheet_name: str, cell_reference: str) -
     try:
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -423,11 +405,9 @@ def get_excel_cell_range(
     if not isinstance(end_cell, str):
         raise TypeError("end_cell must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -437,7 +417,6 @@ def get_excel_cell_range(
     try:
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -445,7 +424,6 @@ def get_excel_cell_range(
 
         ws = wb[sheet_name]
 
-        # Get range
         cell_range = f"{start_cell}:{end_cell}"
         data = []
 
@@ -502,11 +480,9 @@ def search_excel_text(
     if not isinstance(case_sensitive, bool):
         raise TypeError("case_sensitive must be a boolean")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -517,10 +493,8 @@ def search_excel_text(
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
         matches = []
 
-        # Prepare search term for comparison
         search_compare = search_term if case_sensitive else search_term.lower()
 
-        # Search all sheets
         for sheet_name in wb.sheetnames:
             ws = wb[sheet_name]
 
@@ -580,11 +554,9 @@ def get_excel_metadata(file_path: str) -> dict[str, str]:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -646,11 +618,9 @@ def get_excel_info(file_path: str) -> dict[str, object]:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -660,7 +630,6 @@ def get_excel_info(file_path: str) -> dict[str, object]:
     try:
         wb = load_workbook(filename=file_path, read_only=True)
 
-        # Get sheet information
         sheet_info = []
         for sheet_name in wb.sheetnames:
             ws = wb[sheet_name]
@@ -725,11 +694,9 @@ def get_sheet_info(file_path: str, sheet_name: str) -> dict[str, str]:
     if not isinstance(sheet_name, str):
         raise TypeError("sheet_name must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -739,7 +706,6 @@ def get_sheet_info(file_path: str, sheet_name: str) -> dict[str, str]:
     try:
         wb = load_workbook(filename=file_path, read_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -805,11 +771,9 @@ def get_sheet_schema(
     if not isinstance(sample_rows, int) or sample_rows < 1:
         raise TypeError("sample_rows must be a positive integer")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -819,7 +783,6 @@ def get_sheet_schema(
     try:
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -827,7 +790,6 @@ def get_sheet_schema(
 
         ws = wb[sheet_name]
 
-        # Get headers from first row
         headers = []
         for cell in next(ws.iter_rows(min_row=1, max_row=1, values_only=True)):
             headers.append(str(cell) if cell is not None else "")
@@ -835,7 +797,6 @@ def get_sheet_schema(
         if not headers or all(h == "" for h in headers):
             raise ValueError("Sheet has no header row")
 
-        # Sample data rows for type inference
         sample_data = []
         row_count = 0
         for row in ws.iter_rows(min_row=2, values_only=True):
@@ -847,10 +808,8 @@ def get_sheet_schema(
         if not sample_data:
             raise ValueError("Sheet has no data rows")
 
-        # Infer types for each column
         schema = {}
         for col_idx, header in enumerate(headers):
-            # Collect non-None values for this column
             values = [
                 row[col_idx]
                 for row in sample_data
@@ -861,7 +820,6 @@ def get_sheet_schema(
                 schema[header] = "string"
                 continue
 
-            # Type inference logic
             all_bool = all(isinstance(v, bool) for v in values)
             all_int = all(
                 isinstance(v, int) and not isinstance(v, bool) for v in values
@@ -929,11 +887,9 @@ def preview_sheet_rows(
     if not isinstance(num_rows, int) or num_rows < 1:
         raise TypeError("num_rows must be a positive integer")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -943,7 +899,6 @@ def preview_sheet_rows(
     try:
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -951,7 +906,6 @@ def preview_sheet_rows(
 
         ws = wb[sheet_name]
 
-        # Get headers
         headers = []
         for cell in next(ws.iter_rows(min_row=1, max_row=1, values_only=True)):
             headers.append(str(cell) if cell is not None else "")
@@ -959,7 +913,6 @@ def preview_sheet_rows(
         if not headers:
             raise ValueError("Sheet has no header row")
 
-        # Read preview rows
         result = []
         row_count = 0
         for row in ws.iter_rows(min_row=2, values_only=True):
@@ -1024,11 +977,9 @@ def select_sheet_columns(
     if not isinstance(columns, list) or not all(isinstance(c, str) for c in columns):
         raise TypeError("columns must be a list of strings")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -1038,7 +989,6 @@ def select_sheet_columns(
     try:
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -1046,12 +996,10 @@ def select_sheet_columns(
 
         ws = wb[sheet_name]
 
-        # Get headers
         headers = []
         for cell in next(ws.iter_rows(min_row=1, max_row=1, values_only=True)):
             headers.append(str(cell) if cell is not None else "")
 
-        # Find column indices
         col_indices = {}
         for col in columns:
             try:
@@ -1061,7 +1009,6 @@ def select_sheet_columns(
                     f"Column '{col}' not found in sheet. Available: {headers}"
                 )
 
-        # Read data with only selected columns
         result = []
         for row in ws.iter_rows(min_row=2, values_only=True):
             row_dict = {}
@@ -1110,7 +1057,6 @@ def filter_sheet_rows(
         >>> rows[0]
         {'Name': 'Bob', 'Age': '35', 'City': 'LA'}
     """
-    # Validate inputs
     _check_openpyxl_installed()
 
     if not isinstance(file_path, str):
@@ -1139,14 +1085,12 @@ def filter_sheet_rows(
     if operator not in valid_operators:
         raise ValueError(f"operator must be one of: {valid_operators}")
 
-    # Validate file and load sheet
     _validate_excel_file(file_path)
 
     try:
         wb, ws = _load_excel_sheet(file_path, sheet_name)
         headers = _get_sheet_headers(ws)
 
-        # Find column index
         try:
             col_idx = headers.index(column)
         except ValueError:
@@ -1154,7 +1098,6 @@ def filter_sheet_rows(
                 f"Column '{column}' not found in sheet. Available: {headers}"
             )
 
-        # Filter rows
         result = []
         for row in ws.iter_rows(min_row=2, values_only=True):
             cell_value = (
@@ -1163,7 +1106,6 @@ def filter_sheet_rows(
                 else ""
             )
 
-            # Apply filter
             matches = False
             if operator == "equals":
                 matches = cell_value == value
@@ -1241,11 +1183,9 @@ def get_sheet_row_range(
     if not isinstance(end_row, int) or end_row < start_row:
         raise TypeError("end_row must be an integer >= start_row")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -1255,7 +1195,6 @@ def get_sheet_row_range(
     try:
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -1263,12 +1202,10 @@ def get_sheet_row_range(
 
         ws = wb[sheet_name]
 
-        # Get headers
         headers = []
         for cell in next(ws.iter_rows(min_row=1, max_row=1, values_only=True)):
             headers.append(str(cell) if cell is not None else "")
 
-        # Read range of rows
         result = []
         row_num = 0
         for row in ws.iter_rows(min_row=2, values_only=True):
@@ -1323,7 +1260,6 @@ def sample_sheet_rows(
         >>> len(rows)
         100
     """
-    # Validate inputs
     _check_openpyxl_installed()
 
     if not isinstance(file_path, str):
@@ -1343,13 +1279,11 @@ def sample_sheet_rows(
         raise ValueError(f"method must be one of: {valid_methods}")
 
     if method == "first":
-        # Just use preview_sheet_rows for first N rows
         result_preview: list[dict[str, str]] = preview_sheet_rows(
             file_path, sheet_name, sample_size
         )
         return result_preview
 
-    # Validate file and load sheet
     _validate_excel_file(file_path)
 
     try:
@@ -1357,7 +1291,6 @@ def sample_sheet_rows(
         headers = _get_sheet_headers(ws)
 
         if method == "random":
-            # Reservoir sampling
             import random
 
             result: list[dict[str, str]] = []
@@ -1369,7 +1302,6 @@ def sample_sheet_rows(
                 if row_num < sample_size:
                     result.append(row_dict)
                 else:
-                    # Reservoir sampling algorithm
                     j = random.randint(0, row_num)
                     if j < sample_size:
                         result[j] = row_dict
@@ -1379,18 +1311,15 @@ def sample_sheet_rows(
             wb.close()
             return result
 
-        else:  # systematic
-            # Get total rows first
-            total_rows = ws.max_row - 1  # Exclude header
+        else:
+            total_rows = ws.max_row - 1
             if total_rows <= sample_size:
-                # Return all rows if total is less than sample size
                 result_all = []
                 for row in ws.iter_rows(min_row=2, values_only=True):
                     result_all.append(_row_to_dict(row, headers))
                 wb.close()
                 return result_all
 
-            # Calculate step size
             step = total_rows // sample_size
 
             result_systematic = []
@@ -1462,11 +1391,9 @@ def get_sheet_column_stats(
     if not isinstance(sample_size, int) or sample_size < 1:
         raise TypeError("sample_size must be a positive integer")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -1476,7 +1403,6 @@ def get_sheet_column_stats(
     try:
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -1484,12 +1410,10 @@ def get_sheet_column_stats(
 
         ws = wb[sheet_name]
 
-        # Get headers
         headers = []
         for cell in next(ws.iter_rows(min_row=1, max_row=1, values_only=True)):
             headers.append(str(cell) if cell is not None else "")
 
-        # Find column index
         try:
             col_idx = headers.index(column)
         except ValueError:
@@ -1497,7 +1421,6 @@ def get_sheet_column_stats(
                 f"Column '{column}' not found in sheet. Available: {headers}"
             )
 
-        # Collect sample values
         values = []
         null_count = 0
         row_count = 0
@@ -1513,10 +1436,8 @@ def get_sheet_column_stats(
 
             row_count += 1
 
-        # Get total row count
-        total_rows = ws.max_row - 1  # Exclude header
+        total_rows = ws.max_row - 1
 
-        # Calculate statistics
         unique_values = {str(v) for v in values}
         stats = {
             "total_rows": str(total_rows),
@@ -1526,14 +1447,13 @@ def get_sheet_column_stats(
             "sample_values": ", ".join(str(v) for v in list(unique_values)[:5]),
         }
 
-        # Try to calculate min/max for numeric columns
         try:
             numeric_values = [float(v) for v in values if v != ""]
             if numeric_values:
                 stats["min_value"] = str(min(numeric_values))
                 stats["max_value"] = str(max(numeric_values))
         except (ValueError, TypeError):
-            pass  # Not a numeric column
+            pass
 
         wb.close()
         return stats
@@ -1589,11 +1509,9 @@ def count_sheet_rows(
     if not isinstance(filter_value, str):
         raise TypeError("filter_value must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -1603,7 +1521,6 @@ def count_sheet_rows(
     try:
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -1611,18 +1528,15 @@ def count_sheet_rows(
 
         ws = wb[sheet_name]
 
-        # No filter - return total count
         if not filter_column:
-            count_total: int = ws.max_row - 1  # Exclude header
+            count_total: int = ws.max_row - 1
             wb.close()
             return count_total
 
-        # With filter - count matching rows
         headers = []
         for cell in next(ws.iter_rows(min_row=1, max_row=1, values_only=True)):
             headers.append(str(cell) if cell is not None else "")
 
-        # Find column index
         try:
             col_idx = headers.index(filter_column)
         except ValueError:
@@ -1630,7 +1544,6 @@ def count_sheet_rows(
                 f"Column '{filter_column}' not found in sheet. Available: {headers}"
             )
 
-        # Count matching rows
         count = 0
         for row in ws.iter_rows(min_row=2, values_only=True):
             cell_value = (
@@ -1695,11 +1608,9 @@ def get_sheet_value_counts(
     if not isinstance(top_n, int) or top_n < 1:
         raise TypeError("top_n must be a positive integer")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -1711,7 +1622,6 @@ def get_sheet_value_counts(
 
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -1719,12 +1629,10 @@ def get_sheet_value_counts(
 
         ws = wb[sheet_name]
 
-        # Get headers
         headers = []
         for cell in next(ws.iter_rows(min_row=1, max_row=1, values_only=True)):
             headers.append(str(cell) if cell is not None else "")
 
-        # Find column index
         try:
             col_idx = headers.index(column)
         except ValueError:
@@ -1732,7 +1640,6 @@ def get_sheet_value_counts(
                 f"Column '{column}' not found in sheet. Available: {headers}"
             )
 
-        # Count values
         values = []
         for row in ws.iter_rows(min_row=2, values_only=True):
             if col_idx < len(row) and row[col_idx] is not None:
@@ -1741,7 +1648,6 @@ def get_sheet_value_counts(
         counter = Counter(values)
         top_values = dict(counter.most_common(top_n))
 
-        # Convert to string values
         result = {k: str(v) for k, v in top_values.items()}
 
         wb.close()

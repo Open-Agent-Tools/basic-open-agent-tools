@@ -39,17 +39,15 @@ class TestCompressFileGzip:
     ):
         """Test successful GZIP compression."""
 
-        # Input exists, output doesn't exist
         def exists_side_effect(path):
             return path == "input.txt"
 
         mock_exists.side_effect = exists_side_effect
         mock_isfile.return_value = True
-        mock_getsize.side_effect = [1000, 300]  # Input: 1000, Output: 300 bytes
+        mock_getsize.side_effect = [1000, 300]
 
         result = compress_file_gzip("input.txt", "output.txt.gz", False)
 
-        # Function returns string description now
         assert isinstance(result, str)
         assert "output.txt.gz" in result
         assert "input.txt" in result
@@ -74,13 +72,11 @@ class TestDecompressFileGzip:
         """Test decompression with explicit output path for .gz files."""
         with patch("os.path.exists", return_value=False):
             with pytest.raises(BasicAgentToolsError):
-                # Will fail at exists check
                 try:
                     decompress_file_gzip("test.txt.gz", "test.txt")
                 except BasicAgentToolsError as e:
-                    # Should fail because file doesn't exist
                     assert "not found" in str(e)
-                    raise  # Re-raise so pytest.raises can catch it
+                    raise
 
     @patch("os.path.exists")
     @patch("os.path.getsize")
@@ -92,7 +88,7 @@ class TestDecompressFileGzip:
     ):
         """Test successful GZIP decompression."""
         mock_exists.return_value = True
-        mock_getsize.side_effect = [300, 1000]  # Compressed: 300, Decompressed: 1000
+        mock_getsize.side_effect = [300, 1000]
 
         result = decompress_file_gzip("input.txt.gz", "output.txt")
 
@@ -100,7 +96,7 @@ class TestDecompressFileGzip:
         assert result["output_path"] == "output.txt"
         assert result["compressed_size_bytes"] == 300
         assert result["decompressed_size_bytes"] == 1000
-        assert result["expansion_ratio"] == 3.33  # 1000/300 rounded
+        assert result["expansion_ratio"] == 3.33
         assert result["decompression_type"] == "gzip"
         assert result["decompression_status"] == "success"
 
@@ -119,17 +115,15 @@ class TestCompressFileBzip2:
     ):
         """Test successful BZIP2 compression."""
 
-        # Input exists, output doesn't exist
         def exists_side_effect(path):
             return path == "large_file.txt"
 
         mock_exists.side_effect = exists_side_effect
         mock_isfile.return_value = True
-        mock_getsize.side_effect = [2000, 400]  # Better compression than gzip
+        mock_getsize.side_effect = [2000, 400]
 
         result = compress_file_bzip2("large_file.txt", "large_file.txt.bz2", False)
 
-        # Function returns string description now
         assert isinstance(result, str)
         assert "large_file.txt.bz2" in result
         assert "large_file.txt" in result
@@ -150,17 +144,15 @@ class TestCompressFileXz:
     ):
         """Test successful XZ compression."""
 
-        # Input exists, output doesn't exist
         def exists_side_effect(path):
             return path == "huge_file.txt"
 
         mock_exists.side_effect = exists_side_effect
         mock_isfile.return_value = True
-        mock_getsize.side_effect = [3000, 450]  # Best compression ratio
+        mock_getsize.side_effect = [3000, 450]
 
         result = compress_file_xz("huge_file.txt", "compressed.xz", False)
 
-        # Function returns string description now
         assert isinstance(result, str)
         assert "compressed.xz" in result
         assert "huge_file.txt" in result

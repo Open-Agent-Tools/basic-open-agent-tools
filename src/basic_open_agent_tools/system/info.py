@@ -144,7 +144,6 @@ def get_disk_usage(path: str) -> dict[str, Union[int, float, str]]:
     if not isinstance(path, str) or not path.strip():
         raise BasicAgentToolsError("Path must be a non-empty string")
 
-    # Default to appropriate root for platform
     if path == "/":
         system = platform.system().lower()
         if system == "windows":
@@ -187,7 +186,6 @@ def get_uptime() -> dict[str, Union[int, float, str]]:
         current_time = time.time()
         uptime_seconds = current_time - boot_time
 
-        # Calculate human-readable components
         days = int(uptime_seconds // 86400)
         hours = int((uptime_seconds % 86400) // 3600)
         minutes = int((uptime_seconds % 3600) // 60)

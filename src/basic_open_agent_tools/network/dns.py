@@ -29,10 +29,8 @@ def resolve_hostname(
     hostname = hostname.strip()
 
     try:
-        # Get all IP addresses for the hostname
         addr_info = socket.getaddrinfo(hostname, None)
 
-        # Extract unique IP addresses
         ipv4_addresses = []
         ipv6_addresses = []
 
@@ -81,7 +79,6 @@ def reverse_dns_lookup(ip_address: str) -> dict[str, Union[str, bool]]:
     ip_address = ip_address.strip()
 
     try:
-        # Validate IP address format
         socket.inet_pton(socket.AF_INET, ip_address)
         ip_family = "IPv4"
     except OSError:
@@ -92,7 +89,6 @@ def reverse_dns_lookup(ip_address: str) -> dict[str, Union[str, bool]]:
             raise BasicAgentToolsError(f"Invalid IP address format: {ip_address}")
 
     try:
-        # Perform reverse DNS lookup
         hostname, _, _ = socket.gethostbyaddr(ip_address)
 
         return {
@@ -158,9 +154,7 @@ def check_port_open(
         sock.close()
 
         end_time = time.time()
-        response_time = round(
-            (end_time - start_time) * 1000, 2
-        )  # Convert to milliseconds
+        response_time = round((end_time - start_time) * 1000, 2)
 
         is_open = result == 0
 

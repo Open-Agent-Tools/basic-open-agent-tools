@@ -6,9 +6,6 @@ This module provides a hybrid confirmation system that works in three modes:
 3. Agent mode: If not in TTY, raises error instructing agent to ask user
 
 Interactive mode defaults to YES - users can simply press Enter to confirm, or type 'n' to cancel.
-
-This design allows tools to work seamlessly in terminal environments (with direct
-user prompts) and in agent frameworks (where the LLM asks the user via conversation).
 """
 
 import os
@@ -76,7 +73,6 @@ def check_user_confirmation(
         >>> check_user_confirmation("overwrite file", "/path/to/file.txt", True)
         (True, None)
     """
-    # Mode 1: Bypass confirmation if skip_confirm=True or BYPASS_TOOL_CONSENT is set
     bypass_env = os.getenv("BYPASS_TOOL_CONSENT", "false").lower() == "true"
 
     if skip_confirm or bypass_env:
@@ -84,11 +80,9 @@ def check_user_confirmation(
             print("[BYPASS] Confirmation bypassed via BYPASS_TOOL_CONSENT")
         return (True, None)
 
-    # Mode 2: Interactive terminal mode - prompt user directly
     if _is_interactive_terminal():
         return _interactive_confirm(operation, target, preview_info)
 
-    # Mode 3: Agent mode - raise error with instructions for the agent
     _raise_agent_confirmation_error(operation, target, preview_info)
 
 
@@ -126,29 +120,23 @@ def _interactive_confirm(
 
     if preview_info:
         print()
-        # Check if preview contains newlines for multi-line content
         if "\n" in preview_info:
-            # Multi-line preview - display as-is without indentation
             print(preview_info)
         else:
-            # Single-line preview - indent for readability
             print(f"Preview: {preview_info}")
 
     try:
         response = input("\nDo you want to proceed? [Y/n]: ").strip().lower()
 
-        # Default to Yes (empty response or 'y'/'yes' confirms)
         if response in ("", "y", "yes"):
             print("✓ Confirmed - proceeding\n")
             return (True, None)
         else:
             print("✗ Cancelled by user")
-            # Prompt for optional decline reason
             decline_reason = input("Decline Reason (optional): ").strip()
-            print()  # Extra newline for spacing
+            print()
             return (False, decline_reason)
     except (EOFError, KeyboardInterrupt):
-        # Handle Ctrl+C or EOF gracefully
         print("\n✗ Cancelled by user (interrupted)\n")
         return (False, "interrupted by user")
 

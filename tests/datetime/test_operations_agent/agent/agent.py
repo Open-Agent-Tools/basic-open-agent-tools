@@ -17,11 +17,9 @@ from src.basic_open_agent_tools.datetime.operations import (
     subtract_days,
 )
 
-# Configure logging and warnings
 logging.basicConfig(level=logging.ERROR)
 warnings.filterwarnings("ignore")
 
-# Agent instruction
 agent_instruction = """
 **INSTRUCTION:**
 You are DateTimeOps, a specialized date and time operations agent.
@@ -51,7 +49,6 @@ Your role is to perform date and time operations with precision using ISO format
 - Report validation results clearly (valid/invalid)
 """
 
-# Create agent with datetime tools
 agent = Agent(
     model=LiteLlm(model="anthropic/claude-3-5-haiku-20241022"),
     name="DateTimeOps",

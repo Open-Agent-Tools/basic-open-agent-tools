@@ -74,26 +74,21 @@ def apply_heading_style(
     if heading_level < 1 or heading_level > 9:
         raise ValueError("heading_level must be between 1 and 9")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Word document not found: {file_path}")
 
     try:
-        # Load document
         doc = Document(file_path)
 
-        # Check paragraph index is valid
         if paragraph_index >= len(doc.paragraphs):
             raise IndexError(
                 f"Paragraph index {paragraph_index} out of range "
                 f"(document has {len(doc.paragraphs)} paragraphs)"
             )
 
-        # Get paragraph and apply heading style
         paragraph = doc.paragraphs[paragraph_index]
         paragraph.style = f"Heading {heading_level}"
 
-        # Save document
         doc.save(file_path)
 
         return f"Applied Heading {heading_level} style to paragraph {paragraph_index} in {file_path}"
@@ -150,27 +145,22 @@ def apply_bold_to_paragraph(
     if paragraph_index < 0:
         raise ValueError("paragraph_index must be non-negative")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Word document not found: {file_path}")
 
     try:
-        # Load document
         doc = Document(file_path)
 
-        # Check paragraph index is valid
         if paragraph_index >= len(doc.paragraphs):
             raise IndexError(
                 f"Paragraph index {paragraph_index} out of range "
                 f"(document has {len(doc.paragraphs)} paragraphs)"
             )
 
-        # Get paragraph and apply bold to all runs
         paragraph = doc.paragraphs[paragraph_index]
         for run in paragraph.runs:
             run.bold = True
 
-        # Save document
         doc.save(file_path)
 
         return f"Applied bold formatting to paragraph {paragraph_index} in {file_path}"
@@ -232,29 +222,24 @@ def set_paragraph_alignment(
     if paragraph_index < 0:
         raise ValueError("paragraph_index must be non-negative")
 
-    # Validate alignment
     valid_alignments = ["left", "center", "right", "justify"]
     if alignment.lower() not in valid_alignments:
         raise ValueError(
             f"alignment must be one of {valid_alignments}, got '{alignment}'"
         )
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Word document not found: {file_path}")
 
     try:
-        # Load document
         doc = Document(file_path)
 
-        # Check paragraph index is valid
         if paragraph_index >= len(doc.paragraphs):
             raise IndexError(
                 f"Paragraph index {paragraph_index} out of range "
                 f"(document has {len(doc.paragraphs)} paragraphs)"
             )
 
-        # Get paragraph and set alignment
         paragraph = doc.paragraphs[paragraph_index]
 
         alignment_map = {
@@ -266,7 +251,6 @@ def set_paragraph_alignment(
 
         paragraph.alignment = alignment_map[alignment.lower()]
 
-        # Save document
         doc.save(file_path)
 
         return f"Set alignment to {alignment} for paragraph {paragraph_index} in {file_path}"
@@ -322,27 +306,22 @@ def add_page_break(file_path: str, after_paragraph: int, skip_confirm: bool) -> 
     if after_paragraph < 0:
         raise ValueError("after_paragraph must be non-negative")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Word document not found: {file_path}")
 
     try:
-        # Load document
         doc = Document(file_path)
 
-        # Check paragraph index is valid
         if after_paragraph >= len(doc.paragraphs):
             raise IndexError(
                 f"Paragraph index {after_paragraph} out of range "
                 f"(document has {len(doc.paragraphs)} paragraphs)"
             )
 
-        # Get paragraph and add page break
         paragraph = doc.paragraphs[after_paragraph]
         run = paragraph.add_run()
         run.add_break(break_type=WD_BREAK_TYPE.PAGE)
 
-        # Save document
         doc.save(file_path)
 
         return f"Added page break after paragraph {after_paragraph} in {file_path}"

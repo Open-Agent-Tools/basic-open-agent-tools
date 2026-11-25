@@ -53,7 +53,7 @@ class TestValidatePath:
         result = validate_path(test_path, "test operation")
 
         assert isinstance(result, Path)
-        assert result.is_absolute()  # resolve() makes it absolute
+        assert result.is_absolute()
         assert result.name == "test.txt"
 
     def test_validate_existing_file_path(self, tmp_path: Path) -> None:
@@ -85,7 +85,7 @@ class TestValidatePath:
         result = validate_path(test_path, "create")
 
         assert isinstance(result, Path)
-        assert not result.exists()  # Path validation doesn't require existence
+        assert not result.exists()
 
     def test_validate_empty_string_path(self) -> None:
         """Test validating an empty string path."""
@@ -107,7 +107,6 @@ class TestValidatePath:
         result = validate_path("   ", "test operation")
 
         assert isinstance(result, Path)
-        # Whitespace path is technically valid, just unusual
 
     def test_validate_path_with_special_characters(self, tmp_path: Path) -> None:
         """Test validating path with special characters."""
@@ -130,7 +129,6 @@ class TestValidatePath:
 
     def test_validate_path_resolution(self, tmp_path: Path) -> None:
         """Test that path resolution works correctly."""
-        # Create a path with .. components
         test_subdir = tmp_path / "subdir"
         test_subdir.mkdir()
         test_path = str(test_subdir / ".." / "test.txt")
@@ -138,7 +136,7 @@ class TestValidatePath:
         result = validate_path(test_path, "create")
 
         assert isinstance(result, Path)
-        assert result.parent == tmp_path  # Should resolve .. correctly
+        assert result.parent == tmp_path
 
     def test_validate_path_os_error(self) -> None:
         """Test handling of OSError during path resolution."""
@@ -164,7 +162,6 @@ class TestValidatePath:
     @skip_if_no_symlinks
     def test_validate_path_symlink_resolution(self, tmp_path: Path) -> None:
         """Test that symlinks are resolved correctly."""
-        # Create a file and a symlink to it
         target_file = tmp_path / "target.txt"
         target_file.write_text("content")
 
@@ -174,7 +171,6 @@ class TestValidatePath:
         result = validate_path(str(symlink_file), "read")
 
         assert isinstance(result, Path)
-        # The resolved path should point to the target
         assert result == target_file.resolve()
 
     def test_validate_current_directory_path(self) -> None:
@@ -193,49 +189,42 @@ class TestValidateFileContent:
         """Test validating valid string content."""
         content = "This is valid content"
 
-        # Should not raise any exception
         validate_file_content(content, "write")
 
     def test_validate_empty_string_content(self) -> None:
         """Test validating empty string content."""
         content = ""
 
-        # Should not raise any exception - empty strings are valid
         validate_file_content(content, "write")
 
     def test_validate_multiline_string_content(self) -> None:
         """Test validating multiline string content."""
         content = "Line 1\nLine 2\nLine 3"
 
-        # Should not raise any exception
         validate_file_content(content, "write")
 
     def test_validate_unicode_string_content(self) -> None:
         """Test validating Unicode string content."""
         content = "Hello 世界! 🌍 Здравствуй мир!"
 
-        # Should not raise any exception
         validate_file_content(content, "write")
 
     def test_validate_string_with_special_characters(self) -> None:
         """Test validating string with special characters."""
         content = "Special chars: !@#$%^&*()_+-=[]{}|;':\",./<>?"
 
-        # Should not raise any exception
         validate_file_content(content, "write")
 
     def test_validate_very_long_string_content(self) -> None:
         """Test validating very long string content."""
         content = "a" * 10000
 
-        # Should not raise any exception
         validate_file_content(content, "write")
 
     def test_validate_whitespace_only_content(self) -> None:
         """Test validating whitespace-only content."""
         content = "   \n\t  \r\n  "
 
-        # Should not raise any exception
         validate_file_content(content, "write")
 
     def test_validate_none_content(self) -> None:
@@ -296,18 +285,15 @@ class TestValidateFileContent:
             "Line 1\n\tIndented line\r\nWindows line ending\vVertical tab\fForm feed"
         )
 
-        # Should not raise any exception
         validate_file_content(content, "write")
 
     def test_validate_json_string_content(self) -> None:
         """Test validating JSON string as content."""
         content = '{"key": "value", "number": 42, "array": [1, 2, 3]}'
 
-        # Should not raise any exception - JSON strings are valid strings
         validate_file_content(content, "write")
 
 
-# Integration tests
 class TestValidationIntegration:
     """Integration tests for validation functions working together."""
 
@@ -316,20 +302,16 @@ class TestValidationIntegration:
         test_path = str(tmp_path / "test.txt")
         test_content = "Test content for integration"
 
-        # Validate path
         validated_path = validate_path(test_path, "write")
         assert isinstance(validated_path, Path)
 
-        # Validate content
-        validate_file_content(test_content, "write")  # Should not raise
+        validate_file_content(test_content, "write")
 
-        # They should work together seamlessly
         validated_path.write_text(test_content)
         assert validated_path.read_text() == test_content
 
     def test_error_consistency(self) -> None:
         """Test that both functions raise consistent FileSystemError types."""
-        # Both should raise FileSystemError
         with pytest.raises(FileSystemError):
             validate_path("", "test")
 
@@ -338,21 +320,16 @@ class TestValidationIntegration:
 
     def test_validation_with_realistic_file_operations(self, tmp_path: Path) -> None:
         """Test validation functions in realistic file operation context."""
-        # Simulate a complete file write operation validation
         file_path = str(tmp_path / "document.txt")
         file_content = (
             "# Document Title\n\nThis is a test document with multiple lines.\n"
         )
 
-        # Step 1: Validate path
         validated_path = validate_path(file_path, "write file")
 
-        # Step 2: Validate content
         validate_file_content(file_content, "write file")
 
-        # Step 3: Perform operation (should work after validation)
         validated_path.write_text(file_content)
 
-        # Verify the operation succeeded
         assert validated_path.exists()
         assert validated_path.read_text() == file_content

@@ -79,11 +79,9 @@ class TestAddTask:
 
     def test_add_task_with_dependencies(self):
         """Test adding task with dependencies."""
-        # Create dependency task
         dep_task = add_task("Dependency", "low", "", [], "", [])
         dep_id = dep_task["task"]["id"]
 
-        # Create task with dependency
         result = add_task(
             title="Main task",
             priority="high",
@@ -105,7 +103,7 @@ class TestAddTask:
                 notes="",
                 tags=[],
                 estimated_duration="",
-                dependencies=[999],  # Non-existent task
+                dependencies=[999],
             )
 
 
@@ -116,7 +114,6 @@ class TestListTasks:
         """Clear tasks and add test data."""
         clear_all_tasks()
 
-        # Add test tasks
         add_task("Open task", "low", "", ["work"], "", [])
         add_task("Progress task", "medium", "", ["personal"], "", [])
         update_task(
@@ -241,7 +238,6 @@ class TestUpdateTask:
 
     def test_update_task_with_dependencies(self):
         """Test updating task with dependencies."""
-        # Create dependency
         dep_task = add_task("Dependency", "low", "", [], "", [])
         dep_id = dep_task["task"]["id"]
 
@@ -262,11 +258,9 @@ class TestUpdateTask:
 
     def test_update_task_circular_dependency(self):
         """Test preventing circular dependencies."""
-        # Create two tasks
         task_a = add_task("Task A", "low", "", [], "", [])
         task_b = add_task("Task B", "low", "", [], "", [task_a["task"]["id"]])
 
-        # Try to make task_a depend on task_b (circular)
         with pytest.raises(BasicAgentToolsError):
             update_task(
                 task_id=task_a["task"]["id"],
@@ -297,7 +291,6 @@ class TestDeleteTask:
         assert "deleted" in result.lower()
         assert str(self.task_id) in result
 
-        # Verify task is deleted
         with pytest.raises(BasicAgentToolsError):
             get_task(self.task_id)
 
@@ -337,7 +330,6 @@ class TestGetTaskStats:
         """Clear tasks and add test data."""
         clear_all_tasks()
 
-        # Add various tasks
         add_task("Open task 1", "low", "", [], "", [])
         add_task("Open task 2", "medium", "", [], "", [])
         add_task("Progress task", "high", "", [], "", [])
@@ -370,7 +362,6 @@ class TestClearAllTasks:
 
     def test_clear_all_tasks(self):
         """Test clearing all tasks."""
-        # Add some tasks
         add_task("Task 1", "low", "", [], "", [])
         add_task("Task 2", "medium", "", [], "", [])
 
@@ -379,7 +370,6 @@ class TestClearAllTasks:
         assert result["success"] is True
         assert result["cleared_count"] == 2
 
-        # Verify all tasks are cleared
         stats = get_task_stats()
         assert stats["total_tasks"] == 0
         assert stats["next_id"] == 1
@@ -394,31 +384,25 @@ class TestTaskConstraints:
 
     def test_task_limit_enforcement(self):
         """Test that task limit is enforced."""
-        # Add maximum allowed tasks (50)
         for i in range(50):
             add_task(f"Task {i + 1}", "low", "", [], "", [])
 
-        # Verify we can't add more
         with pytest.raises(BasicAgentToolsError, match="Maximum task limit"):
             add_task("Overflow task", "low", "", [], "", [])
 
     def test_title_length_validation(self):
         """Test title length constraints."""
-        # Valid title
         result = add_task("A" * 500, "low", "", [], "", [])
         assert result["success"] is True
 
-        # Invalid title (too long)
         with pytest.raises(BasicAgentToolsError):
             add_task("A" * 501, "low", "", [], "", [])
 
     def test_notes_length_validation(self):
         """Test notes length constraints."""
-        # Valid notes
         result = add_task("Title", "low", "A" * 2000, [], "", [])
         assert result["success"] is True
 
-        # Invalid notes (too long)
         with pytest.raises(BasicAgentToolsError):
             add_task("Title", "low", "A" * 2001, [], "", [])
 
@@ -432,7 +416,6 @@ class TestIntegrationWorkflows:
 
     def test_agent_workflow_scenario(self):
         """Test a realistic agent workflow."""
-        # Agent creates main task
         main_task = add_task(
             title="Build user dashboard",
             priority="high",
@@ -443,7 +426,6 @@ class TestIntegrationWorkflows:
         )
         main_task["task"]["id"]
 
-        # Agent breaks down into subtasks
         api_task = add_task(
             title="Create API endpoints",
             priority="high",
@@ -464,7 +446,6 @@ class TestIntegrationWorkflows:
         )
         charts_id = charts_task["task"]["id"]
 
-        # Agent starts working
         update_task(
             api_id,
             "Create API endpoints",
@@ -476,10 +457,8 @@ class TestIntegrationWorkflows:
             [],
         )
 
-        # Complete API task
         complete_task(api_id)
 
-        # Start charts task (dependency resolved)
         update_task(
             charts_id,
             "Implement chart components",
@@ -491,7 +470,6 @@ class TestIntegrationWorkflows:
             [api_id],
         )
 
-        # Get progress report
         stats = get_task_stats()
         in_progress = list_tasks("in_progress", "")
         completed = list_tasks("completed", "")
@@ -505,29 +483,24 @@ class TestIntegrationWorkflows:
 
     def test_dependency_chain_workflow(self):
         """Test complex dependency chains."""
-        # Create dependency chain: A -> B -> C -> D
         task_a = add_task("Task A", "high", "", [], "", [])
         task_b = add_task("Task B", "high", "", [], "", [task_a["task"]["id"]])
         task_c = add_task("Task C", "medium", "", [], "", [task_b["task"]["id"]])
         task_d = add_task("Task D", "low", "", [], "", [task_c["task"]["id"]])
 
-        # Complete in order
         complete_task(task_a["task"]["id"])
         complete_task(task_b["task"]["id"])
         complete_task(task_c["task"]["id"])
         complete_task(task_d["task"]["id"])
 
-        # Verify all completed
         completed_tasks = list_tasks("completed", "")
         assert completed_tasks["count"] == 4
 
     def test_blocked_task_workflow(self):
         """Test handling blocked tasks."""
-        # Create task that gets blocked
         task = add_task("Implement feature", "high", "", [], "", [])
         task_id = task["task"]["id"]
 
-        # Mark as blocked
         update_task(
             task_id,
             "Implement feature",
@@ -539,7 +512,6 @@ class TestIntegrationWorkflows:
             [],
         )
 
-        # Later, unblock and continue
         update_task(
             task_id,
             "Implement feature",
@@ -551,7 +523,6 @@ class TestIntegrationWorkflows:
             [],
         )
 
-        # Complete
         complete_task(task_id)
 
         final_task = get_task(task_id)

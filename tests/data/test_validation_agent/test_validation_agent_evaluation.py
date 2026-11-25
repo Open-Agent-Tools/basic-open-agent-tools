@@ -21,4 +21,4 @@ class TestValidationAgentEvaluation:
             agent_module="tests.data.test_validation_agent.agent",
             eval_dataset_file_path_or_dir="tests/data/test_validation_agent/list_available_tools.test.json",
         )
-        await asyncio.sleep(2)  # Rate limiting delay
+        await asyncio.sleep(2)

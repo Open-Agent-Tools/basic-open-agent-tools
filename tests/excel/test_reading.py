@@ -14,7 +14,6 @@ class TestReadExcelSheet:
         """Test reading Excel sheet returns 2D list of strings."""
         with patch.object(reading, "HAS_OPENPYXL", True):
             with patch.object(reading, "load_workbook") as mock_wb:
-                # Setup mock
                 mock_sheet = MagicMock()
                 mock_sheet.iter_rows.return_value = [
                     ("Name", "Age"),
@@ -25,14 +24,11 @@ class TestReadExcelSheet:
                 mock_wb.return_value.__getitem__.return_value = mock_sheet
                 mock_wb.return_value.close = Mock()
 
-                # Create temp file
                 test_file = tmp_path / "test.xlsx"
                 test_file.write_bytes(b"fake excel content")
 
-                # Call function
                 result = reading.read_excel_sheet(str(test_file), "Sheet1")
 
-                # Verify
                 assert isinstance(result, list)
                 assert len(result) == 3
                 assert result[0] == ["Name", "Age"]
@@ -208,7 +204,6 @@ class TestGetExcelCellRange:
         """Test getting cell range returns 2D list."""
         with patch.object(reading, "HAS_OPENPYXL", True):
             with patch.object(reading, "load_workbook") as mock_wb:
-                # Create mock cells
                 mock_cell1 = Mock()
                 mock_cell1.value = "Name"
                 mock_cell2 = Mock()
@@ -399,8 +394,8 @@ class TestGetSheetSchema:
             with patch.object(reading, "load_workbook") as mock_wb:
                 mock_sheet = MagicMock()
                 mock_sheet.iter_rows.side_effect = [
-                    iter([("Name", "Age", "Active")]),  # First call for headers
-                    iter([("Alice", 30, True), ("Bob", 25, False)]),  # Second call for data
+                    iter([("Name", "Age", "Active")]),
+                    iter([("Alice", 30, True), ("Bob", 25, False)]),
                 ]
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]
@@ -518,12 +513,14 @@ class TestGetSheetRowRange:
                 mock_sheet = MagicMock()
                 mock_sheet.iter_rows.side_effect = [
                     iter([("Name", "Age")]),
-                    iter([
-                        ("Alice", 30),
-                        ("Bob", 25),
-                        ("Charlie", 35),
-                        ("Dana", 28),
-                    ]),
+                    iter(
+                        [
+                            ("Alice", 30),
+                            ("Bob", 25),
+                            ("Charlie", 35),
+                            ("Dana", 28),
+                        ]
+                    ),
                 ]
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]
@@ -536,7 +533,7 @@ class TestGetSheetRowRange:
                 result = reading.get_sheet_row_range(str(test_file), "Sheet1", 2, 3)
 
                 assert isinstance(result, list)
-                assert len(result) == 2  # Rows 2 and 3
+                assert len(result) == 2
 
 
 class TestSampleSheetRows:
@@ -569,11 +566,13 @@ class TestGetSheetColumnStats:
                 mock_sheet.max_row = 1000
                 mock_sheet.iter_rows.side_effect = [
                     iter([("Name", "Age", "City")]),
-                    iter([
-                        ("Alice", 30, "NYC"),
-                        ("Bob", 25, "LA"),
-                        ("Charlie", 30, "NYC"),
-                    ]),
+                    iter(
+                        [
+                            ("Alice", 30, "NYC"),
+                            ("Bob", 25, "LA"),
+                            ("Charlie", 30, "NYC"),
+                        ]
+                    ),
                 ]
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]
@@ -600,7 +599,7 @@ class TestCountSheetRows:
         with patch.object(reading, "HAS_OPENPYXL", True):
             with patch.object(reading, "load_workbook") as mock_wb:
                 mock_sheet = MagicMock()
-                mock_sheet.max_row = 1001  # Including header
+                mock_sheet.max_row = 1001
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]
                 mock_wb.return_value.__getitem__.return_value = mock_sheet
@@ -611,7 +610,7 @@ class TestCountSheetRows:
 
                 result = reading.count_sheet_rows(str(test_file), "Sheet1", "", "")
 
-                assert result == 1000  # Excluding header
+                assert result == 1000
 
 
 class TestGetSheetValueCounts:
@@ -624,13 +623,15 @@ class TestGetSheetValueCounts:
                 mock_sheet = MagicMock()
                 mock_sheet.iter_rows.side_effect = [
                     iter([("Name", "City")]),
-                    iter([
-                        ("Alice", "NYC"),
-                        ("Bob", "LA"),
-                        ("Charlie", "NYC"),
-                        ("Dana", "NYC"),
-                        ("Eve", "SF"),
-                    ]),
+                    iter(
+                        [
+                            ("Alice", "NYC"),
+                            ("Bob", "LA"),
+                            ("Charlie", "NYC"),
+                            ("Dana", "NYC"),
+                            ("Eve", "SF"),
+                        ]
+                    ),
                 ]
 
                 mock_wb.return_value.sheetnames = ["Sheet1"]

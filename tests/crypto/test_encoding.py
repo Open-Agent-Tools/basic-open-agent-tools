@@ -53,7 +53,6 @@ class TestBase64Encode:
         assert result["original_data"] == unicode_string
         assert len(result["encoded_data"]) > 0
 
-        # Verify it can be decoded back
         decoded = base64.b64decode(result["encoded_data"]).decode("utf-8")
         assert decoded == unicode_string
 
@@ -134,10 +133,10 @@ class TestUrlEncode:
         result = url_encode(special_string)
 
         assert result["original_data"] == special_string
-        assert "%40" in result["encoded_data"]  # @ encoded
-        assert "%3F" in result["encoded_data"]  # ? encoded
-        assert "%3D" in result["encoded_data"]  # = encoded
-        assert "%26" in result["encoded_data"]  # & encoded
+        assert "%40" in result["encoded_data"]
+        assert "%3F" in result["encoded_data"]
+        assert "%3D" in result["encoded_data"]
+        assert "%26" in result["encoded_data"]
 
     def test_empty_string_url_encoding(self):
         """Test URL encoding of empty string."""
@@ -216,7 +215,6 @@ class TestHexEncode:
         assert result["original_data"] == unicode_string
         assert len(result["encoded_data"]) > 0
 
-        # Unicode characters should encode to multiple bytes
         assert len(result["encoded_data"]) > 2
 
     def test_special_characters_hex_encoding(self):
@@ -259,21 +257,20 @@ class TestHexDecode:
         with pytest.raises(
             BasicAgentToolsError, match="Hex string must have even number of characters"
         ):
-            hex_decode("68656c6c6")  # Missing last character
+            hex_decode("68656c6c6")
 
     def test_invalid_hex_characters(self):
         """Test error handling for invalid hex characters."""
         with pytest.raises(BasicAgentToolsError, match="Invalid hexadecimal string"):
-            hex_decode("68656c6g6f")  # 'g' is not a valid hex character
+            hex_decode("68656c6g6f")
 
     def test_invalid_utf8_sequence(self):
         """Test error handling for hex that doesn't decode to valid UTF-8."""
-        # This hex sequence represents invalid UTF-8
         with pytest.raises(
             BasicAgentToolsError,
             match="Decoded bytes do not represent valid UTF-8 text",
         ):
-            hex_decode("ff")  # 0xFF is not valid UTF-8
+            hex_decode("ff")
 
     def test_roundtrip_hex_encoding_decoding(self):
         """Test that hex encoding and decoding are inverse operations."""
@@ -286,12 +283,12 @@ class TestHexDecode:
 
     def test_uppercase_hex_decoding(self):
         """Test hex decoding with uppercase characters."""
-        result = hex_decode("48454C4C4F")  # "HELLO" in uppercase hex
+        result = hex_decode("48454C4C4F")
 
         assert result["decoded_data"] == "HELLO"
 
     def test_mixed_case_hex_decoding(self):
         """Test hex decoding with mixed case characters."""
-        result = hex_decode("48656C6c6F")  # Mixed case hex for "Hello"
+        result = hex_decode("48656C6c6F")
 
         assert result["decoded_data"] == "Hello"

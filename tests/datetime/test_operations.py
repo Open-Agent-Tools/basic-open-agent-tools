@@ -30,7 +30,7 @@ class TestGetCurrentDatetime:
         """Test getting current datetime in different timezone."""
         result = get_current_datetime("America/New_York")
         assert result.startswith("2025-07-08T")
-        assert "-04:00" in result or "-05:00" in result  # EST/EDT
+        assert "-04:00" in result or "-05:00" in result
 
     def test_get_current_datetime_invalid_timezone(self):
         """Test get_current_datetime with invalid timezone."""
@@ -84,7 +84,7 @@ class TestGetCurrentTime:
         """Test getting current time in different timezone."""
         result = get_current_time("America/New_York")
         assert ":" in result
-        assert len(result.split(":")) >= 3  # HH:MM:SS format
+        assert len(result.split(":")) >= 3
 
     def test_get_current_time_invalid_timezone(self):
         """Test get_current_time with invalid timezone."""
@@ -107,7 +107,7 @@ class TestIsValidIsoDate:
             "2000-01-01",
             "2024-12-31",
             "1999-02-28",
-            "2024-02-29",  # leap year
+            "2024-02-29",
         ]
         for date_str in valid_dates:
             assert is_valid_iso_date(date_str) is True
@@ -116,14 +116,14 @@ class TestIsValidIsoDate:
         """Test with invalid ISO date strings."""
         invalid_dates = [
             "invalid-date",
-            "2025-13-01",  # invalid month
-            "2025-12-32",  # invalid day
-            "2025-02-30",  # invalid day for February
-            "2023-02-29",  # not a leap year
-            "07-08-2025",  # wrong format
-            "2025/07/08",  # wrong separator
+            "2025-13-01",
+            "2025-12-32",
+            "2025-02-30",
+            "2023-02-29",
+            "07-08-2025",
+            "2025/07/08",
             "",
-            "2025-7-8",  # missing leading zeros
+            "2025-7-8",
         ]
         for date_str in invalid_dates:
             assert is_valid_iso_date(date_str) is False
@@ -153,18 +153,17 @@ class TestIsValidIsoTime:
         """Test with invalid ISO time strings."""
         invalid_times = [
             "invalid-time",
-            "25:00:00",  # invalid hour
-            "12:60:00",  # invalid minute
-            "12:30:60",  # invalid second
+            "25:00:00",
+            "12:60:00",
+            "12:30:60",
             "",
-            "2:30:45",  # missing leading zero
+            "2:30:45",
         ]
         for time_str in invalid_times:
             assert is_valid_iso_time(time_str) is False
 
-        # Python's fromisoformat() accepts these formats
-        assert is_valid_iso_time("12:30") is True  # HH:MM format
-        assert is_valid_iso_time("12:30:45:123") is True  # treats :123 as microseconds
+        assert is_valid_iso_time("12:30") is True
+        assert is_valid_iso_time("12:30:45:123") is True
 
     def test_non_string_input(self):
         """Test is_valid_iso_time with non-string input."""
@@ -192,20 +191,17 @@ class TestIsValidIsoDatetime:
         """Test with invalid ISO datetime strings."""
         invalid_datetimes = [
             "invalid-datetime",
-            "2025-07-08T25:30:45",  # invalid hour
-            "2025-13-08T14:30:45",  # invalid month
+            "2025-07-08T25:30:45",
+            "2025-13-08T14:30:45",
             "",
-            "14:30:45",  # time only
+            "14:30:45",
         ]
         for datetime_str in invalid_datetimes:
             assert is_valid_iso_datetime(datetime_str) is False
 
-        # Python's fromisoformat() accepts these formats
-        assert (
-            is_valid_iso_datetime("2025-07-08 14:30:45") is True
-        )  # space instead of T
-        assert is_valid_iso_datetime("2025-07-08T14:30") is True  # missing seconds
-        assert is_valid_iso_datetime("2025-07-08") is True  # date only (adds 00:00:00)
+        assert is_valid_iso_datetime("2025-07-08 14:30:45") is True
+        assert is_valid_iso_datetime("2025-07-08T14:30") is True
+        assert is_valid_iso_datetime("2025-07-08") is True
 
     def test_non_string_input(self):
         """Test is_valid_iso_datetime with non-string input."""
@@ -329,7 +325,6 @@ class TestDateTimeOperationsIntegration:
         original_date = "2025-07-08"
         days_to_add = 15
 
-        # Add days then subtract the same amount
         added_date = add_days(original_date, days_to_add)
         result_date = subtract_days(added_date, days_to_add)
 
@@ -337,7 +332,6 @@ class TestDateTimeOperationsIntegration:
 
     def test_multiple_timezone_consistency(self):
         """Test that date operations work consistently across timezones."""
-        # All should return valid dates regardless of timezone
         timezones = ["UTC", "America/New_York", "Europe/London", "Asia/Tokyo"]
 
         for tz in timezones:

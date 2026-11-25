@@ -134,7 +134,7 @@ class TestAddMinutes:
 
     def test_add_large_minutes(self):
         """Test adding large number of minutes."""
-        result = add_minutes("2025-07-08T14:30:45", 1440)  # 24 hours
+        result = add_minutes("2025-07-08T14:30:45", 1440)
         assert result == "2025-07-09T14:30:45"
 
     def test_invalid_datetime(self):
@@ -173,7 +173,7 @@ class TestSubtractMinutes:
 
     def test_subtract_large_minutes(self):
         """Test subtracting large number of minutes."""
-        result = subtract_minutes("2025-07-08T14:30:45", 1440)  # 24 hours
+        result = subtract_minutes("2025-07-08T14:30:45", 1440)
         assert result == "2025-07-07T14:30:45"
 
     def test_subtract_negative_minutes(self):

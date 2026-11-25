@@ -40,14 +40,12 @@ class TestGetFileInfo:
 
     def test_get_file_info_basic(self, tmp_path: Path) -> None:
         """Test getting basic file information."""
-        # Create test file
         test_file = tmp_path / "test.txt"
         test_content = "Hello, World!"
         test_file.write_text(test_content)
 
         result = get_file_info(str(test_file))
 
-        # Verify file info structure
         assert isinstance(result, dict)
         assert "name" in result
         assert "size" in result
@@ -68,7 +66,6 @@ class TestGetFileInfo:
 
         result = get_file_info(str(test_file))
 
-        # Check file properties
         assert result["name"] == "example.txt"
         assert result["size"] == len(test_content)
         assert result["is_file"] is True
@@ -87,7 +84,6 @@ class TestGetFileInfo:
 
         result = get_file_info(str(test_dir))
 
-        # Check directory properties
         assert result["name"] == "test_directory"
         assert result["is_file"] is False
         assert result["is_directory"] is True
@@ -125,20 +121,17 @@ class TestGetFileInfo:
     @skip_if_no_symlinks
     def test_get_file_info_symlink(self, tmp_path: Path) -> None:
         """Test getting info for symbolic link (follows symlink to target)."""
-        # Create target file
         target_file = tmp_path / "target.txt"
         target_file.write_text("target content")
 
-        # Create symlink
         symlink_file = tmp_path / "link.txt"
         symlink_file.symlink_to(target_file)
 
         result = get_file_info(str(symlink_file))
 
-        # Note: get_file_info follows symlinks, so returns target info
-        assert result["name"] == "target.txt"  # Target file name
-        assert result["is_symlink"] is False  # Target is not a symlink
-        assert result["is_file"] is True  # Target is a file
+        assert result["name"] == "target.txt"
+        assert result["is_symlink"] is False
+        assert result["is_file"] is True
         assert result["is_directory"] is False
         assert result["size"] == len("target content")
 
@@ -318,7 +311,6 @@ class TestIsEmptyDirectory:
         test_dir = tmp_path / "dir_with_files"
         test_dir.mkdir()
 
-        # Add a file
         (test_dir / "file.txt").touch()
 
         assert is_empty_directory(str(test_dir)) is False
@@ -328,7 +320,6 @@ class TestIsEmptyDirectory:
         test_dir = tmp_path / "dir_with_subdirs"
         test_dir.mkdir()
 
-        # Add a subdirectory
         (test_dir / "subdir").mkdir()
 
         assert is_empty_directory(str(test_dir)) is False
@@ -338,7 +329,6 @@ class TestIsEmptyDirectory:
         test_dir = tmp_path / "dir_with_hidden"
         test_dir.mkdir()
 
-        # Add a hidden file
         (test_dir / ".hidden").touch()
 
         assert is_empty_directory(str(test_dir)) is False
@@ -366,7 +356,6 @@ class TestIsEmptyDirectory:
         test_dir = tmp_path / "mixed_dir"
         test_dir.mkdir()
 
-        # Add multiple items
         (test_dir / "file1.txt").touch()
         (test_dir / "file2.txt").touch()
         (test_dir / "subdir1").mkdir()
@@ -375,7 +364,6 @@ class TestIsEmptyDirectory:
         assert is_empty_directory(str(test_dir)) is False
 
 
-# Integration tests
 class TestInfoIntegration:
     """Integration tests for info functions."""
 
@@ -385,7 +373,6 @@ class TestInfoIntegration:
         content = "Integration test content"
         test_file.write_text(content)
 
-        # Test all functions work together
         assert file_exists(str(test_file)) is True
         assert directory_exists(str(test_file)) is False
 
@@ -402,7 +389,6 @@ class TestInfoIntegration:
         test_dir = tmp_path / "workflow_dir"
         test_dir.mkdir()
 
-        # Test with empty directory
         assert directory_exists(str(test_dir)) is True
         assert file_exists(str(test_dir)) is False
         assert is_empty_directory(str(test_dir)) is True
@@ -412,7 +398,6 @@ class TestInfoIntegration:
         assert info["is_file"] is False
         assert info["name"] == "workflow_dir"
 
-        # Add content and test again
         (test_dir / "file.txt").touch()
         assert is_empty_directory(str(test_dir)) is False
 
@@ -420,11 +405,9 @@ class TestInfoIntegration:
         """Test all functions handle nonexistent paths consistently."""
         nonexistent = "/absolutely/nonexistent/path"
 
-        # These should return False
         assert file_exists(nonexistent) is False
         assert directory_exists(nonexistent) is False
 
-        # These should raise FileSystemError
         with pytest.raises(FileSystemError):
             get_file_info(nonexistent)
 
@@ -437,15 +420,12 @@ class TestInfoIntegration:
     @skip_if_no_symlinks
     def test_symlink_consistency(self, tmp_path: Path) -> None:
         """Test all functions handle symlinks consistently."""
-        # Create target file
         target = tmp_path / "target.txt"
         target.write_text("target content")
 
-        # Create symlink
         link = tmp_path / "link.txt"
         link.symlink_to(target)
 
-        # Test consistency across functions (all follow symlinks)
         assert file_exists(str(link)) is True
         assert directory_exists(str(link)) is False
 
@@ -453,6 +433,6 @@ class TestInfoIntegration:
         info = get_file_info(str(link))
 
         assert info["size"] == size
-        assert info["is_symlink"] is False  # Reports target, not symlink
+        assert info["is_symlink"] is False
         assert info["is_file"] is True
         assert size == len("target content")

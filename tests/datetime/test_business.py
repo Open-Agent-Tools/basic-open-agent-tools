@@ -13,33 +13,33 @@ class TestGetNextBusinessDay:
 
     def test_friday_to_monday(self):
         """Test next business day after Friday is Monday."""
-        result = get_next_business_day("2025-07-04")  # Friday
-        assert result == "2025-07-07"  # Monday
+        result = get_next_business_day("2025-07-04")
+        assert result == "2025-07-07"
 
     def test_saturday_to_monday(self):
         """Test next business day after Saturday is Monday."""
-        result = get_next_business_day("2025-07-05")  # Saturday
-        assert result == "2025-07-07"  # Monday
+        result = get_next_business_day("2025-07-05")
+        assert result == "2025-07-07"
 
     def test_sunday_to_monday(self):
         """Test next business day after Sunday is Monday."""
-        result = get_next_business_day("2025-07-06")  # Sunday
-        assert result == "2025-07-07"  # Monday
+        result = get_next_business_day("2025-07-06")
+        assert result == "2025-07-07"
 
     def test_monday_to_tuesday(self):
         """Test next business day after Monday is Tuesday."""
-        result = get_next_business_day("2025-07-07")  # Monday
-        assert result == "2025-07-08"  # Tuesday
+        result = get_next_business_day("2025-07-07")
+        assert result == "2025-07-08"
 
     def test_thursday_to_friday(self):
         """Test next business day after Thursday is Friday."""
-        result = get_next_business_day("2025-07-03")  # Thursday
-        assert result == "2025-07-04"  # Friday
+        result = get_next_business_day("2025-07-03")
+        assert result == "2025-07-04"
 
     def test_year_boundary(self):
         """Test next business day across year boundary."""
-        result = get_next_business_day("2024-12-31")  # Tuesday
-        assert result == "2025-01-01"  # Wednesday
+        result = get_next_business_day("2024-12-31")
+        assert result == "2025-01-01"
 
     def test_invalid_date(self):
         """Test with invalid date format."""

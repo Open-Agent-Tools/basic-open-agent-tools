@@ -5,7 +5,7 @@ import re
 
 from ..decorators import strands_tool
 
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB limit
+MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
 @strands_tool
@@ -48,7 +48,6 @@ def create_plantuml_class_diagram(
 
     lines = ["@startuml", ""]
 
-    # Generate classes
     for cls in classes:
         name = cls.get("name", "Unknown")
         attributes = cls.get("attributes", "")
@@ -68,7 +67,6 @@ def create_plantuml_class_diagram(
         lines.append("}")
         lines.append("")
 
-    # Generate relationships
     for rel in relationships:
         if not isinstance(rel, dict):
             raise TypeError("each relationship must be a dict")
@@ -80,7 +78,6 @@ def create_plantuml_class_diagram(
         if not from_class or not to_class:
             continue
 
-        # Map relationship types to PlantUML syntax
         rel_syntax = {
             "inheritance": "<|--",
             "composition": "*--",
@@ -134,13 +131,11 @@ def create_plantuml_sequence_diagram(
 
     lines = ["@startuml", ""]
 
-    # Declare participants
     for participant in participants:
         lines.append(f"participant {participant}")
 
     lines.append("")
 
-    # Generate interactions
     for inter in interactions:
         if not isinstance(inter, dict):
             raise TypeError("each interaction must be a dict")
@@ -148,7 +143,7 @@ def create_plantuml_sequence_diagram(
         from_p = inter.get("from", "")
         to_p = inter.get("to", "")
         message = inter.get("message", "")
-        arrow = inter.get("arrow", "->")  # Optional arrow style
+        arrow = inter.get("arrow", "->")
 
         if from_p and to_p and message:
             lines.append(f"{from_p} {arrow} {to_p}: {message}")
@@ -192,7 +187,6 @@ def create_plantuml_activity_diagram(
 
     lines = ["@startuml", ""]
 
-    # Generate activities
     for act in activities:
         if not isinstance(act, dict):
             raise TypeError("each activity must be a dict")
@@ -248,7 +242,6 @@ def create_plantuml_component_diagram(
 
     lines = ["@startuml", ""]
 
-    # Generate components
     for comp in components:
         if not isinstance(comp, dict):
             raise TypeError("each component must be a dict")
@@ -263,7 +256,6 @@ def create_plantuml_component_diagram(
 
     lines.append("")
 
-    # Generate connections
     for conn in connections:
         if not isinstance(conn, dict):
             raise TypeError("each connection must be a dict")
@@ -316,7 +308,6 @@ def parse_plantuml_file(file_path: str) -> dict[str, str]:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
-        # Detect diagram type
         diagram_type = "unknown"
         if "class " in content:
             diagram_type = "class"
@@ -327,7 +318,6 @@ def parse_plantuml_file(file_path: str) -> dict[str, str]:
         elif "start" in content and "stop" in content:
             diagram_type = "activity"
 
-        # Extract elements
         elements: list[str] = []
         for line in content.split("\n"):
             line = line.strip()
@@ -417,7 +407,6 @@ def validate_plantuml_syntax(diagram_content: str) -> bool:
     if not isinstance(diagram_content, str):
         raise TypeError("diagram_content must be a string")
 
-    # Basic validation checks
     has_start = "@startuml" in diagram_content
     has_end = "@enduml" in diagram_content
 
@@ -448,19 +437,15 @@ def extract_plantuml_elements(diagram_content: str) -> list[str]:
 
     elements: list[str] = []
 
-    # Extract class names
     for match in re.finditer(r"class\s+(\w+)", diagram_content):
         elements.append(match.group(1))
 
-    # Extract participant names
     for match in re.finditer(r"participant\s+(\w+)", diagram_content):
         elements.append(match.group(1))
 
-    # Extract component names
     for match in re.finditer(r"component\s+(\w+)", diagram_content):
         elements.append(match.group(1))
 
-    # Extract interface names
     for match in re.finditer(r"interface\s+(\w+)", diagram_content):
         elements.append(match.group(1))
 

@@ -185,8 +185,7 @@ class TestHashFile:
 
     def test_large_file_chunked_reading(self):
         """Test that large files are read in chunks."""
-        # Create a file larger than typical chunk size
-        large_content = "x" * (100 * 1024)  # 100KB
+        large_content = "x" * (100 * 1024)
 
         with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
             f.write(large_content)
@@ -244,7 +243,7 @@ class TestVerifyChecksum:
     def test_successful_checksum_verification_valid(self):
         """Test successful checksum verification with valid hash."""
         data = "hello world"
-        expected_hash = "5eb63bbbe01eeed093cb22bb8f5acdc3"  # MD5 of "hello world"
+        expected_hash = "5eb63bbbe01eeed093cb22bb8f5acdc3"
 
         result = verify_checksum(data, expected_hash, algorithm="md5")
 
@@ -258,7 +257,7 @@ class TestVerifyChecksum:
     def test_successful_checksum_verification_invalid(self):
         """Test successful checksum verification with invalid hash."""
         data = "hello world"
-        wrong_hash = "0000000000000000000000000000000"  # Wrong MD5 hash
+        wrong_hash = "0000000000000000000000000000000"
 
         result = verify_checksum(data, wrong_hash, algorithm="md5")
 
@@ -269,7 +268,7 @@ class TestVerifyChecksum:
     def test_case_insensitive_hash_comparison(self):
         """Test that hash comparison is case-insensitive."""
         data = "hello world"
-        uppercase_hash = "5EB63BBBE01EEED093CB22BB8F5ACDC3"  # MD5 in uppercase
+        uppercase_hash = "5EB63BBBE01EEED093CB22BB8F5ACDC3"
 
         result = verify_checksum(data, uppercase_hash, algorithm="md5")
 

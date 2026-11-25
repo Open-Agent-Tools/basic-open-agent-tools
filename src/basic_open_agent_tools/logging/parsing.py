@@ -18,7 +18,6 @@ def _parse_json_log_line(line: str) -> Optional[dict[str, Any]]:
 
 def _parse_syslog_line(line: str) -> Optional[dict[str, str]]:
     """Parse a syslog format line."""
-    # Format: <timestamp> <hostname> <process>[<pid>]: <message>
     pattern = r"^(\w+\s+\d+\s+\d+:\d+:\d+)\s+(\S+)\s+(\S+?)(?:\[(\d+)\])?:\s+(.+)$"
     match = re.match(pattern, line)
     if match:
@@ -34,7 +33,6 @@ def _parse_syslog_line(line: str) -> Optional[dict[str, str]]:
 
 def _parse_common_log_line(line: str) -> Optional[dict[str, str]]:
     """Parse common log format (CLF) line."""
-    # Format: host ident authuser date request status bytes
     pattern = r'^(\S+) (\S+) (\S+) \[([^\]]+)\] "([^"]+)" (\d+) (\S+)'
     match = re.match(pattern, line)
     if match:
@@ -52,7 +50,6 @@ def _parse_common_log_line(line: str) -> Optional[dict[str, str]]:
 
 def _parse_keyvalue_log_line(line: str) -> Optional[dict[str, str]]:
     """Parse key=value format log line."""
-    # Format: key1=value1 key2=value2 ...
     pattern = r"(\w+)=(?:\"([^\"]*)\"|([^\s]*))"
     matches = re.findall(pattern, line)
     if matches:
@@ -116,7 +113,6 @@ def detect_log_format(file_path: str, sample_lines: int) -> str:
                 format_type = _detect_format(line)
                 formats[format_type] = formats.get(format_type, 0) + 1
 
-        # Return most common format
         if formats:
             return max(formats.items(), key=lambda x: x[1])[0]
         return "plain"
@@ -183,11 +179,10 @@ def parse_log_entries(
                     parsed = _parse_common_log_line(line)
                 elif log_format == "keyvalue":
                     parsed = _parse_keyvalue_log_line(line)
-                else:  # plain
+                else:
                     parsed = {"line": line}
 
                 if parsed:
-                    # Convert any non-string values to strings for JSON serialization
                     str_parsed = {k: str(v) for k, v in parsed.items()}
                     entries.append(str_parsed)
 
@@ -242,7 +237,6 @@ def filter_log_entries(
     if not isinstance(max_results, int):
         raise TypeError("max_results must be an integer")
 
-    # Parse all entries then filter
     all_entries = parse_log_entries(file_path, log_format, -1)
 
     filter_lower = filter_value.lower()
@@ -292,7 +286,6 @@ def get_log_errors(
     if not isinstance(max_errors, int):
         raise TypeError("max_errors must be an integer")
 
-    # Parse all entries
     all_entries = parse_log_entries(file_path, log_format, -1)
 
     errors: list[dict[str, str]] = []
@@ -302,7 +295,6 @@ def get_log_errors(
         if max_errors != -1 and len(errors) >= max_errors:
             break
 
-        # Check common level field names
         found_level = False
         for level_field in ["level", "severity", "loglevel", "priority"]:
             if level_field in entry:
@@ -311,7 +303,6 @@ def get_log_errors(
                     found_level = True
                     break
 
-        # Also check if message contains error keywords
         if not found_level and "message" in entry:
             msg_lower = entry["message"].lower()
             if any(
@@ -363,7 +354,6 @@ def search_log_messages(
     except re.error as e:
         raise ValueError(f"Invalid regex pattern: {e}")
 
-    # Parse all entries
     all_entries = parse_log_entries(file_path, log_format, -1)
 
     results: list[dict[str, str]] = []
@@ -372,7 +362,6 @@ def search_log_messages(
         if max_results != -1 and len(results) >= max_results:
             break
 
-        # Search in message field or line field
         for msg_field in ["message", "msg", "line", "text"]:
             if msg_field in entry:
                 if pattern.search(entry[msg_field]):
@@ -416,30 +405,25 @@ def get_log_summary(file_path: str, log_format: str) -> dict[str, str]:
     if not isinstance(log_format, str):
         raise TypeError("log_format must be a string")
 
-    # Parse all entries
     all_entries = parse_log_entries(file_path, log_format, -1)
 
     level_counts: dict[str, int] = {}
     has_timestamps = False
 
     for entry in all_entries:
-        # Count by level
         for level_field in ["level", "severity", "loglevel", "priority"]:
             if level_field in entry:
                 level = entry[level_field].lower()
                 level_counts[level] = level_counts.get(level, 0) + 1
 
-        # Check for timestamps
         if any(key in entry for key in ["timestamp", "time", "date", "datetime"]):
             has_timestamps = True
 
-    # Convert to string values
     summary = {
         "total_entries": str(len(all_entries)),
         "has_timestamps": str(has_timestamps).lower(),
     }
 
-    # Add level counts
     for level, count in level_counts.items():
         summary[f"{level}_count"] = str(count)
 
@@ -489,7 +473,6 @@ def sample_log_entries(
     if method == "first":
         return parse_log_entries(file_path, log_format, sample_size)  # type: ignore[no-any-return]
 
-    # For random and systematic, need all entries
     all_entries = parse_log_entries(file_path, log_format, -1)
 
     if len(all_entries) <= sample_size:
@@ -498,7 +481,6 @@ def sample_log_entries(
     if method == "random":
         return random.sample(all_entries, sample_size)  # type: ignore[no-any-return]
 
-    # Systematic sampling
     step = len(all_entries) // sample_size
     return [all_entries[i * step] for i in range(sample_size)]  # type: ignore[no-any-return]
 
@@ -535,7 +517,6 @@ def get_log_time_range(file_path: str, log_format: str) -> dict[str, str]:
     if not isinstance(log_format, str):
         raise TypeError("log_format must be a string")
 
-    # Parse all entries
     all_entries = parse_log_entries(file_path, log_format, -1)
 
     timestamps = []
@@ -599,14 +580,11 @@ def count_log_entries(
     if not isinstance(filter_value, str):
         raise TypeError("filter_value must be a string")
 
-    # Parse all entries
     all_entries = parse_log_entries(file_path, log_format, -1)
 
-    # No filter
     if not filter_field or not filter_value:
         return len(all_entries)
 
-    # With filter
     count = 0
     filter_lower = filter_value.lower()
 
@@ -654,17 +632,15 @@ def extract_log_fields(
     if not isinstance(max_entries, int):
         raise TypeError("max_entries must be an integer")
 
-    # Parse entries
     all_entries = parse_log_entries(file_path, log_format, max_entries)
 
-    # Extract only specified fields
     result = []
     for entry in all_entries:
         extracted = {}
         for field in field_names:
             if field in entry:
                 extracted[field] = entry[field]
-        if extracted:  # Only include if at least one field was found
+        if extracted:
             result.append(extracted)
 
     return result

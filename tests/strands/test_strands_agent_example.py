@@ -10,7 +10,6 @@ from pathlib import Path
 
 import pytest
 
-# Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 import basic_open_agent_tools as boat
@@ -35,7 +34,6 @@ class TestStrandsAgentExample:
         if not api_key:
             pytest.skip("ANTHROPIC_API_KEY required for full agent test")
 
-        # Create Anthropic model
         model = AnthropicModel(
             client_args={"api_key": api_key},
             model_id="claude-sonnet-4-20250514",
@@ -43,7 +41,6 @@ class TestStrandsAgentExample:
             params={"temperature": 0.7},
         )
 
-        # Load comprehensive tool set
         file_tools = boat.load_all_filesystem_tools()
         text_tools = boat.load_all_text_tools()
         data_tools = boat.load_all_data_tools()
@@ -52,18 +49,16 @@ class TestStrandsAgentExample:
         network_tools = boat.load_all_network_tools()
         utilities_tools = boat.load_all_utilities_tools()
 
-        # Merge tools for comprehensive agent
         agent_tools = boat.merge_tool_lists(
             file_tools,
             text_tools,
-            data_tools[:10],  # Limit data tools to prevent too many
-            datetime_tools[:10],  # Limit datetime tools
-            crypto_tools[:5],  # Limit crypto tools
+            data_tools[:10],
+            datetime_tools[:10],
+            crypto_tools[:5],
             network_tools,
-            utilities_tools[:3],  # Limit utilities
+            utilities_tools[:3],
         )
 
-        # Create comprehensive Strands agent
         agent = Agent(
             model=model,
             name="Basic Tools Agent",
@@ -84,11 +79,9 @@ class TestStrandsAgentExample:
             tools=agent_tools,
         )
 
-        # Validate agent creation
         assert agent is not None
         assert agent.name == "Basic Tools Agent"
 
-        # Test basic functionality
         try:
             response = agent(
                 "Hello! Please introduce yourself and tell me about your capabilities."
@@ -111,7 +104,6 @@ class TestStrandsAgentExample:
         if not api_key:
             pytest.skip("ANTHROPIC_API_KEY required for file operations test")
 
-        # Create model
         model = AnthropicModel(
             client_args={"api_key": api_key},
             model_id="claude-sonnet-4-20250514",
@@ -119,10 +111,8 @@ class TestStrandsAgentExample:
             params={"temperature": 0.1},
         )
 
-        # Load just file system tools for focused testing
         file_tools = boat.load_all_filesystem_tools()
 
-        # Create file-focused agent
         agent = Agent(
             model=model,
             name="FileOps Agent",
@@ -137,7 +127,6 @@ class TestStrandsAgentExample:
 
         assert agent is not None
 
-        # Test agent understanding of file operations
         try:
             response = agent("What file operations can you perform?")
             assert isinstance(response, str)
@@ -155,11 +144,9 @@ class TestStrandsAgentExample:
         except ImportError:
             pytest.skip("Strands framework not installed")
 
-        # Test pattern 1: Single category tools
         text_tools = boat.load_all_text_tools()
         assert len(text_tools) > 0
 
-        # Test pattern 2: Merged categories
         mixed_tools = boat.merge_tool_lists(
             boat.load_all_filesystem_tools()[:3],
             boat.load_all_text_tools()[:3],
@@ -167,17 +154,11 @@ class TestStrandsAgentExample:
         )
         assert len(mixed_tools) == 8
 
-        # Test pattern 3: All tools (limited for testing)
         try:
-            # This would be too many tools for most agents, but test loading works
             all_tools = boat.load_all_tools()
             assert len(all_tools) > 100
 
-            # Use just first 20 tools for actual agent testing
             all_tools[:20]
-
-            # Could create agent with limited_tools if API key available
-            # This validates the integration pattern works
 
         except Exception as e:
             pytest.skip(f"All tools loading failed: {e}")
@@ -287,7 +268,6 @@ if __name__ == "__main__":
     main()
 '''
 
-    # Write example file to examples directory if it exists
     examples_dir = Path(__file__).parent.parent.parent / "examples"
     if examples_dir.exists():
         example_file = examples_dir / "strands_agent_example.py"
@@ -297,8 +277,6 @@ if __name__ == "__main__":
 
 
 if __name__ == "__main__":
-    # Run tests
     pytest.main([__file__, "-v"])
 
-    # Create example file
     create_example_strands_agent_file()

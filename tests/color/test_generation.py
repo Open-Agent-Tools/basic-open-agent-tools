@@ -18,7 +18,6 @@ class TestLightenColor:
     def test_basic_lighten(self) -> None:
         """Test basic lightening."""
         result = lighten_color("#808080", 20)
-        # Should be lighter than original
         orig_rgb = hex_to_rgb("#808080")
         new_rgb = hex_to_rgb(result)
         assert new_rgb["r"] >= orig_rgb["r"]
@@ -28,14 +27,12 @@ class TestLightenColor:
     def test_lighten_to_white(self) -> None:
         """Test lightening near-white color."""
         result = lighten_color("#F0F0F0", 50)
-        # Should cap at white
         assert result == "#FFFFFF"
 
     def test_zero_percent(self) -> None:
         """Test zero percent lightening."""
         original = "#FF5733"
         result = lighten_color(original, 0)
-        # Should return same color
         orig_rgb = hex_to_rgb(original)
         result_rgb = hex_to_rgb(result)
         assert abs(orig_rgb["r"] - result_rgb["r"]) <= 1
@@ -74,7 +71,6 @@ class TestDarkenColor:
     def test_basic_darken(self) -> None:
         """Test basic darkening."""
         result = darken_color("#808080", 20)
-        # Should be darker than original
         orig_rgb = hex_to_rgb("#808080")
         new_rgb = hex_to_rgb(result)
         assert new_rgb["r"] <= orig_rgb["r"]
@@ -84,14 +80,12 @@ class TestDarkenColor:
     def test_darken_to_black(self) -> None:
         """Test darkening near-black color."""
         result = darken_color("#0F0F0F", 50)
-        # Should cap at black
         assert result == "#000000"
 
     def test_zero_percent(self) -> None:
         """Test zero percent darkening."""
         original = "#FF5733"
         result = darken_color(original, 0)
-        # Should return same color
         orig_rgb = hex_to_rgb(original)
         result_rgb = hex_to_rgb(result)
         assert abs(orig_rgb["r"] - result_rgb["r"]) <= 1
@@ -107,7 +101,6 @@ class TestDarkenColor:
         orig_rgb = hex_to_rgb(original)
         back_rgb = hex_to_rgb(back)
 
-        # Should be very close (allow small rounding)
         assert abs(orig_rgb["r"] - back_rgb["r"]) <= 2
         assert abs(orig_rgb["g"] - back_rgb["g"]) <= 2
         assert abs(orig_rgb["b"] - back_rgb["b"]) <= 2
@@ -130,26 +123,22 @@ class TestAdjustSaturation:
 
     def test_increase_saturation(self) -> None:
         """Test increasing saturation."""
-        # Start with muted color
         original = "#808080"
         result = adjust_saturation(original, 50)
 
         orig_hsl = rgb_to_hsl(*hex_to_rgb(original).values())
         result_hsl = rgb_to_hsl(*hex_to_rgb(result).values())
 
-        # Saturation should increase
         assert result_hsl["s"] >= orig_hsl["s"]
 
     def test_decrease_saturation(self) -> None:
         """Test decreasing saturation."""
-        # Start with vivid color
         original = "#FF0000"
         result = adjust_saturation(original, -50)
 
         orig_hsl = rgb_to_hsl(*hex_to_rgb(original).values())
         result_hsl = rgb_to_hsl(*hex_to_rgb(result).values())
 
-        # Saturation should decrease
         assert result_hsl["s"] <= orig_hsl["s"]
 
     def test_zero_saturation(self) -> None:
@@ -158,7 +147,6 @@ class TestAdjustSaturation:
         result = adjust_saturation(original, -100)
 
         result_hsl = rgb_to_hsl(*hex_to_rgb(result).values())
-        # Should be grayscale
         assert result_hsl["s"] == 0
 
     def test_maximum_saturation(self) -> None:
@@ -167,7 +155,6 @@ class TestAdjustSaturation:
         result = adjust_saturation(original, 100)
 
         result_hsl = rgb_to_hsl(*hex_to_rgb(result).values())
-        # Should be at or near maximum
         assert result_hsl["s"] >= 90
 
     def test_zero_percent(self) -> None:
@@ -178,7 +165,6 @@ class TestAdjustSaturation:
         orig_rgb = hex_to_rgb(original)
         result_rgb = hex_to_rgb(result)
 
-        # Should be same color
         assert abs(orig_rgb["r"] - result_rgb["r"]) <= 1
         assert abs(orig_rgb["g"] - result_rgb["g"]) <= 1
         assert abs(orig_rgb["b"] - result_rgb["b"]) <= 1
@@ -215,12 +201,10 @@ class TestGeneratePalette:
         assert result["count"] == 5
         assert len(result["colors"]) == 5
 
-        # All colors should have same hue
         base_hsl = rgb_to_hsl(*hex_to_rgb("#FF5733").values())
 
         for color in result["colors"]:
             color_hsl = rgb_to_hsl(*hex_to_rgb(color).values())
-            # Allow small hue variation due to rounding
             assert abs(color_hsl["h"] - base_hsl["h"]) <= 5
 
     def test_analogous(self) -> None:
@@ -230,16 +214,14 @@ class TestGeneratePalette:
         assert result["scheme"] == "analogous"
         assert len(result["colors"]) == 5
 
-        # Colors should have similar hues (within ±30 degrees)
         base_hsl = rgb_to_hsl(*hex_to_rgb("#FF5733").values())
 
         for color in result["colors"]:
             color_hsl = rgb_to_hsl(*hex_to_rgb(color).values())
             hue_diff = abs(color_hsl["h"] - base_hsl["h"])
-            # Account for wrap-around
             if hue_diff > 180:
                 hue_diff = 360 - hue_diff
-            assert hue_diff <= 35  # Allow some margin
+            assert hue_diff <= 35
 
     def test_complementary(self) -> None:
         """Test complementary palette."""
@@ -248,10 +230,8 @@ class TestGeneratePalette:
         assert result["scheme"] == "complementary"
         assert len(result["colors"]) >= 2
 
-        # Should include base and its complement
         base_hsl = rgb_to_hsl(*hex_to_rgb("#FF5733").values())
 
-        # Check that at least one color is ~180 degrees away
         found_complement = False
         for color in result["colors"]:
             color_hsl = rgb_to_hsl(*hex_to_rgb(color).values())
@@ -269,18 +249,15 @@ class TestGeneratePalette:
         assert result["scheme"] == "triadic"
         assert len(result["colors"]) == 6
 
-        # Should have colors ~120 degrees apart
         hues = []
-        for color in result["colors"][:3]:  # First 3 should be the triad
+        for color in result["colors"][:3]:
             color_hsl = rgb_to_hsl(*hex_to_rgb(color).values())
             hues.append(color_hsl["h"])
 
-        # Check spacing (allowing for rounding and variations)
         base_hue = hues[0]
         for hue in hues[1:3]:
             diff = abs(hue - base_hue)
-            # Should be ~120 or ~240 degrees away
-            assert diff >= 100 or diff <= 20  # Account for wrap-around
+            assert diff >= 100 or diff <= 20
 
     def test_split_complementary(self) -> None:
         """Test split complementary palette."""
@@ -289,10 +266,8 @@ class TestGeneratePalette:
         assert result["scheme"] == "split_complementary"
         assert len(result["colors"]) >= 3
 
-        # Should have base plus two colors near the complement
         base_hsl = rgb_to_hsl(*hex_to_rgb(result["colors"][0]).values())
 
-        # Check for colors near the complement (180° ± 30°)
         near_complement_count = 0
         for color in result["colors"][1:3]:
             color_hsl = rgb_to_hsl(*hex_to_rgb(color).values())
@@ -300,7 +275,6 @@ class TestGeneratePalette:
             if hue_diff > 180:
                 hue_diff = 360 - hue_diff
 
-            # Should be 150-210 degrees away (180° ± 30°)
             if 140 <= hue_diff <= 220:
                 near_complement_count += 1
 
@@ -318,11 +292,9 @@ class TestGeneratePalette:
 
     def test_scheme_normalization(self) -> None:
         """Test scheme name normalization."""
-        # Should accept hyphenated
         result1 = generate_palette("#FF5733", "split-complementary", 5)
         assert result1["scheme"] == "split_complementary"
 
-        # Should accept underscored
         result2 = generate_palette("#FF5733", "split_complementary", 5)
         assert result2["scheme"] == "split_complementary"
 

@@ -16,7 +16,6 @@ except ImportError:
     HAS_PYTHON_DOCX = False
 
 
-# Maximum file size to prevent memory exhaustion (50MB default)
 MAX_DOCX_FILE_SIZE = 50 * 1024 * 1024
 
 
@@ -57,11 +56,9 @@ def extract_text_from_docx(file_path: str) -> str:
     if not file_path.strip():
         raise ValueError("file_path cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Word document not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_DOCX_FILE_SIZE:
         raise ValueError(
@@ -69,14 +66,12 @@ def extract_text_from_docx(file_path: str) -> str:
             f"(maximum: {MAX_DOCX_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read Word document: {file_path}")
 
     try:
         doc = Document(file_path)
 
-        # Extract text from all paragraphs
         text_parts = []
         for paragraph in doc.paragraphs:
             if paragraph.text.strip():
@@ -124,11 +119,9 @@ def get_docx_paragraphs(file_path: str) -> list[str]:
     if not file_path.strip():
         raise ValueError("file_path cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Word document not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_DOCX_FILE_SIZE:
         raise ValueError(
@@ -139,7 +132,6 @@ def get_docx_paragraphs(file_path: str) -> list[str]:
     try:
         doc = Document(file_path)
 
-        # Extract all paragraphs
         paragraphs = []
         for paragraph in doc.paragraphs:
             paragraphs.append(paragraph.text)
@@ -186,14 +178,12 @@ def get_docx_tables(file_path: str) -> list[list[list[str]]]:
     if not file_path.strip():
         raise ValueError("file_path cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Word document not found: {file_path}")
 
     try:
         doc = Document(file_path)
 
-        # Extract all tables
         tables = []
         for table in doc.tables:
             table_data = []
@@ -252,7 +242,6 @@ def get_docx_metadata(file_path: str) -> dict[str, str]:
     if not file_path.strip():
         raise ValueError("file_path cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Word document not found: {file_path}")
 
@@ -324,7 +313,6 @@ def search_docx_text(
     if not search_term.strip():
         raise ValueError("search_term cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Word document not found: {file_path}")
 
@@ -335,7 +323,6 @@ def search_docx_text(
         for para_index, paragraph in enumerate(doc.paragraphs):
             para_text = paragraph.text
 
-            # Prepare text for searching
             search_text = para_text if case_sensitive else para_text.lower()
             search_for = search_term if case_sensitive else search_term.lower()
 
@@ -394,7 +381,6 @@ def get_docx_info(file_path: str) -> dict[str, object]:
     if not file_path.strip():
         raise ValueError("file_path cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Word document not found: {file_path}")
 
@@ -402,7 +388,6 @@ def get_docx_info(file_path: str) -> dict[str, object]:
         doc = Document(file_path)
         file_size = os.path.getsize(file_path)
 
-        # Get metadata
         core_props = doc.core_properties
         metadata_dict: dict[str, str] = {
             "author": str(core_props.author) if core_props.author else "",

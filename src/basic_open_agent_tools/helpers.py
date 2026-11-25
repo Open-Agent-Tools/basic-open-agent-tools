@@ -41,7 +41,6 @@ def load_all_filesystem_tools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Get all functions from file_system module
     for name in file_system.__all__:
         func = getattr(file_system, name)
         if callable(func):
@@ -63,7 +62,6 @@ def load_all_text_tools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Get all functions from text module
     for name in text.__all__:
         func = getattr(text, name)
         if callable(func):
@@ -85,7 +83,6 @@ def load_all_data_tools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Get all functions from data module
     for name in data.__all__:
         func = getattr(data, name)
         if callable(func):
@@ -107,7 +104,6 @@ def load_all_datetime_tools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Get all functions from datetime module
     for name in datetime.__all__:
         func = getattr(datetime, name)
         if callable(func):
@@ -189,7 +185,6 @@ def load_all_network_tools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Get all functions from network module
     for name in network.__all__:
         func = getattr(network, name)
         if callable(func):
@@ -211,7 +206,6 @@ def load_all_utilities_tools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Get all functions from utilities module
     for name in utilities.__all__:
         func = getattr(utilities, name)
         if callable(func):
@@ -477,27 +471,27 @@ def load_all_tools() -> list[Callable[..., Any]]:
         >>> agent = Agent(tools=load_all_tools())
     """
     return merge_tool_lists(
-        load_all_filesystem_tools(),  # 18 functions
-        load_all_text_tools(),  # 10 functions
-        load_all_data_tools(),  # 23 functions
-        load_all_datetime_tools(),  # 40 functions
-        load_all_network_tools(),  # 3 functions
-        load_all_utilities_tools(),  # 3 functions
-        load_all_system_tools(),  # ~20 functions
-        load_all_crypto_tools(),  # ~13 functions
-        load_all_archive_tools(),  # 5 functions
-        load_all_logging_tools(),  # 5 functions
-        load_all_todo_tools(),  # 8 functions
-        load_all_xml_tools(),  # 24 functions
-        load_all_pdf_tools(),  # 20 functions
-        load_all_word_tools(),  # 18 functions
-        load_all_excel_tools(),  # 24 functions
-        load_all_markdown_tools(),  # 12 functions
-        load_all_html_tools(),  # 17 functions
-        load_all_powerpoint_tools(),  # 10 functions
-        load_all_image_tools(),  # 12 functions
-        load_all_diagrams_tools(),  # 16 functions
-        load_all_color_tools(),  # 14 functions
+        load_all_filesystem_tools(),
+        load_all_text_tools(),
+        load_all_data_tools(),
+        load_all_datetime_tools(),
+        load_all_network_tools(),
+        load_all_utilities_tools(),
+        load_all_system_tools(),
+        load_all_crypto_tools(),
+        load_all_archive_tools(),
+        load_all_logging_tools(),
+        load_all_todo_tools(),
+        load_all_xml_tools(),
+        load_all_pdf_tools(),
+        load_all_word_tools(),
+        load_all_excel_tools(),
+        load_all_markdown_tools(),
+        load_all_html_tools(),
+        load_all_powerpoint_tools(),
+        load_all_image_tools(),
+        load_all_diagrams_tools(),
+        load_all_color_tools(),
     )
 
 
@@ -653,7 +647,6 @@ def load_core_readonly() -> list[Callable[..., Any]]:
 
     tools: list[Callable[..., Any]] = []
 
-    # File system read operations (9 tools)
     from .file_system import (
         directory_exists,
         file_exists,
@@ -680,21 +673,16 @@ def load_core_readonly() -> list[Callable[..., Any]]:
         ]
     )
 
-    # All text processing tools (10 tools - all are read-only transformations)
     tools.extend(load_all_text_tools())
 
-    # Data format readers and validators (8 tools)
-    # CSV tools
     tools.append(csv_tools.read_csv_simple)
     tools.append(csv_tools.csv_to_dict_list)
     tools.append(csv_tools.detect_csv_delimiter)
     tools.append(csv_tools.validate_csv_structure)
 
-    # JSON tools
     tools.append(json_tools.safe_json_deserialize)
     tools.append(json_tools.validate_json_string)
 
-    # Config file readers
     tools.append(config_processing.read_yaml_file)
     tools.append(config_processing.read_toml_file)
     tools.append(config_processing.read_ini_file)
@@ -730,16 +718,12 @@ def load_converters() -> list[Callable[..., Any]]:
     """
     tools: list[Callable[..., Any]] = []
 
-    # All text processing (10 tools - all pure transformations)
     tools.extend(load_all_text_tools())
 
-    # All datetime tools (40 tools - all pure transformations)
     tools.extend(load_all_datetime_tools())
 
-    # All crypto tools (14 tools - hashing, encoding, UUIDs)
     tools.extend(load_all_crypto_tools())
 
-    # All color tools (14 tools - color conversions, palettes)
     tools.extend(load_all_color_tools())
 
     return tools
@@ -797,7 +781,6 @@ def load_document_readers() -> list[Callable[..., Any]]:
 
     tools: list[Callable[..., Any]] = []
 
-    # PDF reading (4 core extraction tools)
     tools.extend(
         [
             extract_text_from_pdf,
@@ -807,7 +790,6 @@ def load_document_readers() -> list[Callable[..., Any]]:
         ]
     )
 
-    # Word reading (3 core extraction tools)
     tools.extend(
         [
             extract_text_from_docx,
@@ -816,7 +798,6 @@ def load_document_readers() -> list[Callable[..., Any]]:
         ]
     )
 
-    # Excel reading (5 core extraction tools)
     tools.extend(
         [
             get_excel_sheet_names,
@@ -827,7 +808,6 @@ def load_document_readers() -> list[Callable[..., Any]]:
         ]
     )
 
-    # PowerPoint reading (4 core extraction tools)
     tools.extend(
         [
             get_pptx_slide_count,
@@ -837,7 +817,6 @@ def load_document_readers() -> list[Callable[..., Any]]:
         ]
     )
 
-    # Image metadata reading (2 tools)
     tools.extend([get_image_info, extract_image_exif])
 
     return tools
@@ -884,7 +863,6 @@ def load_writers() -> list[Callable[..., Any]]:
 
     tools: list[Callable[..., Any]] = []
 
-    # File system write operations (9 tools)
     tools.extend(
         [
             write_file_from_string,
@@ -899,7 +877,6 @@ def load_writers() -> list[Callable[..., Any]]:
         ]
     )
 
-    # Data format writers (7 tools)
     tools.append(csv_tools.write_csv_simple)
     tools.append(csv_tools.dict_list_to_csv)
     tools.append(json_tools.safe_json_serialize)
@@ -908,24 +885,19 @@ def load_writers() -> list[Callable[..., Any]]:
     tools.append(config_processing.write_ini_file)
     tools.append(config_processing.merge_config_files)
 
-    # Document creation (all PDF, Word, Excel, PowerPoint tools)
     tools.extend(load_all_pdf_tools())
     tools.extend(load_all_word_tools())
     tools.extend(load_all_excel_tools())
     tools.extend(load_all_powerpoint_tools())
 
-    # Markup generation (all HTML, Markdown, XML tools)
     tools.extend(load_all_html_tools())
     tools.extend(load_all_markdown_tools())
     tools.extend(load_all_xml_tools())
 
-    # Archive operations (all archive tools)
     tools.extend(load_all_archive_tools())
 
-    # Image operations (all image tools)
     tools.extend(load_all_image_tools())
 
-    # Diagram generation (all diagram tools)
     tools.extend(load_all_diagrams_tools())
 
     return tools
@@ -956,16 +928,12 @@ def load_analyst_tools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # All data validation tools (5 tools)
     tools.extend(load_data_validation_tools())
 
-    # All CSV tools for analysis (7 tools)
     tools.extend(load_data_csv_tools())
 
-    # All JSON tools (3 tools)
     tools.extend(load_data_json_tools())
 
-    # Config file tools for analysis (8 tools)
     tools.extend(load_data_config_tools())
 
     return tools
@@ -995,13 +963,10 @@ def load_web_tools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # All HTML tools (17 tools)
     tools.extend(load_all_html_tools())
 
-    # All Markdown tools (12 tools)
     tools.extend(load_all_markdown_tools())
 
-    # All network tools (4 tools)
     tools.extend(load_all_network_tools())
 
     return tools
@@ -1031,13 +996,10 @@ def load_devtools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # All utilities (8 tools - debugging, timing, performance)
     tools.extend(load_all_utilities_tools())
 
-    # All logging tools (5 tools)
     tools.extend(load_all_logging_tools())
 
-    # Add selected system tools for environment info
     from .system import get_env_var, list_env_vars
 
     tools.extend([get_env_var, list_env_vars])
@@ -1070,16 +1032,12 @@ def load_structured_data_tools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # CSV tools (7 tools)
     tools.extend(load_data_csv_tools())
 
-    # JSON tools (3 tools)
     tools.extend(load_data_json_tools())
 
-    # XML tools (24 tools)
     tools.extend(load_all_xml_tools())
 
-    # Config file tools (8 tools - YAML, TOML, INI)
     tools.extend(load_data_config_tools())
 
     return tools
@@ -1109,13 +1067,10 @@ def load_office_suite() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # All Excel tools (24 tools)
     tools.extend(load_all_excel_tools())
 
-    # All Word tools (18 tools)
     tools.extend(load_all_word_tools())
 
-    # All PowerPoint tools (10 tools)
     tools.extend(load_all_powerpoint_tools())
 
     return tools
@@ -1145,13 +1100,10 @@ def load_markup_tools() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # All HTML tools (17 tools)
     tools.extend(load_all_html_tools())
 
-    # All Markdown tools (12 tools)
     tools.extend(load_all_markdown_tools())
 
-    # All XML tools (24 tools)
     tools.extend(load_all_xml_tools())
 
     return tools
@@ -1205,7 +1157,6 @@ def load_essential() -> list[Callable[..., Any]]:
 
     tools: list[Callable[..., Any]] = []
 
-    # Core file operations (8 tools)
     tools.extend(
         [
             read_file_to_string,
@@ -1219,7 +1170,6 @@ def load_essential() -> list[Callable[..., Any]]:
         ]
     )
 
-    # Essential data tools (6 tools)
     tools.extend(
         [
             json_tools.safe_json_serialize,
@@ -1231,22 +1181,16 @@ def load_essential() -> list[Callable[..., Any]]:
         ]
     )
 
-    # Basic text operations (1 tool)
     tools.append(clean_whitespace)
 
-    # Time utilities (2 tools)
     tools.extend([get_current_date, get_current_datetime])
 
-    # Crypto utilities (2 tools)
     tools.extend([hash_sha256, generate_uuid])
 
-    # Shell (1 tool)
     tools.append(execute_shell_command)
 
-    # Network (1 tool)
     tools.append(http_request)
 
-    # Logging (1 tool)
     from .logging import log_info
 
     tools.append(log_info)
@@ -1289,17 +1233,16 @@ def load_coder_loadout() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Core development tools
-    tools.extend(load_all_filesystem_tools())  # 18
-    tools.extend(load_all_system_tools())  # 20
-    tools.extend(load_all_network_tools())  # 3
-    tools.extend(load_all_utilities_tools())  # 8
-    tools.extend(load_all_logging_tools())  # 5
-    tools.extend(load_all_crypto_tools())  # 13
-    tools.extend(load_all_archive_tools())  # 5
-    tools.extend(load_all_text_tools())  # 10
-    tools.extend(load_datetime_essential())  # 13
-    tools.extend(load_data_config_tools())  # 8
+    tools.extend(load_all_filesystem_tools())
+    tools.extend(load_all_system_tools())
+    tools.extend(load_all_network_tools())
+    tools.extend(load_all_utilities_tools())
+    tools.extend(load_all_logging_tools())
+    tools.extend(load_all_crypto_tools())
+    tools.extend(load_all_archive_tools())
+    tools.extend(load_all_text_tools())
+    tools.extend(load_datetime_essential())
+    tools.extend(load_data_config_tools())
 
     return tools
 
@@ -1338,18 +1281,16 @@ def load_docs_loadout() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Document formats
-    tools.extend(load_all_word_tools())  # 18
-    tools.extend(load_all_pdf_tools())  # 20
-    tools.extend(load_all_markdown_tools())  # 12
-    tools.extend(load_all_html_tools())  # 17
+    tools.extend(load_all_word_tools())
+    tools.extend(load_all_pdf_tools())
+    tools.extend(load_all_markdown_tools())
+    tools.extend(load_all_html_tools())
 
-    # Supporting tools
-    tools.extend(load_all_filesystem_tools())  # 18
-    tools.extend(load_all_text_tools())  # 10
-    tools.extend(load_all_diagrams_tools())  # 16
-    tools.extend(load_datetime_essential())  # 13
-    tools.extend(load_all_image_tools())  # 12
+    tools.extend(load_all_filesystem_tools())
+    tools.extend(load_all_text_tools())
+    tools.extend(load_all_diagrams_tools())
+    tools.extend(load_datetime_essential())
+    tools.extend(load_all_image_tools())
 
     return tools
 
@@ -1386,18 +1327,15 @@ def load_data_analyst_loadout() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Data analysis tools
-    tools.extend(load_all_excel_tools())  # 24
-    tools.extend(load_data_csv_tools())  # 7
-    tools.extend(load_data_validation_tools())  # 5
-    tools.extend(load_all_diagrams_tools())  # 16
+    tools.extend(load_all_excel_tools())
+    tools.extend(load_data_csv_tools())
+    tools.extend(load_data_validation_tools())
+    tools.extend(load_all_diagrams_tools())
 
-    # Structured data
-    tools.extend(load_structured_data_tools())  # 42
+    tools.extend(load_structured_data_tools())
 
-    # Supporting tools
-    tools.extend(load_all_filesystem_tools())  # 18
-    tools.extend(load_datetime_essential())  # 13
+    tools.extend(load_all_filesystem_tools())
+    tools.extend(load_datetime_essential())
 
     return tools
 
@@ -1434,16 +1372,14 @@ def load_web_publisher_loadout() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Web formats
-    tools.extend(load_all_html_tools())  # 17
-    tools.extend(load_all_xml_tools())  # 24
-    tools.extend(load_all_markdown_tools())  # 12
+    tools.extend(load_all_html_tools())
+    tools.extend(load_all_xml_tools())
+    tools.extend(load_all_markdown_tools())
 
-    # Supporting tools
-    tools.extend(load_all_network_tools())  # 3
-    tools.extend(load_all_filesystem_tools())  # 18
-    tools.extend(load_all_text_tools())  # 10
-    tools.extend(load_datetime_essential())  # 13
+    tools.extend(load_all_network_tools())
+    tools.extend(load_all_filesystem_tools())
+    tools.extend(load_all_text_tools())
+    tools.extend(load_datetime_essential())
 
     return tools
 
@@ -1477,13 +1413,11 @@ def load_visual_designer_loadout() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Visual tools
-    tools.extend(load_all_image_tools())  # 12
-    tools.extend(load_all_diagrams_tools())  # 16
-    tools.extend(load_all_color_tools())  # 14
+    tools.extend(load_all_image_tools())
+    tools.extend(load_all_diagrams_tools())
+    tools.extend(load_all_color_tools())
 
-    # Supporting tools
-    tools.extend(load_all_filesystem_tools())  # 18
+    tools.extend(load_all_filesystem_tools())
 
     return tools
 
@@ -1518,14 +1452,12 @@ def load_office_suite_loadout() -> list[Callable[..., Any]]:
     """
     tools = []
 
-    # Office suite
-    tools.extend(load_all_excel_tools())  # 24
-    tools.extend(load_all_word_tools())  # 18
-    tools.extend(load_all_powerpoint_tools())  # 10
+    tools.extend(load_all_excel_tools())
+    tools.extend(load_all_word_tools())
+    tools.extend(load_all_powerpoint_tools())
 
-    # Supporting tools
-    tools.extend(load_all_filesystem_tools())  # 18
-    tools.extend(load_datetime_essential())  # 13
+    tools.extend(load_all_filesystem_tools())
+    tools.extend(load_datetime_essential())
 
     return tools
 
@@ -1556,17 +1488,15 @@ def merge_tool_lists(
         True
     """
     merged = []
-    seen = set()  # Track (name, module) tuples to detect duplicates
+    seen = set()
 
     for arg in args:
         if callable(arg):
-            # Single function
             func_key = (arg.__name__, getattr(arg, "__module__", ""))
             if func_key not in seen:
                 merged.append(arg)
                 seen.add(func_key)
         elif isinstance(arg, list):
-            # List of functions
             for item in arg:
                 if not callable(item):
                     raise TypeError(
@@ -1635,7 +1565,6 @@ def list_all_available_tools() -> dict[str, list[dict[str, Any]]]:
 
 
 __all__ = [
-    # Category loaders
     "load_all_filesystem_tools",
     "load_all_text_tools",
     "load_all_data_tools",
@@ -1658,12 +1587,10 @@ __all__ = [
     "load_all_diagrams_tools",
     "load_all_color_tools",
     "load_all_tools",
-    # Subcategory loaders
     "load_data_json_tools",
     "load_data_csv_tools",
     "load_data_validation_tools",
     "load_data_config_tools",
-    # Curated collections
     "load_core_readonly",
     "load_converters",
     "load_document_readers",
@@ -1676,14 +1603,12 @@ __all__ = [
     "load_markup_tools",
     "load_essential",
     "load_datetime_essential",
-    # Loadouts (use-case focused tool bundles)
     "load_coder_loadout",
     "load_docs_loadout",
     "load_data_analyst_loadout",
     "load_web_publisher_loadout",
     "load_visual_designer_loadout",
     "load_office_suite_loadout",
-    # Utility functions
     "merge_tool_lists",
     "get_tool_info",
     "list_all_available_tools",

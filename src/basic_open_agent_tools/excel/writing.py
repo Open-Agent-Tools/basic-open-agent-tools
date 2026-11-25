@@ -19,7 +19,6 @@ try:
 except ImportError:
     HAS_OPENPYXL = False
 
-# Maximum file size: 100MB
 MAX_FILE_SIZE = 100 * 1024 * 1024
 
 
@@ -67,7 +66,6 @@ def create_simple_excel(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Validate data structure
     if not data:
         raise ValueError("data must not be empty")
 
@@ -75,27 +73,22 @@ def create_simple_excel(
         if not isinstance(row, list):
             raise TypeError("each row in data must be a list")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory exists
     parent_dir = os.path.dirname(file_path)
     if parent_dir and not os.path.exists(parent_dir):
         raise ValueError(f"Parent directory does not exist: {parent_dir}")
 
     try:
-        # Create workbook
         wb = Workbook()
         ws = wb.active
 
-        # Write data
         for row_data in data:
             ws.append(row_data)
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -153,7 +146,6 @@ def create_excel_with_headers(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Validate headers
     if not headers:
         raise ValueError("headers must not be empty")
 
@@ -161,7 +153,6 @@ def create_excel_with_headers(
         if not isinstance(header, str):
             raise TypeError("each header must be a string")
 
-    # Combine headers and data
     combined_data = [headers] + data
 
     return cast(str, create_simple_excel(file_path, combined_data, skip_confirm))
@@ -211,7 +202,6 @@ def create_excel_from_dicts(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Validate data
     if not data:
         raise ValueError("data must not be empty")
 
@@ -219,10 +209,8 @@ def create_excel_from_dicts(
         if not isinstance(item, dict):
             raise TypeError("each item in data must be a dict")
 
-    # Extract headers from first dict
     headers = list(data[0].keys())
 
-    # Convert dicts to rows
     rows = []
     for item in data:
         row = [item.get(key, "") for key in headers]
@@ -276,11 +264,9 @@ def add_sheet_to_excel(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Validate data
     if not data:
         raise ValueError("data must not be empty")
 
@@ -289,27 +275,21 @@ def add_sheet_to_excel(
             raise TypeError("each row in data must be a list")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check if sheet exists
         if sheet_name in wb.sheetnames and not skip_confirm:
             raise ValueError(
                 f"Sheet '{sheet_name}' already exists. Set skip_confirm=True to overwrite."
             )
 
-        # Remove sheet if it exists and skip_confirm is True
         if sheet_name in wb.sheetnames and skip_confirm:
             del wb[sheet_name]
 
-        # Create new sheet
         ws = wb.create_sheet(title=sheet_name)
 
-        # Write data
         for row_data in data:
             ws.append(row_data)
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -364,11 +344,9 @@ def append_rows_to_excel(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Validate rows
     if not rows:
         raise ValueError("rows must not be empty")
 
@@ -377,10 +355,8 @@ def append_rows_to_excel(
             raise TypeError("each row must be a list")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -388,11 +364,9 @@ def append_rows_to_excel(
 
         ws = wb[sheet_name]
 
-        # Append rows
         for row_data in rows:
             ws.append(row_data)
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -454,15 +428,12 @@ def update_excel_cell(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -470,10 +441,8 @@ def update_excel_cell(
 
         ws = wb[sheet_name]
 
-        # Update cell
         ws[cell_reference] = value
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -528,28 +497,22 @@ def delete_excel_sheet(file_path: str, sheet_name: str, skip_confirm: bool) -> s
             f"Deletion requires confirmation. Set skip_confirm=True to delete sheet '{sheet_name}'."
         )
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
             )
 
-        # Check not last sheet
         if len(wb.sheetnames) == 1:
             raise ValueError("Cannot delete the last sheet in workbook")
 
-        # Delete sheet
         del wb[sheet_name]
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -604,26 +567,21 @@ def excel_to_csv(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Check Excel file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
-    # Check if CSV exists
     if os.path.exists(output_path) and not skip_confirm:
         raise ValueError(
             f"CSV file already exists: {output_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory exists
     parent_dir = os.path.dirname(output_path)
     if parent_dir and not os.path.exists(parent_dir):
         raise ValueError(f"Parent directory does not exist: {parent_dir}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path, read_only=True, data_only=True)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -631,12 +589,10 @@ def excel_to_csv(
 
         ws = wb[sheet_name]
 
-        # Write to CSV
         with open(output_path, "w", newline="", encoding="utf-8") as csvfile:
             writer = csv.writer(csvfile)
 
             for row in ws.iter_rows(values_only=True):
-                # Convert None to empty string
                 csv_row = [str(cell) if cell is not None else "" for cell in row]
                 writer.writerow(csv_row)
 

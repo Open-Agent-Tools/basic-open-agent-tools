@@ -5,7 +5,6 @@ This module provides text processing and manipulation tools organized into logic
 - processing: Core text cleaning, normalization, and formatting
 """
 
-# Import all functions from submodules
 from .processing import (
     clean_whitespace,
     extract_sentences,
@@ -19,18 +18,14 @@ from .processing import (
     to_title_case,
 )
 
-# Re-export all functions at module level for convenience
 __all__: list[str] = [
-    # Text cleaning and normalization
     "clean_whitespace",
     "normalize_line_endings",
     "strip_html_tags",
     "normalize_unicode",
-    # Case conversion
     "to_snake_case",
     "to_camel_case",
     "to_title_case",
-    # Text splitting and manipulation
     "smart_split_lines",
     "extract_sentences",
     "join_with_oxford_comma",

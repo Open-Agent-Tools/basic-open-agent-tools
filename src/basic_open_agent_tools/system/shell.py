@@ -46,25 +46,20 @@ def execute_shell_command(
         raise BasicAgentToolsError("Working directory must be a string")
 
     try:
-        # Determine the appropriate shell based on platform
         system = platform.system().lower()
 
         if system == "windows":
-            # Use cmd.exe on Windows
             shell_command = ["cmd.exe", "/c", command]
-            shell = False  # Don't use shell=True on Windows for security
+            shell = False
         else:
-            # Use sh on Unix-like systems (more portable than bash)
             shell_command = ["/bin/sh", "-c", command]
             shell = False
 
-        # Log command info
         logger.info(f"Executing: {command}")
         logger.debug(f"Platform: {system}")
         logger.debug(f"Working directory: {working_directory or 'current'}")
         logger.debug(f"Timeout: {timeout}s")
 
-        # Execute the command
         start_time = time.time()
 
         result = subprocess.run(
@@ -79,7 +74,6 @@ def execute_shell_command(
         end_time = time.time()
         execution_time = end_time - start_time
 
-        # Log execution results
         logger.info(
             f"Command completed in {execution_time:.3f}s (return code: {result.returncode})"
         )
@@ -149,16 +143,13 @@ def run_bash(
         )
 
     try:
-        # Log command info
         logger.info(f"Executing (bash): {command}")
         logger.debug(f"Platform: {system}")
         logger.debug(f"Working directory: {working_directory or 'current'}")
         logger.debug(f"Timeout: {timeout}s")
 
-        # Execute the command
         start_time = time.time()
 
-        # Use bash explicitly
         result = subprocess.run(
             ["/bin/bash", "-c", command],
             capture_output=capture_output,
@@ -170,7 +161,6 @@ def run_bash(
         end_time = time.time()
         execution_time = end_time - start_time
 
-        # Log execution results
         logger.info(
             f"Command completed in {execution_time:.3f}s (return code: {result.returncode})"
         )
@@ -237,16 +227,13 @@ def run_powershell(
         )
 
     try:
-        # Log command info
         logger.info(f"Executing (powershell): {command}")
         logger.debug(f"Platform: {system}")
         logger.debug(f"Working directory: {working_directory or 'current'}")
         logger.debug(f"Timeout: {timeout}s")
 
-        # Execute the command
         start_time = time.time()
 
-        # Use PowerShell with execution policy bypass for basic commands
         result = subprocess.run(
             ["powershell.exe", "-ExecutionPolicy", "Bypass", "-Command", command],
             capture_output=capture_output,
@@ -258,7 +245,6 @@ def run_powershell(
         end_time = time.time()
         execution_time = end_time - start_time
 
-        # Log execution results
         logger.info(
             f"Command completed in {execution_time:.3f}s (return code: {result.returncode})"
         )

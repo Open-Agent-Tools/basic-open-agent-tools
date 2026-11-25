@@ -21,7 +21,7 @@ class TestValidateTitle:
     def test_valid_title(self):
         """Test valid titles pass validation."""
         validate_title("Valid title")
-        validate_title("A" * 500)  # Maximum length
+        validate_title("A" * 500)
         validate_title("Title with numbers 123")
         validate_title("Title with symbols !@#$%")
 
@@ -42,10 +42,10 @@ class TestValidateTitle:
             validate_title("")
 
         with pytest.raises(ValueError, match="Title cannot be empty"):
-            validate_title("   ")  # Whitespace only
+            validate_title("   ")
 
         with pytest.raises(ValueError, match="Title cannot be empty"):
-            validate_title("\t\n")  # Whitespace only
+            validate_title("\t\n")
 
     def test_title_too_long(self):
         """Test titles exceeding length limit raise ValueError."""
@@ -83,7 +83,7 @@ class TestValidateStatus:
             validate_status("invalid_status")
 
         with pytest.raises(ValueError, match="Invalid status"):
-            validate_status("pending")  # Not in our valid list
+            validate_status("pending")
 
         with pytest.raises(ValueError, match="Invalid status"):
             validate_status("")
@@ -112,7 +112,7 @@ class TestValidatePriority:
             validate_priority("invalid_priority")
 
         with pytest.raises(ValueError, match="Invalid priority"):
-            validate_priority("critical")  # Not in our valid list
+            validate_priority("critical")
 
         with pytest.raises(ValueError, match="Invalid priority"):
             validate_priority("")
@@ -125,7 +125,7 @@ class TestValidateTaskCount:
         """Test valid task counts pass validation."""
         validate_task_count(0)
         validate_task_count(25)
-        validate_task_count(49)  # Just under limit
+        validate_task_count(49)
 
     def test_task_limit_exceeded(self):
         """Test task count at or above limit raises ValueError."""
@@ -176,9 +176,9 @@ class TestValidateDependencies:
         """Test valid dependencies pass validation."""
         tasks = {1: {"title": "Task 1"}, 2: {"title": "Task 2"}}
 
-        validate_dependencies([], tasks, 0)  # Empty dependencies
-        validate_dependencies([1], tasks, 0)  # Single dependency
-        validate_dependencies([1, 2], tasks, 0)  # Multiple dependencies
+        validate_dependencies([], tasks, 0)
+        validate_dependencies([1], tasks, 0)
+        validate_dependencies([1, 2], tasks, 0)
 
     def test_invalid_dependencies_type(self):
         """Test invalid dependencies type raises TypeError."""
@@ -222,24 +222,20 @@ class TestValidateDependencies:
 
     def test_circular_dependency_detection(self):
         """Test circular dependency detection."""
-        # Create tasks with dependencies: 1 -> 2 -> 3
         tasks = {
             1: {"title": "Task 1", "dependencies": [2]},
             2: {"title": "Task 2", "dependencies": [3]},
             3: {"title": "Task 3", "dependencies": []},
         }
 
-        # Try to make task 3 depend on task 1 (would create cycle)
         with pytest.raises(ValueError, match="Circular dependency detected"):
             validate_dependencies([1], tasks, exclude_task_id=3)
 
-        # Try to make task 2 depend on task 1 (would create cycle)
         with pytest.raises(ValueError, match="Circular dependency detected"):
             validate_dependencies([1], tasks, exclude_task_id=2)
 
     def test_complex_circular_dependency(self):
         """Test detection of complex circular dependencies."""
-        # Create complex dependency chain: 1 -> 2 -> 3 -> 4
         tasks = {
             1: {"title": "Task 1", "dependencies": [2]},
             2: {"title": "Task 2", "dependencies": [3]},
@@ -247,7 +243,6 @@ class TestValidateDependencies:
             4: {"title": "Task 4", "dependencies": []},
         }
 
-        # Try to make task 4 depend on task 1 (would create long cycle)
         with pytest.raises(ValueError, match="Circular dependency detected"):
             validate_dependencies([1], tasks, exclude_task_id=4)
 
@@ -257,10 +252,10 @@ class TestValidateTags:
 
     def test_valid_tags(self):
         """Test valid tags pass validation."""
-        validate_tags([])  # Empty list
-        validate_tags(["tag1"])  # Single tag
-        validate_tags(["tag1", "tag2", "tag3"])  # Multiple tags
-        validate_tags(["a" * 50])  # Maximum length tag
+        validate_tags([])
+        validate_tags(["tag1"])
+        validate_tags(["tag1", "tag2", "tag3"])
+        validate_tags(["a" * 50])
 
     def test_invalid_tags_type(self):
         """Test invalid tags type raises TypeError."""
@@ -301,7 +296,7 @@ class TestValidateTags:
 
     def test_too_many_tags(self):
         """Test too many tags raise ValueError."""
-        many_tags = [f"tag{i}" for i in range(21)]  # 21 tags
+        many_tags = [f"tag{i}" for i in range(21)]
         with pytest.raises(ValueError, match="Maximum 20 tags allowed"):
             validate_tags(many_tags)
 
@@ -311,11 +306,11 @@ class TestValidateEstimatedDuration:
 
     def test_valid_durations(self):
         """Test valid durations pass validation."""
-        validate_estimated_duration("")  # Empty duration
+        validate_estimated_duration("")
         validate_estimated_duration("1 hour")
         validate_estimated_duration("30 minutes")
         validate_estimated_duration("2-3 days")
-        validate_estimated_duration("a" * 100)  # Maximum length
+        validate_estimated_duration("a" * 100)
 
     def test_invalid_duration_type(self):
         """Test invalid duration type raises TypeError."""
@@ -338,9 +333,9 @@ class TestValidateNotes:
 
     def test_valid_notes(self):
         """Test valid notes pass validation."""
-        validate_notes("")  # Empty notes
+        validate_notes("")
         validate_notes("Short note")
-        validate_notes("a" * 2000)  # Maximum length
+        validate_notes("a" * 2000)
 
     def test_invalid_notes_type(self):
         """Test invalid notes type raises TypeError."""
@@ -364,7 +359,6 @@ class TestValidationIntegration:
 
     def test_realistic_validation_scenarios(self):
         """Test realistic combinations of validations."""
-        # Valid task data
         validate_title("Implement user authentication")
         validate_status("in_progress")
         validate_priority("high")
@@ -374,7 +368,6 @@ class TestValidationIntegration:
             "Use OAuth2 with JWT tokens. Reference external API documentation."
         )
 
-        # Valid dependencies
         tasks = {
             1: {"title": "Setup database", "dependencies": []},
             2: {"title": "Create models", "dependencies": [1]},
@@ -383,18 +376,14 @@ class TestValidationIntegration:
 
     def test_edge_case_combinations(self):
         """Test edge cases and boundary conditions."""
-        # Maximum length title and notes
         validate_title("A" * 500)
         validate_notes("B" * 2000)
 
-        # Maximum tags
         max_tags = [f"tag{i}" for i in range(20)]
         validate_tags(max_tags)
 
-        # Complex dependency validation
         tasks = {}
-        for i in range(1, 11):  # 10 tasks
+        for i in range(1, 11):
             tasks[i] = {"title": f"Task {i}", "dependencies": [i - 1] if i > 1 else []}
 
-        # Validate that task 10 can depend on task 9 (valid chain)
         validate_dependencies([9], tasks, exclude_task_id=10)

@@ -60,12 +60,12 @@ class TestResolveHostname:
         """Test resolution with IPv4 addresses only."""
         mock_getaddrinfo.return_value = [
             (socket.AF_INET, None, None, None, ("192.168.1.1", 80)),
-            (socket.AF_INET, None, None, None, ("192.168.1.1", 80)),  # Duplicate
+            (socket.AF_INET, None, None, None, ("192.168.1.1", 80)),
         ]
 
         result = resolve_hostname("ipv4only.example")
 
-        assert len(result["ipv4_addresses"]) == 1  # Duplicates removed
+        assert len(result["ipv4_addresses"]) == 1
         assert len(result["ipv6_addresses"]) == 0
         assert result["total_addresses"] == 1
 
@@ -95,11 +95,10 @@ class TestReverseDnsLookup:
     @patch("socket.gethostbyaddr")
     def test_successful_ipv4_lookup(self, mock_gethostbyaddr, mock_inet_pton):
         """Test successful IPv4 reverse lookup."""
-        # Mock IPv4 validation to succeed
         mock_inet_pton.side_effect = [
             None,
             OSError(),
-        ]  # First call succeeds, second fails
+        ]
 
         mock_gethostbyaddr.return_value = (
             "example.com",
@@ -119,7 +118,6 @@ class TestReverseDnsLookup:
     @patch("socket.gethostbyaddr")
     def test_successful_ipv6_lookup(self, mock_gethostbyaddr, mock_inet_pton):
         """Test successful IPv6 reverse lookup."""
-        # Mock IPv4 validation to fail, IPv6 to succeed
         mock_inet_pton.side_effect = [OSError(), None]
 
         mock_gethostbyaddr.return_value = ("ipv6.example.com", [], ["2001:db8::1"])
@@ -135,7 +133,7 @@ class TestReverseDnsLookup:
     @patch("socket.gethostbyaddr")
     def test_no_reverse_dns_record(self, mock_gethostbyaddr, mock_inet_pton):
         """Test IP with no reverse DNS record."""
-        mock_inet_pton.side_effect = [None, OSError()]  # IPv4
+        mock_inet_pton.side_effect = [None, OSError()]
         mock_gethostbyaddr.side_effect = socket.herror("No reverse DNS record")
 
         result = reverse_dns_lookup("192.168.1.100")
@@ -172,12 +170,10 @@ class TestCheckPortOpen:
     @patch("time.time")
     def test_port_open_success(self, mock_time, mock_socket_class):
         """Test successful port connection."""
-        # Mock timing
-        mock_time.side_effect = [1000.0, 1000.05]  # 50ms response time
+        mock_time.side_effect = [1000.0, 1000.05]
 
-        # Mock socket
         mock_socket = MagicMock()
-        mock_socket.connect_ex.return_value = 0  # Success
+        mock_socket.connect_ex.return_value = 0
         mock_socket_class.return_value = mock_socket
 
         result = check_port_open("example.com", 80, 10)
@@ -195,7 +191,7 @@ class TestCheckPortOpen:
         mock_time.side_effect = [1000.0, 1000.1]
 
         mock_socket = MagicMock()
-        mock_socket.connect_ex.return_value = 1  # Connection refused
+        mock_socket.connect_ex.return_value = 1
         mock_socket_class.return_value = mock_socket
 
         result = check_port_open("example.com", 81, 5)
@@ -207,7 +203,7 @@ class TestCheckPortOpen:
     @patch("time.time")
     def test_connection_timeout(self, mock_time, mock_socket_class):
         """Test connection timeout."""
-        mock_time.side_effect = [1000.0, 1005.0]  # 5 second timeout
+        mock_time.side_effect = [1000.0, 1005.0]
 
         mock_socket = MagicMock()
         mock_socket.connect_ex.side_effect = socket.timeout()

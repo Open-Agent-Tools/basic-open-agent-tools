@@ -36,15 +36,13 @@ class TestGenerateUuid:
         assert isinstance(result["uuid_string"], str)
         assert isinstance(result["uuid_hex"], str)
         assert result["uuid_bytes_length"] == 16
-        assert result["uuid_string_length"] == 36  # Standard UUID string length
+        assert result["uuid_string_length"] == 36
 
-        # Verify UUID format
         uuid_pattern = (
             r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
         )
         assert re.match(uuid_pattern, result["uuid_string"])
 
-        # Verify hex format (no dashes)
         assert len(result["uuid_hex"]) == 32
         assert re.match(r"^[0-9a-f]{32}$", result["uuid_hex"])
 
@@ -57,7 +55,6 @@ class TestGenerateUuid:
         assert isinstance(result["uuid_string"], str)
         assert result["uuid_string_length"] == 36
 
-        # Verify UUID format (UUID1 has version 1 in the version field)
         uuid_pattern = (
             r"^[0-9a-f]{8}-[0-9a-f]{4}-1[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
         )
@@ -82,7 +79,6 @@ class TestGenerateUuid:
         """Test that generated UUIDs can be parsed by standard UUID library."""
         result = generate_uuid(version=4)
 
-        # Should be able to parse without error
         parsed_uuid = uuid.UUID(result["uuid_string"])
         assert str(parsed_uuid) == result["uuid_string"]
         assert parsed_uuid.hex == result["uuid_hex"]
@@ -132,7 +128,6 @@ class TestGenerateRandomString:
         assert result["character_set"] == "alphanumeric"
         assert len(result["random_string"]) == 20
 
-        # Verify only alphanumeric characters
         assert re.match(r"^[a-zA-Z0-9]+$", result["random_string"])
 
     def test_successful_letters_generation(self):
@@ -142,7 +137,6 @@ class TestGenerateRandomString:
         assert result["character_set"] == "letters"
         assert len(result["random_string"]) == 15
 
-        # Verify only letters
         assert re.match(r"^[a-zA-Z]+$", result["random_string"])
 
     def test_successful_digits_generation(self):
@@ -152,7 +146,6 @@ class TestGenerateRandomString:
         assert result["character_set"] == "digits"
         assert len(result["random_string"]) == 10
 
-        # Verify only digits
         assert re.match(r"^[0-9]+$", result["random_string"])
 
     def test_successful_ascii_generation(self):
@@ -162,8 +155,6 @@ class TestGenerateRandomString:
         assert result["character_set"] == "ascii"
         assert len(result["random_string"]) == 25
 
-        # Should contain letters, digits, and punctuation
-        # Just verify it's ASCII printable
         assert all(ord(c) < 128 and ord(c) >= 32 for c in result["random_string"])
 
     def test_common_alphanumeric_generation(self):
@@ -180,9 +171,9 @@ class TestGenerateRandomString:
         result_letters = generate_random_string(length=10, character_set="letters")
         result_digits = generate_random_string(length=10, character_set="digits")
 
-        assert result_alpha["character_set_size"] == 62  # 26+26+10
-        assert result_letters["character_set_size"] == 52  # 26+26
-        assert result_digits["character_set_size"] == 10  # 10
+        assert result_alpha["character_set_size"] == 62
+        assert result_letters["character_set_size"] == 52
+        assert result_digits["character_set_size"] == 10
 
     def test_string_uniqueness(self):
         """Test that generated strings are unique."""
@@ -238,10 +229,9 @@ class TestGenerateRandomBytes:
 
         assert result["random_bytes_length"] == 16
         assert result["encoding"] == "hex"
-        assert result["encoded_length"] == 32  # 16 bytes = 32 hex chars
-        assert result["entropy_bits"] == 128  # 16 * 8
+        assert result["encoded_length"] == 32
+        assert result["entropy_bits"] == 128
 
-        # Verify hex format
         assert re.match(r"^[0-9a-f]+$", result["encoded_data"])
 
     def test_successful_base64_encoding(self):
@@ -252,7 +242,6 @@ class TestGenerateRandomBytes:
         assert result["encoding"] == "base64"
         assert result["entropy_bits"] == 128
 
-        # Base64 encoding should produce valid base64
         import base64
 
         try:
@@ -280,9 +269,9 @@ class TestGenerateRandomBytes:
         result16 = generate_random_bytes(length=16, encoding="hex")
         result32 = generate_random_bytes(length=32, encoding="hex")
 
-        assert result8["entropy_bits"] == 64  # 8 * 8
-        assert result16["entropy_bits"] == 128  # 16 * 8
-        assert result32["entropy_bits"] == 256  # 32 * 8
+        assert result8["entropy_bits"] == 64
+        assert result16["entropy_bits"] == 128
+        assert result32["entropy_bits"] == 256
 
     def test_case_insensitive_encoding(self):
         """Test that encoding parameter is case-insensitive."""
@@ -296,10 +285,8 @@ class TestGenerateRandomBytes:
 
     def test_encoded_length_relationship(self):
         """Test the relationship between byte length and encoded length."""
-        # Hex encoding: each byte becomes 2 hex characters
         hex_result = generate_random_bytes(length=20, encoding="hex")
         assert hex_result["encoded_length"] == 40
 
-        # Base64 encoding: more complex relationship, but should be consistent
         b64_result = generate_random_bytes(length=21, encoding="base64")
         assert len(b64_result["encoded_data"]) == b64_result["encoded_length"]

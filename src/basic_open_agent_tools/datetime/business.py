@@ -42,11 +42,9 @@ def get_next_business_day(date_string: str) -> str:
     except ValueError as e:
         raise ValueError(f"Invalid ISO date format '{date_string}': {e}")
 
-    # Move to next day
     next_date = current_date + timedelta(days=1)
 
-    # Find next business day (Monday=0, Sunday=6)
-    while next_date.weekday() > 4:  # Saturday=5, Sunday=6
+    while next_date.weekday() > 4:
         next_date += timedelta(days=1)
 
     return next_date.isoformat()
@@ -85,5 +83,4 @@ def is_business_day(date_string: str) -> bool:
     except ValueError as e:
         raise ValueError(f"Invalid ISO date format '{date_string}': {e}")
 
-    # Monday=0, Friday=4, Saturday=5, Sunday=6
     return dt.weekday() < 5

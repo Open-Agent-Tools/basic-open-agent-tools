@@ -33,11 +33,9 @@ def generate_uuid(version: int) -> dict[str, Union[str, int]]:
 
     try:
         if version == 1:
-            # UUID1 includes MAC address and timestamp
             generated_uuid = uuid.uuid1()
             uuid_type = "time-based (includes MAC address)"
-        else:  # version == 4
-            # UUID4 is random
+        else:
             generated_uuid = uuid.uuid4()
             uuid_type = "random"
 
@@ -88,7 +86,6 @@ def generate_random_string(
     character_set = character_set.lower().strip()
 
     try:
-        # Define character sets
         if character_set == "alphanumeric":
             chars = string.ascii_letters + string.digits
         elif character_set == "letters":
@@ -102,7 +99,6 @@ def generate_random_string(
                 "Character set must be one of: alphanumeric, letters, digits, ascii"
             )
 
-        # Generate random string
         random_string = "".join(secrets.choice(chars) for _ in range(length))
 
         logger.debug(
@@ -152,13 +148,11 @@ def generate_random_bytes(length: int, encoding: str) -> dict[str, Union[str, in
         raise BasicAgentToolsError("Encoding must be 'hex' or 'base64'")
 
     try:
-        # Generate random bytes
         random_bytes = secrets.token_bytes(length)
 
-        # Encode the bytes
         if encoding == "hex":
             encoded_data = random_bytes.hex()
-        else:  # base64
+        else:
             import base64
 
             encoded_data = base64.b64encode(random_bytes).decode("ascii")

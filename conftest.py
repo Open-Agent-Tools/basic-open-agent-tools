@@ -7,7 +7,6 @@ import pytest
 
 def pytest_configure(config):
     """Configure pytest with custom settings."""
-    # Ensure agent evaluation tests run sequentially
     config.addinivalue_line(
         "markers",
         "agent_evaluation: marks tests as agent evaluation tests (run sequentially)",
@@ -25,7 +24,6 @@ def pytest_collection_modifyitems(config, items):
         else:
             other_tests.append(item)
 
-    # Run regular tests first, then agent tests sequentially
     items[:] = other_tests + agent_tests
 
 
@@ -40,9 +38,8 @@ async def agent_evaluation_sequential(request, agent_evaluation_lock):
     """Ensure agent evaluation tests run one at a time."""
     if request.node.get_closest_marker("agent_evaluation"):
         async with agent_evaluation_lock:
-            # Add extra delay between agent tests to prevent API rate limiting
             await asyncio.sleep(5)
             yield
-            await asyncio.sleep(5)  # Extra delay after test completion
+            await asyncio.sleep(5)
     else:
         yield

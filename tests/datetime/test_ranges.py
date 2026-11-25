@@ -196,12 +196,12 @@ class TestGetMonthsAgo:
     def test_get_months_ago_day_overflow(self):
         """Test months ago with day overflow (Jan 31 -> Feb 31)."""
         result = get_months_ago(1, "2025-01-31")
-        assert result == "2024-12-31"  # Should use last day of target month
+        assert result == "2024-12-31"
 
     def test_get_months_ago_leap_year_handling(self):
         """Test months ago with leap year handling."""
         result = get_months_ago(1, "2024-03-29")
-        assert result == "2024-02-29"  # Feb 29 exists in 2024
+        assert result == "2024-02-29"
 
     def test_get_months_ago_zero_months(self):
         """Test zero months ago."""
@@ -224,23 +224,23 @@ class TestGetLastBusinessDay:
 
     def test_get_last_business_day_monday(self):
         """Test last business day when reference is Monday."""
-        result = get_last_business_day("2025-07-07")  # Monday
+        result = get_last_business_day("2025-07-07")
         assert result == "2025-07-07"
 
     def test_get_last_business_day_friday(self):
         """Test last business day when reference is Friday."""
-        result = get_last_business_day("2025-07-04")  # Friday
+        result = get_last_business_day("2025-07-04")
         assert result == "2025-07-04"
 
     def test_get_last_business_day_saturday(self):
         """Test last business day when reference is Saturday."""
-        result = get_last_business_day("2025-07-05")  # Saturday
-        assert result == "2025-07-04"  # Previous Friday
+        result = get_last_business_day("2025-07-05")
+        assert result == "2025-07-04"
 
     def test_get_last_business_day_sunday(self):
         """Test last business day when reference is Sunday."""
-        result = get_last_business_day("2025-07-06")  # Sunday
-        assert result == "2025-07-04"  # Previous Friday
+        result = get_last_business_day("2025-07-06")
+        assert result == "2025-07-04"
 
     def test_get_last_business_day_invalid_date(self):
         """Test get_last_business_day with invalid date."""
@@ -362,7 +362,7 @@ class TestCalculateDaysBetween:
     def test_calculate_days_between_leap_year(self):
         """Test days between in leap year."""
         result = calculate_days_between("2024-02-28", "2024-03-01")
-        assert result == 2  # Includes Feb 29
+        assert result == 2
 
     def test_calculate_days_between_invalid_date(self):
         """Test calculate_days_between with invalid date."""
@@ -380,34 +380,32 @@ class TestGetBusinessDaysInRange:
 
     def test_get_business_days_in_range_full_week(self):
         """Test business days in full work week (Mon-Fri)."""
-        result = get_business_days_in_range("2025-07-07", "2025-07-11")  # Mon-Fri
+        result = get_business_days_in_range("2025-07-07", "2025-07-11")
         assert result == 5
 
     def test_get_business_days_in_range_with_weekend(self):
         """Test business days with weekend included."""
-        result = get_business_days_in_range("2025-07-05", "2025-07-07")  # Sat-Mon
-        assert result == 1  # Only Monday
+        result = get_business_days_in_range("2025-07-05", "2025-07-07")
+        assert result == 1
 
     def test_get_business_days_in_range_weekend_only(self):
         """Test business days in weekend only."""
-        result = get_business_days_in_range("2025-07-05", "2025-07-06")  # Sat-Sun
+        result = get_business_days_in_range("2025-07-05", "2025-07-06")
         assert result == 0
 
     def test_get_business_days_in_range_single_business_day(self):
         """Test single business day."""
-        result = get_business_days_in_range("2025-07-07", "2025-07-07")  # Monday
+        result = get_business_days_in_range("2025-07-07", "2025-07-07")
         assert result == 1
 
     def test_get_business_days_in_range_single_weekend_day(self):
         """Test single weekend day."""
-        result = get_business_days_in_range("2025-07-05", "2025-07-05")  # Saturday
+        result = get_business_days_in_range("2025-07-05", "2025-07-05")
         assert result == 0
 
     def test_get_business_days_in_range_two_weeks(self):
         """Test business days in two weeks."""
-        result = get_business_days_in_range(
-            "2025-07-07", "2025-07-18"
-        )  # Mon-Fri, Mon-Fri
+        result = get_business_days_in_range("2025-07-07", "2025-07-18")
         assert result == 10
 
     def test_get_business_days_in_range_invalid_order(self):
@@ -436,18 +434,18 @@ class TestDateTimeRangesIntegration:
         quarter_dates = get_quarter_dates(2025, 1)
         date_range = get_date_range(quarter_dates["start"], quarter_dates["end"])
 
-        assert len(date_range) == 90  # Q1 2025 has 90 days
+        assert len(date_range) == 90
         assert date_range[0] == "2025-01-01"
         assert date_range[-1] == "2025-03-31"
 
     def test_month_range_to_business_days(self):
         """Test counting business days in month range."""
-        month_range = get_month_range(2025, 7)  # July 2025
+        month_range = get_month_range(2025, 7)
         business_days = get_business_days_in_range(
             month_range["start"], month_range["end"]
         )
 
-        assert business_days == 23  # July 2025 has 23 business days
+        assert business_days == 23
 
     def test_days_ago_in_range_check(self):
         """Test checking if days ago date is in range."""
@@ -465,4 +463,4 @@ class TestDateTimeRangesIntegration:
         days_ago_7 = get_days_ago(7, sunday)
 
         business_days = get_business_days_in_range(days_ago_7, last_biz_day)
-        assert business_days == 5  # One work week
+        assert business_days == 5

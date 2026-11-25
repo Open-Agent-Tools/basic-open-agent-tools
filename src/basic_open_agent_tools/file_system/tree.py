@@ -35,24 +35,19 @@ def list_all_directory_contents(directory_path: str) -> str:
         """Recursively generate tree representation."""
         tree_lines = []
 
-        # Prepare prefix for current level
         current_prefix = prefix + ("└── " if is_last else "├── ")
         next_prefix = prefix + ("    " if is_last else "│   ")
 
-        # Add current directory/file to tree
         tree_lines.append(f"{current_prefix}{current_path.name}")
 
-        # If it's a directory, explore its contents
         if current_path.is_dir():
             try:
-                # Get contents, filtering hidden files
                 contents = [
                     item
                     for item in sorted(current_path.iterdir())
                     if _should_include(item)
                 ]
 
-                # Recursively add subdirectories and files
                 for i, item in enumerate(contents):
                     is_last_item = i == len(contents) - 1
                     tree_lines.extend(_generate_tree(item, next_prefix, is_last_item))
@@ -62,7 +57,6 @@ def list_all_directory_contents(directory_path: str) -> str:
         return tree_lines
 
     try:
-        # Generate tree-like representation
         return "\n".join(_generate_tree(path))
 
     except OSError as e:
@@ -103,28 +97,22 @@ def generate_directory_tree(
         """Recursively generate tree representation with depth control."""
         tree_lines: list[str] = []
 
-        # Check depth limit
         if depth > max_depth:
             return tree_lines
 
-        # Prepare prefix for current level
         current_prefix = prefix + ("└── " if is_last else "├── ")
         next_prefix = prefix + ("    " if is_last else "│   ")
 
-        # Add current directory/file to tree
         tree_lines.append(f"{current_prefix}{current_path.name}")
 
-        # If it's a directory and we haven't reached max depth, explore its contents
         if current_path.is_dir() and (max_depth is None or depth < max_depth):
             try:
-                # Get contents, filtering based on include_hidden
                 contents = [
                     item
                     for item in sorted(current_path.iterdir())
                     if _should_include(item)
                 ]
 
-                # Recursively add subdirectories and files
                 for i, item in enumerate(contents):
                     is_last_item = i == len(contents) - 1
                     tree_lines.extend(
@@ -136,7 +124,6 @@ def generate_directory_tree(
         return tree_lines
 
     try:
-        # Generate tree-like representation
         result = _generate_tree(path)
         return "\n".join(result) if result else path.name
 

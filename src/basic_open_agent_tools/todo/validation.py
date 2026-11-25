@@ -122,7 +122,6 @@ def validate_dependencies(
     if not isinstance(dependencies, list):
         raise TypeError("Dependencies must be a list")
 
-    # Check each dependency exists
     for dep_id in dependencies:
         if not isinstance(dep_id, int):
             raise TypeError(f"Dependency ID {dep_id} must be an integer")
@@ -130,11 +129,9 @@ def validate_dependencies(
         if dep_id not in tasks:
             raise ValueError(f"Dependency task {dep_id} not found")
 
-        # Prevent self-dependency (exclude_task_id=0 means no exclusion)
         if exclude_task_id > 0 and dep_id == exclude_task_id:
             raise ValueError("Task cannot depend on itself")
 
-    # Check for circular dependencies (exclude_task_id=0 means no check needed)
     if exclude_task_id > 0:
         _check_circular_dependencies(exclude_task_id, dependencies, tasks)
 
@@ -173,7 +170,6 @@ def _check_circular_dependencies(
 
         return False
 
-    # Check if any dependency has a path back to this task
     for dep_id in dependencies:
         if has_path_to_task(dep_id, task_id, set()):
             raise ValueError(
@@ -204,7 +200,6 @@ def validate_tags(tags: list[str]) -> None:
         if len(tag) > 50:
             raise ValueError("Tags cannot exceed 50 characters")
 
-    # Check for duplicates
     if len(tags) != len(set(tags)):
         raise ValueError("Duplicate tags are not allowed")
 
@@ -225,7 +220,6 @@ def validate_estimated_duration(estimated_duration: str) -> None:
     if not isinstance(estimated_duration, str):
         raise TypeError("Estimated duration must be a string")
 
-    # Allow empty duration
     if not estimated_duration.strip():
         return
 

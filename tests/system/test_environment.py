@@ -45,7 +45,6 @@ class TestGetEnvVar:
 
     def test_nonexistent_environment_variable(self):
         """Test getting a non-existent environment variable."""
-        # Make sure the variable doesn't exist
         if "NONEXISTENT_VAR" in os.environ:
             del os.environ["NONEXISTENT_VAR"]
 
@@ -101,7 +100,6 @@ class TestSetEnvVar:
 
     def test_set_new_environment_variable(self):
         """Test setting a new environment variable."""
-        # Ensure variable doesn't exist
         var_name = "NEW_TEST_VAR"
         if var_name in os.environ:
             del os.environ[var_name]
@@ -115,10 +113,8 @@ class TestSetEnvVar:
         assert result["operation"] == "set"
         assert result["success"] is True
 
-        # Verify it was actually set
         assert os.environ[var_name] == "new_value"
 
-        # Clean up
         if var_name in os.environ:
             del os.environ[var_name]
 
@@ -138,7 +134,6 @@ class TestSetEnvVar:
             assert result["operation"] == "set"
             assert result["success"] is True
 
-            # Verify it was actually updated
             assert os.environ[var_name] == new_value
 
     def test_set_empty_value(self):
@@ -151,7 +146,6 @@ class TestSetEnvVar:
         assert result["success"] is True
         assert os.environ[var_name] == ""
 
-        # Clean up
         if var_name in os.environ:
             del os.environ[var_name]
 
@@ -162,7 +156,6 @@ class TestSetEnvVar:
         assert result["variable_name"] == "WHITESPACE_NAME"
         assert os.environ["WHITESPACE_NAME"] == "test_value"
 
-        # Clean up
         if "WHITESPACE_NAME" in os.environ:
             del os.environ["WHITESPACE_NAME"]
 
@@ -208,14 +201,13 @@ class TestListEnvVars:
         }
 
         with patch.dict(os.environ, test_vars, clear=False):
-            result = list_env_vars(filter_pattern=None, limit=200)  # type: ignore[arg-type] # High limit to get all
+            result = list_env_vars(filter_pattern=None, limit=200)  # type: ignore[arg-type]
 
             assert isinstance(result["variables"], dict)
             assert result["filter_pattern"] is None
             assert result["limit_applied"] == 200
-            assert result["total_found"] >= 3  # At least our test variables
+            assert result["total_found"] >= 3
 
-            # Check that our test variables are included
             for var_name, var_value in test_vars.items():
                 if var_name in result["variables"]:
                     assert result["variables"][var_name] == var_value
@@ -232,11 +224,8 @@ class TestListEnvVars:
             result = list_env_vars(filter_pattern="FILTER", limit=50)
 
             assert result["filter_pattern"] == "FILTER"
-            assert (
-                result["total_found"] >= 2
-            )  # At least TEST_FILTER_1 and TEST_FILTER_2
+            assert result["total_found"] >= 2
 
-            # Check that filtered variables are included
             filtered_vars = result["variables"]
             filter_found = 0
             for var_name in filtered_vars:
@@ -256,7 +245,6 @@ class TestListEnvVars:
         with patch.dict(os.environ, test_vars, clear=False):
             result = list_env_vars(filter_pattern="case", limit=50)
 
-            # Should find both Test_Case_Var and TEST_CASE_VAR2
             case_vars_found = 0
             for var_name in result["variables"]:
                 if "case" in var_name.lower():
@@ -266,7 +254,6 @@ class TestListEnvVars:
 
     def test_limit_enforcement(self):
         """Test that the limit parameter is enforced."""
-        # Use a small limit
         result = list_env_vars(filter_pattern=None, limit=3)  # type: ignore[arg-type]
 
         assert len(result["variables"]) <= 3

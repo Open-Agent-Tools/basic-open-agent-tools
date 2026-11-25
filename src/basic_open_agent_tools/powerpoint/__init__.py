@@ -16,14 +16,12 @@ from .writing import (
 )
 
 __all__: list[str] = [
-    # Reading functions (6)
     "get_pptx_metadata",
     "get_pptx_slide_count",
     "extract_pptx_text",
     "get_pptx_slide_text",
     "get_pptx_slide_titles",
     "extract_pptx_notes",
-    # Writing functions (4)
     "create_simple_pptx",
     "add_pptx_title_slide",
     "add_pptx_content_slide",

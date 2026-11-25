@@ -21,4 +21,4 @@ class TestInfoAgentEvaluation:
             agent_module="tests.file_system.test_info_agent.agent",
             eval_dataset_file_path_or_dir="tests/file_system/test_info_agent/list_available_tools.test.json",
         )
-        await asyncio.sleep(2)  # Rate limiting delay
+        await asyncio.sleep(2)

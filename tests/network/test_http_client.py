@@ -36,7 +36,6 @@ class TestHttpRequest:
     @patch("urllib.request.urlopen")
     def test_successful_get_request(self, mock_urlopen):
         """Test successful GET request."""
-        # Mock response
         mock_response = Mock()
         mock_response.getcode.return_value = 200
         mock_response.headers = {"Content-Type": "application/json"}
@@ -84,7 +83,6 @@ class TestHttpRequest:
 
         http_request("GET", "https://example.com", custom_headers, "", 30, True, True)
 
-        # The function should parse the JSON headers
         assert mock_urlopen.called
 
     @patch("urllib.request.urlopen")
@@ -123,7 +121,7 @@ class TestHttpRequest:
         mock_response = Mock()
         mock_response.getcode.return_value = 200
         mock_response.headers = {"Content-Type": "image/png"}
-        mock_response.read.return_value = b"\x89PNG\r\n\x1a\n"  # PNG header
+        mock_response.read.return_value = b"\x89PNG\r\n\x1a\n"
         mock_response.geturl.return_value = "https://example.com/image.png"
         mock_urlopen.return_value = mock_response
 
@@ -146,6 +144,5 @@ class TestHttpRequest:
 
         http_request("GET", "https://example.com", "{}", "", 60, True, True)
 
-        # Check that timeout was passed
         call_kwargs = mock_urlopen.call_args[1]
         assert call_kwargs.get("timeout") == 60

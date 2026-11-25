@@ -8,7 +8,6 @@ from typing import cast
 
 from ..decorators import strands_tool
 
-# Maximum file size: 10MB
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
@@ -43,13 +42,11 @@ def create_markdown_from_text(file_path: str, content: str, skip_confirm: bool) 
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory exists
     parent_dir = os.path.dirname(file_path)
     if parent_dir and not os.path.exists(parent_dir):
         raise ValueError(f"Parent directory does not exist: {parent_dir}")
@@ -104,19 +101,17 @@ def create_markdown_with_frontmatter(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Validate frontmatter keys and values are strings
     for key, value in frontmatter.items():
         if not isinstance(key, str):
             raise TypeError("All frontmatter keys must be strings")
         if not isinstance(value, str):
             raise TypeError("All frontmatter values must be strings")
 
-    # Build frontmatter section
     frontmatter_lines = ["---"]
     for key, value in frontmatter.items():
         frontmatter_lines.append(f"{key}: {value}")
     frontmatter_lines.append("---")
-    frontmatter_lines.append("")  # Blank line after frontmatter
+    frontmatter_lines.append("")
 
     full_content = "\n".join(frontmatter_lines) + content
 
@@ -169,18 +164,14 @@ def create_markdown_table(headers: list[str], rows: list[list[str]]) -> str:
             if not isinstance(cell, str):
                 raise TypeError("all cells must be strings")
 
-    # Build table
     lines = []
 
-    # Header row
     header_line = "| " + " | ".join(headers) + " |"
     lines.append(header_line)
 
-    # Separator row
     separator = "| " + " | ".join(["---"] * len(headers)) + " |"
     lines.append(separator)
 
-    # Data rows
     for row in rows:
         row_line = "| " + " | ".join(row) + " |"
         lines.append(row_line)
@@ -267,11 +258,9 @@ def append_to_markdown(file_path: str, content: str, skip_confirm: bool) -> str:
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Markdown file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -330,44 +319,34 @@ def markdown_to_html_string(markdown_text: str) -> str:
     import html as html_module
     import re
 
-    # Escape HTML entities first
     text = html_module.escape(markdown_text)
 
-    # Convert horizontal rules (before processing other content)
     text = re.sub(r"^---+$", r"<hr>", text, flags=re.MULTILINE)
     text = re.sub(r"^\*\*\*+$", r"<hr>", text, flags=re.MULTILINE)
 
-    # Convert headings
     for level in range(6, 0, -1):
         pattern = r"^" + "#" * level + r"\s+(.+)$"
         text = re.sub(pattern, rf"<h{level}>\1</h{level}>", text, flags=re.MULTILINE)
 
-    # Convert code blocks (before inline code)
     def replace_code_block(match: re.Match[str]) -> str:
         code = match.group(2)
-        # Unescape for code blocks
         code = html_module.unescape(code)
         code = html_module.escape(code)
         return f"<pre><code>{code}</code></pre>"
 
     text = re.sub(r"```\w*\n(.*?)```", replace_code_block, text, flags=re.DOTALL)
 
-    # Convert inline code
     text = re.sub(r"`([^`]+)`", r"<code>\1</code>", text)
 
-    # Convert bold (before italic to handle ***)
     text = re.sub(r"\*\*\*(.+?)\*\*\*", r"<strong><em>\1</em></strong>", text)
     text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
     text = re.sub(r"__(.+?)__", r"<strong>\1</strong>", text)
 
-    # Convert italic
     text = re.sub(r"\*(.+?)\*", r"<em>\1</em>", text)
     text = re.sub(r"_(.+?)_", r"<em>\1</em>", text)
 
-    # Convert links
     text = re.sub(r"\[([^\]]+)\]\(([^\)]+)\)", r'<a href="\2">\1</a>', text)
 
-    # Convert task lists (checkboxes)
     text = re.sub(
         r"^- \[x\] (.+)$",
         r'<input type="checkbox" checked disabled> \1<br>',
@@ -381,7 +360,6 @@ def markdown_to_html_string(markdown_text: str) -> str:
         flags=re.MULTILINE,
     )
 
-    # Convert blockquotes (process line by line)
     lines = text.split("\n")
     processed_lines = []
     in_blockquote = False
@@ -389,13 +367,11 @@ def markdown_to_html_string(markdown_text: str) -> str:
 
     for line in lines:
         if line.strip().startswith("&gt;"):
-            # Remove the escaped > and add to blockquote
-            quote_text = line.strip()[4:].strip()  # Remove &gt; (4 chars)
+            quote_text = line.strip()[4:].strip()
             blockquote_content.append(quote_text)
             in_blockquote = True
         else:
             if in_blockquote:
-                # End of blockquote
                 processed_lines.append(
                     f"<blockquote>{' '.join(blockquote_content)}</blockquote>"
                 )
@@ -403,7 +379,6 @@ def markdown_to_html_string(markdown_text: str) -> str:
                 in_blockquote = False
             processed_lines.append(line)
 
-    # Handle blockquote at end of file
     if in_blockquote:
         processed_lines.append(
             f"<blockquote>{' '.join(blockquote_content)}</blockquote>"
@@ -411,8 +386,6 @@ def markdown_to_html_string(markdown_text: str) -> str:
 
     text = "\n".join(processed_lines)
 
-    # Convert tables
-    # Find table blocks (lines starting with |)
     lines = text.split("\n")
     processed_lines = []
     in_table = False
@@ -424,7 +397,6 @@ def markdown_to_html_string(markdown_text: str) -> str:
             in_table = True
         else:
             if in_table:
-                # Process complete table
                 if table_lines:
                     html_table = _convert_table_to_html(table_lines)
                     processed_lines.append(html_table)
@@ -432,20 +404,17 @@ def markdown_to_html_string(markdown_text: str) -> str:
                 in_table = False
             processed_lines.append(line)
 
-    # Handle table at end of file
     if in_table and table_lines:
         html_table = _convert_table_to_html(table_lines)
         processed_lines.append(html_table)
 
     text = "\n".join(processed_lines)
 
-    # Convert paragraphs (split by double newline)
     paragraphs = text.split("\n\n")
     html_paragraphs = []
     for para in paragraphs:
         para = para.strip()
         if para:
-            # Don't wrap if already has HTML tags or is a table/blockquote/hr
             if not para.startswith("<"):
                 para = f"<p>{para}</p>"
             html_paragraphs.append(para)
@@ -467,12 +436,10 @@ def _convert_table_to_html(table_lines: list[str]) -> str:
 
     html = ["<table>"]
 
-    # Check if second line is separator (|---|---|)
     has_header = False
     if len(table_lines) > 1 and all(c in "|-: " for c in table_lines[1]):
         has_header = True
 
-    # Process header row if present
     if has_header:
         header_row = table_lines[0]
         cells = [cell.strip() for cell in header_row.split("|")[1:-1]]
@@ -481,9 +448,8 @@ def _convert_table_to_html(table_lines: list[str]) -> str:
             html.append(f"<th>{cell}</th>")
         html.append("</tr></thead>")
 
-        # Process body rows
         html.append("<tbody>")
-        for row in table_lines[2:]:  # Skip header and separator
+        for row in table_lines[2:]:
             cells = [cell.strip() for cell in row.split("|")[1:-1]]
             html.append("<tr>")
             for cell in cells:
@@ -491,7 +457,6 @@ def _convert_table_to_html(table_lines: list[str]) -> str:
             html.append("</tr>")
         html.append("</tbody>")
     else:
-        # No header, all rows are body
         html.append("<tbody>")
         for row in table_lines:
             cells = [cell.strip() for cell in row.split("|")[1:-1]]

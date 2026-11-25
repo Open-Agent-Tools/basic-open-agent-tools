@@ -6,7 +6,6 @@ with minimal dependencies for local (non-HTTP/API) actions.
 
 __version__ = "1.3.2"
 
-# Modular structure
 from . import (
     archive,
     color,
@@ -34,8 +33,6 @@ from . import (
 from . import (
     logging as log_module,
 )
-
-# Helper functions for tool management
 from .helpers import (
     get_tool_info,
     list_all_available_tools,
@@ -87,7 +84,6 @@ from .helpers import (
 )
 
 __all__: list[str] = [
-    # All implemented modules
     "archive",
     "color",
     "crypto",
@@ -109,10 +105,8 @@ __all__: list[str] = [
     "utilities",
     "word",
     "xml",
-    # Common infrastructure
     "exceptions",
     "types",
-    # Helper functions
     "load_all_archive_tools",
     "load_all_color_tools",
     "load_all_crypto_tools",
@@ -151,14 +145,12 @@ __all__: list[str] = [
     "load_structured_data_tools",
     "load_web_tools",
     "load_writers",
-    # Loadouts (use-case focused tool bundles)
     "load_coder_loadout",
     "load_docs_loadout",
     "load_data_analyst_loadout",
     "load_web_publisher_loadout",
     "load_visual_designer_loadout",
     "load_office_suite_loadout",
-    # Utility functions
     "merge_tool_lists",
     "get_tool_info",
     "list_all_available_tools",

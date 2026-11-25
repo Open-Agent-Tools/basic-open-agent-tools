@@ -16,7 +16,6 @@ class TestConvertTimezone:
     def test_utc_to_eastern(self):
         """Test converting from UTC to Eastern time."""
         result = convert_timezone("2025-07-08T14:30:45", "UTC", "America/New_York")
-        # During DST, Eastern is UTC-4
         assert "10:30:45" in result
         assert "-04:00" in result
 
@@ -25,7 +24,6 @@ class TestConvertTimezone:
         result = convert_timezone(
             "2025-07-08T10:30:45", "America/New_York", "America/Los_Angeles"
         )
-        # Pacific is 3 hours behind Eastern
         assert "07:30:45" in result
 
     def test_utc_to_utc(self):
@@ -36,7 +34,6 @@ class TestConvertTimezone:
     def test_winter_time(self):
         """Test converting during winter (no DST)."""
         result = convert_timezone("2025-01-08T14:30:45", "UTC", "America/New_York")
-        # During winter, Eastern is UTC-5
         assert "09:30:45" in result
         assert "-05:00" in result
 
@@ -82,17 +79,17 @@ class TestGetTimezoneOffset:
     def test_eastern_summer_offset(self):
         """Test Eastern time offset during summer (varies by actual date)."""
         result = get_timezone_offset("America/New_York")
-        assert result in ["-04:00", "-05:00"]  # EDT or EST
+        assert result in ["-04:00", "-05:00"]
 
     def test_pacific_offset(self):
         """Test Pacific time offset."""
         result = get_timezone_offset("America/Los_Angeles")
-        assert result in ["-07:00", "-08:00"]  # PDT or PST
+        assert result in ["-07:00", "-08:00"]
 
     def test_positive_offset(self):
         """Test timezone with positive offset."""
         result = get_timezone_offset("Europe/Paris")
-        assert result in ["+01:00", "+02:00"]  # CET or CEST
+        assert result in ["+01:00", "+02:00"]
 
     def test_invalid_timezone(self):
         """Test with invalid timezone."""

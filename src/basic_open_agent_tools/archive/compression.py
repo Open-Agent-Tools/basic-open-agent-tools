@@ -28,12 +28,10 @@ def _generate_archive_preview(source_paths: list[str]) -> str:
     file_count = len(source_paths)
     preview = f"Archiving {file_count} source(s)\n"
 
-    # Show first 10 sources
     sample_count = min(10, file_count)
     if sample_count > 0:
         preview += f"\nFirst {sample_count} source(s):\n"
         for i, path in enumerate(source_paths[:sample_count]):
-            # Try to get size if it's a file
             try:
                 if os.path.isfile(path):
                     size = os.path.getsize(path)
@@ -93,15 +91,12 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
     if not isinstance(skip_confirm, bool):
         raise BasicAgentToolsError("skip_confirm must be a boolean")
 
-    # Check if output file exists
     file_existed = os.path.exists(output_path)
 
     logger.info(f"Creating ZIP: {output_path} from {len(source_paths)} source(s)")
     logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
 
     if file_existed:
-        # Check user confirmation (interactive prompt, agent error, or bypass)
-        # Show preview of NEW archive being created, not old file size
         preview = _generate_archive_preview(source_paths)
         confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing ZIP archive",
@@ -132,7 +127,6 @@ def create_zip(source_paths: list[str], output_path: str, skip_confirm: bool) ->
                             zf.write(file_path, arc_name)
                             files_added.append(file_path)
 
-        # Calculate stats for feedback
         archive_size = os.path.getsize(output_path)
         file_count = len(files_added)
         action = "Overwrote" if file_existed else "Created"
@@ -179,13 +173,11 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
     logger.info(f"Extracting ZIP: {zip_path} → {extract_to}")
     logger.debug(f"skip_confirm: {skip_confirm}")
 
-    # Check if extraction directory exists and has contents
     extract_exists = os.path.exists(extract_to)
     if extract_exists:
         try:
             contents = os.listdir(extract_to) if os.path.exists(extract_to) else []
-            if contents:  # Directory exists and has contents
-                # Check user confirmation
+            if contents:
                 confirmed, decline_reason = check_user_confirmation(
                     operation="extract to non-empty directory",
                     target=extract_to,
@@ -202,17 +194,15 @@ def extract_zip(zip_path: str, extract_to: str, skip_confirm: bool) -> str:
                     )
                     return f"Operation cancelled by user{reason_msg}: {extract_to}"
         except OSError:
-            pass  # Can't read directory, proceed anyway
+            pass
 
     try:
-        # Create extraction directory if it doesn't exist
         os.makedirs(extract_to, exist_ok=True)
 
         with zipfile.ZipFile(zip_path, "r") as zf:
             zf.extractall(extract_to)
             files_extracted = len(zf.namelist())
 
-        # Calculate archive size for feedback
         archive_size = os.path.getsize(zip_path)
 
         result = f"Extracted ZIP archive {zip_path} to {extract_to} ({files_extracted} files, {archive_size} bytes)"
@@ -285,7 +275,6 @@ def _compress_file_generic(
     if not isinstance(skip_confirm, bool):
         raise BasicAgentToolsError("skip_confirm must be a boolean")
 
-    # Check if output file exists
     file_existed = os.path.exists(output_path)
     input_size = os.path.getsize(input_path)
 
@@ -295,7 +284,6 @@ def _compress_file_generic(
     logger.debug(f"skip_confirm: {skip_confirm}, file_existed: {file_existed}")
 
     if file_existed:
-        # Check user confirmation - show preview of source file being compressed
         preview = _generate_compression_preview(input_path, compression_type)
         confirmed, decline_reason = check_user_confirmation(
             operation=f"overwrite existing {compression_type} file",

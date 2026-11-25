@@ -30,16 +30,14 @@ class TestCleanWhitespace:
         """Test cleaning mixed whitespace characters."""
         assert clean_whitespace("  hello\t\n  world  \r\n  ") == "hello world"
         assert clean_whitespace("a\r\n\t b\f\v c") == "a b c"
-        assert (
-            clean_whitespace("\u00a0hello\u2000world\u3000") == "hello world"
-        )  # Unicode spaces
+        assert clean_whitespace("\u00a0hello\u2000world\u3000") == "hello world"
 
     def test_clean_empty_and_whitespace_only(self) -> None:
         """Test cleaning empty strings and whitespace-only strings."""
         assert clean_whitespace("") == ""
         assert clean_whitespace("   ") == ""
         assert clean_whitespace("\t\n\r") == ""
-        assert clean_whitespace("\u00a0\u2000\u3000") == ""  # Unicode spaces only
+        assert clean_whitespace("\u00a0\u2000\u3000") == ""
 
     def test_clean_single_character(self) -> None:
         """Test cleaning single character strings."""
@@ -187,7 +185,6 @@ class TestStripHtmlTags:
 
     def test_strip_malformed_html(self) -> None:
         """Test stripping malformed HTML."""
-        # Unclosed tags are not stripped (not valid HTML)
         assert (
             strip_html_tags("Hello <unclosed tag world") == "Hello <unclosed tag world"
         )
@@ -195,7 +192,6 @@ class TestStripHtmlTags:
             strip_html_tags("Text with > brackets < here")
             == "Text with > brackets < here"
         )
-        # Empty tags result in empty string after whitespace cleaning
         result = strip_html_tags("<<>>")
         assert result == ">" or result.isspace()
 
@@ -226,31 +222,26 @@ class TestNormalizeUnicode:
 
     def test_normalize_nfc(self) -> None:
         """Test Unicode normalization to NFC form."""
-        # Test with decomposed characters
-        decomposed = "café"  # 'e' + combining acute accent
+        decomposed = "café"
         normalized = normalize_unicode(decomposed, "NFC")
         assert len(normalized) <= len(decomposed)
         assert normalized == "café"
 
     def test_normalize_nfd(self) -> None:
         """Test Unicode normalization to NFD form."""
-        # Test with composed characters
-        composed = "café"  # composed 'é'
+        composed = "café"
         normalized = normalize_unicode(composed, "NFD")
-        # NFD should decompose characters
         assert "café" in normalized or "cafe" in normalized
 
     def test_normalize_nfkc(self) -> None:
         """Test Unicode normalization to NFKC form."""
-        # Test with compatibility characters
-        text = "①②③"  # Circled numbers
+        text = "①②③"
         normalized = normalize_unicode(text, "NFKC")
         assert normalized == "123"
 
     def test_normalize_nfkd(self) -> None:
         """Test Unicode normalization to NFKD form."""
-        # Test with compatibility characters and decomposition
-        text = "ﬁ"  # fi ligature
+        text = "ﬁ"
         normalized = normalize_unicode(text, "NFKD")
         assert normalized == "fi"
 
@@ -279,7 +270,7 @@ class TestNormalizeUnicode:
             normalize_unicode("test", "INVALID")
 
         with pytest.raises(ValueError, match="Unsupported normalization form"):
-            normalize_unicode("test", "nfc")  # Case sensitive
+            normalize_unicode("test", "nfc")
 
     def test_normalize_unicode_invalid_input(self) -> None:
         """Test error handling for invalid input types."""
@@ -403,11 +394,8 @@ class TestToCamelCase:
 
     def test_camel_case_already_camel_case(self) -> None:
         """Test converting already camelCase text."""
-        assert (
-            to_camel_case("helloWorld", False) == "helloworld"
-        )  # Gets lowercased first
+        assert to_camel_case("helloWorld", False) == "helloworld"
         assert to_camel_case("helloWorld", True) == "Helloworld"
-        # Since it splits and processes, the original casing is lost
 
     def test_camel_case_empty_and_single_word(self) -> None:
         """Test converting empty and single word strings."""
@@ -500,10 +488,8 @@ class TestToTitleCase:
     def test_title_case_preserve_structure(self) -> None:
         """Test that Title Case preserves original structure."""
         assert to_title_case("a-b_c d") == "A-B_C D"
-        assert (
-            to_title_case("word1   word2") == "Word1   Word2"
-        )  # Preserve multiple spaces
-        assert to_title_case("test\tword") == "Test\tWord"  # Preserve tabs
+        assert to_title_case("word1   word2") == "Word1   Word2"
+        assert to_title_case("test\tword") == "Test\tWord"
 
     def test_title_case_invalid_input(self) -> None:
         """Test error handling for invalid input types."""
@@ -529,7 +515,7 @@ class TestSmartSplitLines:
         """Test splitting lines based on character count."""
         text = "This is a long line that needs splitting"
         result = smart_split_lines(text, 10, False)
-        assert len(result) == 4  # 40 chars / 10 = 4 lines
+        assert len(result) == 4
         assert all(len(line) <= 10 for line in result)
         assert "".join(result) == text
 
@@ -557,7 +543,6 @@ class TestSmartSplitLines:
         result = smart_split_lines(text, 1, False)
         assert result == ["h", "e", "l", "l", "o"]
 
-        # With word preservation, might be different
         result = smart_split_lines(text, 1, True)
         assert len(result) >= 1
 
@@ -573,26 +558,23 @@ class TestSmartSplitLines:
         """Test splitting with whitespace handling."""
         text = "hello    world"
         result = smart_split_lines(text, 10, True)
-        # textwrap should normalize whitespace
         assert len(result) >= 1
 
     def test_split_lines_long_word(self) -> None:
         """Test splitting with words longer than max_length."""
         text = "supercalifragilisticexpialidocious"
         result = smart_split_lines(text, 10, True)
-        # With preserve_words=True and break_long_words=False,
-        # long words might exceed max_length
         assert len(result) >= 1
 
         result = smart_split_lines(text, 10, False)
-        assert len(result) == 4  # 33 chars / 10 = 3.3 -> 4 lines
+        assert len(result) == 4
         assert all(len(line) <= 10 for line in result)
 
     def test_split_lines_multiple_lines(self) -> None:
         """Test splitting text that already has line breaks."""
         text = "Line 1\nLine 2 is longer than expected\nLine 3"
         result = smart_split_lines(text, 15, True)
-        assert len(result) >= 3  # At least one per original line
+        assert len(result) >= 3
 
     def test_split_lines_unicode_text(self) -> None:
         """Test splitting Unicode text."""
@@ -600,7 +582,6 @@ class TestSmartSplitLines:
         result = smart_split_lines(text, 15, True)
         assert len(result) >= 2
         reconstructed = " ".join(result)
-        # Account for potential whitespace normalization
         assert "Café" in reconstructed
         assert "résumé" in reconstructed
 
@@ -638,7 +619,7 @@ class TestExtractSentences:
         text = "First sentence.  Second sentence!   Third sentence?"
         result = extract_sentences(text)
         assert len(result) == 3
-        assert all(sentence.strip() for sentence in result)  # No empty sentences
+        assert all(sentence.strip() for sentence in result)
 
     def test_extract_single_sentence(self) -> None:
         """Test extracting single sentence."""
@@ -654,7 +635,6 @@ class TestExtractSentences:
         """Test extracting sentences with multiple punctuation marks."""
         text = "What?!! Really... Yes!"
         result = extract_sentences(text)
-        # The regex splits on punctuation, so this might create some empty results
         assert len(result) >= 2
         assert any("What" in sentence for sentence in result)
         assert any("Really" in sentence for sentence in result)
@@ -679,8 +659,6 @@ class TestExtractSentences:
         """Test extracting sentences with abbreviations."""
         text = "Mr. Smith went to Washington. He met Dr. Johnson."
         result = extract_sentences(text)
-        # This simple regex will split on periods, so abbreviations might cause issues
-        # The function may not handle abbreviations perfectly
         assert len(result) >= 2
 
     def test_extract_sentences_mixed_punctuation(self) -> None:
@@ -762,8 +740,8 @@ class TestJoinWithOxfordComma:
         items = ["one", "two", "three", "four", "five", "six"]
         result = join_with_oxford_comma(items, "and")
         assert result == "one, two, three, four, five, and six"
-        assert result.count(",") == 5  # 5 commas total
-        assert ", and " in result  # Oxford comma present
+        assert result.count(",") == 5
+        assert ", and " in result
 
     def test_join_different_conjunctions(self) -> None:
         """Test joining with different conjunctions."""
@@ -780,7 +758,6 @@ class TestJoinWithOxfordComma:
 
     def test_join_mixed_types(self) -> None:
         """Test joining items of mixed types (converted to strings)."""
-        # Function expects List[str] so convert items to strings first
         items = ["text", "123", "True", "None"]
         result = join_with_oxford_comma(items, "and")
         assert "text" in result
@@ -823,16 +800,12 @@ class TestTextProcessingIntegration:
 
     def test_clean_and_normalize_workflow(self) -> None:
         """Test workflow combining cleaning and normalization."""
-        # Raw HTML with mixed line endings and extra whitespace
         html_text = "<p>Hello   world!\r\n</p><div>How  are\tyou?</div>"
 
-        # Step 1: Strip HTML
         no_html = strip_html_tags(html_text)
 
-        # Step 2: Clean whitespace
         clean_text = clean_whitespace(no_html)
 
-        # Step 3: Normalize line endings
         normalized = normalize_line_endings(clean_text, "unix")
 
         assert normalized == "Hello world! How are you?"
@@ -841,19 +814,15 @@ class TestTextProcessingIntegration:
         """Test chaining case conversion functions."""
         original = "hello-world_example TEST"
 
-        # Convert to snake_case
         snake = to_snake_case(original)
         assert snake == "hello_world_example_test"
 
-        # Convert to camelCase
         camel = to_camel_case(snake, False)
         assert camel == "helloWorldExampleTest"
 
-        # Convert to PascalCase
         pascal = to_camel_case(snake, True)
         assert pascal == "HelloWorldExampleTest"
 
-        # Convert to Title Case (from snake_case)
         title = to_title_case(snake)
         assert title == "Hello_World_Example_Test"
 
@@ -861,25 +830,20 @@ class TestTextProcessingIntegration:
         """Test splitting text and joining with Oxford comma."""
         long_text = "This is a very long sentence that needs to be split into smaller parts for better readability"
 
-        # Split into lines
         lines = smart_split_lines(long_text, 25, True)
         assert len(lines) > 1
 
-        # Join with Oxford comma
         joined = join_with_oxford_comma(lines, "and")
-        assert ", and " in joined  # Oxford comma present
+        assert ", and " in joined
 
     def test_sentence_extraction_and_case_conversion(self) -> None:
         """Test extracting sentences and converting case."""
         text = "hello world. how are you? i am fine!"
 
-        # Extract sentences
         sentences = extract_sentences(text)
 
-        # Convert each sentence to title case
         title_sentences = [to_title_case(sentence) for sentence in sentences]
 
-        # Join back together
         result = " ".join(title_sentences)
 
         assert "Hello World." in result
@@ -888,19 +852,14 @@ class TestTextProcessingIntegration:
 
     def test_unicode_processing_workflow(self) -> None:
         """Test complete Unicode text processing workflow."""
-        # Text with various Unicode normalization needs
         unicode_text = "<p>Café résumé</p>\r\n<div>naïve approach</div>"
 
-        # Step 1: Strip HTML
         no_html = strip_html_tags(unicode_text)
 
-        # Step 2: Normalize Unicode to NFC
         normalized_unicode = normalize_unicode(no_html, "NFC")
 
-        # Step 3: Clean whitespace
         clean_text = clean_whitespace(normalized_unicode)
 
-        # Step 4: Convert to title case
         final_text = to_title_case(clean_text)
 
         assert "Café Résumé" in final_text
@@ -916,16 +875,13 @@ class TestTextProcessingIntegration:
         </body></html>
         """
 
-        # Complete cleaning workflow
         clean = strip_html_tags(messy_text)
         clean = clean_whitespace(clean)
         clean = normalize_unicode(clean, "NFC")
         clean = normalize_line_endings(clean, "unix")
 
-        # Convert to snake_case for consistency
         snake_case = to_snake_case(clean)
 
-        # Should be clean, normalized text
         assert "hello" in snake_case
         assert "world" in snake_case
         assert "test" in snake_case

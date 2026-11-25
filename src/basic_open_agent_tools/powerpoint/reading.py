@@ -9,7 +9,7 @@ try:
 except ImportError:
     Presentation = None  # type: ignore[assignment,misc]
 
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB limit
+MAX_FILE_SIZE = 50 * 1024 * 1024
 
 
 @strands_tool

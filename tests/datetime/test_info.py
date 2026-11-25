@@ -17,17 +17,17 @@ class TestGetWeekdayName:
 
     def test_monday(self):
         """Test getting weekday name for Monday."""
-        result = get_weekday_name("2025-07-07")  # Monday
+        result = get_weekday_name("2025-07-07")
         assert result == "Monday"
 
     def test_friday(self):
         """Test getting weekday name for Friday."""
-        result = get_weekday_name("2025-07-04")  # Friday
+        result = get_weekday_name("2025-07-04")
         assert result == "Friday"
 
     def test_sunday(self):
         """Test getting weekday name for Sunday."""
-        result = get_weekday_name("2025-07-06")  # Sunday
+        result = get_weekday_name("2025-07-06")
         assert result == "Sunday"
 
     def test_invalid_date(self):
@@ -75,8 +75,8 @@ class TestGetWeekNumber:
 
     def test_first_week(self):
         """Test getting week number for first week of year."""
-        result = get_week_number("2025-01-06")  # First Monday of 2025
-        assert result == 2  # ISO week numbering
+        result = get_week_number("2025-01-06")
+        assert result == 2
 
     def test_mid_year(self):
         """Test getting week number for mid-year."""
@@ -86,7 +86,7 @@ class TestGetWeekNumber:
     def test_last_week(self):
         """Test getting week number for last week of year."""
         result = get_week_number("2025-12-31")
-        assert result in [1, 52, 53]  # Can be week 1 of next year
+        assert result in [1, 52, 53]
 
     def test_invalid_date(self):
         """Test with invalid date format."""

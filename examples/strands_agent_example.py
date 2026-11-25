@@ -12,14 +12,12 @@ from strands.models.anthropic import AnthropicModel
 
 import basic_open_agent_tools as boat
 
-# Load environment variables
 load_dotenv()
 
 
 def create_basic_tools_agent():
     """Create a Strands agent with basic-open-agent-tools."""
 
-    # Create Anthropic model
     model = AnthropicModel(
         client_args={
             "api_key": os.getenv("ANTHROPIC_API_KEY"),
@@ -31,41 +29,33 @@ def create_basic_tools_agent():
         },
     )
 
-    # Load tools from basic-open-agent-tools
-    # Option 1: Load all tools (150+ functions)
-    # agent_tools = boat.load_all_tools()
+    file_tools = boat.load_all_filesystem_tools()
+    text_tools = boat.load_all_text_tools()
+    data_tools = boat.load_all_data_tools()
+    datetime_tools = boat.load_all_datetime_tools()
+    network_tools = boat.load_all_network_tools()
+    utilities_tools = boat.load_all_utilities_tools()
+    crypto_tools = boat.load_all_crypto_tools()
 
-    # Option 2: Load specific categories
-    file_tools = boat.load_all_filesystem_tools()  # File operations
-    text_tools = boat.load_all_text_tools()  # Text processing
-    data_tools = boat.load_all_data_tools()  # JSON, CSV, config
-    datetime_tools = boat.load_all_datetime_tools()  # Date/time ops
-    network_tools = boat.load_all_network_tools()  # HTTP client
-    utilities_tools = boat.load_all_utilities_tools()  # Timing, debugging
-    crypto_tools = boat.load_all_crypto_tools()  # Hashing, encoding
-
-    # Optional: Load system tools if available
     try:
-        system_tools = boat.load_all_system_tools()  # Requires psutil
+        system_tools = boat.load_all_system_tools()
     except ImportError:
         system_tools = []
         print(
             "⚠️  System tools not available (install with: pip install basic-open-agent-tools[system])"
         )
 
-    # Merge selected tools (automatically deduplicates)
     agent_tools = boat.merge_tool_lists(
         file_tools,
         text_tools,
-        data_tools[:15],  # Limit to prevent too many tools
-        datetime_tools[:15],  # Limit datetime tools
+        data_tools[:15],
+        datetime_tools[:15],
         network_tools,
         utilities_tools,
-        crypto_tools[:10],  # Limit crypto tools
-        system_tools[:10],  # Limit system tools
+        crypto_tools[:10],
+        system_tools[:10],
     )
 
-    # Create the Strands agent
     agent = Agent(
         model=model,
         name="Basic Tools Agent",
@@ -94,7 +84,6 @@ def create_basic_tools_agent():
 def create_specialized_agents():
     """Create specialized agents for different use cases."""
 
-    # File Operations Agent
     file_agent = Agent(
         model=AnthropicModel(
             client_args={"api_key": os.getenv("ANTHROPIC_API_KEY")},
@@ -110,7 +99,6 @@ def create_specialized_agents():
         tools=boat.load_all_filesystem_tools(),
     )
 
-    # Data Processing Agent
     data_agent = Agent(
         model=AnthropicModel(
             client_args={"api_key": os.getenv("ANTHROPIC_API_KEY")},
@@ -125,7 +113,7 @@ def create_specialized_agents():
         ),
         tools=boat.merge_tool_lists(
             boat.load_all_data_tools(),
-            boat.load_all_text_tools(),  # Text processing helps with data cleaning
+            boat.load_all_text_tools(),
         ),
     )
 
@@ -137,12 +125,10 @@ def main():
     print("🚀 Creating Basic Tools Agent with Strands + basic-open-agent-tools...")
 
     try:
-        # Create comprehensive agent
         agent = create_basic_tools_agent()
         print(f"✅ Agent created successfully: {agent.name}")
         print(f"📊 Tools loaded: {len(agent.tools)}")
 
-        # Show available tool categories
         print("\n📋 Available tool categories:")
         print(f"  • File System: {len(boat.load_all_filesystem_tools())} tools")
         print(f"  • Text Processing: {len(boat.load_all_text_tools())} tools")
@@ -152,7 +138,6 @@ def main():
         print(f"  • Utilities: {len(boat.load_all_utilities_tools())} tools")
         print(f"  • Crypto: {len(boat.load_all_crypto_tools())} tools")
 
-        # Test the agent
         print("\n🧪 Testing agent...")
         test_questions = [
             "Hello! Please introduce yourself and list your main capabilities.",

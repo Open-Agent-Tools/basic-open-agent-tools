@@ -21,4 +21,4 @@ class TestHelpersAgentEvaluation:
             agent_module="tests.helpers.test_helpers_agent.agent",
             eval_dataset_file_path_or_dir="tests/helpers/test_helpers_agent/list_all_available_tools.test.json",
         )
-        await asyncio.sleep(2)  # Rate limiting delay
+        await asyncio.sleep(2)

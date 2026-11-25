@@ -10,7 +10,6 @@ from typing import Any
 
 from ..decorators import strands_tool
 
-# Maximum file size: 10MB
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
@@ -39,11 +38,9 @@ def parse_markdown_to_dict(file_path: str) -> dict[str, object]:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Markdown file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -54,7 +51,6 @@ def parse_markdown_to_dict(file_path: str) -> dict[str, object]:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
-        # Extract frontmatter if present
         frontmatter = {}
         content_without_frontmatter = content
 
@@ -62,14 +58,12 @@ def parse_markdown_to_dict(file_path: str) -> dict[str, object]:
             parts = content.split("---", 2)
             if len(parts) >= 3:
                 frontmatter_text = parts[1].strip()
-                # Simple key: value parsing
                 for line in frontmatter_text.split("\n"):
                     if ":" in line:
                         key, value = line.split(":", 1)
                         frontmatter[key.strip()] = value.strip()
                 content_without_frontmatter = parts[2].strip()
 
-        # Extract headings
         headings = []
         for line_num, line in enumerate(content_without_frontmatter.split("\n"), 1):
             match = re.match(r"^(#{1,6})\s+(.+)$", line)
@@ -78,12 +72,11 @@ def parse_markdown_to_dict(file_path: str) -> dict[str, object]:
                 text = match.group(2).strip()
                 headings.append({"level": level, "text": text, "line": line_num})
 
-        # Build sections based on headings
         sections = []
         lines = content_without_frontmatter.split("\n")
 
         for i, heading in enumerate(headings):
-            start_line = int(heading["line"])  # Cast to int for type safety
+            start_line = int(heading["line"])
             end_line = (
                 int(headings[i + 1]["line"]) if i + 1 < len(headings) else len(lines)
             )
@@ -131,11 +124,9 @@ def extract_markdown_headings(file_path: str) -> list[dict[str, str]]:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Markdown file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -185,11 +176,9 @@ def extract_markdown_links(file_path: str) -> list[dict[str, str]]:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Markdown file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -202,7 +191,6 @@ def extract_markdown_links(file_path: str) -> list[dict[str, str]]:
 
         links = []
 
-        # Match inline links: [text](url "optional title")
         inline_pattern = r'\[([^\]]+)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)'
         for match in re.finditer(inline_pattern, content):
             text = match.group(1)
@@ -241,11 +229,9 @@ def extract_markdown_code_blocks(file_path: str) -> list[dict[str, str]]:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Markdown file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -258,7 +244,6 @@ def extract_markdown_code_blocks(file_path: str) -> list[dict[str, str]]:
 
         blocks = []
 
-        # Match fenced code blocks: ```language\ncode\n```
         pattern = r"```(\w*)\n(.*?)```"
         for match in re.finditer(pattern, content, re.DOTALL):
             language = match.group(1) if match.group(1) else ""
@@ -296,11 +281,9 @@ def extract_markdown_tables(file_path: str) -> list[list[list[str]]]:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Markdown file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -318,22 +301,17 @@ def extract_markdown_tables(file_path: str) -> list[list[list[str]]]:
         while i < len(lines):
             line = lines[i].strip()
 
-            # Check if line looks like a table row (contains |)
             if "|" in line and line.count("|") >= 2:
                 table = []
 
-                # Start collecting table rows
                 while i < len(lines) and "|" in lines[i]:
                     row_line = lines[i].strip()
 
-                    # Skip separator lines (like |---|---|)
                     if re.match(r"^\|[\s\-:|\|]+\|$", row_line):
                         i += 1
                         continue
 
-                    # Parse row
                     cells = [cell.strip() for cell in row_line.split("|")]
-                    # Remove empty first/last cells from leading/trailing |
                     if cells and cells[0] == "":
                         cells = cells[1:]
                     if cells and cells[-1] == "":
@@ -380,11 +358,9 @@ def markdown_to_plain_text(file_path: str) -> str:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Markdown file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_FILE_SIZE:
         raise ValueError(
@@ -395,45 +371,34 @@ def markdown_to_plain_text(file_path: str) -> str:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
-        # Remove frontmatter
         if content.startswith("---"):
             parts = content.split("---", 2)
             if len(parts) >= 3:
                 content = parts[2].strip()
 
-        # Remove code blocks
         content = re.sub(r"```.*?```", "", content, flags=re.DOTALL)
 
-        # Remove inline code
         content = re.sub(r"`[^`]+`", "", content)
 
-        # Remove images ![alt](url)
         content = re.sub(r"!\[([^\]]*)\]\([^\)]+\)", r"\1", content)
 
-        # Remove links but keep text [text](url)
         content = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", content)
 
-        # Remove bold/italic
-        content = re.sub(r"\*\*\*([^\*]+)\*\*\*", r"\1", content)  # Bold italic
-        content = re.sub(r"\*\*([^\*]+)\*\*", r"\1", content)  # Bold
-        content = re.sub(r"\*([^\*]+)\*", r"\1", content)  # Italic
-        content = re.sub(r"__([^_]+)__", r"\1", content)  # Bold
-        content = re.sub(r"_([^_]+)_", r"\1", content)  # Italic
+        content = re.sub(r"\*\*\*([^\*]+)\*\*\*", r"\1", content)
+        content = re.sub(r"\*\*([^\*]+)\*\*", r"\1", content)
+        content = re.sub(r"\*([^\*]+)\*", r"\1", content)
+        content = re.sub(r"__([^_]+)__", r"\1", content)
+        content = re.sub(r"_([^_]+)_", r"\1", content)
 
-        # Remove headings markers but keep text
         content = re.sub(r"^#{1,6}\s+", "", content, flags=re.MULTILINE)
 
-        # Remove horizontal rules
         content = re.sub(r"^[\*\-_]{3,}$", "", content, flags=re.MULTILINE)
 
-        # Remove blockquote markers
         content = re.sub(r"^>\s*", "", content, flags=re.MULTILINE)
 
-        # Remove list markers
         content = re.sub(r"^[\*\-\+]\s+", "", content, flags=re.MULTILINE)
         content = re.sub(r"^\d+\.\s+", "", content, flags=re.MULTILINE)
 
-        # Clean up extra whitespace
         content = re.sub(r"\n{3,}", "\n\n", content)
         content = content.strip()
 
@@ -486,21 +451,17 @@ def get_markdown_info(file_path: str) -> dict[str, str]:
             for line in f:
                 line_count += 1
 
-                # Check for frontmatter
                 if first_line and line.strip() == "---":
                     has_frontmatter = True
                 first_line = False
 
-                # Check for headings
                 if re.match(r"^#{1,6}\s+", line):
                     heading_count += 1
 
-                # Check for code blocks
                 if line.strip().startswith("```"):
                     has_code_blocks = True
                     in_code_block = not in_code_block
 
-                # Check for tables (if not in code block)
                 if not in_code_block and "|" in line and line.count("|") >= 2:
                     has_tables = True
 
@@ -619,7 +580,6 @@ def count_markdown_elements(file_path: str, element_type: str) -> int:
                     if re.match(r"^#{1,6}\s+", line):
                         count += 1
                 elif element_type == "links":
-                    # Count inline links
                     pattern = r'\[([^\]]+)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)'
                     count += len(re.findall(pattern, line))
                 elif element_type == "code_blocks":
@@ -629,7 +589,6 @@ def count_markdown_elements(file_path: str, element_type: str) -> int:
                         in_code_block = not in_code_block
                 elif element_type == "tables":
                     if not in_code_block and "|" in line and line.count("|") >= 2:
-                        # Check if it's a separator line
                         if not re.match(r"^\|[\s\-:|\|]+\|$", line.strip()):
                             count += 1
 
@@ -684,7 +643,6 @@ def get_markdown_section(file_path: str, heading_text: str) -> dict[str, str]:
                 line_number += 1
 
                 if not found_heading:
-                    # Look for the target heading
                     match = re.match(r"^(#{1,6})\s+(.+)$", line)
                     if match and match.group(2).strip().lower() == heading_text_lower:
                         found_heading = True
@@ -692,12 +650,10 @@ def get_markdown_section(file_path: str, heading_text: str) -> dict[str, str]:
                         line_start = line_number
                         continue
                 else:
-                    # Check if we've reached the next heading of same or higher level
                     match = re.match(r"^(#{1,6})\s+", line)
                     if match:
                         next_level = len(match.group(1))
                         if next_level <= heading_level:
-                            # End of section
                             break
 
                     content_lines.append(line.rstrip())
@@ -885,7 +841,7 @@ def get_markdown_toc(file_path: str, max_level: int) -> list[dict[str, str]]:
                     level = len(match.group(1))
                     if level <= max_level:
                         text = match.group(2).strip()
-                        indent = "  " * (level - 1)  # 2 spaces per level
+                        indent = "  " * (level - 1)
                         toc_entries.append(
                             {
                                 "level": str(level),
@@ -1013,7 +969,6 @@ def get_markdown_frontmatter(file_path: str) -> dict[str, str]:
 
                 if in_frontmatter:
                     if stripped == "---":
-                        # End of frontmatter
                         break
 
                     if ":" in line:
@@ -1082,14 +1037,12 @@ def extract_markdown_section_range(
             for line in f:
                 line_number += 1
 
-                # Check for headings
                 match = re.match(r"^#{1,6}\s+(.+)$", line)
 
                 if match:
                     heading_text = match.group(1).strip().lower()
 
                     if not in_range and heading_text == start_lower:
-                        # Start of range
                         in_range = True
                         line_start = line_number
                         content_lines.append(line.rstrip())
@@ -1097,11 +1050,9 @@ def extract_markdown_section_range(
                         continue
 
                     if in_range and heading_text == end_lower:
-                        # End of range (exclusive)
                         break
 
                     if in_range:
-                        # Count subsections
                         sections_included += 1
 
                 if in_range:
@@ -1124,9 +1075,6 @@ def extract_markdown_section_range(
         raise
     except Exception as e:
         raise ValueError(f"Failed to extract section range: {e}")
-
-
-# ===== Advanced Parsing Features (Issue #30) =====
 
 
 @strands_tool
@@ -1168,7 +1116,6 @@ def parse_reference_links(file_path: str) -> list[dict[str, str]]:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
-        # Find reference definitions: [ref]: url "title"
         ref_pattern = r'^\[([^\]]+)\]:\s+(\S+)(?:\s+"([^"]*)")?'
         references: dict[str, dict[str, Any]] = {}
 
@@ -1178,7 +1125,6 @@ def parse_reference_links(file_path: str) -> list[dict[str, str]]:
             title = match.group(3) or ""
             references[ref_id] = {"url": url, "title": title, "used_by": []}
 
-        # Find usage of references: [text][ref]
         usage_pattern = r"\[([^\]]+)\]\[([^\]]+)\]"
 
         for match in re.finditer(usage_pattern, content):
@@ -1187,7 +1133,6 @@ def parse_reference_links(file_path: str) -> list[dict[str, str]]:
             if ref_id in references:
                 references[ref_id]["used_by"].append(text)
 
-        # Convert to list format
         result = []
         for ref_id, data in references.items():
             result.append(
@@ -1247,7 +1192,6 @@ def parse_footnotes(file_path: str) -> list[dict[str, str]]:
 
         with open(file_path, encoding="utf-8") as f:
             for line_num, line in enumerate(f, 1):
-                # Match footnote definition: [^id]: content
                 match = re.match(r"^\[\^([^\]]+)\]:\s+(.+)$", line.strip())
                 if match:
                     footnote_id = match.group(1)
@@ -1312,10 +1256,9 @@ def parse_definition_lists(file_path: str) -> list[dict[str, str]]:
             for line_num, line in enumerate(f, 1):
                 stripped = line.strip()
 
-                # Check for definition marker
                 if stripped.startswith(": "):
                     if current_term:
-                        definition = stripped[2:].strip()  # Remove ": "
+                        definition = stripped[2:].strip()
                         definitions.append(
                             {
                                 "term": current_term,
@@ -1325,7 +1268,6 @@ def parse_definition_lists(file_path: str) -> list[dict[str, str]]:
                         )
                         current_term = ""
                 elif stripped and not stripped.startswith(": "):
-                    # This could be a term
                     current_term = stripped
                     term_line = line_num
 
@@ -1379,7 +1321,6 @@ def parse_task_lists(file_path: str) -> list[dict[str, str]]:
             for line_num, line in enumerate(f, 1):
                 stripped = line.strip()
 
-                # Match checked task
                 checked_match = re.match(r"^-\s+\[x\]\s+(.+)$", stripped, re.IGNORECASE)
                 if checked_match:
                     task_text = checked_match.group(1)
@@ -1392,7 +1333,6 @@ def parse_task_lists(file_path: str) -> list[dict[str, str]]:
                     )
                     continue
 
-                # Match unchecked task
                 unchecked_match = re.match(r"^-\s+\[\s\]\s+(.+)$", stripped)
                 if unchecked_match:
                     task_text = unchecked_match.group(1)
@@ -1454,7 +1394,6 @@ def extract_image_references(file_path: str) -> list[dict[str, str]]:
 
         images = []
 
-        # Find reference definitions for images first
         ref_pattern = r'^\[([^\]]+)\]:\s+(\S+)(?:\s+"([^"]*)")?'
         image_refs = {}
 
@@ -1462,14 +1401,12 @@ def extract_image_references(file_path: str) -> list[dict[str, str]]:
             ref_id = match.group(1)
             url = match.group(2)
             title = match.group(3) or ""
-            # Only store if it looks like an image URL
             if any(
                 url.lower().endswith(ext)
                 for ext in [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"]
             ):
                 image_refs[ref_id] = {"url": url, "title": title}
 
-        # Find inline images: ![alt](url "title")
         inline_pattern = r'!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]*)")?\)'
 
         for line_num, line in enumerate(content.split("\n"), 1):
@@ -1486,7 +1423,6 @@ def extract_image_references(file_path: str) -> list[dict[str, str]]:
                     }
                 )
 
-        # Find reference-style images: ![alt][ref]
         ref_usage_pattern = r"!\[([^\]]*)\]\[([^\]]+)\]"
 
         for line_num, line in enumerate(content.split("\n"), 1):

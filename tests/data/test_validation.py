@@ -93,7 +93,6 @@ class TestValidateSchemaSimple:
         """Test validation failure when data type doesn't match schema."""
         schema = {"type": "object"}
 
-        # Non-dict data should fail for object schema
         with pytest.raises(ValidationError, match="Expected object, got"):
             validate_schema_simple(["not", "a", "dict"], schema)  # type: ignore[arg-type]
 
@@ -111,13 +110,11 @@ class TestValidateSchemaSimple:
             "required": ["name", "email"],
         }
 
-        # Missing email field
         with pytest.raises(
             ValidationError, match="Required property 'email' is missing"
         ):
             validate_schema_simple({"name": "Alice"}, schema)
 
-        # Missing both fields
         with pytest.raises(
             ValidationError, match="Required property 'name' is missing"
         ):
@@ -136,7 +133,6 @@ class TestValidateSchemaSimple:
         schema = {}
         data = {"any": "data"}
 
-        # Empty schema should pass (no validation rules)
         result = validate_schema_simple(data, schema)
         assert result is True
 
@@ -145,7 +141,6 @@ class TestValidateSchemaSimple:
         schema = {"properties": {"name": {"type": "string"}}}
         data = {"name": "Alice"}
 
-        # Schema without type should pass (no type validation)
         result = validate_schema_simple(data, schema)
         assert result is True
 
@@ -307,13 +302,12 @@ class TestValidateDataTypesSimple:
         data = {"name": "Alice"}
         type_map = {"name": "str", "missing_field": "int"}
 
-        # Should not fail for missing fields (only validates present fields)
         result = validate_data_types_simple(data, type_map)
         assert result is True
 
     def test_single_type_mismatch(self) -> None:
         """Test when single field type doesn't match."""
-        data = {"name": "Alice", "age": "30"}  # age is string, not int
+        data = {"name": "Alice", "age": "30"}
         type_map = {"name": "str", "age": "int"}
 
         with pytest.raises(
@@ -340,13 +334,11 @@ class TestValidateDataTypesSimple:
         data = {"field": "value"}
         type_map = {"field": "invalid_type"}
 
-        # Should not fail when type name is not in type_mapping
         result = validate_data_types_simple(data, type_map)
         assert result is True
 
     def test_numeric_type_variations(self) -> None:
         """Test numeric type validation variations."""
-        # int can be validated as float (Python int is instance of numbers)
         data = {"value": 42}
         type_map = {"value": "int"}
 
@@ -402,9 +394,9 @@ class TestValidateRangeSimple:
     def test_value_within_range(self) -> None:
         """Test when value is within the specified range."""
         assert validate_range_simple(5.0, 1.0, 10.0) is True
-        assert validate_range_simple(1.0, 1.0, 10.0) is True  # Boundary: min
-        assert validate_range_simple(10.0, 1.0, 10.0) is True  # Boundary: max
-        assert validate_range_simple(5.5, 1.0, 10.0) is True  # Float
+        assert validate_range_simple(1.0, 1.0, 10.0) is True
+        assert validate_range_simple(10.0, 1.0, 10.0) is True
+        assert validate_range_simple(5.5, 1.0, 10.0) is True
 
     def test_integer_values(self) -> None:
         """Test range validation with integer values."""
@@ -619,13 +611,13 @@ class TestCreateValidationReport:
         data = {"field": "value"}
         rules = {
             "patterns": {
-                "field": "[invalid_regex",  # Invalid regex
+                "field": "[invalid_regex",
             },
         }
 
         result = create_validation_report(data, rules)
 
-        assert result["valid"] is True  # Should still be valid despite warning
+        assert result["valid"] is True
         assert result["errors"] == []
         assert len(result["warnings"]) == 1
         assert "Invalid regex pattern" in result["warnings"][0]
@@ -640,7 +632,7 @@ class TestCreateValidationReport:
 
         result = create_validation_report(data, rules)
 
-        assert result["valid"] is True  # Warnings don't make it invalid
+        assert result["valid"] is True
         assert result["errors"] == []
         assert len(result["warnings"]) == 1
         assert "Unexpected fields found" in result["warnings"][0]
@@ -672,7 +664,7 @@ class TestCreateValidationReport:
 
         assert result["valid"] is True
         assert result["errors"] == []
-        assert len(result["warnings"]) == 1  # Unexpected field warning
+        assert len(result["warnings"]) == 1
         assert result["fields_validated"] == 6
         assert result["rules_applied"] == 5
 
@@ -712,7 +704,6 @@ class TestCreateValidationReport:
 
         result = create_validation_report(data, rules)
 
-        # Should not fail for missing fields in range validation
         assert result["valid"] is True
         assert result["errors"] == []
 
@@ -725,7 +716,6 @@ class TestCreateValidationReport:
 
         result = create_validation_report(data, rules)
 
-        # Should not fail for missing fields in pattern validation
         assert result["valid"] is True
         assert result["errors"] == []
 
@@ -738,13 +728,11 @@ class TestAliaseFunctions:
         data = {"name": "Alice", "age": 30}
         required = ["name", "age"]
 
-        # Should behave identically to check_required_fields
         result1 = check_required_fields(data, required)
         result2 = check_required_fields_simple(data, required)
 
         assert result1 == result2 is True
 
-        # Should raise same errors
         with pytest.raises(ValidationError):
             check_required_fields_simple({"name": "Alice"}, ["name", "missing"])
 
@@ -753,7 +741,6 @@ class TestAliaseFunctions:
         data = {"name": "Alice", "age": 30}
         rules = {"required": ["name"], "types": {"age": "int"}}
 
-        # Should behave identically to create_validation_report
         result1 = create_validation_report(data, rules)
         result2 = create_validation_report_simple(data, rules)
 
@@ -761,13 +748,11 @@ class TestAliaseFunctions:
         assert result1["valid"] is True
 
 
-# Integration tests
 class TestValidationIntegration:
     """Integration tests for validation functions working together."""
 
     def test_complete_user_validation_workflow(self) -> None:
         """Test complete user validation workflow."""
-        # Valid user data
         user_data = {
             "name": "Alice Johnson",
             "age": 28,
@@ -775,19 +760,15 @@ class TestValidationIntegration:
             "score": 85.5,
         }
 
-        # Step 1: Check required fields
         required_fields = ["name", "age", "email"]
         assert check_required_fields(user_data, required_fields) is True
 
-        # Step 2: Validate data types
         type_map = {"name": "str", "age": "int", "email": "str", "score": "float"}
         assert validate_data_types_simple(user_data, type_map) is True
 
-        # Step 3: Validate ranges
         assert validate_range_simple(user_data["age"], 18, 65) is True
         assert validate_range_simple(user_data["score"], 0, 100) is True
 
-        # Step 4: Schema validation
         schema = {
             "type": "object",
             "properties": {
@@ -799,7 +780,6 @@ class TestValidationIntegration:
         }
         assert validate_schema_simple(user_data, schema) is True
 
-        # Step 5: Comprehensive report
         rules = {
             "required": required_fields,
             "types": type_map,
@@ -811,13 +791,11 @@ class TestValidationIntegration:
 
     def test_validation_error_propagation(self) -> None:
         """Test that validation errors are properly propagated."""
-        invalid_data = {"name": 123}  # Wrong type
+        invalid_data = {"name": 123}
 
-        # Individual function should raise
         with pytest.raises(ValidationError):
             validate_data_types_simple(invalid_data, {"name": "str"})
 
-        # Report should capture the error
         rules = {"types": {"name": "str"}}
         report = create_validation_report(invalid_data, rules)
         assert report["valid"] is False
@@ -827,12 +805,12 @@ class TestValidationIntegration:
         """Test partial validation where some rules pass and others fail."""
         data = {"name": "Alice", "age": "not_a_number", "score": 150}
         rules = {
-            "required": ["name"],  # This should pass
-            "types": {"name": "str", "age": "int"},  # name passes, age fails
-            "ranges": {"score": {"min": 0, "max": 100}},  # This should fail
+            "required": ["name"],
+            "types": {"name": "str", "age": "int"},
+            "ranges": {"score": {"min": 0, "max": 100}},
         }
 
         report = create_validation_report(data, rules)
         assert report["valid"] is False
-        assert len(report["errors"]) == 2  # Type error + range error
+        assert len(report["errors"]) == 2
         assert report["fields_validated"] == 3

@@ -87,7 +87,6 @@ def _prepare_request_headers(headers_dict: dict[str, str]) -> dict[str, str]:
     """
     request_headers = dict(headers_dict)
 
-    # Set default User-Agent if not provided
     if "User-Agent" not in request_headers:
         request_headers["User-Agent"] = "basic-open-agent-tools/0.9.1"
 
@@ -117,7 +116,6 @@ def _prepare_request_body(
             raise BasicAgentToolsError("Body must be a string")
         request_body = body.encode("utf-8")
 
-        # Set Content-Type if not provided and body contains JSON-like content
         if "Content-Type" not in updated_headers:
             try:
                 json.loads(body)
@@ -196,7 +194,6 @@ def _decode_response_body(response_body: bytes) -> str:
     try:
         return response_body.decode("utf-8")
     except UnicodeDecodeError:
-        # If decoding fails, return as base64
         import base64
 
         return f"[Binary content - base64]: {base64.b64encode(response_body).decode('ascii')}"
@@ -323,12 +320,10 @@ def http_request(
         >>> print(response["status_code"])
         404
     """
-    # Validate and parse input parameters
     headers_dict = _parse_headers_json(headers)
     method = _validate_http_method(method)
     _validate_http_url(url)
 
-    # Log request details
     body_info = f" ({len(body)} bytes)" if body else ""
     headers_info = f", {len(headers_dict)} headers" if headers_dict else ""
     logger.info(f"{method} {url}{body_info}")
@@ -336,35 +331,29 @@ def http_request(
         f"Timeout: {timeout}s{headers_info}, follow_redirects: {follow_redirects}, verify_ssl: {verify_ssl}"
     )
 
-    # Prepare request components
     request_headers = _prepare_request_headers(headers_dict)
     request_body, request_headers = _prepare_request_body(body, request_headers)
 
     try:
-        # Create request object
         req = urllib.request.Request(
             url=url, data=request_body, headers=request_headers, method=method
         )
 
-        # Configure SSL and redirects
         ssl_context = _create_ssl_context(verify_ssl, url)
         opener = _create_url_opener(follow_redirects, ssl_context)
 
-        # Execute request
         start_time = time.time()
         if not follow_redirects or ssl_context:
             response = opener.open(req, timeout=timeout)
         else:
             response = urllib.request.urlopen(req, timeout=timeout)
 
-        # Process response
         response_body = response.read()
         request_time = time.time() - start_time
 
         decoded_body = _decode_response_body(response_body)
         result = _build_response_dict(response, decoded_body)
 
-        # Log response details
         body_size = len(decoded_body) if decoded_body else 0
         response_headers = json.loads(cast(str, result["headers"]))
         logger.info(

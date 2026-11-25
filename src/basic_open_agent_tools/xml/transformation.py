@@ -45,26 +45,20 @@ def _element_to_json_dict(element: ET.Element) -> dict:
     """
     result: dict[str, object] = {"_tag": element.tag}
 
-    # Add attributes
     if element.attrib:
         result["_attributes"] = dict(element.attrib)
 
-    # Add text content
     if element.text and element.text.strip():
         result["_text"] = element.text.strip()
 
-    # Add children
     for child in element:
         child_dict = _element_to_json_dict(child)
         tag = child.tag
 
-        # Handle multiple children with same tag
         if tag in result:
-            # Convert to list if not already
             existing = result[tag]
             if not isinstance(existing, list):
                 result[tag] = [existing]
-            # Type cast to list before appending
             children_list = result[tag]
             if not isinstance(children_list, list):
                 raise TypeError(
@@ -108,16 +102,13 @@ def xml_to_json(xml_content: str) -> str:
         raise ValueError("xml_content cannot be empty")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             root = defused_fromstring(xml_content)
         else:
             root = ET.fromstring(xml_content)
 
-        # Convert to JSON-friendly dict
         result = _element_to_json_dict(root)
 
-        # Serialize to JSON with indentation
         return json.dumps(result, indent=2, ensure_ascii=False)
 
     except ET.ParseError as e:
@@ -162,25 +153,20 @@ def json_to_xml(json_content: str, root_tag: str) -> str:
         raise ValueError("root_tag cannot be empty")
 
     try:
-        # Parse JSON
         data = json.loads(json_content)
 
         if not isinstance(data, dict):
             raise ValueError("JSON content must be an object/dictionary")
 
-        # Create root element
         root = ET.Element(root_tag)
 
-        # Convert dict to XML elements
         def dict_to_element(parent: ET.Element, data: dict) -> None:
             """Recursively convert dict to XML elements."""
             for key, value in data.items():
-                # Skip special keys
                 if key in ("_tag", "_attributes", "_text"):
                     continue
 
                 if isinstance(value, dict):
-                    # Handle single element
                     attrs = value.get("_attributes", {})
                     child = ET.SubElement(parent, key, attrs)
 
@@ -190,7 +176,6 @@ def json_to_xml(json_content: str, root_tag: str) -> str:
                     dict_to_element(child, value)
 
                 elif isinstance(value, list):
-                    # Handle multiple elements with same tag
                     for item in value:
                         if isinstance(item, dict):
                             attrs = item.get("_attributes", {})
@@ -201,20 +186,16 @@ def json_to_xml(json_content: str, root_tag: str) -> str:
 
                             dict_to_element(child, item)
                         else:
-                            # Simple value
                             child = ET.SubElement(parent, key)
                             child.text = str(item)
                 else:
-                    # Simple value
                     child = ET.SubElement(parent, key)
                     child.text = str(value)
 
         dict_to_element(root, data)
 
-        # Format with indentation
         ET.indent(root, space="  ")
 
-        # Convert to string with XML declaration
         xml_bytes = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
         decoded_str = xml_bytes.decode("UTF-8")
         if not isinstance(decoded_str, str):
@@ -264,17 +245,14 @@ def format_xml(xml_content: str, indent_size: int) -> str:
         raise ValueError("indent_size must be non-negative")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             root = defused_fromstring(xml_content)
         else:
             root = ET.fromstring(xml_content)
 
-        # Format with indentation
         indent_str = " " * indent_size
         ET.indent(root, space=indent_str)
 
-        # Convert to string
         xml_bytes_result = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
         decoded_str = xml_bytes_result.decode("UTF-8")
         if not isinstance(decoded_str, str):
@@ -318,20 +296,16 @@ def strip_xml_namespaces(xml_content: str) -> str:
         raise ValueError("xml_content cannot be empty")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             root = defused_fromstring(xml_content)
         else:
             root = ET.fromstring(xml_content)
 
-        # Strip namespaces from all elements
         def strip_ns(element: ET.Element) -> None:
             """Remove namespace from element and descendants."""
-            # Remove namespace from tag
             if "}" in element.tag:
                 element.tag = element.tag.split("}", 1)[1]
 
-            # Remove xmlns attributes
             attribs_to_remove = []
             for key in element.attrib:
                 if key.startswith("{") or key.startswith("xmlns"):
@@ -340,13 +314,11 @@ def strip_xml_namespaces(xml_content: str) -> str:
             for key in attribs_to_remove:
                 del element.attrib[key]
 
-            # Process children
             for child in element:
                 strip_ns(child)
 
         strip_ns(root)
 
-        # Format and return
         ET.indent(root, space="  ")
         xml_bytes_result = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
         decoded_str = xml_bytes_result.decode("UTF-8")
@@ -406,18 +378,14 @@ def transform_xml_with_xslt(xml_content: str, xslt_path: str) -> str:
         raise ValueError("xslt_path cannot be empty")
 
     try:
-        # Parse XSLT stylesheet
         with open(xslt_path, "rb") as f:
             xslt_doc = lxml_etree.parse(f)
             transform = lxml_etree.XSLT(xslt_doc)
 
-        # Parse XML
         doc = lxml_etree.fromstring(xml_content.encode("utf-8"))
 
-        # Apply transformation
         result_tree = transform(doc)
 
-        # Convert result to string
         result_str = str(result_tree)
         if not isinstance(result_str, str):
             raise TypeError(
@@ -480,21 +448,17 @@ def extract_xml_to_csv(xml_content: str, element_tag: str) -> list[dict]:
         raise ValueError("element_tag cannot be empty")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             root = defused_fromstring(xml_content)
         else:
             root = ET.fromstring(xml_content)
 
-        # Find all matching elements
         elements = root.findall(f".//{element_tag}")
 
-        # Convert to list of dicts
         result = []
         for element in elements:
             row = dict(element.attrib)
 
-            # Add text content if present
             if element.text and element.text.strip():
                 row["_text"] = element.text.strip()
 

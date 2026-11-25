@@ -30,7 +30,6 @@ except ImportError:
     )
 
 
-# Maximum file size to prevent memory exhaustion (10MB default)
 MAX_XML_FILE_SIZE = 10 * 1024 * 1024
 
 
@@ -50,7 +49,6 @@ def _element_to_dict(element: ET.Element) -> dict:
         "children": [],
     }
 
-    # Convert children recursively
     children: list[dict] = []
     for child in element:
         children.append(_element_to_dict(child))
@@ -90,11 +88,9 @@ def read_xml_file(file_path: str) -> dict:
         >>> xml_data['children'][0]['tag']
         'setting'
     """
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size to prevent memory exhaustion
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -102,12 +98,10 @@ def read_xml_file(file_path: str) -> dict:
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Use defusedxml if available for security
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -153,7 +147,6 @@ def parse_xml_string(xml_content: str) -> dict:
     if not isinstance(xml_content, str):
         raise TypeError("xml_content must be a string")
 
-    # Check content size
     content_size = len(xml_content.encode("utf-8"))
     if content_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -165,7 +158,6 @@ def parse_xml_string(xml_content: str) -> dict:
         raise ValueError("XML content cannot be empty")
 
     try:
-        # Use defusedxml if available for security
         if HAS_DEFUSEDXML:
             root = defused_fromstring(xml_content)
         else:
@@ -214,11 +206,9 @@ def extract_xml_elements_by_tag(file_path: str, tag_name: str) -> list[dict]:
     if not tag_name.strip():
         raise ValueError("tag_name cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -227,7 +217,6 @@ def extract_xml_elements_by_tag(file_path: str, tag_name: str) -> list[dict]:
         )
 
     try:
-        # Use defusedxml if available
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -235,7 +224,6 @@ def extract_xml_elements_by_tag(file_path: str, tag_name: str) -> list[dict]:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Find all matching elements
         elements = root.findall(f".//{tag_name}")
         return [_element_to_dict(elem) for elem in elements]
 
@@ -281,13 +269,11 @@ def get_xml_element_text(xml_content: str, xpath: str) -> str:
         raise ValueError("xpath cannot be empty")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             root = defused_fromstring(xml_content)
         else:
             root = ET.fromstring(xml_content)
 
-        # Find element
         element = root.find(xpath)
         if element is None:
             raise LookupError(f"No element found at XPath: {xpath}")
@@ -344,18 +330,15 @@ def get_xml_element_attribute(xml_content: str, xpath: str, attribute_name: str)
         raise ValueError("attribute_name cannot be empty")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             root = defused_fromstring(xml_content)
         else:
             root = ET.fromstring(xml_content)
 
-        # Find element
         element = root.find(xpath)
         if element is None:
             raise LookupError(f"No element found at XPath: {xpath}")
 
-        # Get attribute
         if attribute_name not in element.attrib:
             raise KeyError(
                 f"Attribute '{attribute_name}' not found on element at {xpath}"
@@ -390,11 +373,9 @@ def list_xml_element_tags(file_path: str) -> list[str]:
         >>> tags
         ['book', 'catalog', 'title', 'author', 'price']
     """
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -402,12 +383,10 @@ def list_xml_element_tags(file_path: str) -> list[str]:
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -415,7 +394,6 @@ def list_xml_element_tags(file_path: str) -> list[str]:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Collect all unique tags
         tags = set()
         tags.add(root.tag)
 
@@ -461,11 +439,9 @@ def get_xml_structure(file_path: str, max_depth: int) -> dict[str, str]:
     if not isinstance(max_depth, int) or max_depth < 0:
         raise TypeError("max_depth must be a non-negative integer")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -473,12 +449,10 @@ def get_xml_structure(file_path: str, max_depth: int) -> dict[str, str]:
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -492,21 +466,16 @@ def get_xml_structure(file_path: str, max_depth: int) -> dict[str, str]:
             if max_depth > 0 and depth > max_depth:
                 return
 
-            # Add element
             structure[path] = "element"
 
-            # Add attributes
             for attr_name in element.attrib:
                 structure[f"{path}.@{attr_name}"] = "attribute"
 
-            # Traverse children
             for child in element:
-                # Remove namespace from tag if present
                 tag = child.tag.split("}")[-1] if "}" in child.tag else child.tag
                 child_path = f"{path}.{tag}"
                 traverse(child, child_path, depth + 1)
 
-        # Start traversal
         root_tag = root.tag.split("}")[-1] if "}" in root.tag else root.tag
         traverse(root, root_tag, 1)
 
@@ -547,11 +516,9 @@ def count_xml_elements(file_path: str, tag_name: str) -> int:
     if not isinstance(tag_name, str):
         raise TypeError("tag_name must be a string")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -559,12 +526,10 @@ def count_xml_elements(file_path: str, tag_name: str) -> int:
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -572,15 +537,12 @@ def count_xml_elements(file_path: str, tag_name: str) -> int:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Count elements
         if not tag_name:
-            # Count all elements
-            count = 1  # Root
+            count = 1
             for _ in root.iter():
                 count += 1
-            return count - 1  # Subtract root as iter() includes it
+            return count - 1
         else:
-            # Count specific tag
             count = 0
             for element in root.iter():
                 element_tag = (
@@ -625,11 +587,9 @@ def get_xml_element_at_path(file_path: str, xpath: str) -> dict:
     if not isinstance(xpath, str):
         raise TypeError("xpath must be a string")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -637,12 +597,10 @@ def get_xml_element_at_path(file_path: str, xpath: str) -> dict:
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -650,13 +608,11 @@ def get_xml_element_at_path(file_path: str, xpath: str) -> dict:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Find element using XPath
         element = root.find(xpath)
 
         if element is None:
             raise ValueError(f"No element found at XPath: {xpath}")
 
-        # Convert to dict
         return _element_to_dict(element)
 
     except ET.ParseError as e:
@@ -694,11 +650,9 @@ def get_xml_attributes(file_path: str, tag_name: str) -> list[str]:
     if not isinstance(tag_name, str):
         raise TypeError("tag_name must be a string")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -706,12 +660,10 @@ def get_xml_attributes(file_path: str, tag_name: str) -> list[str]:
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -719,7 +671,6 @@ def get_xml_attributes(file_path: str, tag_name: str) -> list[str]:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Collect unique attributes
         attributes = set()
         for element in root.iter():
             element_tag = (
@@ -765,11 +716,9 @@ def search_xml_tags(file_path: str, tag_pattern: str) -> list[str]:
     if not isinstance(tag_pattern, str):
         raise TypeError("tag_pattern must be a string")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -777,12 +726,10 @@ def search_xml_tags(file_path: str, tag_pattern: str) -> list[str]:
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -794,20 +741,17 @@ def search_xml_tags(file_path: str, tag_pattern: str) -> list[str]:
         matching_paths: list[str] = []
 
         def traverse(element: ET.Element, path: str) -> None:
-            # Check if tag matches pattern
             element_tag = (
                 element.tag.split("}")[-1] if "}" in element.tag else element.tag
             )
             if pattern_lower in element_tag.lower():
                 matching_paths.append(path)
 
-            # Traverse children
             for child in element:
                 child_tag = child.tag.split("}")[-1] if "}" in child.tag else child.tag
                 child_path = f"{path}.{child_tag}"
                 traverse(child, child_path)
 
-        # Start traversal
         root_tag = root.tag.split("}")[-1] if "}" in root.tag else root.tag
         traverse(root, root_tag)
 
@@ -848,11 +792,9 @@ def select_xml_elements(file_path: str, tag_name: str) -> list[dict]:
     if not isinstance(tag_name, str):
         raise TypeError("tag_name must be a string")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -860,12 +802,10 @@ def select_xml_elements(file_path: str, tag_name: str) -> list[dict]:
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -873,7 +813,6 @@ def select_xml_elements(file_path: str, tag_name: str) -> list[dict]:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Extract matching elements
         result: list[dict] = []
         for element in root.iter():
             element_tag = (
@@ -945,11 +884,9 @@ def filter_xml_elements(
     if operator not in valid_operators:
         raise ValueError(f"operator must be one of: {valid_operators}")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -957,12 +894,10 @@ def filter_xml_elements(
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -970,7 +905,6 @@ def filter_xml_elements(
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Filter elements
         result: list[dict] = []
         for element in root.iter():
             element_tag = (
@@ -979,15 +913,11 @@ def filter_xml_elements(
             if element_tag != tag_name:
                 continue
 
-            # Get comparison value
             if attribute:
-                # Filter by attribute
                 compare_value = element.get(attribute, "")
             else:
-                # Filter by text content
                 compare_value = element.text.strip() if element.text else ""
 
-            # Apply filter
             matches = False
             if operator == "equals":
                 matches = compare_value == value
@@ -1054,11 +984,9 @@ def preview_xml_elements(
     if not isinstance(num_elements, int) or num_elements < 1:
         raise TypeError("num_elements must be a positive integer")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -1066,12 +994,10 @@ def preview_xml_elements(
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -1079,7 +1005,6 @@ def preview_xml_elements(
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Extract first N elements
         result: list[dict] = []
         count = 0
 
@@ -1141,11 +1066,9 @@ def slice_xml_elements(
     if not isinstance(end, int) or end < start:
         raise TypeError("end must be an integer >= start")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -1153,12 +1076,10 @@ def slice_xml_elements(
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -1166,7 +1087,6 @@ def slice_xml_elements(
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Extract slice of elements
         result: list[dict] = []
         index = 0
 
@@ -1215,11 +1135,9 @@ def get_xml_namespace_info(file_path: str) -> dict[str, str]:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -1227,12 +1145,10 @@ def get_xml_namespace_info(file_path: str) -> dict[str, str]:
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -1240,10 +1156,8 @@ def get_xml_namespace_info(file_path: str) -> dict[str, str]:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Collect namespaces
         namespaces: dict[str, str] = {}
 
-        # Get namespaces from root
         for prefix, uri in root.attrib.items():
             if prefix.startswith("{http://www.w3.org/2000/xmlns/}"):
                 ns_prefix = prefix.split("}")[-1]
@@ -1251,10 +1165,9 @@ def get_xml_namespace_info(file_path: str) -> dict[str, str]:
             elif prefix == "xmlns":
                 namespaces["default"] = uri
 
-        # Scan all elements for namespace URIs in tags
         for element in root.iter():
             if "}" in element.tag:
-                uri = element.tag.split("}")[0][1:]  # Remove leading {
+                uri = element.tag.split("}")[0][1:]
                 if uri and uri not in namespaces.values():
                     namespaces[f"ns{len(namespaces)}"] = uri
 
@@ -1296,11 +1209,9 @@ def get_xml_element_stats(file_path: str, tag_name: str) -> dict[str, str]:
     if not isinstance(tag_name, str):
         raise TypeError("tag_name must be a string")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         raise ValueError(
@@ -1308,12 +1219,10 @@ def get_xml_element_stats(file_path: str, tag_name: str) -> dict[str, str]:
             f"(maximum: {MAX_XML_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -1321,7 +1230,6 @@ def get_xml_element_stats(file_path: str, tag_name: str) -> dict[str, str]:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Collect statistics
         count = 0
         all_attributes = set()
         has_text = False
@@ -1391,15 +1299,12 @@ def validate_xml_structure_simple(file_path: str) -> dict[str, str]:
     if not isinstance(file_path, str):
         raise TypeError("file_path must be a string")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"XML file not found: {file_path}")
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read XML file: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_XML_FILE_SIZE:
         return {
@@ -1411,7 +1316,6 @@ def validate_xml_structure_simple(file_path: str) -> dict[str, str]:
         }
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             tree = defused_parse(file_path)
             root = tree.getroot()
@@ -1419,7 +1323,6 @@ def validate_xml_structure_simple(file_path: str) -> dict[str, str]:
             tree = ET.parse(file_path)
             root = tree.getroot()
 
-        # Collect statistics
         element_count = sum(1 for _ in root.iter())
         unique_tags = {
             elem.tag.split("}")[-1] if "}" in elem.tag else elem.tag

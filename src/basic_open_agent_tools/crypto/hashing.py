@@ -153,17 +153,14 @@ def hash_file(file_path: str, algorithm: str) -> dict[str, Union[str, int]]:
     file_path = file_path.strip()
 
     try:
-        # Check if file exists and is readable
         if not os.path.exists(file_path):
             raise BasicAgentToolsError(f"File not found: {file_path}")
 
         if not os.path.isfile(file_path):
             raise BasicAgentToolsError(f"Path is not a file: {file_path}")
 
-        # Get file size
         file_size = os.path.getsize(file_path)
 
-        # Create hash object
         if algorithm == "md5":
             hash_obj = hashlib.md5()
         elif algorithm == "sha256":
@@ -171,8 +168,7 @@ def hash_file(file_path: str, algorithm: str) -> dict[str, Union[str, int]]:
         elif algorithm == "sha512":
             hash_obj = hashlib.sha512()
 
-        # Read and hash file in chunks to handle large files
-        chunk_size = 64 * 1024  # 64KB chunks
+        chunk_size = 64 * 1024
 
         with open(file_path, "rb") as f:
             while chunk := f.read(chunk_size):
@@ -234,10 +230,8 @@ def verify_checksum(
     expected_hash = expected_hash.strip().lower()
 
     try:
-        # Validate expected hash format (should be hex)
-        int(expected_hash, 16)  # This will raise ValueError if not valid hex
+        int(expected_hash, 16)
 
-        # Generate hash of the data
         if algorithm == "md5":
             hash_result = hash_md5(data)
         elif algorithm == "sha256":

@@ -17,10 +17,9 @@ from basic_open_agent_tools.helpers import (
     merge_tool_lists,
 )
 
-# Load environment variables for API keys
-load_dotenv()  # From current working directory (when pytest runs from root)
+load_dotenv()
 project_root = Path(__file__).parent.parent.parent.parent.parent
-load_dotenv(project_root / ".env")  # From project root
+load_dotenv(project_root / ".env")
 
 agent_tools = merge_tool_lists(
     load_all_filesystem_tools(),
