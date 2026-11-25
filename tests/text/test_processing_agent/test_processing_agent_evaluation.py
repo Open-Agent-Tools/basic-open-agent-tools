@@ -21,4 +21,4 @@ class TestTextProcessingAgentEvaluation:
             agent_module="tests.text.test_processing_agent.agent",
             eval_dataset_file_path_or_dir="tests/text/test_processing_agent/list_available_tools.test.json",
         )
-        await asyncio.sleep(2)  # Rate limiting delay
+        await asyncio.sleep(2)

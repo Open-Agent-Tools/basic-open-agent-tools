@@ -8,7 +8,6 @@ This module provides XML processing capabilities organized into logical submodul
 - transformation: XML/JSON conversion, formatting, and XSLT transforms
 """
 
-# Import all functions from submodules
 from .authoring import (
     add_xml_child_element,
     build_simple_xml,
@@ -54,16 +53,13 @@ from .validation import (
     validate_xml_well_formed,
 )
 
-# Re-export all functions at module level for convenience
 __all__: list[str] = [
-    # Parsing functions (18 - includes 12 token-saving inspection tools)
     "read_xml_file",
     "parse_xml_string",
     "extract_xml_elements_by_tag",
     "get_xml_element_text",
     "get_xml_element_attribute",
     "list_xml_element_tags",
-    # Token-saving inspection tools
     "get_xml_structure",
     "count_xml_elements",
     "get_xml_element_at_path",
@@ -76,7 +72,6 @@ __all__: list[str] = [
     "get_xml_namespace_info",
     "get_xml_element_stats",
     "validate_xml_structure_simple",
-    # Authoring functions
     "create_xml_from_dict",
     "write_xml_file",
     "create_xml_element",
@@ -84,13 +79,11 @@ __all__: list[str] = [
     "set_xml_element_attribute",
     "build_simple_xml",
     "xml_from_csv",
-    # Validation functions
     "validate_xml_well_formed",
     "validate_xml_against_dtd",
     "validate_xml_against_xsd",
     "check_xml_has_required_elements",
     "create_xml_validation_report",
-    # Transformation functions
     "xml_to_json",
     "json_to_xml",
     "format_xml",

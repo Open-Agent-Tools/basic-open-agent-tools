@@ -47,7 +47,6 @@ class TestBypassMode:
 
         assert confirmed is True
         assert decline_reason is None
-        # Should print bypass message
         mock_print.assert_called_once_with(
             "[BYPASS] Confirmation bypassed via BYPASS_TOOL_CONSENT"
         )
@@ -69,7 +68,6 @@ class TestBypassMode:
         """Test BYPASS_TOOL_CONSENT=false does not bypass."""
         monkeypatch.setenv("BYPASS_TOOL_CONSENT", "false")
 
-        # Should not bypass, will go to agent mode (non-TTY in tests)
         with pytest.raises(BasicAgentToolsError, match="CONFIRMATION_REQUIRED"):
             check_user_confirmation(
                 operation="test operation",
@@ -106,7 +104,6 @@ class TestInteractiveMode:
 
         assert confirmed is True
         assert decline_reason is None
-        # Check confirmation message was printed
         calls = [str(call) for call in mock_print.call_args_list]
         assert any("Confirmation Required" in str(call) for call in calls)
         assert any("delete file" in str(call) for call in calls)
@@ -125,7 +122,6 @@ class TestInteractiveMode:
 
         assert confirmed is False
         assert decline_reason == "file not ready"
-        # Check cancelled message was printed
         calls = [str(call) for call in mock_print.call_args_list]
         assert any("Cancelled" in str(call) for call in calls)
 
@@ -165,7 +161,6 @@ class TestInteractiveMode:
 
         assert confirmed is True
         assert decline_reason is None
-        # Preview should not be in output
         calls = [str(call) for call in mock_print.call_args_list]
         assert not any("Preview" in str(call) for call in calls)
 
@@ -199,21 +194,16 @@ class TestInteractiveMode:
 
     def test_is_interactive_terminal_detection(self):
         """Test TTY detection (mocked)."""
-        # In test environment, stdin/stdout are not TTY
-        # This tests the actual behavior in pytest
         assert _is_interactive_terminal() is False
 
-        # Test with mocked TTY
         with patch("sys.stdin.isatty", return_value=True):
             with patch("sys.stdout.isatty", return_value=True):
                 assert _is_interactive_terminal() is True
 
-        # Test with only stdin as TTY
         with patch("sys.stdin.isatty", return_value=True):
             with patch("sys.stdout.isatty", return_value=False):
                 assert _is_interactive_terminal() is False
 
-        # Test with only stdout as TTY
         with patch("sys.stdin.isatty", return_value=False):
             with patch("sys.stdout.isatty", return_value=True):
                 assert _is_interactive_terminal() is False
@@ -263,11 +253,10 @@ class TestAgentMode:
 
         error_msg = str(exc_info.value)
         assert "CONFIRMATION_REQUIRED" in error_msg
-        assert "Preview" not in error_msg  # Should not include preview section
+        assert "Preview" not in error_msg
 
     def test_check_user_confirmation_agent_mode_default(self):
         """Test check_user_confirmation goes to agent mode in non-TTY environment."""
-        # In pytest, we're not in a TTY, so should raise error
         with pytest.raises(BasicAgentToolsError, match="CONFIRMATION_REQUIRED"):
             check_user_confirmation(
                 operation="test operation",
@@ -308,8 +297,6 @@ class TestIntegrationScenarios:
 
     def test_directory_delete_scenario_interactive(self):
         """Test directory delete scenario in interactive mode."""
-        # Need to patch _is_interactive_terminal directly since check_user_confirmation
-        # calls it internally
         with patch(
             "basic_open_agent_tools.confirmation._is_interactive_terminal",
             return_value=True,
@@ -346,7 +333,6 @@ class TestIntegrationScenarios:
 
     def test_multiple_confirmations_same_session(self, monkeypatch):
         """Test multiple confirmations in same session."""
-        # First with bypass
         confirmed1, reason1 = check_user_confirmation(
             operation="write file",
             target="/tmp/file1.txt",
@@ -355,7 +341,6 @@ class TestIntegrationScenarios:
         assert confirmed1 is True
         assert reason1 is None
 
-        # Then without bypass (should raise in non-TTY)
         with pytest.raises(BasicAgentToolsError):
             check_user_confirmation(
                 operation="write file",
@@ -363,7 +348,6 @@ class TestIntegrationScenarios:
                 skip_confirm=False,
             )
 
-        # Then with env var bypass
         monkeypatch.setenv("BYPASS_TOOL_CONSENT", "true")
         confirmed3, reason3 = check_user_confirmation(
             operation="write file",
@@ -417,9 +401,9 @@ class TestEdgeCases:
         """Test with Unicode characters."""
         with pytest.raises(BasicAgentToolsError) as exc_info:
             _raise_agent_confirmation_error(
-                operation="删除文件",  # "delete file" in Chinese
-                target="/data/文档.txt",  # "document.txt" in Chinese
-                preview_info="大小: 1MB",  # "size: 1MB" in Chinese
+                operation="删除文件",
+                target="/data/文档.txt",
+                preview_info="大小: 1MB",
             )
 
         error_msg = str(exc_info.value)

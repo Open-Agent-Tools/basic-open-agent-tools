@@ -66,15 +66,12 @@ def apply_excel_bold(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -82,14 +79,11 @@ def apply_excel_bold(
 
         ws = wb[sheet_name]
 
-        # Apply bold to range
         for row in ws[cell_range]:
-            # Handle single cell or range
             cells = row if isinstance(row, tuple) else [row]
             for cell in cells:
                 cell.font = Font(bold=True)
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -154,15 +148,12 @@ def apply_excel_font_size(
     if font_size < 1 or font_size > 409:
         raise ValueError("font_size must be between 1 and 409")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -170,13 +161,11 @@ def apply_excel_font_size(
 
         ws = wb[sheet_name]
 
-        # Apply font size to range
         for row in ws[cell_range]:
             cells = row if isinstance(row, tuple) else [row]
             for cell in cells:
                 cell.font = Font(size=font_size)
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -243,7 +232,6 @@ def apply_excel_alignment(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Validate alignment values
     valid_horizontal = ["left", "center", "right", "justify"]
     valid_vertical = ["top", "center", "bottom", "justify"]
 
@@ -255,15 +243,12 @@ def apply_excel_alignment(
     if vertical.lower() not in valid_vertical:
         raise ValueError(f"vertical must be one of {valid_vertical}, got '{vertical}'")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -271,7 +256,6 @@ def apply_excel_alignment(
 
         ws = wb[sheet_name]
 
-        # Apply alignment to range
         for row in ws[cell_range]:
             cells = row if isinstance(row, tuple) else [row]
             for cell in cells:
@@ -279,7 +263,6 @@ def apply_excel_alignment(
                     horizontal=horizontal.lower(), vertical=vertical.lower()
                 )
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -340,19 +323,15 @@ def set_excel_column_width(
     if width < 0 or width > 255:
         raise ValueError("width must be between 0 and 255")
 
-    # Validate column letter format
     if not re.match(r"^[A-Z]+$", column_letter.upper()):
         raise ValueError(f"Invalid column letter: {column_letter}")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -360,10 +339,8 @@ def set_excel_column_width(
 
         ws = wb[sheet_name]
 
-        # Set column width
         ws.column_dimensions[column_letter.upper()].width = width
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -427,15 +404,12 @@ def set_excel_row_height(
     if height < 0 or height > 409:
         raise ValueError("height must be between 0 and 409")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -443,10 +417,8 @@ def set_excel_row_height(
 
         ws = wb[sheet_name]
 
-        # Set row height
         ws.row_dimensions[row_number].height = height
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -508,19 +480,15 @@ def apply_excel_cell_color(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Validate hex color (6 characters, hex digits)
     if not re.match(r"^[0-9A-Fa-f]{6}$", color_hex):
         raise ValueError(f"color_hex must be 6 hex digits without #, got '{color_hex}'")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -528,7 +496,6 @@ def apply_excel_cell_color(
 
         ws = wb[sheet_name]
 
-        # Apply color to range
         fill = PatternFill(
             start_color=color_hex.upper(),
             end_color=color_hex.upper(),
@@ -540,7 +507,6 @@ def apply_excel_cell_color(
             for cell in cells:
                 cell.fill = fill
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -596,15 +562,12 @@ def freeze_excel_panes(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -612,10 +575,8 @@ def freeze_excel_panes(
 
         ws = wb[sheet_name]
 
-        # Freeze panes
         ws.freeze_panes = cell_reference
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 
@@ -677,19 +638,15 @@ def add_excel_formula(
     if not isinstance(skip_confirm, bool):
         raise TypeError("skip_confirm must be a boolean")
 
-    # Validate formula starts with =
     if not formula.startswith("="):
         raise ValueError(f"Formula must start with '=', got '{formula}'")
 
-    # Check file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Excel file not found: {file_path}")
 
     try:
-        # Load workbook
         wb = load_workbook(filename=file_path)
 
-        # Check sheet exists
         if sheet_name not in wb.sheetnames:
             raise ValueError(
                 f"Sheet '{sheet_name}' not found. Available: {wb.sheetnames}"
@@ -697,10 +654,8 @@ def add_excel_formula(
 
         ws = wb[sheet_name]
 
-        # Add formula
         ws[cell_reference] = formula
 
-        # Save workbook
         wb.save(file_path)
         wb.close()
 

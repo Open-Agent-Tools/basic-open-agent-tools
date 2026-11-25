@@ -45,21 +45,16 @@ def _validate_against_schema(data: dict, schema: dict) -> None:
         properties = schema.get("properties", {})
         required = schema.get("required", [])
 
-        # Check required properties
         for prop in required:
             if prop not in data:
                 raise ValidationError(f"Required property '{prop}' is missing")
 
-        # Validate properties
         for prop, value in data.items():
             if prop in properties:
-                # Only validate dict values recursively
                 if isinstance(value, dict):
                     _validate_against_schema(value, properties[prop])
 
     elif schema_type == "array":
-        # For dict-only validation, we can't handle arrays directly
-        # This would need to be a dict with array-like structure
         raise ValidationError("Array validation not supported with dict-only input")
 
 
@@ -225,21 +220,18 @@ def create_validation_report(data: dict, rules: dict) -> dict:
     errors = []
     warnings = []
 
-    # Check required fields
     required_fields = rules.get("required", [])
     try:
         check_required_fields(data, required_fields)
     except ValidationError as e:
         errors.append(str(e))
 
-    # Check data types
     type_map = rules.get("types", {})
     try:
         validate_data_types_simple(data, type_map)
     except ValidationError as e:
         errors.append(str(e))
 
-    # Check ranges for numeric fields
     ranges = rules.get("ranges", {})
     for field, range_spec in ranges.items():
         if field in data:
@@ -251,7 +243,6 @@ def create_validation_report(data: dict, rules: dict) -> dict:
             except (ValidationError, TypeError) as e:
                 errors.append(f"Range validation failed for '{field}': {str(e)}")
 
-    # Check custom patterns
     patterns = rules.get("patterns", {})
     for field, pattern in patterns.items():
         if field in data:
@@ -264,7 +255,6 @@ def create_validation_report(data: dict, rules: dict) -> dict:
             except re.error:
                 warnings.append(f"Invalid regex pattern for field '{field}': {pattern}")
 
-    # Check for unexpected fields
     allowed_fields = rules.get("allowed_fields")
     if allowed_fields:
         unexpected = set(data.keys()) - set(allowed_fields)

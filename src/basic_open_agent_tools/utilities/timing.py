@@ -44,7 +44,7 @@ def sleep_seconds(seconds: float) -> dict[str, Union[str, float]]:
     if seconds < 0:
         raise BasicAgentToolsError("Seconds cannot be negative")
 
-    if seconds > 3600:  # 1 hour maximum
+    if seconds > 3600:
         raise BasicAgentToolsError("Maximum sleep duration is 3600 seconds (1 hour)")
 
     start_time = time.time()
@@ -54,13 +54,11 @@ def sleep_seconds(seconds: float) -> dict[str, Union[str, float]]:
         nonlocal interrupted
         interrupted = True
 
-    # Set up signal handler for graceful interruption
     original_handler = None
     if hasattr(signal, "SIGINT"):
         try:
             original_handler = signal.signal(signal.SIGINT, signal_handler)
         except (ValueError, OSError):
-            # Signal handling might not be available in all environments
             pass
 
     try:
@@ -68,7 +66,6 @@ def sleep_seconds(seconds: float) -> dict[str, Union[str, float]]:
     except KeyboardInterrupt:
         interrupted = True
 
-    # Restore original signal handler
     if original_handler is not None:
         try:
             signal.signal(signal.SIGINT, original_handler)
@@ -122,7 +119,6 @@ def sleep_milliseconds(milliseconds: float) -> dict[str, Union[str, float]]:
     seconds = milliseconds / 1000.0
     result: dict[str, Union[str, float]] = sleep_seconds(seconds)
 
-    # Update the result to reflect milliseconds
     result["requested_milliseconds"] = float(milliseconds)
     result["actual_milliseconds"] = round(float(result["actual_seconds"]) * 1000, 1)
 
@@ -157,17 +153,15 @@ def precise_sleep(seconds: float) -> dict[str, Union[str, float]]:
     if seconds < 0:
         raise BasicAgentToolsError("Seconds cannot be negative")
 
-    if seconds > 60:  # 1 minute maximum for precise sleep
+    if seconds > 60:
         raise BasicAgentToolsError("Maximum precise sleep duration is 60 seconds")
 
     start_time = time.time()
 
-    # Use regular sleep for most of the duration
-    if seconds > 0.01:  # 10ms threshold
+    if seconds > 0.01:
         coarse_sleep = seconds - 0.01
         time.sleep(coarse_sleep)
 
-    # Use busy-waiting for the final precise portion
     target_time = start_time + seconds
     while time.time() < target_time:
         pass

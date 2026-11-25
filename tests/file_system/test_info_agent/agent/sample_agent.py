@@ -18,11 +18,9 @@ from basic_open_agent_tools.file_system.info import (
     is_empty_directory,
 )
 
-# Load environment variables for API keys
-# Try multiple locations: current working directory and project root
-load_dotenv()  # From current working directory (when pytest runs from root)
+load_dotenv()
 project_root = Path(__file__).parent.parent.parent.parent.parent
-load_dotenv(project_root / ".env")  # From project root
+load_dotenv(project_root / ".env")
 
 root_agent = Agent(
     name="info_agent",

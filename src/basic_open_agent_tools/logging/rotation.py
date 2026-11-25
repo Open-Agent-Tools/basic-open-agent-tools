@@ -13,7 +13,7 @@ from ..exceptions import BasicAgentToolsError
 def setup_rotating_log(
     logger_name: str,
     log_file: str,
-    max_bytes: int,  # 10MB
+    max_bytes: int,
     backup_count: int,
 ) -> dict[str, Union[str, int]]:
     """Set up a rotating file handler for a logger."""

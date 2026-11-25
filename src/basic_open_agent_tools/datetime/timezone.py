@@ -48,11 +48,9 @@ def convert_timezone(datetime_string: str, from_timezone: str, to_timezone: str)
         from_tz = zoneinfo.ZoneInfo(from_timezone)
         to_tz = zoneinfo.ZoneInfo(to_timezone)
 
-        # Parse datetime and localize to source timezone
         dt = datetime.fromisoformat(datetime_string)
         dt_localized = dt.replace(tzinfo=from_tz)
 
-        # Convert to target timezone
         dt_converted = dt_localized.astimezone(to_tz)
 
         return dt_converted.isoformat()
@@ -89,8 +87,7 @@ def get_timezone_offset(timezone: str) -> str:
         now = datetime.now(tz)
         offset = now.strftime("%z")
 
-        # Format as +HH:MM or -HH:MM
-        if len(offset) == 5:  # +HHMM format
+        if len(offset) == 5:
             return f"{offset[:3]}:{offset[3:]}"
         return offset
     except Exception as e:

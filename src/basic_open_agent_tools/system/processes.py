@@ -99,10 +99,8 @@ def list_running_processes(limit: int) -> list[dict[str, Union[str, int, float]]
                     break
 
             except (psutil.NoSuchProcess, psutil.AccessDenied):
-                # Skip processes that disappeared or we can't access
                 continue
 
-        # Sort by CPU usage (highest first)
         processes.sort(key=lambda x: x["cpu_percent"], reverse=True)
 
         return processes[:limit]
@@ -198,7 +196,6 @@ def is_process_running(
                 if proc.info["name"] and proc.info["name"].lower() == process_name:
                     matching_pids.append(proc.info["pid"])
             except (psutil.NoSuchProcess, psutil.AccessDenied):
-                # Skip processes that disappeared or we can't access
                 continue
 
         return {

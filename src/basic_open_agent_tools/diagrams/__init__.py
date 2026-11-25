@@ -22,7 +22,6 @@ from .plantuml import (
 )
 
 __all__: list[str] = [
-    # PlantUML functions (8)
     "create_plantuml_class_diagram",
     "create_plantuml_sequence_diagram",
     "create_plantuml_activity_diagram",
@@ -31,7 +30,6 @@ __all__: list[str] = [
     "write_plantuml_file",
     "validate_plantuml_syntax",
     "extract_plantuml_elements",
-    # Mermaid functions (8)
     "create_mermaid_flowchart",
     "create_mermaid_sequence_diagram",
     "create_mermaid_gantt_chart",

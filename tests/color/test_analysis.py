@@ -27,16 +27,14 @@ class TestCalculateLuminance:
     def test_gray(self) -> None:
         """Test gray has intermediate luminance."""
         lum = calculate_luminance(128, 128, 128)
-        assert 0.2 < lum < 0.3  # Gray is darker than you'd think
+        assert 0.2 < lum < 0.3
 
     def test_various_colors(self) -> None:
         """Test various color luminances."""
-        # Red, green, blue have different perceptual luminance
         red_lum = calculate_luminance(255, 0, 0)
         green_lum = calculate_luminance(0, 255, 0)
         blue_lum = calculate_luminance(0, 0, 255)
 
-        # Green appears brightest to human eye
         assert green_lum > red_lum
         assert green_lum > blue_lum
 
@@ -76,15 +74,12 @@ class TestCalculateContrastRatio:
 
     def test_wcag_ratings(self) -> None:
         """Test WCAG rating classifications."""
-        # AAA: >= 7.0
         result = calculate_contrast_ratio("#000000", "#FFFFFF")
         assert result["wcag_rating"] == "AAA"
 
-        # AA: >= 4.5
         result = calculate_contrast_ratio("#767676", "#FFFFFF")
         assert result["wcag_rating"] in ["AA", "AAA"]
 
-        # Fail: < 3.0
         result = calculate_contrast_ratio("#CCCCCC", "#FFFFFF")
         assert result["wcag_rating"] in ["Fail", "AA Large"]
 
@@ -137,7 +132,6 @@ class TestCheckWcagCompliance:
 
     def test_level_normalization(self) -> None:
         """Test level string normalization."""
-        # Accepts various formats
         result1 = check_wcag_compliance("#000000", "#FFFFFF", "aa")
         result2 = check_wcag_compliance("#000000", "#FFFFFF", "AA")
         result3 = check_wcag_compliance("#000000", "#FFFFFF", "aa-large")
@@ -171,28 +165,24 @@ class TestGetComplementaryColor:
     def test_basic_complement(self) -> None:
         """Test basic complementary color."""
         comp = get_complementary_color("#FF5733")
-        # Complementary should be 180 degrees opposite
         assert comp.startswith("#")
         assert len(comp) == 7
 
     def test_red_complement(self) -> None:
         """Test red's complement is cyan."""
         comp = get_complementary_color("#FF0000")
-        # Red (0°) complement should be cyan (180°)
         result = comp.upper()
         assert result == "#00FFFF"
 
     def test_green_complement(self) -> None:
         """Test green's complement is magenta."""
         comp = get_complementary_color("#00FF00")
-        # Green (120°) complement should be magenta (300°)
         result = comp.upper()
         assert result == "#FF00FF"
 
     def test_blue_complement(self) -> None:
         """Test blue's complement is yellow."""
         comp = get_complementary_color("#0000FF")
-        # Blue (240°) complement should be yellow (60°)
         result = comp.upper()
         assert result == "#FFFF00"
 
@@ -202,7 +192,6 @@ class TestGetComplementaryColor:
         comp1 = get_complementary_color(original)
         comp2 = get_complementary_color(comp1)
 
-        # Should be very close to original (allow small rounding)
         from basic_open_agent_tools.color.conversion import hex_to_rgb
 
         orig_rgb = hex_to_rgb(original)

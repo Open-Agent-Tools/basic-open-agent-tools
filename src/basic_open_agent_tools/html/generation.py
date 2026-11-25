@@ -319,11 +319,9 @@ def append_to_html_body(file_path: str, content: str, skip_confirm: bool) -> str
         with open(file_path, encoding="utf-8") as f:
             html_content = f.read()
 
-        # Insert before closing body tag
         if "</body>" in html_content:
             html_content = html_content.replace("</body>", f"{content}\n</body>")
         else:
-            # No closing body tag, append to end
             html_content += content
 
         with open(file_path, "w", encoding="utf-8") as f:
@@ -375,13 +373,11 @@ def markdown_to_html_file(md_path: str, html_path: str, skip_confirm: bool) -> s
         )
 
     try:
-        # Import markdown module function
         from ..markdown.generation import markdown_to_html_string
 
         with open(md_path, encoding="utf-8") as f:
             md_content = f.read()
 
-        # Extract title from first heading if present
         title_match = re.match(r"^#\s+(.+)$", md_content, re.MULTILINE)
         title = title_match.group(1) if title_match else "Document"
 
@@ -434,10 +430,8 @@ def html_to_markdown_file(html_path: str, md_path: str, skip_confirm: bool) -> s
         with open(html_path, encoding="utf-8") as f:
             html_content = f.read()
 
-        # Basic HTML to Markdown conversion
         md_content = html_content
 
-        # Convert headings
         for level in range(1, 7):
             md_content = re.sub(
                 f"<h{level}[^>]*>(.*?)</h{level}>",
@@ -446,7 +440,6 @@ def html_to_markdown_file(html_path: str, md_path: str, skip_confirm: bool) -> s
                 flags=re.IGNORECASE | re.DOTALL,
             )
 
-        # Convert paragraphs
         md_content = re.sub(
             r"<p[^>]*>(.*?)</p>",
             r"\1\n\n",
@@ -454,7 +447,6 @@ def html_to_markdown_file(html_path: str, md_path: str, skip_confirm: bool) -> s
             flags=re.IGNORECASE | re.DOTALL,
         )
 
-        # Convert bold
         md_content = re.sub(
             r"<(strong|b)[^>]*>(.*?)</\1>",
             r"**\2**",
@@ -462,7 +454,6 @@ def html_to_markdown_file(html_path: str, md_path: str, skip_confirm: bool) -> s
             flags=re.IGNORECASE | re.DOTALL,
         )
 
-        # Convert italic
         md_content = re.sub(
             r"<(em|i)[^>]*>(.*?)</\1>",
             r"*\2*",
@@ -470,7 +461,6 @@ def html_to_markdown_file(html_path: str, md_path: str, skip_confirm: bool) -> s
             flags=re.IGNORECASE | re.DOTALL,
         )
 
-        # Convert links
         md_content = re.sub(
             r'<a[^>]*href="([^"]+)"[^>]*>(.*?)</a>',
             r"[\2](\1)",
@@ -478,10 +468,8 @@ def html_to_markdown_file(html_path: str, md_path: str, skip_confirm: bool) -> s
             flags=re.IGNORECASE | re.DOTALL,
         )
 
-        # Remove remaining tags
         md_content = re.sub(r"<[^>]+>", "", md_content)
 
-        # Clean up whitespace
         md_content = re.sub(r"\n{3,}", "\n\n", md_content)
         md_content = md_content.strip()
 
@@ -533,7 +521,6 @@ def prettify_html(file_path: str, skip_confirm: bool) -> str:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
-        # Basic indentation (simplified)
         indent_level = 0
         lines = []
         for line in content.split(">"):
@@ -541,13 +528,11 @@ def prettify_html(file_path: str, skip_confirm: bool) -> str:
             if not line:
                 continue
 
-            # Decrease indent for closing tags
             if line.startswith("</"):
                 indent_level = max(0, indent_level - 1)
 
             lines.append("  " * indent_level + line + ">")
 
-            # Increase indent for opening tags (not self-closing)
             if (
                 line.startswith("<")
                 and not line.startswith("</")

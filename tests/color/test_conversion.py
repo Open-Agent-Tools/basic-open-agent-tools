@@ -24,10 +24,10 @@ class TestRgbToHex:
 
     def test_various_colors(self) -> None:
         """Test various color conversions."""
-        assert rgb_to_hex(255, 0, 0) == "#FF0000"  # Red
-        assert rgb_to_hex(0, 255, 0) == "#00FF00"  # Green
-        assert rgb_to_hex(0, 0, 255) == "#0000FF"  # Blue
-        assert rgb_to_hex(128, 128, 128) == "#808080"  # Gray
+        assert rgb_to_hex(255, 0, 0) == "#FF0000"
+        assert rgb_to_hex(0, 255, 0) == "#00FF00"
+        assert rgb_to_hex(0, 0, 255) == "#0000FF"
+        assert rgb_to_hex(128, 128, 128) == "#808080"
 
     def test_invalid_type(self) -> None:
         """Test with invalid types."""
@@ -114,17 +114,14 @@ class TestRgbToHsl:
 
     def test_pure_colors(self) -> None:
         """Test pure color conversions."""
-        # Red
         result = rgb_to_hsl(255, 0, 0)
         assert result["h"] == 0
         assert result["s"] == 100
 
-        # Green
         result = rgb_to_hsl(0, 255, 0)
         assert result["h"] == 120
         assert result["s"] == 100
 
-        # Blue
         result = rgb_to_hsl(0, 0, 255)
         assert result["h"] == 240
         assert result["s"] == 100
@@ -134,15 +131,13 @@ class TestRgbToHsl:
         result = rgb_to_hsl(128, 128, 128)
         assert result["h"] == 0
         assert result["s"] == 0
-        assert 49 <= result["l"] <= 51  # Allow rounding
+        assert 49 <= result["l"] <= 51
 
     def test_black_and_white(self) -> None:
         """Test black and white."""
-        # Black
         result = rgb_to_hsl(0, 0, 0)
         assert result["l"] == 0
 
-        # White
         result = rgb_to_hsl(255, 255, 255)
         assert result["l"] == 100
 
@@ -165,26 +160,22 @@ class TestHslToRgb:
     def test_basic_conversion(self) -> None:
         """Test basic HSL to RGB conversion."""
         result = hsl_to_rgb(11, 100, 60)
-        # Allow small rounding differences
         assert result["r"] == 255
         assert 86 <= result["g"] <= 88
         assert 50 <= result["b"] <= 52
 
     def test_pure_colors(self) -> None:
         """Test pure color conversions."""
-        # Red
         result = hsl_to_rgb(0, 100, 50)
         assert result["r"] == 255
         assert result["g"] == 0
         assert result["b"] == 0
 
-        # Green
         result = hsl_to_rgb(120, 100, 50)
         assert result["r"] == 0
         assert result["g"] == 255
         assert result["b"] == 0
 
-        # Blue
         result = hsl_to_rgb(240, 100, 50)
         assert result["r"] == 0
         assert result["g"] == 0
@@ -194,7 +185,7 @@ class TestHslToRgb:
         """Test grayscale (no saturation)."""
         result = hsl_to_rgb(0, 0, 50)
         assert result["r"] == result["g"] == result["b"]
-        assert 127 <= result["r"] <= 128  # Allow rounding
+        assert 127 <= result["r"] <= 128
 
     def test_roundtrip(self) -> None:
         """Test RGB -> HSL -> RGB roundtrip."""
@@ -202,7 +193,6 @@ class TestHslToRgb:
         hsl = rgb_to_hsl(*original)
         result = hsl_to_rgb(hsl["h"], hsl["s"], hsl["l"])
 
-        # Allow small rounding differences
         assert abs(result["r"] - original[0]) <= 1
         assert abs(result["g"] - original[1]) <= 1
         assert abs(result["b"] - original[2]) <= 1
@@ -253,19 +243,16 @@ class TestRgbToCmyk:
 
     def test_pure_colors(self) -> None:
         """Test pure colors."""
-        # Pure cyan (subtract red from white)
         result = rgb_to_cmyk(0, 255, 255)
         assert result["c"] == 100
         assert result["m"] == 0
         assert result["y"] == 0
 
-        # Pure magenta
         result = rgb_to_cmyk(255, 0, 255)
         assert result["c"] == 0
         assert result["m"] == 100
         assert result["y"] == 0
 
-        # Pure yellow
         result = rgb_to_cmyk(255, 255, 0)
         assert result["c"] == 0
         assert result["m"] == 0
@@ -314,7 +301,6 @@ class TestCmykToRgb:
         cmyk = rgb_to_cmyk(*original)
         result = cmyk_to_rgb(cmyk["c"], cmyk["m"], cmyk["y"], cmyk["k"])
 
-        # Allow small rounding differences
         assert abs(result["r"] - original[0]) <= 1
         assert abs(result["g"] - original[1]) <= 1
         assert abs(result["b"] - original[2]) <= 1

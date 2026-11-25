@@ -63,13 +63,11 @@ def create_simple_docx(file_path: str, content: str, skip_confirm: bool) -> str:
     if not content.strip():
         raise ValueError("content cannot be empty")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory is writable
     parent_dir = os.path.dirname(file_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -78,14 +76,11 @@ def create_simple_docx(file_path: str, content: str, skip_confirm: bool) -> str:
         raise PermissionError(f"Cannot write to directory: {parent_dir}")
 
     try:
-        # Create document
         doc = Document()
         doc.add_paragraph(content)
 
-        # Save document
         doc.save(file_path)
 
-        # Get file size
         file_size = os.path.getsize(file_path)
         return f"Created Word document {file_path} ({file_size} bytes)"
 
@@ -142,18 +137,15 @@ def create_docx_from_paragraphs(
     if not paragraphs:
         raise ValueError("paragraphs cannot be empty")
 
-    # Validate all paragraphs are strings
     for i, para in enumerate(paragraphs):
         if not isinstance(para, str):
             raise TypeError(f"Paragraph at index {i} must be a string")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(file_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -164,7 +156,6 @@ def create_docx_from_paragraphs(
     try:
         doc = Document()
 
-        # Add each paragraph
         for para_text in paragraphs:
             doc.add_paragraph(para_text)
 
@@ -231,13 +222,11 @@ def create_docx_with_title(
     if not content.strip():
         raise ValueError("content cannot be empty")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(file_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -248,10 +237,8 @@ def create_docx_with_title(
     try:
         doc = Document()
 
-        # Add title with Heading 1 style
         doc.add_heading(title, level=1)
 
-        # Add content
         doc.add_paragraph(content)
 
         doc.save(file_path)
@@ -307,23 +294,18 @@ def add_paragraph_to_docx(file_path: str, paragraph: str, skip_confirm: bool) ->
     if not paragraph.strip():
         raise ValueError("paragraph cannot be empty")
 
-    # Check if file exists
     if not os.path.exists(file_path):
         if not skip_confirm:
             raise FileNotFoundError(
                 f"File does not exist: {file_path}. Set skip_confirm=True to create new file."
             )
-        # Create new document
         doc = Document()
     else:
-        # Load existing document
         doc = Document(file_path)
 
     try:
-        # Add paragraph
         doc.add_paragraph(paragraph)
 
-        # Save document
         doc.save(file_path)
 
         return f"Added paragraph to {file_path}"
@@ -387,7 +369,6 @@ def create_docx_with_headings(
     if not sections:
         raise ValueError("sections cannot be empty")
 
-    # Validate sections structure
     for i, section in enumerate(sections):
         if not isinstance(section, dict):
             raise TypeError(f"Section at index {i} must be a dictionary")
@@ -406,7 +387,6 @@ def create_docx_with_headings(
         if not isinstance(section["content"], str):
             raise TypeError(f"Section {i} content must be a string")
 
-        # Validate level is 1-9
         try:
             level_int = int(section["level"])
             if level_int < 1 or level_int > 9:
@@ -416,13 +396,11 @@ def create_docx_with_headings(
         except ValueError as e:
             raise ValueError(f"Section {i} level must be a valid integer: {e}")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(file_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -433,7 +411,6 @@ def create_docx_with_headings(
     try:
         doc = Document()
 
-        # Add each section
         for section in sections:
             level = int(section["level"])
             doc.add_heading(section["heading"], level=level)
@@ -495,7 +472,6 @@ def add_table_to_docx(
     if not table_data:
         raise ValueError("table_data cannot be empty")
 
-    # Validate table structure
     for i, row in enumerate(table_data):
         if not isinstance(row, list):
             raise TypeError(f"Row at index {i} must be a list")
@@ -503,36 +479,29 @@ def add_table_to_docx(
             if not isinstance(cell, str):
                 raise TypeError(f"Cell at row {i}, column {j} must be a string")
 
-    # Check all rows have same length
     row_lengths = [len(row) for row in table_data]
     if len(set(row_lengths)) > 1:
         raise ValueError(f"All rows must have same length, got {row_lengths}")
 
-    # Check if file exists
     if not os.path.exists(file_path):
         if not skip_confirm:
             raise FileNotFoundError(
                 f"File does not exist: {file_path}. Set skip_confirm=True to create new file."
             )
-        # Create new document
         doc = Document()
     else:
-        # Load existing document
         doc = Document(file_path)
 
     try:
-        # Add table
         rows = len(table_data)
         cols = len(table_data[0])
         table = doc.add_table(rows=rows, cols=cols)
 
-        # Populate table
         for i, row_data in enumerate(table_data):
             row = table.rows[i]
             for j, cell_text in enumerate(row_data):
                 row.cells[j].text = cell_text
 
-        # Save document
         doc.save(file_path)
 
         return f"Added {rows}x{cols} table to {file_path}"
@@ -598,24 +567,20 @@ def create_docx_from_template(
     if not output_path.strip():
         raise ValueError("output_path cannot be empty")
 
-    # Validate replacements
     for key, value in replacements.items():
         if not isinstance(key, str):
             raise TypeError(f"Replacement key must be string, got {type(key)}")
         if not isinstance(value, str):
             raise TypeError(f"Replacement value must be string, got {type(value)}")
 
-    # Check template exists
     if not os.path.exists(template_path):
         raise FileNotFoundError(f"Template not found: {template_path}")
 
-    # Check if output exists
     if os.path.exists(output_path) and not skip_confirm:
         raise ValueError(
             f"Output file already exists: {output_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check output directory
     parent_dir = os.path.dirname(output_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Output directory does not exist: {parent_dir}")
@@ -624,20 +589,16 @@ def create_docx_from_template(
         raise PermissionError(f"Cannot write to directory: {parent_dir}")
 
     try:
-        # Load template
         doc = Document(template_path)
 
-        # Replace placeholders in paragraphs
         for paragraph in doc.paragraphs:
             for key, value in replacements.items():
                 placeholder = f"{{{{{key}}}}}"
                 if placeholder in paragraph.text:
-                    # Replace in full paragraph text
                     for run in paragraph.runs:
                         if placeholder in run.text:
                             run.text = run.text.replace(placeholder, value)
 
-        # Replace placeholders in tables
         for table in doc.tables:
             for row in table.rows:
                 for cell in row.cells:
@@ -646,7 +607,6 @@ def create_docx_from_template(
                         if placeholder in cell.text:
                             cell.text = cell.text.replace(placeholder, value)
 
-        # Save filled document
         doc.save(output_path)
 
         file_size = os.path.getsize(output_path)
@@ -703,17 +663,14 @@ def docx_to_text(file_path: str, output_path: str, skip_confirm: bool) -> str:
     if not output_path.strip():
         raise ValueError("output_path cannot be empty")
 
-    # Check input exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Input document not found: {file_path}")
 
-    # Check if output exists
     if os.path.exists(output_path) and not skip_confirm:
         raise ValueError(
             f"Output file already exists: {output_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check output directory
     parent_dir = os.path.dirname(output_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Output directory does not exist: {parent_dir}")
@@ -722,16 +679,13 @@ def docx_to_text(file_path: str, output_path: str, skip_confirm: bool) -> str:
         raise PermissionError(f"Cannot write to directory: {parent_dir}")
 
     try:
-        # Load document
         doc = Document(file_path)
 
-        # Extract all text
         text_parts = []
         for paragraph in doc.paragraphs:
             if paragraph.text.strip():
                 text_parts.append(paragraph.text)
 
-        # Write to text file
         with open(output_path, "w", encoding="utf-8") as f:
             f.write("\n".join(text_parts))
 

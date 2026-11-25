@@ -39,12 +39,12 @@ class TestSleepSeconds:
     def test_successful_sleep(self):
         """Test successful sleep operation."""
         start_time = time.time()
-        result = sleep_seconds(0.1)  # 100ms
+        result = sleep_seconds(0.1)
         end_time = time.time()
 
         assert result["status"] == "completed"
         assert result["requested_seconds"] == 0.1
-        assert 0.09 <= result["actual_seconds"] <= 0.2  # Allow some variance
+        assert 0.09 <= result["actual_seconds"] <= 0.2
         assert 0.09 <= (end_time - start_time) <= 0.2
         assert "Successfully slept" in result["message"]
 
@@ -58,7 +58,7 @@ class TestSleepSeconds:
 
     def test_fractional_seconds(self):
         """Test sleep with fractional seconds."""
-        result = sleep_seconds(0.05)  # 50ms
+        result = sleep_seconds(0.05)
 
         assert result["status"] == "completed"
         assert result["requested_seconds"] == 0.05
@@ -81,7 +81,6 @@ class TestSleepSeconds:
         """Test graceful handling when signal setup fails."""
         mock_signal.side_effect = ValueError("Signal not available")
 
-        # Should still work even if signal handling fails
         result = sleep_seconds(0.01)
 
         assert result["status"] == "completed"
@@ -104,12 +103,12 @@ class TestSleepMilliseconds:
 
     def test_successful_sleep_milliseconds(self):
         """Test successful sleep in milliseconds."""
-        result = sleep_milliseconds(100)  # 100ms
+        result = sleep_milliseconds(100)
 
         assert result["status"] == "completed"
         assert result["requested_milliseconds"] == 100.0
         assert result["requested_seconds"] == 0.1
-        assert 90 <= result["actual_milliseconds"] <= 200  # Allow variance
+        assert 90 <= result["actual_milliseconds"] <= 200
 
     def test_zero_milliseconds(self):
         """Test sleep with zero milliseconds."""
@@ -151,21 +150,19 @@ class TestPreciseSleep:
     def test_short_precise_sleep(self):
         """Test precise sleep for very short durations."""
         start_time = time.time()
-        result = precise_sleep(0.001)  # 1ms
+        result = precise_sleep(0.001)
         end_time = time.time()
 
         assert result["status"] == "completed"
         assert result["requested_seconds"] == 0.001
         assert result["precision"] == "high"
-        assert (
-            0.0005 <= result["actual_seconds"] <= 0.005
-        )  # Allow some variance for precision
+        assert 0.0005 <= result["actual_seconds"] <= 0.005
         assert 0.0005 <= (end_time - start_time) <= 0.005
 
     def test_longer_precise_sleep(self):
         """Test precise sleep for longer durations that use both sleep and busy-wait."""
         start_time = time.time()
-        result = precise_sleep(0.05)  # 50ms
+        result = precise_sleep(0.05)
         end_time = time.time()
 
         assert result["status"] == "completed"
@@ -178,23 +175,19 @@ class TestPreciseSleep:
     @patch("time.time")
     def test_precise_sleep_logic(self, mock_time, mock_sleep):
         """Test the logic of combining sleep and busy-wait."""
-        # Mock time progression with enough values for all calls
-        # Start time, after regular sleep, then busy-wait progression, final time
         time_values = [0.0, 0.04, 0.049, 0.0499, 0.05, 0.051]
         mock_time.side_effect = time_values
 
         result = precise_sleep(0.05)
 
-        # Should call regular sleep for most of the duration
-        mock_sleep.assert_called_once_with(0.04)  # 0.05 - 0.01
+        mock_sleep.assert_called_once_with(0.04)
 
-        # Verify result structure
         assert result["status"] == "completed"
         assert result["requested_seconds"] == 0.05
 
     def test_very_short_precise_sleep(self):
         """Test precise sleep for durations shorter than 10ms threshold."""
-        result = precise_sleep(0.005)  # 5ms
+        result = precise_sleep(0.005)
 
         assert result["status"] == "completed"
         assert result["requested_seconds"] == 0.005

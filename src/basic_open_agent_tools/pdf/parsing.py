@@ -16,7 +16,6 @@ except ImportError:
     HAS_PYPDF2 = False
 
 
-# Maximum file size to prevent memory exhaustion (100MB default)
 MAX_PDF_FILE_SIZE = 100 * 1024 * 1024
 
 
@@ -57,11 +56,9 @@ def extract_text_from_pdf(file_path: str) -> str:
     if not file_path.strip():
         raise ValueError("file_path cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"PDF file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_PDF_FILE_SIZE:
         raise ValueError(
@@ -69,14 +66,12 @@ def extract_text_from_pdf(file_path: str) -> str:
             f"(maximum: {MAX_PDF_FILE_SIZE} bytes)"
         )
 
-    # Check read permission
     if not os.access(file_path, os.R_OK):
         raise PermissionError(f"Cannot read PDF file: {file_path}")
 
     try:
         reader = PdfReader(file_path)
 
-        # Extract text from all pages
         text_parts = []
         for page in reader.pages:
             page_text = page.extract_text()
@@ -129,11 +124,9 @@ def extract_text_from_page(file_path: str, page_number: int) -> str:
     if page_number < 0:
         raise ValueError("page_number must be non-negative")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"PDF file not found: {file_path}")
 
-    # Check file size
     file_size = os.path.getsize(file_path)
     if file_size > MAX_PDF_FILE_SIZE:
         raise ValueError(
@@ -204,7 +197,6 @@ def get_pdf_metadata(file_path: str) -> dict[str, str]:
     if not file_path.strip():
         raise ValueError("file_path cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"PDF file not found: {file_path}")
 
@@ -223,7 +215,6 @@ def get_pdf_metadata(file_path: str) -> dict[str, str]:
         }
 
         if metadata:
-            # PyPDF2 metadata keys start with /
             result["author"] = str(metadata.get("/Author", ""))
             result["title"] = str(metadata.get("/Title", ""))
             result["subject"] = str(metadata.get("/Subject", ""))
@@ -273,7 +264,6 @@ def get_pdf_page_count(file_path: str) -> int:
     if not file_path.strip():
         raise ValueError("file_path cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"PDF file not found: {file_path}")
 
@@ -334,7 +324,6 @@ def extract_pdf_pages_to_text(
     if end_page < start_page:
         raise ValueError("end_page must be >= start_page")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"PDF file not found: {file_path}")
 
@@ -411,7 +400,6 @@ def search_pdf_text(
     if not search_term.strip():
         raise ValueError("search_term cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"PDF file not found: {file_path}")
 
@@ -424,18 +412,15 @@ def search_pdf_text(
             if not text:
                 continue
 
-            # Prepare text for searching
             search_text = text if case_sensitive else text.lower()
             search_for = search_term if case_sensitive else search_term.lower()
 
-            # Find all occurrences
             start = 0
             while True:
                 pos = search_text.find(search_for, start)
                 if pos == -1:
                     break
 
-                # Extract context (100 chars before and after)
                 context_start = max(0, pos - 100)
                 context_end = min(len(text), pos + len(search_term) + 100)
                 context = text[context_start:context_end]
@@ -498,7 +483,6 @@ def get_pdf_info(file_path: str) -> dict[str, object]:
     if not file_path.strip():
         raise ValueError("file_path cannot be empty")
 
-    # Validate file exists
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"PDF file not found: {file_path}")
 
@@ -506,7 +490,6 @@ def get_pdf_info(file_path: str) -> dict[str, object]:
         reader = PdfReader(file_path)
         file_size = os.path.getsize(file_path)
 
-        # Get metadata
         metadata_dict: dict[str, str] = {
             "author": "",
             "title": "",
@@ -657,7 +640,6 @@ def sample_pdf_pages(
         total_pages = len(reader.pages)
 
         if sample_size >= total_pages:
-            # Return all pages if sample size >= total
             page_indices = list(range(total_pages))
         elif method == "first":
             page_indices = list(range(sample_size))
@@ -666,7 +648,6 @@ def sample_pdf_pages(
 
             page_indices = sorted(random.sample(range(total_pages), sample_size))
         elif method == "systematic":
-            # Evenly spaced pages
             step = total_pages / sample_size
             page_indices = [int(i * step) for i in range(sample_size)]
         else:
@@ -790,7 +771,6 @@ def get_pdf_outline(file_path: str) -> list[dict[str, str]]:
                     extract_outline(item, level + 1)
                 else:
                     title = str(item.get("/Title", "Untitled"))
-                    # Try to get page number
                     page_num = "unknown"
                     if "/Page" in item:
                         try:
@@ -808,7 +788,6 @@ def get_pdf_outline(file_path: str) -> list[dict[str, str]]:
                         }
                     )
 
-                    # Check for children
                     if hasattr(item, "children") and item.children:
                         extract_outline(item.children, level + 1)
 
@@ -1216,7 +1195,6 @@ def check_pdf_has_text(file_path: str) -> dict[str, str]:
         reader = PdfReader(file_path)
         total_pages = len(reader.pages)
 
-        # Check first 5 pages or all pages if less than 5
         pages_to_check = min(5, total_pages)
         pages_with_text = 0
 

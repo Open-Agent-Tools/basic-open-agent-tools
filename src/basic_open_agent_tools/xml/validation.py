@@ -69,7 +69,6 @@ def validate_xml_well_formed(xml_content: str) -> bool:
         raise ValueError("XML content cannot be empty")
 
     try:
-        # Use defusedxml if available for security
         if HAS_DEFUSEDXML:
             defused_fromstring(xml_content)
         else:
@@ -126,14 +125,11 @@ def validate_xml_against_dtd(xml_content: str, dtd_path: str) -> bool:
         raise ValueError("dtd_path cannot be empty")
 
     try:
-        # Parse DTD
         with open(dtd_path, "rb") as f:
             dtd = lxml_etree.DTD(f)
 
-        # Parse XML
         doc = lxml_etree.fromstring(xml_content.encode("utf-8"))
 
-        # Validate
         if not dtd.validate(doc):
             error_log = dtd.error_log.filter_from_errors()
             errors = [str(error) for error in error_log]
@@ -194,15 +190,12 @@ def validate_xml_against_xsd(xml_content: str, xsd_path: str) -> bool:
         raise ValueError("xsd_path cannot be empty")
 
     try:
-        # Parse XSD schema
         with open(xsd_path, "rb") as f:
             schema_doc = lxml_etree.parse(f)
             schema = lxml_etree.XMLSchema(schema_doc)
 
-        # Parse XML
         doc = lxml_etree.fromstring(xml_content.encode("utf-8"))
 
-        # Validate
         if not schema.validate(doc):
             error_log = schema.error_log.filter_from_errors()
             errors = [str(error) for error in error_log]
@@ -261,25 +254,21 @@ def check_xml_has_required_elements(xml_content: str, required_tags: list[str]) 
     if not xml_content.strip():
         raise ValueError("xml_content cannot be empty")
 
-    # Validate required_tags items are strings
     for i, tag in enumerate(required_tags):
         if not isinstance(tag, str):
             raise TypeError(f"Tag at index {i} must be a string")
 
     try:
-        # Parse XML
         if HAS_DEFUSEDXML:
             root = defused_fromstring(xml_content)
         else:
             root = ET.fromstring(xml_content)
 
-        # Collect all tag names in document
         found_tags = set()
         found_tags.add(root.tag)
         for element in root.iter():
             found_tags.add(element.tag)
 
-        # Check which required tags are present
         found = []
         missing = []
         for tag in required_tags:
@@ -351,18 +340,14 @@ def create_xml_validation_report(xml_content: str, schema_path: str) -> dict:
         raise ValueError("schema_path cannot be empty")
 
     try:
-        # Parse XSD schema
         with open(schema_path, "rb") as f:
             schema_doc = lxml_etree.parse(f)
             schema = lxml_etree.XMLSchema(schema_doc)
 
-        # Parse XML
         doc = lxml_etree.fromstring(xml_content.encode("utf-8"))
 
-        # Validate and collect errors
         is_valid = schema.validate(doc)
 
-        # Extract errors and warnings from log
         errors = []
         warnings = []
 

@@ -9,7 +9,7 @@ try:
 except ImportError:
     Image = None  # type: ignore[assignment,misc]
 
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB limit
+MAX_FILE_SIZE = 50 * 1024 * 1024
 
 
 @strands_tool
@@ -199,7 +199,6 @@ def extract_image_exif(file_path: str) -> dict[str, str]:
         with Image.open(file_path) as img:
             exif_data: dict[str, str] = {}
 
-            # Get EXIF data if available
             if hasattr(img, "_getexif") and img._getexif():
                 from PIL.ExifTags import TAGS
 
@@ -260,20 +259,16 @@ def get_image_colors(file_path: str, num_colors: int) -> list[str]:
 
     try:
         with Image.open(file_path) as img:
-            # Convert to RGB if necessary
             if img.mode != "RGB":
                 img = img.convert("RGB")
 
-            # Resize for faster processing
             img.thumbnail((200, 200))
 
-            # Get colors using quantize
             palette = img.quantize(colors=num_colors).getpalette()
 
             if palette is None:
                 return []
 
-            # Convert palette to hex colors
             colors: list[str] = []
             for i in range(num_colors):
                 r = palette[i * 3]

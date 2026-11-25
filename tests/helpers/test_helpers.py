@@ -39,15 +39,13 @@ class TestLoadAllFilesystemTools:
     def test_load_filesystem_tools_expected_count(self) -> None:
         """Test that expected number of tools are loaded."""
         tools = load_all_filesystem_tools()
-        # Expected: 18 file system functions (module complete)
-        assert len(tools) >= 15  # Allow some flexibility
+        assert len(tools) >= 15
 
     def test_load_filesystem_tools_function_names(self) -> None:
         """Test that expected function names are present."""
         tools = load_all_filesystem_tools()
         tool_names = [tool.__name__ for tool in tools]
 
-        # Check for some known file system functions
         expected_functions = [
             "read_file_to_string",
             "write_file_from_string",
@@ -82,7 +80,6 @@ class TestLoadAllTextTools:
     def test_load_text_tools_expected_count(self) -> None:
         """Test that expected number of tools are loaded."""
         tools = load_all_text_tools()
-        # Expected: 10 text processing functions
         assert len(tools) == 10
 
     def test_load_text_tools_function_names(self) -> None:
@@ -90,7 +87,6 @@ class TestLoadAllTextTools:
         tools = load_all_text_tools()
         tool_names = [tool.__name__ for tool in tools]
 
-        # Check for all known text processing functions
         expected_functions = [
             "clean_whitespace",
             "normalize_line_endings",
@@ -130,7 +126,6 @@ class TestLoadAllDataTools:
     def test_load_data_tools_expected_count(self) -> None:
         """Test that expected number of tools are loaded."""
         tools = load_all_data_tools()
-        # Expected: 61 data processing functions (22 JSON + 18 CSV + 5 validation + 16 config)
         assert len(tools) == 61
 
     def test_load_data_tools_function_names(self) -> None:
@@ -138,7 +133,6 @@ class TestLoadAllDataTools:
         tools = load_all_data_tools()
         tool_names = [tool.__name__ for tool in tools]
 
-        # Check for some known data processing functions
         expected_functions = [
             "safe_json_serialize",
             "safe_json_deserialize",
@@ -319,7 +313,6 @@ class TestMergeToolLists:
 
         result = merge_tool_lists(json_tools, csv_tools)
 
-        # Should contain all tools from both lists
         assert len(result) == len(json_tools) + len(csv_tools)
         assert all(tool in result for tool in json_tools)
         assert all(tool in result for tool in csv_tools)
@@ -328,10 +321,9 @@ class TestMergeToolLists:
         """Test merging lists with duplicate functions."""
         json_tools = load_data_json_tools()
 
-        # Merge the same list twice - should deduplicate
         result = merge_tool_lists(json_tools, json_tools)
 
-        assert len(result) == len(json_tools)  # No duplicates
+        assert len(result) == len(json_tools)
         assert all(tool in result for tool in json_tools)
 
     def test_merge_with_individual_functions(self) -> None:
@@ -510,7 +502,7 @@ class TestListAllAvailableTools:
         tools = list_all_available_tools()
 
         fs_tools = tools["file_system"]
-        assert len(fs_tools) >= 15  # Allow some flexibility
+        assert len(fs_tools) >= 15
 
     def test_list_tools_text_count(self) -> None:
         """Test text tools count."""
@@ -530,12 +522,10 @@ class TestListAllAvailableTools:
         """Test that expected function names are present in categories."""
         tools = list_all_available_tools()
 
-        # Check text category
         text_names = [tool["name"] for tool in tools["text"]]
         assert "clean_whitespace" in text_names
         assert "to_snake_case" in text_names
 
-        # Check data category
         data_names = [tool["name"] for tool in tools["data"]]
         assert "safe_json_serialize" in data_names
         assert "read_csv_simple" in data_names
@@ -545,7 +535,6 @@ class TestListAllAvailableTools:
         """Test that tool info is complete and useful."""
         tools = list_all_available_tools()
 
-        # Check a specific tool
         text_tools = tools["text"]
         clean_whitespace_info = next(
             tool for tool in text_tools if tool["name"] == "clean_whitespace"
@@ -570,7 +559,6 @@ class TestHelpersIntegration:
         expected_count = len(fs_tools) + len(text_tools) + len(data_tools)
         assert len(all_tools) == expected_count
 
-        # All tools should be callable
         assert all(callable(tool) for tool in all_tools)
 
     def test_load_specific_data_tools_and_merge(self) -> None:
@@ -584,14 +572,11 @@ class TestHelpersIntegration:
             json_tools, csv_tools, validation_tools, config_tools
         )
 
-        # Verify subcategories merge correctly (3 + 7 + 5 + 8 = 23)
         assert len(specific_data_tools) == 23
 
-        # Verify subcategories are a subset of all data tools
         all_data_tools = load_all_data_tools()
         assert len(specific_data_tools) < len(all_data_tools)
 
-        # Verify all subcategory tool names are present in all_data_tools
         specific_names = {tool.__name__ for tool in specific_data_tools}
         all_names = {tool.__name__ for tool in all_data_tools}
         assert specific_names.issubset(all_names)
@@ -600,14 +585,11 @@ class TestHelpersIntegration:
         """Test consistency between list_all_available_tools and get_tool_info."""
         all_tools_info = list_all_available_tools()
 
-        # Get actual tools for comparison
         text_tools = load_all_text_tools()
 
-        # Check that listed info matches actual tool info
         for tool in text_tools:
             tool_info = get_tool_info(tool)
 
-            # Find matching tool in list
             listed_tool = next(
                 t for t in all_tools_info["text"] if t["name"] == tool.__name__
             )
@@ -620,7 +602,6 @@ class TestHelpersIntegration:
 
     def test_comprehensive_tool_loading_workflow(self) -> None:
         """Test a comprehensive tool loading workflow."""
-        # Step 1: Load all tools by category
         all_categories = {
             "file_system": load_all_filesystem_tools(),
             "text": load_all_text_tools(),
@@ -628,20 +609,15 @@ class TestHelpersIntegration:
             "datetime": load_all_datetime_tools(),
         }
 
-        # Step 2: Merge all tools
         all_tools = merge_tool_lists(*all_categories.values())
 
-        # Step 3: Get info for all tools
         all_tools_info = [get_tool_info(tool) for tool in all_tools]
 
-        # Step 4: Verify against list_all_available_tools
         listed_tools = list_all_available_tools()
 
-        # Total count should match
         total_listed = sum(len(tools) for tools in listed_tools.values())
         assert len(all_tools_info) == total_listed
 
-        # All tools should have complete info
         for tool_info in all_tools_info:
             assert len(tool_info["name"]) > 0
             assert "parameters" in tool_info

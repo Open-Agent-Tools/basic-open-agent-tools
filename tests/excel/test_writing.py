@@ -94,7 +94,6 @@ class TestCreateExcelWithHeaders:
                 )
 
                 assert "Created Excel file" in result
-                # Verify headers were combined with data
                 call_args = mock_create.call_args[0]
                 combined_data = call_args[1]
                 assert combined_data[0] == headers
@@ -137,7 +136,6 @@ class TestCreateExcelFromDicts:
                 result = writing.create_excel_from_dicts(str(test_file), data, True)
 
                 assert "Created Excel file" in result
-                # Verify headers and rows were extracted correctly
                 call_args = mock_create.call_args[0]
                 headers = call_args[1]
                 assert "Name" in headers

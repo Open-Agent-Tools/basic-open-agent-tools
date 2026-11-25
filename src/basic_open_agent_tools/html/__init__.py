@@ -33,7 +33,6 @@ from .parsing import (
 )
 
 __all__: list[str] = [
-    # Parsing functions (18 - includes 10 token-saving inspection tools)
     "parse_html_to_dict",
     "extract_html_text",
     "extract_html_links",
@@ -42,7 +41,6 @@ __all__: list[str] = [
     "extract_html_headings",
     "extract_html_metadata",
     "html_to_plain_text",
-    # Token-saving inspection tools
     "get_html_text_at_tag",
     "count_html_elements",
     "get_html_structure",
@@ -53,7 +51,6 @@ __all__: list[str] = [
     "get_html_title",
     "get_html_tag_attributes",
     "get_html_element_count_by_type",
-    # Generation functions (9)
     "create_simple_html",
     "create_html_with_head",
     "create_html_table",

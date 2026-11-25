@@ -7,7 +7,6 @@ import pytest
 
 def pytest_configure(config):
     """Configure pytest for Strands tests."""
-    # Add custom markers
     config.addinivalue_line(
         "markers",
         "strands_integration: marks tests as requiring Strands integration (may require API keys)",
@@ -20,7 +19,6 @@ def pytest_configure(config):
 
 def pytest_collection_modifyitems(config, items):
     """Modify test collection to handle Strands-specific markers."""
-    # Auto-mark Strands tests
     for item in items:
         if "strands" in item.nodeid.lower():
             if not any(
@@ -58,12 +56,10 @@ def basic_tools_sample():
     import sys
     from pathlib import Path
 
-    # Add src to path
     sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
     import basic_open_agent_tools as boat
 
-    # Return a manageable set of tools for testing
     return boat.merge_tool_lists(
         boat.load_all_filesystem_tools()[:5],
         boat.load_all_text_tools()[:3],

@@ -24,7 +24,6 @@ def log_info(
         raise BasicAgentToolsError("Message must be a string")
 
     try:
-        # Parse extra data from JSON
         extra_data = (
             json.loads(extra_data_json)
             if extra_data_json and extra_data_json != "{}"
@@ -71,7 +70,6 @@ def log_error(
         raise BasicAgentToolsError("Message must be a string")
 
     try:
-        # Parse extra data from JSON
         extra_data = (
             json.loads(extra_data_json)
             if extra_data_json and extra_data_json != "{}"

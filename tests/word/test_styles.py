@@ -40,7 +40,6 @@ class TestApplyHeadingStyle:
                     skip_confirm=True,
                 )
 
-            # Verify style was set
             assert mock_para.style == "Heading 1"
             mock_doc.save.assert_called_once()
 
@@ -156,7 +155,6 @@ class TestApplyBoldToParagraph:
                     str(docx_file), paragraph_index=0, skip_confirm=True
                 )
 
-            # Verify bold was applied
             assert mock_run.bold is True
             mock_doc.save.assert_called_once()
 
@@ -189,7 +187,6 @@ class TestApplyBoldToParagraph:
                     str(docx_file), paragraph_index=0, skip_confirm=True
                 )
 
-            # Verify bold was applied to all runs
             assert all(run.bold is True for run in [mock_run1, mock_run2, mock_run3])
 
         assert "Applied bold formatting" in result
@@ -237,7 +234,6 @@ class TestSetParagraphAlignment:
         docx_file.touch()
 
         with patch("basic_open_agent_tools.word.styles.HAS_PYTHON_DOCX", True):
-            # Mock WD_ALIGN_PARAGRAPH enum
             from docx.enum.text import WD_ALIGN_PARAGRAPH
 
             mock_para = Mock()
@@ -263,7 +259,6 @@ class TestSetParagraphAlignment:
                         skip_confirm=True,
                     )
 
-            # Verify alignment was set
             assert mock_para.alignment is not None
             mock_doc.save.assert_called_once()
 
@@ -386,7 +381,6 @@ class TestAddPageBreak:
                 return_value=mock_doc,
                 create=True,
             ):
-                # Mock BreakType enum
                 from docx.enum.text import WD_BREAK
 
                 with patch(
@@ -398,7 +392,6 @@ class TestAddPageBreak:
                         str(docx_file), after_paragraph=0, skip_confirm=True
                     )
 
-            # Verify page break was added
             mock_para.add_run.assert_called_once()
             mock_run.add_break.assert_called_once()
             mock_doc.save.assert_called_once()

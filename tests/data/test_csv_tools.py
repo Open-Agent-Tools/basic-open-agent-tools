@@ -144,13 +144,11 @@ class TestReadCsvSimple:
     def test_read_csv_malformed_data(self, tmp_path: Path) -> None:
         """Test reading CSV with unusual but valid data."""
         csv_file = tmp_path / "unusual.csv"
-        # Create a file with unmatched quotes (Python CSV reader handles this)
         csv_content = 'name,age\n"Alice,25\nBob,30'
         csv_file.write_text(csv_content, encoding="utf-8")
 
-        # This should work because Python's CSV reader is lenient
         result = read_csv_simple(str(csv_file), ",", True)
-        assert len(result) == 1  # CSV reader treats this as one record
+        assert len(result) == 1
         assert "name" in result[0]
         assert "age" in result[0]
 
@@ -168,7 +166,6 @@ class TestWriteCsvSimple:
 
         write_csv_simple(data, str(csv_file), ",", True, skip_confirm=True)
 
-        # Read back and verify
         content = csv_file.read_text(encoding="utf-8")
         lines = content.strip().split("\n")
         assert lines[0] == "name,age,city"
@@ -185,12 +182,10 @@ class TestWriteCsvSimple:
 
         write_csv_simple(data, str(csv_file), ",", False, skip_confirm=True)
 
-        # Read back and verify
         content = csv_file.read_text(encoding="utf-8")
         lines = content.strip().split("\n")
         assert "Alice,25" in lines
         assert "Bob,30" in lines
-        # Should not contain header line
         assert "name,age" not in lines
 
     def test_write_csv_with_different_delimiter(self, tmp_path: Path) -> None:
@@ -239,10 +234,8 @@ class TestWriteCsvSimple:
 
         write_csv_simple(data, str(csv_file), ",", True, skip_confirm=True)
 
-        # Read back to verify all keys are included
         result = read_csv_simple(str(csv_file), ",", True)
         assert len(result) == 3
-        # All unique keys should be present as columns
         all_keys = set()
         for row in result:
             all_keys.update(row.keys())
@@ -278,7 +271,6 @@ class TestWriteCsvSimple:
     def test_write_csv_permission_error(self, tmp_path: Path) -> None:
         """Test error handling for file permission issues."""
         data = [{"name": "Alice"}]
-        # Try to write to a directory (should fail)
         invalid_path = tmp_path / "directory_not_file"
         invalid_path.mkdir()
 
@@ -366,9 +358,8 @@ class TestCsvToDictList:
         """Test parsing CSV string with unusual but valid data."""
         unusual_csv = 'name,age\n"Alice,25\nBob,30'
 
-        # This should work because Python's CSV reader is lenient
         result = csv_to_dict_list(unusual_csv, ",")
-        assert len(result) == 1  # CSV reader treats this as one record
+        assert len(result) == 1
         assert "name" in result[0]
         assert "age" in result[0]
 
@@ -385,11 +376,8 @@ class TestDictListToCsv:
 
         result = dict_list_to_csv(data, ",")
 
-        # Parse result back to verify
         lines = [line.strip() for line in result.strip().split("\n")]
-        assert (
-            "name,age,city" in lines or "name,city,age" in lines
-        )  # Header order may vary
+        assert "name,age,city" in lines or "name,city,age" in lines
         assert "Alice,25,NYC" in result or "Alice,NYC,25" in result
         assert "Bob,30,LA" in result or "Bob,LA,30" in result
 
@@ -429,7 +417,6 @@ class TestDictListToCsv:
 
         result = dict_list_to_csv(data, ",")
 
-        # All keys should be included as columns
         assert "name" in result
         assert "age" in result
         assert "city" in result
@@ -493,7 +480,7 @@ class TestDetectCsvDelimiter:
         csv_content = "name,age,city\n" + "Alice,25,NYC\n" * 1000 + "Bob,30,LA"
         csv_file.write_text(csv_content, encoding="utf-8")
 
-        result = detect_csv_delimiter(str(csv_file), 50)  # Small sample
+        result = detect_csv_delimiter(str(csv_file), 50)
         assert result == ","
 
     def test_detect_delimiter_file_not_found(self) -> None:
@@ -567,7 +554,7 @@ class TestValidateCsvStructure:
         csv_file.write_text("", encoding="utf-8")
 
         result = validate_csv_structure(str(csv_file), ["name", "age"])
-        assert result is True  # Empty file is considered valid
+        assert result is True
 
     def test_validate_csv_structure_no_expected_columns(self, tmp_path: Path) -> None:
         """Test validation with no expected columns."""
@@ -601,10 +588,9 @@ class TestValidateCsvStructure:
     def test_validate_csv_structure_malformed_file(self, tmp_path: Path) -> None:
         """Test validation of unusual but valid CSV file."""
         csv_file = tmp_path / "unusual.csv"
-        csv_content = 'name,age\n"Alice,25\nBob,30'  # Python CSV reader handles this
+        csv_content = 'name,age\n"Alice,25\nBob,30'
         csv_file.write_text(csv_content, encoding="utf-8")
 
-        # This should succeed because Python's CSV reader is lenient
         result = validate_csv_structure(str(csv_file), ["name", "age"])
         assert result is True
 
@@ -686,11 +672,10 @@ class TestCleanCsvData:
             {"name": "  Alice  ", "age": "N/A", "score": "null"},
             {"name": "Bob", "age": "30", "score": "85"},
         ]
-        rules = {}  # Use all defaults
+        rules = {}
 
         result = clean_csv_data(data, rules)
 
-        # Default rules: strip_whitespace=True, remove_empty=False, na_values includes N/A and null
         expected = [
             {"name": "Alice", "age": "", "score": ""},
             {"name": "Bob", "age": "30", "score": "85"},
@@ -748,7 +733,6 @@ class TestCleanCsvData:
 
         result = clean_csv_data(data, rules)
 
-        # Non-dict items should be skipped
         expected = [
             {"name": "Alice", "age": "25"},
             {"name": "Bob", "age": "30"},
@@ -770,58 +754,48 @@ class TestCleanCsvData:
     def test_clean_csv_data_merge_rules(self) -> None:
         """Test that provided rules merge with defaults correctly."""
         data = [{"name": "  Alice  ", "age": "N/A"}]
-        rules = {"remove_empty": True}  # Only specify one rule
+        rules = {"remove_empty": True}
 
         result = clean_csv_data(data, rules)
 
-        # Should still apply default strip_whitespace and na_values
-        expected = [{"name": "Alice"}]  # N/A converted to empty, then removed
+        expected = [{"name": "Alice"}]
         assert result == expected
 
 
-# Integration tests
 class TestCsvToolsIntegration:
     """Integration tests for CSV tools working together."""
 
     def test_complete_csv_workflow(self, tmp_path: Path) -> None:
         """Test complete CSV processing workflow."""
-        # Step 1: Create test data
         original_data = [
             {"name": "Alice", "age": "25", "city": "NYC"},
             {"name": "Bob", "age": "30", "city": "LA"},
         ]
 
-        # Step 2: Write to file
         csv_file = tmp_path / "workflow.csv"
         write_csv_simple(original_data, str(csv_file), ",", True, skip_confirm=True)
 
-        # Step 3: Detect delimiter
         detected_delimiter = detect_csv_delimiter(str(csv_file), 1000)
         assert detected_delimiter == ","
 
-        # Step 4: Validate structure
         is_valid = validate_csv_structure(str(csv_file), ["name", "age"])
         assert is_valid is True
 
-        # Step 5: Read back
         read_data = read_csv_simple(str(csv_file), detected_delimiter, True)
         assert read_data == original_data
 
-        # Step 6: Convert to string and back
         csv_string = dict_list_to_csv(read_data, detected_delimiter)
         dict_data = csv_to_dict_list(csv_string, detected_delimiter)
         assert dict_data == original_data
 
     def test_csv_cleaning_workflow(self) -> None:
         """Test CSV data cleaning workflow."""
-        # Step 1: Create messy data
         messy_data = [
             {"name": "  Alice  ", "age": "", "score": "N/A"},
             {"name": "Bob", "age": " 30 ", "score": "95"},
             {"name": "", "age": "25", "score": "null"},
         ]
 
-        # Step 2: Clean the data
         clean_rules = {
             "strip_whitespace": True,
             "remove_empty": True,
@@ -829,7 +803,6 @@ class TestCsvToolsIntegration:
         }
         cleaned_data = clean_csv_data(messy_data, clean_rules)
 
-        # Step 3: Verify cleaning results
         expected = [
             {"name": "Alice"},
             {"name": "Bob", "age": "30", "score": "95"},
@@ -837,21 +810,18 @@ class TestCsvToolsIntegration:
         ]
         assert cleaned_data == expected
 
-        # Step 4: Convert cleaned data to CSV string
         csv_string = dict_list_to_csv(cleaned_data, ",")
         assert "Alice" in csv_string
         assert "Bob,30,95" in csv_string or "30,Bob,95" in csv_string
 
     def test_error_consistency_across_functions(self, tmp_path: Path) -> None:
         """Test that functions handle unusual but valid CSV consistently."""
-        # Create unusual but valid CSV file
         csv_file = tmp_path / "unusual.csv"
-        csv_content = 'name,age\n"Alice,25\nBob,30'  # Python CSV reader handles this
+        csv_content = 'name,age\n"Alice,25\nBob,30'
         csv_file.write_text(csv_content, encoding="utf-8")
 
-        # All functions should handle this consistently (not raise errors)
         data = read_csv_simple(str(csv_file), ",", True)
-        assert len(data) == 1  # CSV reader treats this as one record
+        assert len(data) == 1
 
         result = validate_csv_structure(str(csv_file), ["name", "age"])
         assert result is True
@@ -864,19 +834,15 @@ class TestCsvToolsIntegration:
             {"name": "Владимир", "city": "Москва"},
         ]
 
-        # Step 1: Write Unicode data
         csv_file = tmp_path / "unicode.csv"
         write_csv_simple(unicode_data, str(csv_file), ",", True, skip_confirm=True)
 
-        # Step 2: Read back
         read_data = read_csv_simple(str(csv_file), ",", True)
         assert read_data == unicode_data
 
-        # Step 3: Convert to string and back
         csv_string = dict_list_to_csv(unicode_data, ",")
         dict_data = csv_to_dict_list(csv_string, ",")
         assert dict_data == unicode_data
 
-        # Step 4: Detect delimiter (should work with Unicode)
         delimiter = detect_csv_delimiter(str(csv_file), 1000)
         assert delimiter == ","

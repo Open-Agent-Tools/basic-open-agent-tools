@@ -30,7 +30,6 @@ def lighten_color(hex_color: str, percent: int) -> str:
     if not (0 <= percent <= 100):
         raise BasicAgentToolsError("Percent must be between 0 and 100")
 
-    # Convert to HSL
     try:
         rgb = hex_to_rgb(hex_color)
     except BasicAgentToolsError as e:
@@ -38,10 +37,8 @@ def lighten_color(hex_color: str, percent: int) -> str:
 
     hsl = rgb_to_hsl(rgb["r"], rgb["g"], rgb["b"])
 
-    # Increase lightness
     new_l = min(100, hsl["l"] + percent)
 
-    # Convert back to RGB and hex
     new_rgb = hsl_to_rgb(hsl["h"], hsl["s"], new_l)
     result: str = rgb_to_hex(new_rgb["r"], new_rgb["g"], new_rgb["b"])
     return result
@@ -70,7 +67,6 @@ def darken_color(hex_color: str, percent: int) -> str:
     if not (0 <= percent <= 100):
         raise BasicAgentToolsError("Percent must be between 0 and 100")
 
-    # Convert to HSL
     try:
         rgb = hex_to_rgb(hex_color)
     except BasicAgentToolsError as e:
@@ -78,10 +74,8 @@ def darken_color(hex_color: str, percent: int) -> str:
 
     hsl = rgb_to_hsl(rgb["r"], rgb["g"], rgb["b"])
 
-    # Decrease lightness
     new_l = max(0, hsl["l"] - percent)
 
-    # Convert back to RGB and hex
     new_rgb = hsl_to_rgb(hsl["h"], hsl["s"], new_l)
     result: str = rgb_to_hex(new_rgb["r"], new_rgb["g"], new_rgb["b"])
     return result
@@ -113,7 +107,6 @@ def adjust_saturation(hex_color: str, percent: int) -> str:
     if not (-100 <= percent <= 100):
         raise BasicAgentToolsError("Percent must be between -100 and 100")
 
-    # Convert to HSL
     try:
         rgb = hex_to_rgb(hex_color)
     except BasicAgentToolsError as e:
@@ -121,10 +114,8 @@ def adjust_saturation(hex_color: str, percent: int) -> str:
 
     hsl = rgb_to_hsl(rgb["r"], rgb["g"], rgb["b"])
 
-    # Adjust saturation
     new_s = max(0, min(100, hsl["s"] + percent))
 
-    # Convert back to RGB and hex
     new_rgb = hsl_to_rgb(hsl["h"], new_s, hsl["l"])
     result: str = rgb_to_hex(new_rgb["r"], new_rgb["g"], new_rgb["b"])
     return result
@@ -169,7 +160,6 @@ def generate_palette(base_color: str, scheme: str, count: int) -> dict[str, Any]
     if not (2 <= count <= 10):
         raise BasicAgentToolsError("Count must be between 2 and 10")
 
-    # Convert base color to HSL
     try:
         rgb = hex_to_rgb(base_color)
     except BasicAgentToolsError as e:
@@ -183,15 +173,12 @@ def generate_palette(base_color: str, scheme: str, count: int) -> dict[str, Any]
     colors: list[str] = []
 
     if scheme == "monochromatic":
-        # Vary lightness, keep hue and saturation
         for i in range(count):
-            # Generate colors from dark to light
             l_value = int(20 + (60 * i / (count - 1)))
             new_rgb = hsl_to_rgb(base_h, base_s, l_value)
             colors.append(rgb_to_hex(new_rgb["r"], new_rgb["g"], new_rgb["b"]))
 
     elif scheme == "analogous":
-        # Colors adjacent on the color wheel (±30 degrees)
         step = 60 // (count - 1) if count > 1 else 0
         for i in range(count):
             offset = -30 + (i * step)
@@ -200,33 +187,27 @@ def generate_palette(base_color: str, scheme: str, count: int) -> dict[str, Any]
             colors.append(rgb_to_hex(new_rgb["r"], new_rgb["g"], new_rgb["b"]))
 
     elif scheme == "complementary":
-        # Base color and its complement (180 degrees opposite)
         colors.append(base_color)
         comp_h = (base_h + 180) % 360
         comp_rgb = hsl_to_rgb(comp_h, base_s, base_l)
         colors.append(rgb_to_hex(comp_rgb["r"], comp_rgb["g"], comp_rgb["b"]))
 
-        # Fill remaining with variations
         remaining = count - 2
         for i in range(remaining):
             if i % 2 == 0:
-                # Lighter variation of base
                 l_value = min(100, base_l + 20)
                 new_rgb = hsl_to_rgb(base_h, base_s, l_value)
             else:
-                # Darker variation of complement
                 l_value = max(0, base_l - 20)
                 new_rgb = hsl_to_rgb(comp_h, base_s, l_value)
             colors.append(rgb_to_hex(new_rgb["r"], new_rgb["g"], new_rgb["b"]))
 
     elif scheme == "triadic":
-        # Three colors evenly spaced (120 degrees apart)
         for i in range(min(3, count)):
             new_h = (base_h + (i * 120)) % 360
             new_rgb = hsl_to_rgb(new_h, base_s, base_l)
             colors.append(rgb_to_hex(new_rgb["r"], new_rgb["g"], new_rgb["b"]))
 
-        # Fill remaining with variations
         for i in range(count - 3):
             idx = i % 3
             h_value = (base_h + (idx * 120)) % 360
@@ -236,7 +217,6 @@ def generate_palette(base_color: str, scheme: str, count: int) -> dict[str, Any]
             colors.append(rgb_to_hex(new_rgb["r"], new_rgb["g"], new_rgb["b"]))
 
     elif scheme == "split_complementary":
-        # Base color and two colors adjacent to complement
         colors.append(base_color)
         comp_h = (base_h + 180) % 360
         split1_h = (comp_h - 30) % 360
@@ -247,7 +227,6 @@ def generate_palette(base_color: str, scheme: str, count: int) -> dict[str, Any]
         colors.append(rgb_to_hex(split1_rgb["r"], split1_rgb["g"], split1_rgb["b"]))
         colors.append(rgb_to_hex(split2_rgb["r"], split2_rgb["g"], split2_rgb["b"]))
 
-        # Fill remaining with variations
         for i in range(count - 3):
             if i % 3 == 0:
                 h_value = base_h

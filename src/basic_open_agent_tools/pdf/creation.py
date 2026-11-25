@@ -76,13 +76,11 @@ def create_simple_pdf(file_path: str, content: str, skip_confirm: bool) -> str:
     if not content.strip():
         raise ValueError("content cannot be empty")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory is writable
     parent_dir = os.path.dirname(file_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -91,18 +89,15 @@ def create_simple_pdf(file_path: str, content: str, skip_confirm: bool) -> str:
         raise PermissionError(f"Cannot write to directory: {parent_dir}")
 
     try:
-        # Create PDF
         doc = SimpleDocTemplate(file_path, pagesize=letter)
         styles = getSampleStyleSheet()
         story = []
 
-        # Add content as paragraph
         para = Paragraph(content, styles["Normal"])
         story.append(para)
 
         doc.build(story)
 
-        # Get file size
         file_size = os.path.getsize(file_path)
         return f"Created PDF {file_path} ({file_size} bytes)"
 
@@ -159,18 +154,15 @@ def create_pdf_from_text_list(
     if not paragraphs:
         raise ValueError("paragraphs cannot be empty")
 
-    # Validate all paragraphs are strings
     for i, para in enumerate(paragraphs):
         if not isinstance(para, str):
             raise TypeError(f"Paragraph at index {i} must be a string")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(file_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -183,7 +175,6 @@ def create_pdf_from_text_list(
         styles = getSampleStyleSheet()
         story = []
 
-        # Add each paragraph with spacing
         for para_text in paragraphs:
             if para_text.strip():
                 para = Paragraph(para_text, styles["Normal"])
@@ -253,13 +244,11 @@ def create_pdf_with_title(
     if not content.strip():
         raise ValueError("content cannot be empty")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(file_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -272,12 +261,10 @@ def create_pdf_with_title(
         styles = getSampleStyleSheet()
         story = []
 
-        # Add title
         title_para = Paragraph(title, styles["Title"])
         story.append(title_para)
         story.append(Spacer(1, 0.3 * inch))
 
-        # Add content
         content_para = Paragraph(content, styles["Normal"])
         story.append(content_para)
 
@@ -343,20 +330,17 @@ def create_pdf_with_metadata(
     if not content.strip():
         raise ValueError("content cannot be empty")
 
-    # Validate metadata values are strings
     for key, value in metadata.items():
         if not isinstance(key, str):
             raise TypeError(f"Metadata key must be string, got {type(key)}")
         if not isinstance(value, str):
             raise TypeError(f"Metadata value must be string, got {type(value)}")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(file_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -377,7 +361,6 @@ def create_pdf_with_metadata(
         styles = getSampleStyleSheet()
         story = []
 
-        # Add content
         para = Paragraph(content, styles["Normal"])
         story.append(para)
 
@@ -442,7 +425,6 @@ def create_multi_page_pdf(
     if not pages:
         raise ValueError("pages cannot be empty")
 
-    # Validate pages structure
     for i, page in enumerate(pages):
         if not isinstance(page, dict):
             raise TypeError(f"Page at index {i} must be a dictionary")
@@ -453,13 +435,11 @@ def create_multi_page_pdf(
         if not isinstance(page["content"], str):
             raise TypeError(f"Page {i} content must be a string")
 
-    # Check if file exists
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(file_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -474,20 +454,16 @@ def create_multi_page_pdf(
         styles = getSampleStyleSheet()
         story = []
 
-        # Add each page
         for i, page in enumerate(pages):
-            # Add title if provided
             if page["title"].strip():
                 title_para = Paragraph(page["title"], styles["Heading1"])
                 story.append(title_para)
                 story.append(Spacer(1, 0.2 * inch))
 
-            # Add content if provided
             if page["content"].strip():
                 content_para = Paragraph(page["content"], styles["Normal"])
                 story.append(content_para)
 
-            # Add page break except for last page
             if i < len(pages) - 1:
                 story.append(PageBreak())
 
@@ -554,13 +530,11 @@ def text_to_pdf(
     if font_size < 6 or font_size > 72:
         raise ValueError("font_size must be between 6 and 72")
 
-    # Check if file exists
     if os.path.exists(output_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {output_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory
     parent_dir = os.path.dirname(output_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -574,17 +548,15 @@ def text_to_pdf(
         doc = SimpleDocTemplate(output_path, pagesize=letter)
         styles = getSampleStyleSheet()
 
-        # Create custom style with specified font size
         custom_style = ParagraphStyle(
             "CustomStyle",
             parent=styles["Normal"],
             fontSize=font_size,
-            leading=font_size * 1.2,  # Line height
+            leading=font_size * 1.2,
         )
 
         story = []
 
-        # Split text into paragraphs and add to story
         paragraphs = text_content.split("\n")
         for para_text in paragraphs:
             if para_text.strip():

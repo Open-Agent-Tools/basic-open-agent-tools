@@ -5,7 +5,7 @@ import re
 
 from ..decorators import strands_tool
 
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB limit
+MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
 @strands_tool
@@ -47,19 +47,17 @@ def create_mermaid_flowchart(
 
     lines = [f"flowchart {direction}"]
 
-    # Generate nodes
     for node in nodes:
         if not isinstance(node, dict):
             raise TypeError("each node must be a dict")
 
         node_id = node.get("id", "")
         label = node.get("label", node_id)
-        shape = node.get("shape", "rect")  # rect, round, diamond, circle
+        shape = node.get("shape", "rect")
 
         if not node_id:
             continue
 
-        # Map shape to Mermaid syntax
         shape_syntax = {
             "rect": f"    {node_id}[{label}]",
             "round": f"    {node_id}({label})",
@@ -68,7 +66,6 @@ def create_mermaid_flowchart(
         }
         lines.append(shape_syntax.get(shape, f"    {node_id}[{label}]"))
 
-    # Generate edges
     for edge in edges:
         if not isinstance(edge, dict):
             raise TypeError("each edge must be a dict")
@@ -119,13 +116,11 @@ def create_mermaid_sequence_diagram(
 
     lines = ["sequenceDiagram"]
 
-    # Declare participants
     for participant in participants:
         if not isinstance(participant, str):
             raise TypeError("all participants must be strings")
         lines.append(f"    participant {participant}")
 
-    # Generate messages
     for msg in messages:
         if not isinstance(msg, dict):
             raise TypeError("each message must be a dict")
@@ -133,7 +128,7 @@ def create_mermaid_sequence_diagram(
         from_p = msg.get("from", "")
         to_p = msg.get("to", "")
         message = msg.get("message", "")
-        msg_type = msg.get("type", "sync")  # sync, async, response
+        msg_type = msg.get("type", "sync")
 
         if from_p and to_p and message:
             arrow = "->>" if msg_type == "async" else "->"
@@ -183,7 +178,6 @@ def create_mermaid_gantt_chart(
 
     lines = ["gantt", f"    title {title}", "    dateFormat YYYY-MM-DD"]
 
-    # Generate sections and tasks
     current_section = ""
     for task in tasks:
         if not isinstance(task, dict):
@@ -195,7 +189,6 @@ def create_mermaid_gantt_chart(
         duration = task.get("duration", "1d")
         status = task.get("status", "")
 
-        # Add section header if changed
         if section and section != current_section:
             lines.append(f"    section {section}")
             current_section = section
@@ -240,7 +233,6 @@ def create_mermaid_er_diagram(
 
     lines = ["erDiagram"]
 
-    # Generate entities with attributes
     for entity in entities:
         if not isinstance(entity, dict):
             raise TypeError("each entity must be a dict")
@@ -257,7 +249,6 @@ def create_mermaid_er_diagram(
                         lines.append(f"        string {attr}")
             lines.append("    }")
 
-    # Generate relationships
     for rel in relationships:
         if not isinstance(rel, dict):
             raise TypeError("each relationship must be a dict")
@@ -268,7 +259,6 @@ def create_mermaid_er_diagram(
         label = rel.get("label", "")
 
         if from_entity and to_entity:
-            # Map relationship type to Mermaid syntax
             type_syntax = {
                 "one-to-one": "||--||",
                 "one-to-many": "||--o{",
@@ -319,7 +309,6 @@ def parse_mermaid_file(file_path: str) -> dict[str, str]:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
-        # Detect diagram type
         diagram_type = "unknown"
         first_line = content.strip().split("\n")[0].lower()
         if "flowchart" in first_line or "graph" in first_line:
@@ -331,7 +320,6 @@ def parse_mermaid_file(file_path: str) -> dict[str, str]:
         elif "erdiagram" in first_line:
             diagram_type = "er"
 
-        # Count elements
         element_count = len([line for line in content.split("\n") if line.strip()])
 
         return {
@@ -439,7 +427,6 @@ def embed_mermaid_in_markdown(
         with open(md_file_path, encoding="utf-8") as f:
             md_content = f.read()
 
-        # Embed Mermaid in markdown code block
         mermaid_block = f"\n```mermaid\n{diagram_content}\n```\n"
         md_content += mermaid_block
 
@@ -488,7 +475,6 @@ def extract_mermaid_from_markdown(md_file_path: str) -> list[str]:
         with open(md_file_path, encoding="utf-8") as f:
             content = f.read()
 
-        # Extract mermaid code blocks
         pattern = r"```mermaid\n(.*?)\n```"
         matches = re.findall(pattern, content, re.DOTALL)
 

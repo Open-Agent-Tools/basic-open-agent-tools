@@ -23,10 +23,9 @@ from basic_open_agent_tools.text.processing import (
     to_title_case,
 )
 
-# Load environment variables for API keys
-load_dotenv()  # From current working directory (when pytest runs from root)
+load_dotenv()
 project_root = Path(__file__).parent.parent.parent.parent.parent
-load_dotenv(project_root / ".env")  # From project root
+load_dotenv(project_root / ".env")
 
 root_agent = Agent(
     name="text_processing_agent",

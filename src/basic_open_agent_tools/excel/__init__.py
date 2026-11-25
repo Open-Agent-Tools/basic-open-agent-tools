@@ -13,7 +13,6 @@ All functions are designed for LLM agent compatibility with:
 - Comprehensive docstrings
 """
 
-# Formatting functions
 from .formatting import (
     add_excel_formula,
     apply_excel_alignment,
@@ -24,8 +23,6 @@ from .formatting import (
     set_excel_column_width,
     set_excel_row_height,
 )
-
-# Reading functions
 from .reading import (
     count_sheet_rows,
     filter_sheet_rows,
@@ -46,8 +43,6 @@ from .reading import (
     search_excel_text,
     select_sheet_columns,
 )
-
-# Writing functions
 from .writing import (
     add_sheet_to_excel,
     append_rows_to_excel,
@@ -60,7 +55,6 @@ from .writing import (
 )
 
 __all__: list[str] = [
-    # Reading functions (18 - includes 10 token-saving inspection tools)
     "read_excel_sheet",
     "get_excel_sheet_names",
     "read_excel_as_dicts",
@@ -69,7 +63,6 @@ __all__: list[str] = [
     "search_excel_text",
     "get_excel_metadata",
     "get_excel_info",
-    # Token-saving inspection tools
     "get_sheet_info",
     "get_sheet_schema",
     "preview_sheet_rows",
@@ -80,7 +73,6 @@ __all__: list[str] = [
     "get_sheet_column_stats",
     "count_sheet_rows",
     "get_sheet_value_counts",
-    # Writing functions (8)
     "create_simple_excel",
     "create_excel_with_headers",
     "create_excel_from_dicts",
@@ -89,7 +81,6 @@ __all__: list[str] = [
     "update_excel_cell",
     "delete_excel_sheet",
     "excel_to_csv",
-    # Formatting functions (8)
     "apply_excel_bold",
     "apply_excel_font_size",
     "apply_excel_alignment",

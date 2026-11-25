@@ -29,9 +29,7 @@ def clean_whitespace(text: str) -> str:
 
     logger.debug(f"Cleaning whitespace in {len(text)} character text")
 
-    # Replace all whitespace sequences with single spaces
     cleaned = re.sub(r"\s+", " ", text)
-    # Strip leading and trailing whitespace
     result = cleaned.strip()
 
     logger.debug(f"Whitespace cleaned: {len(result)} characters")
@@ -66,10 +64,8 @@ def normalize_line_endings(text: str, style: str) -> str:
     if style not in line_endings:
         raise ValueError(f"Unsupported line ending style: {style}")
 
-    # Normalize all line endings to Unix first
     normalized = re.sub(r"\r\n|\r|\n", "\n", text)
 
-    # Convert to target style if not unix
     if style != "unix":
         normalized = normalized.replace("\n", line_endings[style])
 
@@ -96,12 +92,8 @@ def strip_html_tags(text: str) -> str:
 
     logger.debug(f"Stripping HTML tags from {len(text)} character text")
 
-    # Remove HTML tags - be smart about spacing to avoid extra spaces around punctuation
-    # First pass: remove tags that are followed by punctuation without adding space
     cleaned = re.sub(r"<[^>]+>(?=[^\w\s])", "", text)
-    # Second pass: remove remaining tags with space replacement
     cleaned = re.sub(r"<[^>]+>", " ", cleaned)
-    # Clean up extra whitespace that might result from tag removal
     result: str = clean_whitespace(cleaned)
 
     logger.debug(f"HTML tags stripped: {len(result)} characters")
@@ -155,13 +147,9 @@ def to_snake_case(text: str) -> str:
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
 
-    # Replace spaces and hyphens with underscores
     text = re.sub(r"[-\s]+", "_", text)
-    # Handle sequences of uppercase letters (e.g., XMLHttp -> XML_Http)
     text = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", text)
-    # Insert underscore before uppercase letters that follow lowercase letters
     text = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", text)
-    # Convert to lowercase
     return text.lower()
 
 
@@ -185,19 +173,15 @@ def to_camel_case(text: str, upper_first: bool) -> str:
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
 
-    # Split on common delimiters
     words = re.split(r"[-_\s]+", text.lower())
-    # Filter out empty strings
     words = [word for word in words if word]
 
     if not words:
         return ""
 
     if upper_first:
-        # PascalCase - capitalize all words
         return "".join(word.capitalize() for word in words)
     else:
-        # camelCase - first word lowercase, rest capitalized
         return words[0] + "".join(word.capitalize() for word in words[1:])
 
 
@@ -220,13 +204,12 @@ def to_title_case(text: str) -> str:
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
 
-    # Split on word separators (spaces, hyphens, underscores) but preserve them
-    parts = re.split(r"([\s\-_]+)", text)  # Split on whitespace, hyphens, underscores
+    parts = re.split(r"([\s\-_]+)", text)
     result = []
     for part in parts:
-        if part and not re.match(r"^[\s\-_]+$", part):  # If it's not just separators
+        if part and not re.match(r"^[\s\-_]+$", part):
             result.append(part.capitalize())
-        else:  # If it's separators or empty, keep as-is
+        else:
             result.append(part)
     return "".join(result)
 
@@ -257,7 +240,6 @@ def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> list[
         raise ValueError("max_length must be at least 1")
 
     if preserve_words:
-        # Use textwrap for word-preserving splits
         wrapper = textwrap.TextWrapper(
             width=max_length,
             break_long_words=False,
@@ -268,7 +250,6 @@ def smart_split_lines(text: str, max_length: int, preserve_words: bool) -> list[
         )
         return wrapper.wrap(text)
     else:
-        # Simple character-based splitting
         lines = []
         for i in range(0, len(text), max_length):
             lines.append(text[i : i + max_length])
@@ -292,18 +273,13 @@ def extract_sentences(text: str) -> list[str]:
     if not isinstance(text, str):
         raise TypeError("Input must be a string")
 
-    # Simple sentence boundary detection
-    # Split on . ? ! followed by whitespace or end of string
     sentences = re.split(r"[.!?]+(?:\s+|$)", text)
 
-    # Filter out empty sentences and restore punctuation
     result = []
     for i, sentence in enumerate(sentences):
         sentence = sentence.strip()
         if sentence:
-            # Find the punctuation that was used to split
-            if i < len(sentences) - 1:  # Not the last sentence
-                # Look for the punctuation in the original text
+            if i < len(sentences) - 1:
                 start_pos = text.find(sentence)
                 end_pos = start_pos + len(sentence)
                 if end_pos < len(text) and text[end_pos] in ".!?":
@@ -342,5 +318,4 @@ def join_with_oxford_comma(items: list[str], conjunction: str) -> str:
     if len(items) == 2:
         return f"{items[0]} {conjunction} {items[1]}"
 
-    # Three or more items - use Oxford comma
     return f"{', '.join(items[:-1])}, {conjunction} {items[-1]}"

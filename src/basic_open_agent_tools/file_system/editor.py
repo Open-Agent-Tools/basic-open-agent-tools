@@ -27,7 +27,6 @@ def _view_file(file_path: Path, view_range: Union[str, int, None]) -> str:
         raise FileSystemError(f"File not found: {file_path}")
 
     if file_path.is_dir():
-        # List directory contents
         try:
             contents = []
             for item in sorted(file_path.iterdir()):
@@ -42,7 +41,6 @@ def _view_file(file_path: Path, view_range: Union[str, int, None]) -> str:
         lines = content.splitlines()
 
         if view_range:
-            # Convert view_range to string if it's an int
             view_range_str = (
                 str(view_range) if not isinstance(view_range, str) else view_range
             )
@@ -52,7 +50,6 @@ def _view_file(file_path: Path, view_range: Union[str, int, None]) -> str:
         else:
             line_numbers = range(1, len(lines) + 1)
 
-        # Format with line numbers
         formatted_lines = []
         for line_num, line in zip(line_numbers, lines):
             formatted_lines.append(f"{line_num:4d}: {line}")
@@ -88,7 +85,6 @@ def _find_in_file(file_path: Path, pattern: str, use_regex: bool) -> str:
             except re.error as e:
                 raise ValueError(f"Invalid regex pattern '{pattern}': {e}")
         else:
-            # Simple substring search
             for line_num, line in enumerate(lines, 1):
                 if pattern in line:
                     matches.append(f"{line_num:4d}: {line}")
@@ -113,7 +109,6 @@ def _parse_line_range(range_str: str, total_lines: int) -> tuple[int, int]:
     range_str = range_str.strip()
 
     if "-" in range_str:
-        # Range like "5-10"
         try:
             start_str, end_str = range_str.split("-", 1)
             start_line = int(start_str.strip())
@@ -121,13 +116,11 @@ def _parse_line_range(range_str: str, total_lines: int) -> tuple[int, int]:
         except ValueError:
             raise ValueError(f"Invalid line range format: {range_str}")
     else:
-        # Single line like "5"
         try:
             start_line = end_line = int(range_str)
         except ValueError:
             raise ValueError(f"Invalid line number: {range_str}")
 
-    # Validate and clamp ranges
     start_line = max(1, start_line)
     end_line = min(total_lines, end_line)
 
@@ -135,21 +128,6 @@ def _parse_line_range(range_str: str, total_lines: int) -> tuple[int, int]:
         raise ValueError(f"Start line {start_line} is greater than end line {end_line}")
 
     return start_line, end_line
-
-
-# ============================================================================
-# FLAT TOOLS - Simple file editor operations for agents
-# ============================================================================
-#
-# These tools provide unique value beyond existing operations:
-# - view_file_with_lines: Adds line numbers to file viewing
-# - find_text_in_file: Search/grep functionality
-#
-# For other operations, use existing tools:
-# - write_file_from_string: Create/write files
-# - replace_in_file: Replace text with count control
-# - insert_at_line: Insert at specific line
-# ============================================================================
 
 
 @strands_tool
@@ -184,7 +162,6 @@ def view_file_with_lines(path: str, start_line: str, end_line: str) -> str:
     """
     file_path = validate_path(path, "view")
 
-    # Construct view_range parameter for _view_file
     if start_line and end_line:
         view_range: Union[str, None] = f"{start_line}-{end_line}"
     elif start_line:

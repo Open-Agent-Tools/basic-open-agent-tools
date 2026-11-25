@@ -9,7 +9,7 @@ try:
 except ImportError:
     Image = None  # type: ignore[assignment,misc]
 
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB limit
+MAX_FILE_SIZE = 50 * 1024 * 1024
 
 
 @strands_tool
@@ -293,7 +293,6 @@ def convert_image_format(
 
     try:
         with Image.open(file_path) as img:
-            # Convert RGBA to RGB for JPEG
             if output_format.upper() == "JPEG" and img.mode in ("RGBA", "LA", "P"):
                 img = img.convert("RGB")
 
@@ -434,7 +433,7 @@ def flip_image(
         with Image.open(file_path) as img:
             if direction == "horizontal":
                 flipped = img.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-            else:  # vertical
+            else:
                 flipped = img.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 
             flipped.save(output_path)

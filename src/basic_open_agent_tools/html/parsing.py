@@ -11,7 +11,6 @@ from typing import Union
 
 from ..decorators import strands_tool
 
-# Maximum file size: 10MB
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
@@ -47,7 +46,7 @@ class HTMLStructureParser(HTMLParser):
         if tag == "title":
             self._in_title = True
         elif tag in ["h1", "h2", "h3", "h4", "h5", "h6"]:
-            pass  # Will capture text in handle_data
+            pass
         elif tag == "a":
             href = attrs_dict.get("href", "")
             self.links.append({"href": href or "", "text": ""})
@@ -75,7 +74,7 @@ class HTMLStructureParser(HTMLParser):
         if tag == "title":
             self._in_title = False
         elif tag in ["h1", "h2", "h3", "h4", "h5", "h6"]:
-            pass  # Headings captured in handle_data
+            pass
         elif tag == "table":
             if self._current_table:
                 self.tables.append(self._current_table)
@@ -340,7 +339,6 @@ def html_to_plain_text(file_path: str) -> str:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
-        # Remove script and style tags with content
         content = re.sub(
             r"<script[^>]*>.*?</script>", "", content, flags=re.DOTALL | re.IGNORECASE
         )
@@ -348,15 +346,12 @@ def html_to_plain_text(file_path: str) -> str:
             r"<style[^>]*>.*?</style>", "", content, flags=re.DOTALL | re.IGNORECASE
         )
 
-        # Remove all HTML tags
         content = re.sub(r"<[^>]+>", "", content)
 
-        # Decode HTML entities
         import html as html_module
 
         content = html_module.unescape(content)
 
-        # Clean up whitespace
         content = re.sub(r"\s+", " ", content)
         content = content.strip()
 
@@ -364,9 +359,6 @@ def html_to_plain_text(file_path: str) -> str:
 
     except Exception as e:
         raise ValueError(f"Failed to convert HTML to plain text: {e}")
-
-
-# ===== Token-Saving HTML Inspection Tools =====
 
 
 class HTMLElementCounter(HTMLParser):
@@ -949,7 +941,6 @@ def get_html_title(file_path: str) -> str:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
-        # Extract title using regex
         match = re.search(
             r"<title[^>]*>(.*?)</title>", content, re.IGNORECASE | re.DOTALL
         )
@@ -1085,7 +1076,6 @@ def get_html_element_count_by_type(file_path: str) -> dict[str, str]:
         parser = TagCounter()
         parser.feed(content)
 
-        # Convert to string values for JSON serialization
         return {tag: str(count) for tag, count in parser.counts.items()}
 
     except Exception as e:

@@ -80,7 +80,6 @@ class TestExecuteShellCommand:
     @patch("subprocess.run")
     def test_successful_command_execution(self, mock_run):
         """Test successful command execution."""
-        # Mock successful command result
         mock_result = Mock()
         mock_result.returncode = 0
         mock_result.stdout = "Hello World"
@@ -144,7 +143,6 @@ class TestExecuteShellCommand:
                 "dir", timeout=30, capture_output=True, working_directory=""
             )
 
-            # Check that cmd.exe was used
             call_args = mock_run.call_args[0][0]
             assert call_args == ["cmd.exe", "/c", "dir"]
 
@@ -162,7 +160,6 @@ class TestExecuteShellCommand:
                 "ls", timeout=30, capture_output=True, working_directory=""
             )
 
-            # Check that sh was used
             call_args = mock_run.call_args[0][0]
             assert call_args == ["/bin/sh", "-c", "ls"]
 
@@ -179,7 +176,6 @@ class TestExecuteShellCommand:
             "pwd", timeout=30, capture_output=True, working_directory="/tmp"
         )
 
-        # Check that cwd parameter was passed
         call_kwargs = mock_run.call_args[1]
         assert call_kwargs["cwd"] == "/tmp"
 
@@ -224,7 +220,6 @@ class TestRunBash:
             assert result["stdout"] == "bash output"
             assert result["shell"] == "bash"
 
-            # Check that bash was used
             call_args = mock_run.call_args[0][0]
             assert call_args == ["/bin/bash", "-c", "echo bash output"]
 
@@ -280,7 +275,6 @@ class TestRunPowershell:
             assert result["stdout"] == "powershell output"
             assert result["shell"] == "powershell"
 
-            # Check that PowerShell was used with correct parameters
             call_args = mock_run.call_args[0][0]
             assert call_args == [
                 "powershell.exe",

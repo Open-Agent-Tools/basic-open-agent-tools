@@ -11,7 +11,6 @@ from unittest.mock import patch
 
 import pytest
 
-# Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 import basic_open_agent_tools as boat
@@ -22,21 +21,15 @@ class TestStrandsIntegration:
 
     def test_strands_tool_decorator_available(self):
         """Test that @strands_tool decorators are available and functional."""
-        # Test that we can import file_system functions with decorators
         from basic_open_agent_tools.file_system import read_file_to_string
 
-        # When Strands is installed, check for decorator attributes
-        # When Strands is not installed, the decorator is a no-op
         try:
             import strands  # noqa: F401
 
-            # Strands is installed - check for decorator attributes
             assert hasattr(read_file_to_string, "__wrapped__") or hasattr(
                 read_file_to_string, "_strands_decorated"
             )
         except ImportError:
-            # Strands not installed - decorator is a no-op passthrough
-            # Just verify the function is callable and has proper metadata
             assert callable(read_file_to_string)
             assert hasattr(read_file_to_string, "__name__")
             assert hasattr(read_file_to_string, "__doc__")
@@ -47,7 +40,6 @@ class TestStrandsIntegration:
         from basic_open_agent_tools.file_system import read_file_to_string
         from basic_open_agent_tools.text import clean_whitespace
 
-        # Check for proper function signatures and docstrings
         functions_to_test = [read_file_to_string, clean_whitespace, safe_json_serialize]
 
         for func in functions_to_test:
@@ -67,9 +59,7 @@ class TestStrandsIntegration:
         except ImportError:
             pytest.skip("Strands framework not installed")
 
-        # Mock the API key for testing
         with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test_key"}):
-            # Create model
             model = AnthropicModel(
                 client_args={"api_key": "test_key"},
                 model_id="claude-sonnet-4-20250514",
@@ -77,10 +67,8 @@ class TestStrandsIntegration:
                 params={"temperature": 0.1},
             )
 
-            # Load basic-open-agent-tools
-            tools = boat.load_all_filesystem_tools()[:5]  # Limit to 5 tools for testing
+            tools = boat.load_all_filesystem_tools()[:5]
 
-            # Create agent
             agent = Agent(
                 model=model,
                 name="Test Agent",
@@ -94,7 +82,6 @@ class TestStrandsIntegration:
 
     def test_tool_loading_for_strands(self):
         """Test that all tool loading functions work for Strands integration."""
-        # Test all major tool categories
         tool_loaders = [
             boat.load_all_filesystem_tools,
             boat.load_all_text_tools,
@@ -107,19 +94,17 @@ class TestStrandsIntegration:
             boat.load_all_logging_tools,
         ]
 
-        # Test optional dependencies separately
         optional_loaders = []
         try:
             optional_loaders.append(boat.load_all_system_tools)
         except ImportError:
-            pass  # System tools require psutil
+            pass
 
         for loader in tool_loaders:
             tools = loader()
             assert isinstance(tools, list)
             assert len(tools) > 0
 
-            # Check each tool is callable and has proper metadata
             for tool in tools:
                 assert callable(tool)
                 assert hasattr(tool, "__name__")
@@ -136,7 +121,6 @@ class TestStrandsIntegration:
         assert isinstance(merged, list)
         assert len(merged) == len(fs_tools) + len(text_tools) + len(data_tools)
 
-        # Check all tools are unique
         tool_names = [tool.__name__ for tool in merged]
         assert len(tool_names) == len(set(tool_names))
 
@@ -145,14 +129,12 @@ class TestStrandsIntegration:
         all_tools = boat.load_all_tools()
 
         assert isinstance(all_tools, list)
-        assert len(all_tools) > 100  # Should have 150+ tools
+        assert len(all_tools) > 100
 
-        # Check tool uniqueness
         tool_names = [tool.__name__ for tool in all_tools]
         assert len(tool_names) == len(set(tool_names))
 
-        # Check each tool has proper attributes
-        for tool in all_tools[:10]:  # Check first 10 tools
+        for tool in all_tools[:10]:
             assert callable(tool)
             assert hasattr(tool, "__name__")
             assert hasattr(tool, "__doc__")
@@ -179,19 +161,16 @@ class TestStrandsToolCompatibility:
         ]
 
         for tool in tools:
-            # Check function signature compatibility
             import inspect
 
             sig = inspect.signature(tool)
 
-            # All parameters should have type annotations
             for param in sig.parameters.values():
                 if param.name != "self":
                     assert param.annotation != inspect.Parameter.empty, (
                         f"{tool.__name__} parameter {param.name} missing type annotation"
                     )
 
-            # Return type should be annotated
             assert sig.return_annotation != inspect.Parameter.empty, (
                 f"{tool.__name__} missing return type annotation"
             )
@@ -217,7 +196,6 @@ class TestStrandsToolCompatibility:
 
             sig = inspect.signature(tool)
 
-            # Check type annotations
             for param in sig.parameters.values():
                 if param.name != "self":
                     assert param.annotation != inspect.Parameter.empty
@@ -245,7 +223,6 @@ class TestStrandsToolCompatibility:
 
             sig = inspect.signature(tool)
 
-            # Check type annotations
             for param in sig.parameters.values():
                 if param.name != "self":
                     assert param.annotation != inspect.Parameter.empty
@@ -273,7 +250,6 @@ class TestStrandsAgentExecution:
         if not api_key:
             pytest.skip("ANTHROPIC_API_KEY not provided")
 
-        # Create model
         model = AnthropicModel(
             client_args={"api_key": api_key},
             model_id="claude-sonnet-4-20250514",
@@ -281,10 +257,8 @@ class TestStrandsAgentExecution:
             params={"temperature": 0.1},
         )
 
-        # Load minimal set of tools
-        tools = boat.load_all_filesystem_tools()[:3]  # Just first 3 tools
+        tools = boat.load_all_filesystem_tools()[:3]
 
-        # Create agent
         agent = Agent(
             model=model,
             name="Basic Tools Test Agent",
@@ -317,7 +291,6 @@ class TestStrandsAgentExecution:
             response = strands_agent("List the file system tools you have access to.")
             assert isinstance(response, str)
             assert len(response) > 0
-            # Should mention some file-related functionality
             assert any(
                 keyword in response.lower()
                 for keyword in ["read", "file", "directory", "write"]
@@ -327,5 +300,4 @@ class TestStrandsAgentExecution:
 
 
 if __name__ == "__main__":
-    # Run basic tests
     pytest.main([__file__, "-v"])

@@ -9,7 +9,6 @@ from ..confirmation import check_user_confirmation
 from ..decorators import strands_tool
 from ..exceptions import DataError
 
-# Simple YAML support using json fallback
 try:
     import yaml  # type: ignore[import-untyped]
 
@@ -17,7 +16,6 @@ try:
 except ImportError:
     HAS_YAML = False
 
-# Simple TOML support
 try:
     import tomli  # type: ignore[import-not-found]
     import tomli_w  # type: ignore[import-not-found]
@@ -46,7 +44,6 @@ def _generate_dict_preview(data: dict, format_name: str) -> str:
     key_count = len(data)
     preview = f"Writing {key_count} top-level key(s)\n"
 
-    # Show first 10 keys and their values (truncated)
     sample_keys = min(10, len(data))
     if sample_keys > 0:
         preview += f"\nFirst {sample_keys} key(s):\n"
@@ -130,7 +127,6 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     logger.debug(f"File exists: {file_existed}, skip_confirm: {skip_confirm}")
 
     if file_existed:
-        # Check user confirmation - show preview of NEW data being written
         preview = _generate_dict_preview(data, "YAML")
         confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing YAML file",
@@ -148,7 +144,6 @@ def write_yaml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         with open(file_path, "w", encoding="utf-8") as f:
             yaml.safe_dump(data, f, default_flow_style=False, allow_unicode=True)
 
-        # Calculate stats for feedback
         file_size = os.path.getsize(file_path)
         key_count = len(data)
         action = "Overwrote" if file_existed else "Created"
@@ -237,7 +232,6 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     logger.debug(f"File exists: {file_existed}, skip_confirm: {skip_confirm}")
 
     if file_existed:
-        # Check user confirmation - show preview of NEW data being written
         preview = _generate_dict_preview(data, "TOML")
         confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing TOML file",
@@ -255,7 +249,6 @@ def write_toml_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         with open(file_path, "wb") as f:
             tomli_w.dump(data, f)
 
-        # Calculate stats for feedback
         file_size = os.path.getsize(file_path)
         key_count = len(data)
         action = "Overwrote" if file_existed else "Created"
@@ -287,7 +280,6 @@ def read_ini_file(file_path: str) -> dict:
         >>> read_ini_file("config.ini")
         {"database": {"host": "localhost", "port": "5432"}}
     """
-    # Check if file exists first (ConfigParser.read doesn't raise FileNotFoundError)
     import os
 
     if not os.path.isfile(file_path):
@@ -345,7 +337,6 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
     logger.debug(f"File exists: {file_existed}, skip_confirm: {skip_confirm}")
 
     if file_existed:
-        # Check user confirmation - show preview of NEW data being written
         preview = _generate_dict_preview(data, "INI")
         confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing INI file",
@@ -373,7 +364,6 @@ def write_ini_file(data: dict, file_path: str, skip_confirm: bool) -> str:
         with open(file_path, "w", encoding="utf-8") as f:
             config.write(f)
 
-        # Calculate stats for feedback
         file_size = os.path.getsize(file_path)
         action = "Overwrote" if file_existed else "Created"
 
@@ -409,18 +399,14 @@ def validate_config_schema(config_data: dict, schema_definition: dict) -> list:
     """
     errors = []
 
-    # Check each field in the schema
     for field_name, field_spec in schema_definition.items():
-        # Check if required field is present
         if field_spec.get("required", False) and field_name not in config_data:
             errors.append(f"Required field '{field_name}' is missing")
             continue
 
-        # Skip validation if field is not in config data
         if field_name not in config_data:
             continue
 
-        # Check type
         expected_type = field_spec.get("type")
         if expected_type and not isinstance(config_data[field_name], expected_type):
             actual_type = type(config_data[field_name]).__name__
@@ -429,14 +415,12 @@ def validate_config_schema(config_data: dict, schema_definition: dict) -> list:
                 f"Field '{field_name}' has incorrect type: expected {expected_type_name}, got {actual_type}"
             )
 
-        # Check allowed values
         allowed_values = field_spec.get("allowed_values")
         if allowed_values and config_data[field_name] not in allowed_values:
             errors.append(
                 f"Field '{field_name}' has invalid value: {config_data[field_name]}. Allowed values: {allowed_values}"
             )
 
-    # Check for unknown fields
     for field_name in config_data:
         if field_name not in schema_definition:
             errors.append(f"Unknown field '{field_name}' in configuration")
@@ -465,13 +449,11 @@ def merge_config_files(config_paths: list[str], format_type: str) -> dict:
         >>> merge_config_files(["single.yaml"], "yaml")
         {"database": {"host": "localhost", "port": 5432}}
     """
-    # Use the provided list directly
     paths = config_paths
 
     if not paths:
         raise ValueError("No configuration files provided")
 
-    # Validate format_type
     valid_formats = ["yaml", "toml", "ini", "json"]
     if format_type not in valid_formats:
         raise ValueError(f"format_type must be one of {valid_formats}")
@@ -481,7 +463,6 @@ def merge_config_files(config_paths: list[str], format_type: str) -> dict:
     for config_path in paths:
         file_format = format_type
 
-        # Read the file
         if file_format == "yaml":
             config_data = read_yaml_file(config_path)
         elif file_format == "toml":
@@ -497,7 +478,6 @@ def merge_config_files(config_paths: list[str], format_type: str) -> dict:
         else:
             raise DataError(f"Unsupported format: {file_format}")
 
-        # Deep merge the configuration
         merged_config = _deep_merge(merged_config, config_data)
 
     return merged_config
@@ -514,9 +494,6 @@ def _deep_merge(base: dict, override: dict) -> dict:
             result[key] = value
 
     return result
-
-
-# ===== Token-Saving Config Inspection Tools =====
 
 
 def _get_value_at_path(data: dict, path: str) -> tuple[bool, Any]:
@@ -629,15 +606,13 @@ def get_config_keys(file_path: str, format_type: str, path: str) -> list[str]:
 
     logger.info(f"Getting config keys: {file_path} at path '{path}'")
 
-    # Load the appropriate config file
     if format_type == "yaml":
         data = read_yaml_file(file_path)
     elif format_type == "toml":
         data = read_toml_file(file_path)
-    else:  # ini
+    else:
         data = read_ini_file(file_path)
 
-    # Navigate to the specified path
     if path:
         found, target = _get_value_at_path(data, path)
         if not found:
@@ -687,15 +662,13 @@ def get_config_value_at_path(file_path: str, format_type: str, path: str) -> str
 
     logger.info(f"Getting config value: {file_path} at path '{path}'")
 
-    # Load the appropriate config file
     if format_type == "yaml":
         data = read_yaml_file(file_path)
     elif format_type == "toml":
         data = read_toml_file(file_path)
-    else:  # ini
+    else:
         data = read_ini_file(file_path)
 
-    # Navigate to the value
     found, value = _get_value_at_path(data, path)
     if not found:
         raise ValueError(f"Path not found in config: {path}")
@@ -746,12 +719,11 @@ def get_config_structure(file_path: str, format_type: str, max_depth: int) -> An
 
     logger.info(f"Getting config structure: {file_path} (max_depth={max_depth})")
 
-    # Load the appropriate config file
     if format_type == "yaml":
         data = read_yaml_file(file_path)
     elif format_type == "toml":
         data = read_toml_file(file_path)
-    else:  # ini
+    else:
         data = read_ini_file(file_path)
 
     structure = _get_structure(data, max_depth)
@@ -796,15 +768,13 @@ def search_config_keys(
 
     logger.info(f"Searching config keys: {file_path} for pattern '{search_pattern}'")
 
-    # Load the appropriate config file
     if format_type == "yaml":
         data = read_yaml_file(file_path)
     elif format_type == "toml":
         data = read_toml_file(file_path)
-    else:  # ini
+    else:
         data = read_ini_file(file_path)
 
-    # Get all paths and filter by pattern
     all_paths = _get_all_paths(data)
     pattern_lower = search_pattern.lower()
 
@@ -849,15 +819,13 @@ def count_config_items(file_path: str, format_type: str, path: str) -> int:
 
     logger.info(f"Counting config items: {file_path} at path '{path}'")
 
-    # Load the appropriate config file
     if format_type == "yaml":
         data = read_yaml_file(file_path)
     elif format_type == "toml":
         data = read_toml_file(file_path)
-    else:  # ini
+    else:
         data = read_ini_file(file_path)
 
-    # Navigate to the specified path
     if path:
         found, target = _get_value_at_path(data, path)
         if not found:
@@ -904,12 +872,11 @@ def select_config_keys(file_path: str, format_type: str, key_paths: list[str]) -
 
     logger.info(f"Selecting config keys: {file_path} ({len(key_paths)} paths)")
 
-    # Load the appropriate config file
     if format_type == "yaml":
         data = read_yaml_file(file_path)
     elif format_type == "toml":
         data = read_toml_file(file_path)
-    else:  # ini
+    else:
         data = read_ini_file(file_path)
 
     result: dict[str, Any] = {}
@@ -917,7 +884,6 @@ def select_config_keys(file_path: str, format_type: str, key_paths: list[str]) -
     for path in key_paths:
         found, value = _get_value_at_path(data, path)
         if found:
-            # Build nested structure
             keys = path.split(".")
             current = result
 
@@ -970,12 +936,11 @@ def filter_config_sections(
         f"Filtering config sections: {file_path} for pattern '{section_pattern}'"
     )
 
-    # Load the appropriate config file
     if format_type == "yaml":
         data = read_yaml_file(file_path)
     elif format_type == "toml":
         data = read_toml_file(file_path)
-    else:  # ini
+    else:
         data = read_ini_file(file_path)
 
     pattern_lower = section_pattern.lower()
@@ -1023,15 +988,13 @@ def preview_config_section(
         f"Previewing config section: {file_path} at '{section_path}' (max_items={max_items})"
     )
 
-    # Load the appropriate config file
     if format_type == "yaml":
         data = read_yaml_file(file_path)
     elif format_type == "toml":
         data = read_toml_file(file_path)
-    else:  # ini
+    else:
         data = read_ini_file(file_path)
 
-    # Navigate to the specified path
     if section_path:
         found, target = _get_value_at_path(data, section_path)
         if not found:
@@ -1040,7 +1003,6 @@ def preview_config_section(
             raise ValueError(f"Path does not point to a dictionary: {section_path}")
         data = target
 
-    # Get first N items
     result = dict(list(data.items())[:max_items])
     logger.info(f"Previewed {len(result)} items from section '{section_path}'")
     return result

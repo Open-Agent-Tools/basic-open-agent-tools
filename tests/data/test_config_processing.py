@@ -194,7 +194,6 @@ class TestWriteYamlFile:
             ):
                 write_yaml_file(data, str(yaml_file), skip_confirm=True)
 
-        # Verify file was created and contains expected content
         assert yaml_file.exists()
         content = yaml_file.read_text(encoding="utf-8")
         assert "database:" in content
@@ -475,7 +474,6 @@ class TestWriteTomlFile:
             ):
                 write_toml_file(data, str(toml_file), skip_confirm=True)
 
-        # Verify file was created
         assert toml_file.exists()
         content = toml_file.read_text(encoding="utf-8")
         assert "[database]" in content
@@ -699,7 +697,6 @@ class TestWriteIniFile:
 
         write_ini_file(data, str(ini_file), skip_confirm=True)
 
-        # Verify file was created and contains expected content
         assert ini_file.exists()
         content = ini_file.read_text(encoding="utf-8")
         assert "[database]" in content
@@ -747,7 +744,6 @@ class TestWriteIniFile:
 
         assert ini_file.exists()
         content = ini_file.read_text(encoding="utf-8").strip()
-        # Empty data should create empty file or just whitespace
         assert len(content) == 0 or content.isspace()
 
     def test_write_ini_file_non_dict_section_data(self, tmp_path: Path) -> None:
@@ -759,7 +755,6 @@ class TestWriteIniFile:
 
         assert ini_file.exists()
         content = ini_file.read_text(encoding="utf-8")
-        # Should still create sections, non-dict values are skipped
         assert "[section1]" in content
         assert "[section2]" in content
 
@@ -793,10 +788,7 @@ class TestValidateConfigSchema:
 
     def test_validate_config_schema_missing_required_fields(self) -> None:
         """Test validation with missing required fields."""
-        config = {
-            "host": "localhost"
-            # Missing required port
-        }
+        config = {"host": "localhost"}
         schema = {
             "host": {"type": str, "required": True},
             "port": {"type": int, "required": True},
@@ -811,8 +803,8 @@ class TestValidateConfigSchema:
         """Test validation with type mismatches."""
         config = {
             "host": "localhost",
-            "port": "5432",  # Should be int
-            "debug": "true",  # Should be bool
+            "port": "5432",
+            "debug": "true",
         }
         schema = {
             "host": {"type": str, "required": True},
@@ -849,8 +841,8 @@ class TestValidateConfigSchema:
     def test_validate_config_schema_invalid_allowed_values(self) -> None:
         """Test validation with invalid allowed values."""
         config = {
-            "log_level": "TRACE",  # Not in allowed values
-            "environment": "prod",  # Not in allowed values
+            "log_level": "TRACE",
+            "environment": "prod",
         }
         schema = {
             "log_level": {
@@ -903,7 +895,6 @@ class TestValidateConfigSchema:
         config = {
             "host": "localhost",
             "port": 5432,
-            # Optional fields not provided
         }
         schema = {
             "host": {"type": str, "required": True},
@@ -920,8 +911,8 @@ class TestValidateConfigSchema:
         """Test validation when schema field has no type specified."""
         config = {"field1": "any_value", "field2": 42}
         schema = {
-            "field1": {"required": True},  # No type specified
-            "field2": {"required": True},  # No type specified
+            "field1": {"required": True},
+            "field2": {"required": True},
         }
 
         errors = validate_config_schema(config, schema)
@@ -1021,21 +1012,18 @@ logging:
                     [str(base_file), str(override_file)], "yaml"
                 )
 
-        # Should deep merge with override taking precedence
         expected = {
             "database": {
-                "host": "production-db",  # Overridden
-                "port": 5432,  # From base
-                "timeout": 30,  # From base
-                "ssl": True,  # Added from override
+                "host": "production-db",
+                "port": 5432,
+                "timeout": 30,
+                "ssl": True,
             },
             "app": {
-                "name": "Base App",  # From base
-                "debug": True,  # Overridden
+                "name": "Base App",
+                "debug": True,
             },
-            "logging": {
-                "level": "INFO"  # Added from override
-            },
+            "logging": {"level": "INFO"},
         }
         assert result == expected
 
@@ -1188,12 +1176,12 @@ enabled = true
         expected = {
             "level1": {
                 "level2": {
-                    "key1": "value1",  # From first file
-                    "key2": "overridden",  # Overridden by second file
-                    "key3": "value3",  # Added by second file
+                    "key1": "value1",
+                    "key2": "overridden",
+                    "key3": "value3",
                 },
-                "other": "data",  # From first file
-                "new_key": "new_value",  # Added by second file
+                "other": "data",
+                "new_key": "new_value",
             }
         }
         assert result == expected
@@ -1216,7 +1204,6 @@ class TestConfigProcessingIntegration:
             with patch(
                 "basic_open_agent_tools.data.config_processing.yaml", yaml, create=True
             ):
-                # Write then read back
                 write_yaml_file(original_data, str(yaml_file), skip_confirm=True)
                 result = read_yaml_file(str(yaml_file))
 
@@ -1244,7 +1231,6 @@ class TestConfigProcessingIntegration:
                     tomli_w,
                     create=True,
                 ):
-                    # Write then read back
                     write_toml_file(original_data, str(toml_file), skip_confirm=True)
                     result = read_toml_file(str(toml_file))
 
@@ -1258,7 +1244,6 @@ class TestConfigProcessingIntegration:
             "app": {"name": "Test App", "version": "1.0"},
         }
 
-        # Write then read back
         write_ini_file(original_data, str(ini_file), skip_confirm=True)
         result = read_ini_file(str(ini_file))
 
@@ -1275,10 +1260,8 @@ class TestConfigProcessingIntegration:
         config1_file.write_text(json.dumps(config1), encoding="utf-8")
         config2_file.write_text(json.dumps(config2), encoding="utf-8")
 
-        # Merge configs
         merged = merge_config_files([str(config1_file), str(config2_file)], "json")
 
-        # Validate merged config
         schema = {
             "host": {"type": str, "required": True},
             "port": {"type": int, "required": True},
@@ -1290,20 +1273,18 @@ class TestConfigProcessingIntegration:
 
         assert errors == []
         assert merged["host"] == "localhost"
-        assert merged["port"] == 8080  # Overridden
-        assert merged["ssl"] is True  # Added
-        assert merged["debug"] is False  # From base
+        assert merged["port"] == 8080
+        assert merged["ssl"] is True
+        assert merged["debug"] is False
 
     def test_multi_format_config_validation(self, tmp_path: Path) -> None:
         """Test validation workflow with different config formats."""
-        # Create configs in different formats with same schema
         schema = {
             "database_host": {"type": str, "required": True},
             "database_port": {"type": int, "required": True},
             "app_debug": {"type": bool, "required": False},
         }
 
-        # YAML config
         yaml_file = tmp_path / "config.yaml"
         yaml_content = """
 database_host: localhost
@@ -1312,7 +1293,6 @@ app_debug: true
 """
         yaml_file.write_text(yaml_content, encoding="utf-8")
 
-        # INI config
         ini_file = tmp_path / "config.ini"
         ini_content = """
 [main]
@@ -1322,7 +1302,6 @@ app_debug = false
 """
         ini_file.write_text(ini_content, encoding="utf-8")
 
-        # Test YAML validation
         with patch("basic_open_agent_tools.data.config_processing.HAS_YAML", True):
             import yaml
 
@@ -1333,13 +1312,11 @@ app_debug = false
                 yaml_errors = validate_config_schema(yaml_config, schema)
                 assert yaml_errors == []
 
-        # Test INI validation (needs to extract from 'main' section)
         ini_config = read_ini_file(str(ini_file))
         main_config = {
             "database_host": ini_config["main"]["database_host"],
-            "database_port": int(ini_config["main"]["database_port"]),  # Convert to int
-            "app_debug": ini_config["main"]["app_debug"].lower()
-            == "true",  # Convert to bool
+            "database_port": int(ini_config["main"]["database_port"]),
+            "app_debug": ini_config["main"]["app_debug"].lower() == "true",
         }
         ini_errors = validate_config_schema(main_config, schema)
         assert ini_errors == []

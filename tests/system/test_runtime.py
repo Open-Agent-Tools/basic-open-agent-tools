@@ -20,7 +20,6 @@ class TestInspectRuntimeEnvironment:
         """Test successful runtime environment inspection."""
         result = inspect_runtime_environment()
 
-        # Check that all expected keys are present
         expected_keys = [
             "process_id",
             "username",
@@ -39,7 +38,6 @@ class TestInspectRuntimeEnvironment:
         for key in expected_keys:
             assert key in result
 
-        # Check data types and basic validation
         assert isinstance(result["process_id"], int)
         assert isinstance(result["python_version"], str)
         assert isinstance(result["python_paths"], list)
@@ -49,13 +47,11 @@ class TestInspectRuntimeEnvironment:
 
     def test_environment_variables_extraction(self):
         """Test that important environment variables are extracted correctly."""
-        # Set a test environment variable
         test_env_vars = {"TEST_VAR": "test_value", "PATH": "/usr/bin"}
 
         with patch.dict(os.environ, test_env_vars, clear=False):
             result = inspect_runtime_environment()
 
-            # PATH should be included as it's in the important list
             if "PATH" in os.environ:
                 assert "PATH" in result["important_environment_variables"]
 
@@ -90,7 +86,6 @@ class TestGetPythonModuleInfo:
         """Test successful Python module information retrieval."""
         result = get_python_module_info()
 
-        # Check expected keys
         expected_keys = [
             "loaded_modules_count",
             "loaded_modules",
@@ -104,18 +99,15 @@ class TestGetPythonModuleInfo:
         for key in expected_keys:
             assert key in result
 
-        # Check data types
         assert isinstance(result["loaded_modules"], list)
         assert isinstance(result["builtin_modules"], list)
         assert isinstance(result["installed_packages"], list)
         assert isinstance(result["pkg_resources_available"], bool)
 
-        # Check counts match list lengths
         assert result["loaded_modules_count"] == len(result["loaded_modules"])
         assert result["builtin_modules_count"] == len(result["builtin_modules"])
         assert result["installed_packages_count"] == len(result["installed_packages"])
 
-        # Should have some basic modules loaded
         assert len(result["loaded_modules"]) > 0
         assert len(result["builtin_modules"]) > 0
 
@@ -123,7 +115,6 @@ class TestGetPythonModuleInfo:
         """Test that module lists are sorted."""
         result = get_python_module_info()
 
-        # Lists should be sorted
         assert result["loaded_modules"] == sorted(result["loaded_modules"])
         assert result["builtin_modules"] == sorted(result["builtin_modules"])
         assert result["installed_packages"] == sorted(result["installed_packages"])
@@ -136,7 +127,6 @@ class TestGetFileSystemContext:
         """Test successful file system context retrieval."""
         result = get_file_system_context()
 
-        # Check expected keys
         expected_keys = [
             "current_directory",
             "current_directory_contents",
@@ -152,7 +142,6 @@ class TestGetFileSystemContext:
         for key in expected_keys:
             assert key in result
 
-        # Check data types
         assert isinstance(result["current_directory"], str)
         assert isinstance(result["current_directory_contents"], list)
         assert isinstance(result["current_directory_item_count"], int)
@@ -163,7 +152,6 @@ class TestGetFileSystemContext:
         assert isinstance(result["is_python_project"], bool)
         assert isinstance(result["has_virtual_environment"], bool)
 
-        # Item count should match list length
         assert result["current_directory_item_count"] == len(
             result["current_directory_contents"]
         )
@@ -186,7 +174,6 @@ class TestGetNetworkEnvironment:
         """Test successful network environment retrieval."""
         result = get_network_environment()
 
-        # Check expected keys
         expected_keys = [
             "hostname",
             "fqdn",
@@ -199,7 +186,6 @@ class TestGetNetworkEnvironment:
         for key in expected_keys:
             assert key in result
 
-        # Check data types
         assert isinstance(result["hostname"], str)
         assert isinstance(result["fqdn"], str)
         assert isinstance(result["local_ip_address"], str)
@@ -207,7 +193,6 @@ class TestGetNetworkEnvironment:
         assert isinstance(result["proxy_environment_variables"], dict)
         assert isinstance(result["socket_family_support"], dict)
 
-        # Socket family support should have expected keys
         socket_support = result["socket_family_support"]
         assert "ipv4" in socket_support
         assert "ipv6" in socket_support
@@ -248,7 +233,7 @@ class TestGetNetworkEnvironment:
             result = get_network_environment()
 
             assert result["hostname"] == "test-host"
-            assert result["fqdn"] == "test-host"  # Should fallback to hostname
+            assert result["fqdn"] == "test-host"
 
 
 class TestGetCurrentDirectory:
@@ -258,12 +243,10 @@ class TestGetCurrentDirectory:
         """Test successful retrieval of current working directory."""
         result = get_current_directory()
 
-        # Check that result is a string and is an absolute path
         assert isinstance(result, str)
         assert len(result) > 0
         assert os.path.isabs(result)
 
-        # Verify it matches os.getcwd()
         assert result == os.getcwd()
 
     @patch("os.getcwd")

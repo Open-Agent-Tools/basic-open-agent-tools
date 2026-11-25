@@ -32,14 +32,12 @@ def inspect_function_signature(
     function_name = function_name.strip()
 
     try:
-        # Try to get the function
         if module_name:
             if not isinstance(module_name, str) or not module_name.strip():
                 raise BasicAgentToolsError("Module name must be a non-empty string")
 
             module_name = module_name.strip()
 
-            # Import the module
             if module_name in sys.modules:
                 module = sys.modules[module_name]
             else:
@@ -52,15 +50,11 @@ def inspect_function_signature(
 
             func = getattr(module, function_name)
         else:
-            # Search in current frame's globals/locals and builtins
-            # Start from the caller's frame and walk up the stack to find the function
             current_frame = inspect.currentframe()
             func = None
 
-            # Walk up the frame stack to find the function
             frame = current_frame.f_back if current_frame else None
             while frame is not None:
-                # Check locals first, then globals
                 if function_name in frame.f_locals:
                     func = frame.f_locals[function_name]
                     break
@@ -69,7 +63,6 @@ def inspect_function_signature(
                     break
                 frame = frame.f_back
 
-            # If not found in any frame, check builtins
             if func is None:
                 import builtins
 
@@ -83,10 +76,8 @@ def inspect_function_signature(
         if not callable(func):
             raise BasicAgentToolsError(f"'{function_name}' is not a callable function")
 
-        # Get function signature
         sig = inspect.signature(func)
 
-        # Extract parameter information
         parameters = []
         for param_name, param in sig.parameters.items():
             param_info = {
@@ -102,15 +93,12 @@ def inspect_function_signature(
             }
             parameters.append(param_info)
 
-        # Get return annotation
         return_annotation = (
             str(sig.return_annotation) if sig.return_annotation != sig.empty else None
         )
 
-        # Get docstring
         docstring = inspect.getdoc(func) or ""
 
-        # Get source info if possible
         source_info = {}
         try:
             source_file = inspect.getfile(func)
@@ -154,7 +142,6 @@ def get_call_stack_info() -> dict[str, Union[list, int, str, Any]]:
         BasicAgentToolsError: If call stack cannot be retrieved
     """
     try:
-        # Get the current frame and stack
         current_frame = inspect.currentframe()
         stack_frames = inspect.getouterframes(current_frame)
 
@@ -208,14 +195,12 @@ def format_exception_details(
             raise BasicAgentToolsError("Exception info must be a string")
 
         if not exception_info or exception_info.strip() == "":
-            # Get the last exception
             exc_type, exc_value, exc_traceback = sys.exc_info()
 
             if exc_type is None:
                 raise BasicAgentToolsError("No exception information available")
 
         else:
-            # Parse provided exception info
             return {
                 "exception_source": "provided_string",
                 "exception_info": exception_info,
@@ -223,14 +208,12 @@ def format_exception_details(
                 "parsing_status": "string_provided_as_is",
             }
 
-        # Format the exception
         exception_details = {
             "exception_type": exc_type.__name__,
             "exception_message": str(exc_value),
             "has_traceback": exc_traceback is not None,
         }
 
-        # Format traceback if available
         if exc_traceback:
             tb_lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
             exception_details.update(
@@ -243,7 +226,6 @@ def format_exception_details(
                 }
             )
 
-            # Extract frame information
             frames = []
             tb = exc_traceback
             while tb is not None:
@@ -258,7 +240,7 @@ def format_exception_details(
                 )
                 tb = tb.tb_next  # type: ignore[assignment]
 
-            exception_details["frames"] = frames  # type: ignore[unreachable]  # False positive - this is reachable
+            exception_details["frames"] = frames  # type: ignore[unreachable]
             exception_details["frame_count"] = len(frames)
         else:
             exception_details.update(
@@ -305,7 +287,6 @@ def validate_function_call(
     function_name = function_name.strip()
 
     try:
-        # Get the function (similar logic to inspect_function_signature)
         if module_name:
             if not isinstance(module_name, str) or not module_name.strip():
                 raise BasicAgentToolsError("Module name must be a non-empty string")
@@ -324,7 +305,6 @@ def validate_function_call(
 
             func = getattr(module, function_name)
         else:
-            # Walk up the frame stack to find the function
             current_frame = inspect.currentframe()
             func = None
 
@@ -338,7 +318,6 @@ def validate_function_call(
                     break
                 frame = frame.f_back
 
-            # If not found in any frame, check builtins
             if func is None:
                 import builtins
 
@@ -352,10 +331,8 @@ def validate_function_call(
         if not callable(func):
             raise BasicAgentToolsError(f"'{function_name}' is not callable")
 
-        # Get function signature
         sig = inspect.signature(func)
 
-        # Validate arguments against signature
         validation_results = {
             "function_name": function_name,
             "module_name": module_name or "current_scope",
@@ -366,7 +343,6 @@ def validate_function_call(
         }
 
         try:
-            # Try to bind arguments to signature
             bound_args = sig.bind(**arguments)
             bound_args.apply_defaults()
 
@@ -385,7 +361,6 @@ def validate_function_call(
                 )
             issues.append(f"Binding failed: {str(e)}")
 
-        # Additional parameter analysis
         required_params = []
         optional_params = []
 
@@ -440,14 +415,12 @@ def trace_variable_changes(
 
     variable_name = variable_name.strip()
 
-    # Basic validation of variable name
     if not variable_name.isidentifier():
         raise BasicAgentToolsError(
             f"'{variable_name}' is not a valid Python identifier"
         )
 
     try:
-        # Create execution context
         context = {variable_name: initial_value, "__builtins__": {}}
 
         trace_steps = [
@@ -460,10 +433,9 @@ def trace_variable_changes(
             }
         ]
 
-        # Execute each operation and trace changes
         for i, operation in enumerate(operations):
             if not isinstance(operation, str):
-                trace_steps.append(  # type: ignore[unreachable]  # False positive - this is reachable
+                trace_steps.append(  # type: ignore[unreachable]
                     {
                         "step": i + 1,
                         "operation": str(operation),
@@ -481,7 +453,6 @@ def trace_variable_changes(
             if not operation:
                 continue
 
-            # Security check - prevent dangerous operations (check before try block)
             dangerous_keywords = ["import", "exec", "eval", "__", "open", "file"]
             if any(keyword in operation.lower() for keyword in dangerous_keywords):
                 raise BasicAgentToolsError(
@@ -489,7 +460,6 @@ def trace_variable_changes(
                 )
 
             try:
-                # Execute the operation
                 exec(operation, {"__builtins__": {}}, context)
 
                 trace_steps.append(
@@ -527,7 +497,7 @@ def trace_variable_changes(
             "successful_operations": len(
                 [s for s in trace_steps if s["status"] == "success"]
             )
-            - 1,  # Exclude initialization
+            - 1,
             "failed_operations": len(
                 [s for s in trace_steps if s["status"] == "error"]
             ),

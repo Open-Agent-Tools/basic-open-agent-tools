@@ -20,7 +20,6 @@ class TestSafeJsonSerialize:
         data = {"name": "test", "value": 42, "active": True}
         result = safe_json_serialize(data, 0)
 
-        # Parse back to verify correctness
         parsed = json.loads(result)
         assert parsed == data
         assert isinstance(result, str)
@@ -30,9 +29,8 @@ class TestSafeJsonSerialize:
         data = {"a": 1, "b": 2}
         result = safe_json_serialize(data, 0)
 
-        # Should not contain newlines or extra spaces (compact)
         assert "\n" not in result
-        assert "  " not in result  # No double spaces
+        assert "  " not in result
         assert result == '{"a": 1, "b": 2}' or result == '{"b": 2, "a": 1}'
 
     def test_indented_formatting(self) -> None:
@@ -40,19 +38,16 @@ class TestSafeJsonSerialize:
         data = {"a": 1, "b": 2}
         result = safe_json_serialize(data, 2)
 
-        # Should contain newlines and proper indentation
         assert "\n" in result
-        assert "  " in result  # Two-space indentation
+        assert "  " in result
 
-        # Verify structure
         lines = result.split("\n")
-        assert len(lines) >= 3  # Opening brace, content, closing brace
+        assert len(lines) >= 3
 
     def test_various_indent_values(self) -> None:
         """Test different indent values."""
         data = {"test": "value"}
 
-        # Test different indent levels
         for indent in [0, 1, 2, 4, 8]:
             result = safe_json_serialize(data, indent)
             parsed = json.loads(result)
@@ -77,7 +72,6 @@ class TestSafeJsonSerialize:
         parsed = json.loads(result)
         assert parsed == data
 
-        # Verify Unicode characters are preserved
         assert "世界" in result
         assert "🎉🚀" in result
         assert "café" in result
@@ -102,7 +96,6 @@ class TestSafeJsonSerialize:
 
     def test_large_data_structure(self) -> None:
         """Test serialization of large data structures."""
-        # Create a moderately large structure
         data = {
             "items": [{"id": i, "value": f"item_{i}"} for i in range(100)],
             "metadata": {"count": 100, "description": "Large test dataset"},
@@ -128,7 +121,6 @@ class TestSafeJsonSerialize:
 
     def test_non_serializable_data(self) -> None:
         """Test error handling for non-serializable data."""
-        # Function objects are not JSON serializable
         data = {"function": lambda x: x}  # type: ignore[dict-item]
 
         with pytest.raises(
@@ -152,11 +144,9 @@ class TestSafeJsonSerialize:
 
     def test_empty_data_structures(self) -> None:
         """Test serialization of empty data structures."""
-        # Empty dict
         result = safe_json_serialize({}, 0)
         assert result == "{}"
 
-        # Dict with empty values
         data = {"empty_list": [], "empty_dict": {}, "empty_string": ""}
         result = safe_json_serialize(data, 0)
         parsed = json.loads(result)
@@ -201,12 +191,10 @@ class TestSafeJsonDeserialize:
 
     def test_number_wrapping(self) -> None:
         """Test that number results are wrapped in dict."""
-        # Integer
         json_str = "42"
         result = safe_json_deserialize(json_str)
         assert result == {"result": 42}
 
-        # Float
         json_str = "3.14159"
         result = safe_json_deserialize(json_str)
         assert result == {"result": 3.14159}
@@ -267,15 +255,12 @@ class TestSafeJsonDeserialize:
 
     def test_various_json_formats(self) -> None:
         """Test various valid JSON format variations."""
-        # Compact format
         result = safe_json_deserialize('{"a":1,"b":2}')
         assert result == {"a": 1, "b": 2}
 
-        # Spaced format
         result = safe_json_deserialize('{ "a" : 1 , "b" : 2 }')
         assert result == {"a": 1, "b": 2}
 
-        # Multiline format
         json_str = """{
             "a": 1,
             "b": 2
@@ -285,11 +270,9 @@ class TestSafeJsonDeserialize:
 
     def test_empty_structures(self) -> None:
         """Test deserialization of empty structures."""
-        # Empty object
         result = safe_json_deserialize("{}")
         assert result == {}
 
-        # Empty array (gets wrapped)
         result = safe_json_deserialize("[]")
         assert result == {"result": []}
 
@@ -307,15 +290,15 @@ class TestSafeJsonDeserialize:
     def test_invalid_json_string(self) -> None:
         """Test error handling for invalid JSON strings."""
         invalid_json_cases = [
-            '{"invalid": }',  # Missing value
-            '{"unclosed": "string}',  # Unclosed string
-            '{invalid: "no quotes"}',  # Unquoted key
-            '{"trailing": "comma",}',  # Trailing comma
-            "{",  # Incomplete object
-            "[",  # Incomplete array
-            '{"a": 1, "b":}',  # Missing value
-            "",  # Empty string
-            "not json at all",  # Plain text
+            '{"invalid": }',
+            '{"unclosed": "string}',
+            '{invalid: "no quotes"}',
+            '{"trailing": "comma",}',
+            "{",
+            "[",
+            '{"a": 1, "b":}',
+            "",
+            "not json at all",
         ]
 
         for invalid_json in invalid_json_cases:
@@ -326,17 +309,15 @@ class TestSafeJsonDeserialize:
 
     def test_duplicate_keys_handling(self) -> None:
         """Test handling of duplicate keys in JSON (valid but worth testing)."""
-        # Duplicate keys are valid JSON, Python takes the last value
         json_str = '{"duplicate": 1, "duplicate": 2}'
         result = safe_json_deserialize(json_str)
         assert result == {"duplicate": 2}
 
     def test_malformed_unicode(self) -> None:
         """Test handling of malformed Unicode sequences."""
-        # This should be handled gracefully by the JSON parser
         invalid_cases = [
-            '{"bad_escape": "\\u"}',  # Incomplete Unicode escape
-            '{"bad_escape": "\\uGGGG"}',  # Invalid Unicode escape
+            '{"bad_escape": "\\u"}',
+            '{"bad_escape": "\\uGGGG"}',
         ]
 
         for invalid_case in invalid_cases:
@@ -406,10 +387,10 @@ class TestValidateJsonString:
     def test_valid_json_formatting_variations(self) -> None:
         """Test validation of various JSON formatting styles."""
         valid_cases = [
-            '{"a":1,"b":2}',  # Compact
-            '{ "a" : 1 , "b" : 2 }',  # Spaced
-            '{\n  "a": 1,\n  "b": 2\n}',  # Multiline
-            '{"a": 1, "b": 2}',  # Standard
+            '{"a":1,"b":2}',
+            '{ "a" : 1 , "b" : 2 }',
+            '{\n  "a": 1,\n  "b": 2\n}',
+            '{"a": 1, "b": 2}',
         ]
 
         for valid_json in valid_cases:
@@ -418,20 +399,20 @@ class TestValidateJsonString:
     def test_invalid_json_strings(self) -> None:
         """Test validation of invalid JSON strings."""
         invalid_cases = [
-            '{"invalid": }',  # Missing value
-            '{"unclosed": "string}',  # Unclosed string
-            '{invalid: "no quotes"}',  # Unquoted key
-            '{"trailing": "comma",}',  # Trailing comma
-            "{",  # Incomplete object
-            "[",  # Incomplete array
-            '{"a": 1, "b":}',  # Missing value
-            "",  # Empty string
-            "not json at all",  # Plain text
-            '{"bad_escape": "\\u"}',  # Incomplete Unicode escape
-            '{"bad_escape": "\\uGGGG"}',  # Invalid Unicode escape
-            "undefined",  # JavaScript undefined (not JSON)
-            "{a: 1}",  # Unquoted key
-            "{'single': 'quotes'}",  # Single quotes
+            '{"invalid": }',
+            '{"unclosed": "string}',
+            '{invalid: "no quotes"}',
+            '{"trailing": "comma",}',
+            "{",
+            "[",
+            '{"a": 1, "b":}',
+            "",
+            "not json at all",
+            '{"bad_escape": "\\u"}',
+            '{"bad_escape": "\\uGGGG"}',
+            "undefined",
+            "{a: 1}",
+            "{'single': 'quotes'}",
         ]
 
         for invalid_json in invalid_cases:
@@ -455,23 +436,18 @@ class TestValidateJsonString:
 
     def test_edge_cases(self) -> None:
         """Test validation of edge cases."""
-        # Very large numbers (still valid JSON)
         assert validate_json_string("999999999999999999999999999999999") is True
 
-        # Very long strings
         long_string = '"' + "a" * 10000 + '"'
         assert validate_json_string(long_string) is True
 
-        # Deeply nested structures
         nested = '{"a": {"b": {"c": {"d": "value"}}}}'
         assert validate_json_string(nested) is True
 
-        # Large arrays
         large_array = "[" + ",".join(str(i) for i in range(1000)) + "]"
         assert validate_json_string(large_array) is True
 
 
-# Integration tests
 class TestJsonToolsIntegration:
     """Integration tests for JSON tools working together."""
 
@@ -487,16 +463,12 @@ class TestJsonToolsIntegration:
             "nested": {"key": "value", "array": ["a", "b", "c"]},
         }
 
-        # Serialize
         json_str = safe_json_serialize(original_data, 0)
 
-        # Validate
         assert validate_json_string(json_str) is True
 
-        # Deserialize
         result_data = safe_json_deserialize(json_str)
 
-        # Compare
         assert result_data == original_data
 
     def test_validation_with_serialized_data(self) -> None:
@@ -516,10 +488,8 @@ class TestJsonToolsIntegration:
         """Test that invalid JSON fails consistently across functions."""
         invalid_json = '{"invalid": }'
 
-        # Should fail validation
         assert validate_json_string(invalid_json) is False
 
-        # Should fail deserialization
         with pytest.raises(SerializationError):
             safe_json_deserialize(invalid_json)
 
@@ -534,10 +504,8 @@ class TestJsonToolsIntegration:
         ]
 
         for json_str, expected in test_cases:
-            # Validate the JSON
             assert validate_json_string(json_str) is True
 
-            # Deserialize and check wrapping
             result = safe_json_deserialize(json_str)
             assert result == expected
             assert isinstance(result, dict)

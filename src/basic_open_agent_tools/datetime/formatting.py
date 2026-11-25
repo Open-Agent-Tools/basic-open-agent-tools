@@ -125,7 +125,6 @@ def format_duration(seconds: int, format_type: str) -> str:
     if format_type not in ["verbose", "short", "compact"]:
         raise ValueError("format_type must be 'verbose', 'short', or 'compact'")
 
-    # Calculate components
     days = seconds // 86400
     hours = (seconds % 86400) // 3600
     minutes = (seconds % 3600) // 60
@@ -155,7 +154,7 @@ def format_duration(seconds: int, format_type: str) -> str:
             parts.append(f"{secs}s")
         return " ".join(parts)
 
-    else:  # compact
+    else:
         if days > 0:
             return f"{days}:{hours:02d}:{minutes:02d}:{secs:02d}"
         else:
@@ -200,8 +199,6 @@ def parse_duration_string(duration_string: str) -> int:
 
     total_seconds: float = 0
 
-    # Pattern for matching duration components
-    # Matches: "2 days", "2d", "1.5 hours", "1.5h", etc.
     pattern = r"([\d.]+)\s*(days?|d|hours?|h|minutes?|m|seconds?|s)"
 
     matches = re.findall(pattern, duration_string)
@@ -218,7 +215,6 @@ def parse_duration_string(duration_string: str) -> int:
         except ValueError:
             raise ValueError(f"Invalid numeric value '{value_str}' in duration string")
 
-        # Normalize units
         if unit in ["days", "day", "d"]:
             total_seconds += value * 86400
         elif unit in ["hours", "hour", "h"]:

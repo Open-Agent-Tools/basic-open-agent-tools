@@ -24,14 +24,13 @@ class TestExtractTextFromDocx:
         docx_file.touch()
 
         with patch("basic_open_agent_tools.word.reading.HAS_PYTHON_DOCX", True):
-            # Mock Document
             mock_doc = Mock()
             mock_para1 = Mock()
             mock_para1.text = "First paragraph"
             mock_para2 = Mock()
             mock_para2.text = "Second paragraph"
             mock_para3 = Mock()
-            mock_para3.text = ""  # Empty paragraph
+            mock_para3.text = ""
             mock_doc.paragraphs = [mock_para1, mock_para2, mock_para3]
 
             with patch(
@@ -110,9 +109,8 @@ class TestExtractTextFromDocx:
         docx_file = tmp_path / "large.docx"
         docx_file.touch()
 
-        # Mock os.path.getsize to return a large size
         with patch("basic_open_agent_tools.word.reading.HAS_PYTHON_DOCX", True):
-            with patch("os.path.getsize", return_value=60 * 1024 * 1024):  # 60MB
+            with patch("os.path.getsize", return_value=60 * 1024 * 1024):
                 with pytest.raises(ValueError, match="Word document too large"):
                     extract_text_from_docx(str(docx_file))
 
@@ -178,7 +176,7 @@ class TestGetDocxParagraphs:
             mock_para1 = Mock()
             mock_para1.text = "First"
             mock_para2 = Mock()
-            mock_para2.text = ""  # Empty paragraph
+            mock_para2.text = ""
             mock_para3 = Mock()
             mock_para3.text = "Third"
             mock_doc.paragraphs = [mock_para1, mock_para2, mock_para3]
@@ -226,7 +224,6 @@ class TestGetDocxTables:
         docx_file.touch()
 
         with patch("basic_open_agent_tools.word.reading.HAS_PYTHON_DOCX", True):
-            # Mock table with 2x2 cells
             mock_cell_1_1 = Mock()
             mock_cell_1_1.text = "Header 1"
             mock_cell_1_2 = Mock()
@@ -263,7 +260,6 @@ class TestGetDocxTables:
         docx_file.touch()
 
         with patch("basic_open_agent_tools.word.reading.HAS_PYTHON_DOCX", True):
-            # First table
             mock_cell_1 = Mock()
             mock_cell_1.text = "Table 1"
             mock_row_1 = Mock()
@@ -271,7 +267,6 @@ class TestGetDocxTables:
             mock_table_1 = Mock()
             mock_table_1.rows = [mock_row_1]
 
-            # Second table
             mock_cell_2 = Mock()
             mock_cell_2.text = "Table 2"
             mock_row_2 = Mock()
@@ -523,11 +518,9 @@ class TestGetDocxInfo:
             mock_para2.text = "Second paragraph"
             mock_doc.paragraphs = [mock_para1, mock_para2]
 
-            # Mock table
             mock_table = Mock()
             mock_doc.tables = [mock_table]
 
-            # Mock core properties
             mock_doc.core_properties = mock_core_props
 
             with patch(

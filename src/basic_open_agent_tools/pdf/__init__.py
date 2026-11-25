@@ -12,8 +12,6 @@ All functions are designed for LLM agent compatibility with:
 - Comprehensive docstrings
 """
 
-# Parsing functions
-# Creation functions
 from .creation import (
     create_multi_page_pdf,
     create_pdf_from_text_list,
@@ -22,8 +20,6 @@ from .creation import (
     create_simple_pdf,
     text_to_pdf,
 )
-
-# Manipulation functions
 from .manipulation import (
     add_page_numbers,
     extract_pdf_pages,
@@ -54,7 +50,6 @@ from .parsing import (
 )
 
 __all__: list[str] = [
-    # Parsing functions (17 - includes 10 token-saving inspection tools)
     "extract_text_from_pdf",
     "extract_text_from_page",
     "get_pdf_metadata",
@@ -62,7 +57,6 @@ __all__: list[str] = [
     "extract_pdf_pages_to_text",
     "search_pdf_text",
     "get_pdf_info",
-    # Token-saving inspection tools
     "preview_pdf_pages",
     "sample_pdf_pages",
     "get_pdf_page_sizes",
@@ -73,14 +67,12 @@ __all__: list[str] = [
     "filter_pdf_pages_by_text",
     "get_pdf_text_length",
     "check_pdf_has_text",
-    # Creation functions (6)
     "create_simple_pdf",
     "create_pdf_from_text_list",
     "create_pdf_with_title",
     "create_pdf_with_metadata",
     "create_multi_page_pdf",
     "text_to_pdf",
-    # Manipulation functions (7)
     "merge_pdfs",
     "split_pdf",
     "extract_pdf_pages",

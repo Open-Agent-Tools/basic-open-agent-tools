@@ -66,10 +66,8 @@ def set_env_var(variable_name: str, value: str) -> dict[str, Union[str, bool]]:
     variable_name = variable_name.strip()
 
     try:
-        # Store previous value if it exists
         previous_value = os.environ.get(variable_name)
 
-        # Set the new value
         os.environ[variable_name] = value
 
         return {
@@ -115,13 +113,11 @@ def list_env_vars(
         filter_lower = filter_pattern.lower() if filter_pattern else None
 
         for name, value in os.environ.items():
-            # Apply filter if provided
             if filter_lower and filter_lower not in name.lower():
                 continue
 
             variables[name] = value
 
-            # Stop if we hit the limit
             if len(variables) >= limit:
                 break
 

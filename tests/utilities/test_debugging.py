@@ -35,8 +35,8 @@ class TestInspectFunctionSignature:
 
         assert result["function_name"] == "print"
         assert result["module_name"] == "current_scope"
-        assert "args" in result["signature"]  # print has *args parameter
-        assert result["parameter_count"] >= 1  # At least 'args' parameter
+        assert "args" in result["signature"]
+        assert result["parameter_count"] >= 1
         assert result["inspection_status"] == "success"
 
     def test_nonexistent_function(self):
@@ -58,7 +58,6 @@ class TestInspectFunctionSignature:
             """Test function docstring."""
             return f"{arg1}_{arg2}"
 
-        # Add to current scope
         globals()["test_func"] = test_func
 
         result = inspect_function_signature("test_func", "")
@@ -68,7 +67,6 @@ class TestInspectFunctionSignature:
         assert result["docstring"] == "Test function docstring."
         assert "str" in result["return_annotation"]
 
-        # Check parameter details
         params = result["parameters"]
         assert len(params) == 2
         assert params[0]["name"] == "arg1"
@@ -77,7 +75,6 @@ class TestInspectFunctionSignature:
         assert params[1]["has_default"]
         assert params[1]["default_value"] == "10"
 
-        # Cleanup
         del globals()["test_func"]
 
 
@@ -102,7 +99,6 @@ class TestGetCallStackInfo:
         assert "call_stack" in result
         assert result["stack_retrieval_status"] == "success"
 
-        # Check that stack contains our functions
         function_names = [frame["function_name"] for frame in result["call_stack"]]
         assert "inner_function" in function_names
         assert "outer_function" in function_names
@@ -133,7 +129,6 @@ class TestFormatExceptionDetails:
 
     def test_no_exception_available(self):
         """Test when no exception information is available."""
-        # Clear any existing exception
         sys.exc_clear() if hasattr(sys, "exc_clear") else None
 
         with pytest.raises(BasicAgentToolsError) as exc_info:
@@ -143,7 +138,7 @@ class TestFormatExceptionDetails:
     def test_format_current_exception(self):
         """Test formatting current exception."""
         try:
-            _ = 1 / 0  # Intentional division by zero for test
+            _ = 1 / 0
         except ZeroDivisionError:
             result = format_exception_details("")
 
@@ -200,7 +195,6 @@ class TestValidateFunctionCall:
 
     def test_missing_required_arguments(self):
         """Test validation with missing required arguments."""
-        # Test with len() which requires one argument
         arguments = {}
 
         result = validate_function_call("len", arguments, "")
@@ -216,7 +210,6 @@ class TestValidateFunctionCall:
 
         result = validate_function_call("print", arguments, "")
 
-        # print() accepts **kwargs so this should still be valid
         assert "extra_arg" in result["provided_arguments"]
 
     def test_nonexistent_function(self):
@@ -259,15 +252,14 @@ class TestTraceVariableChanges:
 
         assert result["variable_name"] == "counter"
         assert result["initial_value"] == 0
-        assert result["final_value"] == -3  # (0+1)*2-5 = -3
+        assert result["final_value"] == -3
         assert result["operations_count"] == 3
         assert result["successful_operations"] == 3
         assert result["failed_operations"] == 0
         assert result["tracing_status"] == "completed"
 
-        # Check trace steps
         steps = result["trace_steps"]
-        assert len(steps) == 4  # Initial + 3 operations
+        assert len(steps) == 4
         assert steps[0]["step"] == 0
         assert steps[0]["operation"] == "initialization"
         assert steps[0]["value"] == 0
@@ -284,17 +276,16 @@ class TestTraceVariableChanges:
         """Test handling of operations with syntax errors."""
         operations = [
             "counter = counter + 1",
-            "counter = counter +",  # Syntax error
+            "counter = counter +",
             "counter = counter * 2",
         ]
 
         result = trace_variable_changes("counter", 0, operations)
 
-        assert result["successful_operations"] == 2  # First and third operations
+        assert result["successful_operations"] == 2
         assert result["failed_operations"] == 1
 
-        # Check that execution continued after error
-        assert result["final_value"] == 2  # (0+1)*2 = 2
+        assert result["final_value"] == 2
 
     def test_empty_operations_list(self):
         """Test with empty operations list."""
@@ -312,6 +303,5 @@ class TestTraceVariableChanges:
 
         result = trace_variable_changes("counter", 0, operations)
 
-        # Should handle the non-string operation gracefully
         assert result["failed_operations"] == 1
         assert result["successful_operations"] == 2

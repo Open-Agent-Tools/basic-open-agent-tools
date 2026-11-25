@@ -26,12 +26,10 @@ def _dict_to_element(data: dict, parent: Optional[ET.Element] = None) -> ET.Elem
     else:
         element = ET.SubElement(parent, data["tag"], data.get("attributes", {}))
 
-    # Set text content
     text = data.get("text", "")
     if text:
         element.text = text
 
-    # Add children recursively
     for child_data in data.get("children", []):
         _dict_to_element(child_data, element)
 
@@ -92,25 +90,19 @@ def create_xml_from_dict(data: dict, root_tag: str, encoding: str, indent: bool)
     if not encoding.strip():
         raise ValueError("encoding cannot be empty")
 
-    # Validate data structure
     if "tag" not in data:
         raise ValueError("data must contain 'tag' key")
 
-    # Validate data tag matches root_tag
     if data["tag"] != root_tag:
         raise ValueError(f"data tag '{data['tag']}' must match root_tag '{root_tag}'")
 
-    # Create root element
     root = _dict_to_element(data)
 
-    # Format with indentation if requested
     if indent:
         ET.indent(root, space="  ")
 
-    # Create tree and convert to string
     ET.ElementTree(root)
 
-    # Use ET.tostring for proper encoding support
     xml_bytes_result = ET.tostring(root, encoding=encoding, xml_declaration=True)
     decoded_str: str = xml_bytes_result.decode(encoding)
     if not isinstance(decoded_str, str):
@@ -168,13 +160,11 @@ def write_xml_file(
     if not file_path.strip():
         raise ValueError("file_path cannot be empty")
 
-    # Check if file exists and handle based on skip_confirm
     if os.path.exists(file_path) and not skip_confirm:
         raise ValueError(
             f"File already exists: {file_path}. Set skip_confirm=True to overwrite."
         )
 
-    # Check parent directory is writable
     parent_dir = os.path.dirname(file_path) or "."
     if not os.path.exists(parent_dir):
         raise FileNotFoundError(f"Parent directory does not exist: {parent_dir}")
@@ -182,14 +172,11 @@ def write_xml_file(
     if not os.access(parent_dir, os.W_OK):
         raise PermissionError(f"Cannot write to directory: {parent_dir}")
 
-    # Generate XML content with indentation
     xml_content = create_xml_from_dict(data, root_tag, encoding, indent=True)
 
-    # Write to file
     with open(file_path, "w", encoding=encoding) as f:
         f.write(xml_content)
 
-    # Get file size for feedback
     file_size = os.path.getsize(file_path)
 
     return f"Created XML file {file_path} ({file_size} bytes)"
@@ -237,7 +224,6 @@ def create_xml_element(tag: str, text: str, attributes: dict[str, str]) -> dict:
     if not tag.strip():
         raise ValueError("tag cannot be empty")
 
-    # Validate attributes are all strings
     for key, value in attributes.items():
         if not isinstance(key, str):
             raise TypeError(f"Attribute key must be string, got {type(key)}")
@@ -283,18 +269,15 @@ def add_xml_child_element(parent: dict, child: dict) -> dict:
     if not isinstance(child, dict):
         raise TypeError("child must be a dictionary")
 
-    # Validate parent structure
     if "tag" not in parent:
         raise ValueError("parent must contain 'tag' key")
 
     if "children" not in parent:
         raise ValueError("parent must contain 'children' key")
 
-    # Validate child structure
     if "tag" not in child:
         raise ValueError("child must contain 'tag' key")
 
-    # Add child to parent's children list
     parent["children"].append(child)
 
     return parent
@@ -339,14 +322,12 @@ def set_xml_element_attribute(
     if not attribute_name.strip():
         raise ValueError("attribute_name cannot be empty")
 
-    # Validate element structure
     if "tag" not in element:
         raise ValueError("element must contain 'tag' key")
 
     if "attributes" not in element:
         raise ValueError("element must contain 'attributes' key")
 
-    # Set attribute
     element["attributes"][attribute_name] = attribute_value
 
     return element
@@ -389,14 +370,12 @@ def build_simple_xml(root_tag: str, elements: list[dict]) -> str:
     if not root_tag.strip():
         raise ValueError("root_tag cannot be empty")
 
-    # Validate all elements are dicts with required keys
     for i, elem in enumerate(elements):
         if not isinstance(elem, dict):
             raise TypeError(f"Element at index {i} must be a dictionary")
         if "tag" not in elem:
             raise ValueError(f"Element at index {i} missing 'tag' key")
 
-    # Create root element with children
     root_data = {
         "tag": root_tag,
         "attributes": {},
@@ -450,19 +429,16 @@ def xml_from_csv(csv_data: list[dict], root_tag: str, row_tag: str) -> str:
     if not row_tag.strip():
         raise ValueError("row_tag cannot be empty")
 
-    # Validate csv_data items are dicts
     for i, row in enumerate(csv_data):
         if not isinstance(row, dict):
             raise TypeError(f"Row at index {i} must be a dictionary")
 
-        # Validate all keys and values are strings
         for key, value in row.items():
             if not isinstance(key, str):
                 raise TypeError(f"Row {i} key must be string, got {type(key)}")
             if not isinstance(value, str):
                 raise TypeError(f"Row {i} value must be string, got {type(value)}")
 
-    # Convert each row to an element with attributes
     elements = []
     for row in csv_data:
         element = create_xml_element(row_tag, "", row)

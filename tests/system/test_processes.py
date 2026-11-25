@@ -26,7 +26,6 @@ class TestGetCurrentProcessInfo:
     @patch("basic_open_agent_tools.system.processes.psutil")
     def test_successful_current_process_info(self, mock_psutil):
         """Test successful current process information retrieval."""
-        # Mock process object
         mock_process = Mock()
         mock_process.pid = 1234
         mock_process.name.return_value = "python"
@@ -34,7 +33,6 @@ class TestGetCurrentProcessInfo:
         mock_process.cpu_percent.return_value = 15.5
         mock_process.memory_percent.return_value = 5.2
 
-        # Mock memory info
         mock_memory = Mock()
         mock_memory.rss = 50000000
         mock_memory.vms = 100000000
@@ -103,7 +101,6 @@ class TestListRunningProcesses:
     @patch("basic_open_agent_tools.system.processes.psutil")
     def test_successful_process_listing(self, mock_psutil):
         """Test successful process listing."""
-        # Mock process iterator
         mock_processes = []
         for i in range(5):
             mock_proc = Mock()
@@ -123,20 +120,17 @@ class TestListRunningProcesses:
         assert isinstance(result, list)
         assert len(result) == 5
 
-        # Check first process
         first_process = result[0]
         expected_keys = ["pid", "name", "status", "cpu_percent", "memory_percent"]
         for key in expected_keys:
             assert key in first_process
 
-        # Should be sorted by CPU usage (highest first)
         assert result[0]["cpu_percent"] >= result[-1]["cpu_percent"]
 
     @patch("basic_open_agent_tools.system.processes.HAS_PSUTIL", True)
     @patch("basic_open_agent_tools.system.processes.psutil")
     def test_process_access_denied_handling(self, mock_psutil):
         """Test handling of access denied errors."""
-        # Create mock exceptions
         Exception("Access denied")
         Exception("No such process")
 
@@ -145,7 +139,6 @@ class TestListRunningProcesses:
 
         mock_processes = []
 
-        # First process - accessible
         mock_proc1 = Mock()
         mock_proc1.info = {
             "pid": 1000,
@@ -156,9 +149,7 @@ class TestListRunningProcesses:
         }
         mock_processes.append(mock_proc1)
 
-        # Second process - access denied
         mock_proc2 = Mock()
-        # Make accessing .info raise an exception immediately
         type(mock_proc2).info = PropertyMock(side_effect=mock_psutil.AccessDenied())
         mock_processes.append(mock_proc2)
 
@@ -166,7 +157,6 @@ class TestListRunningProcesses:
 
         result = list_running_processes(limit=10)
 
-        # Should only return the accessible process
         assert len(result) == 1
         assert result[0]["name"] == "accessible_process"
 
@@ -174,7 +164,6 @@ class TestListRunningProcesses:
     @patch("basic_open_agent_tools.system.processes.psutil")
     def test_limit_enforcement(self, mock_psutil):
         """Test that the limit parameter is enforced."""
-        # Create more processes than the limit
         mock_processes = []
         for i in range(10):
             mock_proc = Mock()
@@ -224,7 +213,6 @@ class TestGetProcessInfo:
     @patch("basic_open_agent_tools.system.processes.psutil")
     def test_successful_process_info_retrieval(self, mock_psutil):
         """Test successful process information retrieval."""
-        # Mock process object
         mock_process = Mock()
         mock_process.pid = 1234
         mock_process.name.return_value = "test_process"
@@ -232,7 +220,6 @@ class TestGetProcessInfo:
         mock_process.cpu_percent.return_value = 25.0
         mock_process.memory_percent.return_value = 10.5
 
-        # Mock memory info
         mock_memory = Mock()
         mock_memory.rss = 75000000
         mock_memory.vms = 150000000
@@ -317,16 +304,13 @@ class TestIsProcessRunning:
     @patch("basic_open_agent_tools.system.processes.psutil")
     def test_process_running_found(self, mock_psutil):
         """Test finding a running process."""
-        # Mock process iterator
         mock_processes = []
 
-        # Create matching processes
         for i in range(2):
             mock_proc = Mock()
             mock_proc.info = {"pid": 1000 + i, "name": "python"}
             mock_processes.append(mock_proc)
 
-        # Create non-matching process
         mock_proc_other = Mock()
         mock_proc_other.info = {"pid": 2000, "name": "chrome"}
         mock_processes.append(mock_proc_other)
@@ -344,7 +328,6 @@ class TestIsProcessRunning:
     @patch("basic_open_agent_tools.system.processes.psutil")
     def test_process_not_running(self, mock_psutil):
         """Test when process is not running."""
-        # Mock process iterator with no matching processes
         mock_processes = []
         mock_proc = Mock()
         mock_proc.info = {"pid": 1000, "name": "chrome"}

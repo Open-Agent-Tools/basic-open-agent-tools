@@ -27,7 +27,6 @@ def _generate_content_preview(content: str, max_chars: int = 1200) -> str:
     preview = f"Writing {line_count} lines ({byte_size} bytes)\n"
 
     if content:
-        # Show first max_chars of content with actual formatting
         sample = content[:max_chars]
         truncated = len(content) > max_chars
 
@@ -105,8 +104,6 @@ def write_file_from_string(file_path: str, content: str, skip_confirm: bool) -> 
     logger.debug(f"File exists: {file_existed}, skip_confirm: {skip_confirm}")
 
     if file_existed:
-        # Check user confirmation (interactive prompt, agent error, or bypass)
-        # Show preview of NEW content being written, not old file size
         preview = _generate_content_preview(content)
         confirmed, decline_reason = check_user_confirmation(
             operation="overwrite existing file",
@@ -151,7 +148,6 @@ def append_to_file(file_path: str, content: str, skip_confirm: bool) -> str:
     Raises:
         FileSystemError: If append operation fails
     """
-    # Enhanced input logging for security auditing
     logger.debug(
         f"append_to_file: file_path='{file_path}', content='{content[:100]}{'...' if len(content) > 100 else ''}', skip_confirm={skip_confirm}"
     )
@@ -164,7 +160,6 @@ def append_to_file(file_path: str, content: str, skip_confirm: bool) -> str:
     line_count = len(content.splitlines()) if content else 0
     byte_size = len(content.encode("utf-8"))
 
-    # Generate preview for confirmation
     content_preview = content[:200] + ("..." if len(content) > 200 else "")
     preview = f"Appending {line_count} lines ({byte_size} bytes)\n"
     preview += "─" * 40 + "\n"
@@ -173,7 +168,6 @@ def append_to_file(file_path: str, content: str, skip_confirm: bool) -> str:
     if file_existed:
         preview += f"\nCurrent file size: {original_size} bytes"
 
-    # Check user confirmation
     confirmed, decline_reason = check_user_confirmation(
         operation="append to file",
         target=str(path),
@@ -259,7 +253,6 @@ def create_directory(directory_path: str, skip_confirm: bool) -> str:
     already_existed = path.exists()
 
     if already_existed:
-        # Check user confirmation (interactive prompt, agent error, or bypass)
         confirmed, decline_reason = check_user_confirmation(
             operation="use existing directory",
             target=str(path),
@@ -299,7 +292,6 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
     path = validate_path(file_path, "delete file")
 
     if not path.exists():
-        # For non-existent files, check if we need confirmation for the error suppression
         confirmed, decline_reason = check_user_confirmation(
             operation="suppress file-not-found error",
             target=str(path),
@@ -316,13 +308,11 @@ def delete_file(file_path: str, skip_confirm: bool) -> str:
     if not path.is_file():
         raise FileSystemError(f"Path is not a file: {path}")
 
-    # Get file info before deletion
     file_size = path.stat().st_size
 
     logger.info(f"Deleting file: {path} ({file_size} bytes)")
     logger.debug(f"skip_confirm: {skip_confirm}")
 
-    # Check user confirmation for deletion
     confirmed, decline_reason = check_user_confirmation(
         operation="delete file",
         target=str(path),
@@ -364,7 +354,6 @@ def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -
     path = validate_path(directory_path, "delete directory")
 
     if not path.exists():
-        # Check confirmation for error suppression
         confirmed, decline_reason = check_user_confirmation(
             operation="suppress directory-not-found error",
             target=str(path),
@@ -381,7 +370,6 @@ def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -
     if not path.is_dir():
         raise FileSystemError(f"Path is not a directory: {path}")
 
-    # Count contents before deletion
     try:
         contents = list(path.iterdir())
         item_count = len(contents)
@@ -391,9 +379,8 @@ def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -
                 f"Directory not empty: {path}. Use recursive=True to delete contents."
             )
     except OSError:
-        item_count = 0  # Can't read contents, proceed anyway
+        item_count = 0
 
-    # Check user confirmation for deletion
     preview = f"Contains {item_count} items" if item_count > 0 else "Empty directory"
     if recursive and item_count > 0:
         preview += " (recursive deletion)"
@@ -417,7 +404,7 @@ def delete_directory(directory_path: str, recursive: bool, skip_confirm: bool) -
             else:
                 return f"Deleted empty directory: {path}"
         else:
-            path.rmdir()  # Only works if directory is empty
+            path.rmdir()
             return f"Deleted empty directory: {path}"
     except OSError as e:
         raise FileSystemError(f"Failed to delete directory {path}: {e}")
@@ -446,7 +433,6 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
 
     destination_existed = dst_path.exists()
 
-    # Get source info before move
     is_directory = src_path.is_dir()
     if src_path.is_file():
         file_size = src_path.stat().st_size
@@ -468,7 +454,6 @@ def move_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
     )
 
     if destination_existed:
-        # Check user confirmation for overwrite
         confirmed, decline_reason = check_user_confirmation(
             operation=f"overwrite existing {item_type} during move",
             target=str(dst_path),
@@ -520,7 +505,6 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
 
     destination_existed = dst_path.exists()
 
-    # Get source info
     is_directory = src_path.is_dir()
     if src_path.is_file():
         file_size = src_path.stat().st_size
@@ -531,7 +515,6 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
             else None
         )
     else:
-        # Count directory contents
         try:
             contents = list(src_path.rglob("*"))
             file_count = len([p for p in contents if p.is_file()])
@@ -555,7 +538,6 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
     )
 
     if destination_existed:
-        # Check user confirmation for overwrite
         confirmed, decline_reason = check_user_confirmation(
             operation=f"overwrite existing {item_type} during copy",
             target=str(dst_path),
@@ -573,7 +555,7 @@ def copy_file(source_path: str, destination_path: str, skip_confirm: bool) -> st
             shutil.copy2(str(src_path), str(dst_path))
         else:
             if destination_existed:
-                shutil.rmtree(dst_path)  # Remove existing directory first
+                shutil.rmtree(dst_path)
             shutil.copytree(str(src_path), str(dst_path))
 
         action = "Copied and overwrote" if destination_existed else "Copied"
@@ -610,7 +592,6 @@ def replace_in_file(
     if not old_text:
         raise ValueError("old_text cannot be empty")
 
-    # Enhanced input logging for security auditing
     logger.debug(
         f"replace_in_file: file_path='{file_path}', old_text='{old_text[:100]}{'...' if len(old_text) > 100 else ''}', new_text='{new_text[:100]}{'...' if len(new_text) > 100 else ''}', count={count}, skip_confirm={skip_confirm}"
     )
@@ -622,21 +603,17 @@ def replace_in_file(
         raise FileSystemError(f"File not found: {path}")
 
     try:
-        # Read current content
         content = path.read_text(encoding="utf-8")
 
-        # Count total occurrences before replacement
         total_occurrences = content.count(old_text)
 
         if total_occurrences == 0:
             return f"No occurrences of '{old_text}' found in {path}"
 
-        # Calculate how many replacements will be made
         replacements_to_make = (
             total_occurrences if count == -1 else min(count, total_occurrences)
         )
 
-        # Generate preview for confirmation
         old_preview = old_text[:200] + ("..." if len(old_text) > 200 else "")
         new_preview = new_text[:200] + ("..." if len(new_text) > 200 else "")
         preview = f"Will replace {replacements_to_make} of {total_occurrences} occurrence(s)\n"
@@ -645,7 +622,6 @@ def replace_in_file(
         preview += f"New text: {new_preview}\n"
         preview += "─" * 40
 
-        # Check user confirmation
         confirmed, decline_reason = check_user_confirmation(
             operation="replace text in file",
             target=str(path),
@@ -658,14 +634,11 @@ def replace_in_file(
             logger.debug(f"Replace operation cancelled by user: {path}{reason_msg}")
             return f"Operation cancelled by user{reason_msg}: {path}"
 
-        # Perform replacement
         updated_content = content.replace(old_text, new_text, count)
 
-        # Count actual replacements made
         remaining_occurrences = updated_content.count(old_text)
         replacements_made = total_occurrences - remaining_occurrences
 
-        # Write back to file
         path.write_text(updated_content, encoding="utf-8")
 
         logger.info(
@@ -705,7 +678,6 @@ def insert_at_line(
     if line_number < 1:
         raise ValueError("line_number must be 1 or greater")
 
-    # Enhanced input logging for security auditing
     logger.debug(
         f"insert_at_line: file_path='{file_path}', line_number={line_number}, content='{content[:100]}{'...' if len(content) > 100 else ''}', skip_confirm={skip_confirm}"
     )
@@ -717,24 +689,19 @@ def insert_at_line(
         raise FileSystemError(f"File not found: {path}")
 
     try:
-        # Read current lines
         lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
         original_line_count = len(lines)
 
-        # Ensure content ends with newline if it doesn't already
         if content and not content.endswith("\n"):
             content += "\n"
 
-        # Insert at specified line (convert to 0-based index)
         insert_index = line_number - 1
 
-        # Determine position description for feedback
         if insert_index >= original_line_count:
             position_desc = f"end (after line {original_line_count})"
         else:
             position_desc = f"line {line_number}"
 
-        # Generate preview for confirmation
         content_lines = len(content.splitlines()) if content else 0
         content_preview = content[:200] + ("..." if len(content) > 200 else "")
         preview = f"Inserting {content_lines} line(s) at {position_desc}\n"
@@ -743,7 +710,6 @@ def insert_at_line(
         preview += f"Content: {content_preview}\n"
         preview += "─" * 40
 
-        # Check user confirmation
         confirmed, decline_reason = check_user_confirmation(
             operation="insert content in file",
             target=str(path),
@@ -756,13 +722,11 @@ def insert_at_line(
             logger.debug(f"Insert operation cancelled by user: {path}{reason_msg}")
             return f"Operation cancelled by user{reason_msg}: {path}"
 
-        # Perform insertion
         if insert_index >= original_line_count:
             lines.append(content)
         else:
             lines.insert(insert_index, content)
 
-        # Write back to file
         path.write_text("".join(lines), encoding="utf-8")
 
         new_line_count = len(lines)

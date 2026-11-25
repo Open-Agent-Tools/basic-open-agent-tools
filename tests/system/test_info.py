@@ -21,7 +21,6 @@ class TestGetSystemInfo:
         """Test successful system information retrieval."""
         result = get_system_info()
 
-        # Check that all expected keys are present
         expected_keys = [
             "system",
             "release",
@@ -37,11 +36,9 @@ class TestGetSystemInfo:
         for key in expected_keys:
             assert key in result
 
-        # Check that values are strings
         for _key, value in result.items():
             assert isinstance(value, str)
 
-        # Basic validation - system should not be empty
         assert len(result["system"]) > 0
 
 
@@ -58,7 +55,6 @@ class TestGetCpuInfo:
     @patch("basic_open_agent_tools.system.info.psutil")
     def test_successful_cpu_info_retrieval(self, mock_psutil):
         """Test successful CPU information retrieval."""
-        # Mock psutil functions
         mock_psutil.cpu_percent.return_value = 25.5
         mock_psutil.cpu_count.return_value = 4
         mock_freq = Mock()
@@ -114,7 +110,6 @@ class TestGetMemoryInfo:
     @patch("basic_open_agent_tools.system.info.psutil")
     def test_successful_memory_info_retrieval(self, mock_psutil):
         """Test successful memory information retrieval."""
-        # Mock virtual memory
         mock_vmem = Mock()
         mock_vmem.total = 8000000000
         mock_vmem.available = 4000000000
@@ -123,7 +118,6 @@ class TestGetMemoryInfo:
         mock_vmem.percent = 37.5
         mock_psutil.virtual_memory.return_value = mock_vmem
 
-        # Mock swap memory
         mock_swap = Mock()
         mock_swap.total = 2000000000
         mock_swap.used = 500000000
@@ -215,9 +209,8 @@ class TestGetDiskUsage:
         mock_psutil.disk_usage.return_value = mock_usage
 
         with patch("platform.system", return_value="Windows"):
-            get_disk_usage("/")  # Default path
+            get_disk_usage("/")
 
-            # Should be converted to C:\\ on Windows
             mock_psutil.disk_usage.assert_called_with("C:\\")
 
     @patch("basic_open_agent_tools.system.info.HAS_PSUTIL", True)
@@ -244,7 +237,6 @@ class TestGetUptime:
     @patch("basic_open_agent_tools.system.info.time")
     def test_successful_uptime_retrieval(self, mock_time, mock_psutil):
         """Test successful uptime retrieval."""
-        # Mock boot time (1 day, 2 hours, 30 minutes, 45 seconds ago)
         boot_timestamp = 1000000000
         current_timestamp = boot_timestamp + (24 * 3600) + (2 * 3600) + (30 * 60) + 45
 

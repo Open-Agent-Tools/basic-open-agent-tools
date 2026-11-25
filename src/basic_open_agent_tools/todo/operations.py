@@ -23,11 +23,10 @@ from .validation import (
     validate_title,
 )
 
-# Global in-memory storage
 _task_storage: dict[str, Any] = {
-    "tasks": {},  # Dict[int, Dict] - task_id -> task_data
-    "next_id": 1,  # Auto-incrementing counter
-    "total_count": 0,  # Total tasks created (for stats)
+    "tasks": {},
+    "next_id": 1,
+    "total_count": 0,
 }
 
 
@@ -83,7 +82,6 @@ def add_task(
         True
     """
     try:
-        # Validate inputs
         validate_title(title)
         validate_priority(priority)
         validate_notes(notes)
@@ -92,7 +90,6 @@ def add_task(
         validate_task_count(len(_task_storage["tasks"]))
         validate_dependencies(dependencies, _task_storage["tasks"], 0)
 
-        # Create new task
         task_id = _task_storage["next_id"]
         timestamp = _get_current_timestamp()
 
@@ -109,12 +106,10 @@ def add_task(
             "dependencies": dependencies,
         }
 
-        # Store task
         _task_storage["tasks"][task_id] = task
         _task_storage["next_id"] += 1
         _task_storage["total_count"] += 1
 
-        # Log task creation
         logger.info(
             f"[TODO] Created task #{task_id}: '{title}' "
             f"(priority: {priority}, tags: {tags or 'none'}, "
@@ -159,24 +154,20 @@ def list_tasks(status: str, tag: str) -> dict[str, Any]:
         2
     """
     try:
-        # Validate status filter if provided
         if status:
             validate_status(status)
 
         tasks = list(_task_storage["tasks"].values())
         original_count = len(tasks)
 
-        # Apply filters
         if status:
             tasks = [task for task in tasks if task["status"] == status]
 
         if tag:
             tasks = [task for task in tasks if tag in task["tags"]]
 
-        # Sort by ID for consistent ordering
         tasks.sort(key=lambda x: x["id"])
 
-        # Log task listing with filters
         filter_desc = []
         if status:
             filter_desc.append(f"status={status}")
@@ -310,12 +301,10 @@ def update_task(
             dependencies, _task_storage["tasks"], exclude_task_id=task_id
         )
 
-        # Get current task for logging changes
         task = _task_storage["tasks"][task_id]
         old_status = task["status"]
         old_priority = task["priority"]
 
-        # Update task
         task.update(
             {
                 "title": title,
@@ -329,7 +318,6 @@ def update_task(
             }
         )
 
-        # Log changes
         changes = []
         if old_status != status:
             changes.append(f"status: {old_status} → {status}")
@@ -373,14 +361,11 @@ def delete_task(task_id: int, skip_confirm: bool) -> str:
     try:
         validate_task_exists(task_id, _task_storage["tasks"])
 
-        # Get task info before deletion for feedback
         task = _task_storage["tasks"][task_id]
         task_title = task.get("title", "Untitled")
         task_status = task.get("status", "unknown")
 
-        # Check if task is important (e.g., in_progress) and require confirmation
         if task_status == "in_progress":
-            # Check user confirmation
             confirmed, decline_reason = check_user_confirmation(
                 operation="delete in-progress task",
                 target=f"Task {task_id}: {task_title}",
@@ -395,7 +380,6 @@ def delete_task(task_id: int, skip_confirm: bool) -> str:
                 )
                 return f"Operation cancelled by user{reason_msg}: Task {task_id}"
 
-        # Remove task
         del _task_storage["tasks"][task_id]
 
         logger.info(
@@ -436,7 +420,6 @@ def complete_task(task_id: int) -> dict[str, Any]:
     try:
         validate_task_exists(task_id, _task_storage["tasks"])
 
-        # Update status and timestamp
         task = _task_storage["tasks"][task_id]
         old_status = task["status"]
         task["status"] = "completed"
@@ -481,7 +464,6 @@ def get_task_stats() -> dict[str, Any]:
         tasks = list(_task_storage["tasks"].values())
         total = len(tasks)
 
-        # Count by status
         status_counts = {}
         for status in [
             "open",
@@ -493,14 +475,12 @@ def get_task_stats() -> dict[str, Any]:
         ]:
             status_counts[status] = len([t for t in tasks if t["status"] == status])
 
-        # Count by priority
         priority_counts = {}
         for priority in ["low", "medium", "high", "urgent"]:
             priority_counts[priority] = len(
                 [t for t in tasks if t["priority"] == priority]
             )
 
-        # Other stats
         tasks_with_dependencies = len([t for t in tasks if t["dependencies"]])
 
         logger.info(
@@ -544,7 +524,6 @@ def clear_all_tasks() -> dict[str, Any]:
     try:
         cleared_count = len(_task_storage["tasks"])
 
-        # Reset storage
         _task_storage["tasks"] = {}
         _task_storage["next_id"] = 1
         _task_storage["total_count"] = 0

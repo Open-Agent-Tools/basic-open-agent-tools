@@ -39,7 +39,6 @@ class TestCreateSimpleDocx:
                         str(docx_file), "Test content", skip_confirm=True
                     )
 
-            # Verify document methods were called
             mock_doc.add_paragraph.assert_called_once_with("Test content")
             mock_doc.save.assert_called_once_with(str(docx_file))
 
@@ -117,7 +116,6 @@ class TestCreateDocxFromParagraphs:
                     str(docx_file), paragraphs, skip_confirm=True
                 )
 
-            # Verify add_paragraph was called for each paragraph
             assert mock_doc.add_paragraph.call_count == 3
             mock_doc.save.assert_called_once()
 
@@ -289,7 +287,6 @@ class TestCreateDocxWithHeadings:
                     str(docx_file), sections, skip_confirm=True
                 )
 
-            # Verify headings and paragraphs were added
             assert mock_doc.add_heading.call_count == 2
             assert mock_doc.add_paragraph.call_count == 2
             mock_doc.save.assert_called_once()
@@ -337,7 +334,6 @@ class TestAddTableToDocx:
             mock_table = Mock()
             mock_table.rows = []
 
-            # Create mock rows and cells
             for _ in range(3):
                 mock_row = Mock()
                 mock_cell_1 = Mock()
@@ -406,7 +402,7 @@ class TestCreateDocxFromTemplate:
             mock_run.text = "Hello {{name}}, today is {{date}}"
             mock_para.runs = [mock_run]
             mock_doc.paragraphs = [mock_para]
-            mock_doc.tables = []  # Empty tables list
+            mock_doc.tables = []
             mock_doc.save = Mock()
 
             with patch(
@@ -496,7 +492,6 @@ class TestDocxToText:
                             str(docx_file), str(text_file), skip_confirm=True
                         )
 
-                    # Verify text file was written
                     mock_file.write.assert_called()
 
         assert "Converted" in result

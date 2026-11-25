@@ -31,7 +31,6 @@ def base64_encode(data: str) -> dict[str, Union[str, int]]:
     logger.debug(f"Encoding {len(data)} chars to Base64")
 
     try:
-        # Encode string to bytes, then to base64
         data_bytes = data.encode("utf-8")
         encoded_bytes = base64.b64encode(data_bytes)
         encoded_string = encoded_bytes.decode("ascii")
@@ -76,7 +75,6 @@ def base64_decode(encoded_data: str) -> dict[str, Union[str, int]]:
         raise BasicAgentToolsError("Encoded data cannot be empty")
 
     try:
-        # Decode from base64
         encoded_bytes = encoded_data.encode("ascii")
         decoded_bytes = base64.b64decode(encoded_bytes)
         decoded_string = decoded_bytes.decode("utf-8")
@@ -196,7 +194,6 @@ def hex_encode(data: str) -> dict[str, Union[str, int]]:
     logger.debug(f"Hex encoding {len(data)} chars")
 
     try:
-        # Encode string to bytes, then to hex
         data_bytes = data.encode("utf-8")
         hex_string = data_bytes.hex()
 
@@ -242,11 +239,9 @@ def hex_decode(encoded_data: str) -> dict[str, Union[str, int]]:
     encoded_data = encoded_data.strip()
 
     try:
-        # Validate hex string
         if len(encoded_data) % 2 != 0:
             raise BasicAgentToolsError("Hex string must have even number of characters")
 
-        # Decode from hex
         decoded_bytes = bytes.fromhex(encoded_data)
         decoded_string = decoded_bytes.decode("utf-8")
 

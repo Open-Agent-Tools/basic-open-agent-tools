@@ -4,7 +4,6 @@
 import sys
 from pathlib import Path
 
-# Add project root to path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
@@ -16,7 +15,6 @@ def test_direct_tool():
     """Test the tool directly first."""
     print("🔧 Testing tool directly:")
     try:
-        # Test with both max_depth=1 and max_depth=2 to see the difference
         print("With max_depth=1:")
         result1 = generate_directory_tree(".", 1, False)
         print(result1)
@@ -50,7 +48,6 @@ if __name__ == "__main__":
         print("✅ Tool is working!")
         print(f"📋 Actual directory tree output:\n{repr(tool_result)}")
 
-        # Suggest a reasonable expected response substring
         lines = tool_result.split("\n")
         if len(lines) > 0:
             first_line = lines[0].strip()
